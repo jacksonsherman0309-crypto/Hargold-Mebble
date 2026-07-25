@@ -1,0 +1,55 @@
+{
+  "build": 17,
+  "physicsFeatureSetComplete": true,
+  "universalForBothHeroes": [
+    "walk",
+    "run",
+    "skid",
+    "turnaround",
+    "variable jump",
+    "running jump",
+    "triple jump",
+    "coyote jump",
+    "buffered jump",
+    "wall slide",
+    "wall jump",
+    "crouch",
+    "duck slide",
+    "slope slide",
+    "slide jump",
+    "spin jump",
+    "air spin",
+    "fast fall",
+    "ground slam",
+    "stomp bounce",
+    "swimming",
+    "diving",
+    "surface breach",
+    "fence climb",
+    "vine climb",
+    "ladder climb",
+    "rope swing",
+    "carry",
+    "drop",
+    "throw",
+    "moving-platform transport",
+    "one-way drop-through"
+  ],
+  "heroSpecificAdditions": {
+    "Hargold": [
+      "unlockable double jump",
+      "Hargold-only block breaking"
+    ],
+    "Mebble": [
+      "higher jump",
+      "cape glide"
+    ]
+  },
+  "nonPhysicsRigDependencies": [
+    "authored animation clips",
+    "foot locking",
+    "stride synchronization",
+    "cape and cloth motion",
+    "mesh-measured collider tuning"
+  ]
+}
