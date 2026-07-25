@@ -1,0 +1,64 @@
+{
+  "build": "009",
+  "tests": [
+    {
+      "name": "preview_assets_loaded",
+      "pass": true,
+      "details": {
+        "loaded": 29,
+        "expected": 29,
+        "state": "play",
+        "x": 510,
+        "hero": "Hargold",
+        "mobStates": [
+          "walk",
+          "walk"
+        ]
+      }
+    },
+    {
+      "name": "preview_state_play",
+      "pass": true
+    },
+    {
+      "name": "run_acceleration_and_grounding",
+      "pass": true,
+      "details": {
+        "x": 622.6833333333321,
+        "vx": 286,
+        "state": "run",
+        "bottom": 381.50017543859633,
+        "gy": 381.50017543859633
+      }
+    },
+    {
+      "name": "jump_takeoff",
+      "pass": true,
+      "details": {
+        "vy": -390.8333333333334,
+        "onGround": false,
+        "state": "rise"
+      }
+    },
+    {
+      "name": "jump_lands_grounded",
+      "pass": true,
+      "details": {
+        "onGround": true,
+        "state": "land_soft",
+        "bottom": 389.25035087719255,
+        "gy": 389.25035087719255
+      }
+    },
+    {
+      "name": "hero_swap",
+      "pass": true,
+      "details": {
+        "before": "Hargold",
+        "after": "Mebble"
+      }
+    }
+  ],
+  "pass": true,
+  "errors": []
+}
