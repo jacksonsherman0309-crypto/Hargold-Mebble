@@ -27,6 +27,7 @@ export class CharacterRenderer {
     this.onProgress = onProgress;
     this.models = new Map();
     this.failed = new Set();
+    this.courseAssetsReady = false;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x78c9e7);
     this.camera = new THREE.OrthographicCamera(
@@ -44,29 +45,46 @@ export class CharacterRenderer {
     this.renderer.setSize(width, height, false);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.08;
+    this.renderer.toneMappingExposure = 1.16;
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.domElement.className = 'character-layer';
     this.renderer.domElement.setAttribute('aria-hidden', 'true');
     mount.append(this.renderer.domElement);
 
-    this.scene.add(new THREE.HemisphereLight(0xfff4d3, 0x29452f, 2.25));
-    const key = new THREE.DirectionalLight(0xffd5aa, 4.4);
+    this.scene.fog = new THREE.Fog(0x9fd7d1, 700, 1800);
+    this.scene.add(new THREE.HemisphereLight(0xfff4d3, 0x29452f, 2.55));
+    const key = new THREE.DirectionalLight(0xffe1b8, 4.8);
     key.position.set(-260, 380, 520);
+    key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.camera.left = -900;
+    key.shadow.camera.right = 900;
+    key.shadow.camera.top = 700;
+    key.shadow.camera.bottom = -700;
     this.scene.add(key);
     const rim = new THREE.DirectionalLight(0x91c7ff, 2.4);
     rim.position.set(320, 220, -180);
     this.scene.add(rim);
     this.world = new THREE.Group();
     this.scene.add(this.world);
+    this.backgroundFar = new THREE.Group();
+    this.backgroundMid = new THREE.Group();
+    this.scene.add(this.backgroundFar, this.backgroundMid);
     this.collectibleMeshes = [];
+    this.blockSlots = [];
+    this.platformSlots = [];
     this.mobMeshes = new Map();
     this.projectileMeshes = new Map();
+    this.loader = new GLTFLoader();
     this.buildMeadowWake();
 
-    this.loader = new GLTFLoader();
     this.loadPromise = Promise.allSettled(
-      Object.entries(MODEL_SPECS).map(([hero, spec]) => this.loadHero(hero, spec))
+      [
+        ...Object.entries(MODEL_SPECS).map(([hero, spec]) => this.loadHero(hero, spec)),
+        this.loadMeadowWakeAssets()
+      ]
     ).then(() => this.onProgress(this.statusText()));
   }
 
@@ -78,6 +96,67 @@ export class CharacterRenderer {
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
     mesh.name = name;
     mesh.position.set(x, y, 0);
+    this.world.add(mesh);
+    return mesh;
+  }
+
+  terrainSegment(name, x0, x1, top0, top1, material, depth = 170, bottom = -480) {
+    const front = depth / 2;
+    const back = -depth / 2;
+    const vertices = new Float32Array([
+      x0, top0, front, x1, top1, front, x0, bottom, front, x1, bottom, front,
+      x0, top0, back, x1, top1, back, x0, bottom, back, x1, bottom, back
+    ]);
+    const indices = [
+      0, 2, 1, 1, 2, 3,
+      5, 6, 4, 7, 6, 5,
+      0, 1, 4, 1, 5, 4,
+      2, 6, 3, 3, 6, 7,
+      0, 4, 2, 2, 4, 6,
+      1, 3, 5, 3, 7, 5
+    ];
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.name = name;
+    mesh.receiveShadow = true;
+    this.world.add(mesh);
+    return mesh;
+  }
+
+  terrainStrip(name, start, end, heightAt, material, scale = 70, depth = 170) {
+    const front = depth / 2;
+    const back = -depth / 2;
+    const bottom = -480;
+    const samples = [];
+    for (let x = start; x < end; x += 0.25) samples.push(x);
+    samples.push(end);
+    const vertices = [];
+    for (const x of samples) {
+      const top = this.height / 2 - heightAt(x) * scale;
+      vertices.push(x * scale, top, front, x * scale, bottom, front);
+      vertices.push(x * scale, top, back, x * scale, bottom, back);
+    }
+    const indices = [];
+    for (let index = 0; index < samples.length - 1; index += 1) {
+      const a = index * 4;
+      const b = a + 4;
+      indices.push(
+        a, a + 1, b, b, a + 1, b + 1,
+        a + 2, b + 2, a + 3, b + 2, b + 3, a + 3,
+        a, b, a + 2, b, b + 2, a + 2,
+        a + 1, a + 3, b + 1, b + 1, a + 3, b + 3
+      );
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.name = name;
+    mesh.receiveShadow = true;
     this.world.add(mesh);
     return mesh;
   }
@@ -97,11 +176,31 @@ export class CharacterRenderer {
     const grass = this.material(0x5f9d42), soil = this.material(0x4a3423);
     const stone = this.material(0x53605a), wood = this.material(0x704523), leaf = this.material(0x2f6c35);
     const gold = new THREE.MeshStandardMaterial({ color: 0xf5bd32, roughness: 0.28, metalness: 0.55 });
-    for (let x = 0.25; x < 36; x += 0.5) {
-      if (inPit(x)) continue;
-      const top = heightAt(x) * scale;
-      this.box('authored-terrain', x * scale, this.height / 2 - top - 125, 38, 250, 165, soil);
-      this.box('grass-cap', x * scale, this.height / 2 - top + 5, 39, 14, 170, grass);
+    for (const [start, end] of [[0, 9.4], [10.8, 21.1], [22.7, 30.1], [31.5, 36]]) {
+      this.terrainStrip('authored-continuous-terrain', start, end, heightAt, soil);
+    }
+    for (let x = 0; x < 36; x += 0.5) {
+      const x1 = Math.min(36, x + 0.5);
+      if (inPit(x + 0.25)) continue;
+      const top0 = this.height / 2 - heightAt(x) * scale;
+      const top1 = this.height / 2 - heightAt(x1) * scale;
+      this.terrainSegment('living-grass-rim', x * scale, x1 * scale, top0 + 9, top1 + 9, grass, 178, Math.min(top0, top1) - 4);
+      if (x < 10 || Math.round(x * 2) % 3 === 0) {
+        for (let detail = 0; detail < 2; detail += 1) {
+          const detailX = (x + 0.13 + detail * 0.23) * scale;
+          const detailTop = this.height / 2 - heightAt(x + 0.13 + detail * 0.23) * scale;
+          const rock = new THREE.Mesh(
+            new THREE.DodecahedronGeometry(9 + ((x * 7 + detail * 3) % 5), 0),
+            this.material(detail % 2 ? 0x59442f : 0x6b5035)
+          );
+          rock.name = 'terrain-rock-cladding';
+          rock.scale.set(1.25, 0.76, 0.45);
+          rock.position.set(detailX, detailTop - 17 - detail * 16, 88);
+          rock.rotation.z = (x + detail) * 0.41;
+          rock.castShadow = true;
+          this.world.add(rock);
+        }
+      }
     }
     for (const x of [2.2, 5.8, 12.4, 17.2, 25.6, 33.8]) {
       const top = this.height / 2 - heightAt(x) * scale;
@@ -115,15 +214,20 @@ export class CharacterRenderer {
       }
     }
     for (const [x, y, width, height] of [[7.9, 6.25, 2.2, .35], [11.6, 6.5, 1.5, .3], [15.1, 5.55, 1.8, .32], [23.7, 5.65, 2, .32], [27.3, 6.1, 1.5, .3], [32.8, 5.7, 1.8, .32]]) {
-      this.box('authored-platform', x * scale, this.height / 2 - y * scale, width * scale, height * scale, 125, stone);
-      this.box('platform-grass', x * scale, this.height / 2 - y * scale + height * scale / 2, width * scale + 2, 9, 130, grass);
+      const core = this.box('authored-platform', x * scale, this.height / 2 - y * scale, width * scale, height * scale, 125, stone);
+      const cap = this.box('platform-grass', x * scale, this.height / 2 - y * scale + height * scale / 2, width * scale + 2, 9, 130, grass);
+      this.platformSlots.push({ x, y, width, height, core, cap });
     }
     for (let x = 18.3; x <= 20.1; x += .24) {
       const plank = this.box('rope-bridge-plank', x * scale, this.height / 2 - 6.25 * scale + Math.sin((x - 18.3) * Math.PI) * 16, 15, 12, 105, wood);
       plank.rotation.z = Math.cos((x - 18.3) * Math.PI) * .08;
     }
-    for (const x of [6.4, 6.95, 13.5, 14.05, 26.15, 26.7]) this.box('breakable-block', x * scale, this.height / 2 - (heightAt(x) - 1.45) * scale, 36, 36, 82, stone);
-    this.box('hargold-only-block', 28.7 * scale, this.height / 2 - (heightAt(28.7) - 1.45) * scale, 44, 44, 86, this.material(0x6d553c));
+    for (const x of [6.4, 6.95, 13.5, 14.05, 26.15, 26.7]) {
+      const block = this.box('breakable-block', x * scale, this.height / 2 - (heightAt(x) - 1.45) * scale, 36, 36, 82, stone);
+      this.blockSlots.push({ type: 'breakable', placeholder: block });
+    }
+    const hargoldBlock = this.box('hargold-only-block', 28.7 * scale, this.height / 2 - (heightAt(28.7) - 1.45) * scale, 44, 44, 86, this.material(0x6d553c));
+    this.blockSlots.push({ type: 'hargold', placeholder: hargoldBlock });
     [3.5, 6.8, 8.7, 12.5, 15.2, 18.4, 23.5, 26.2, 29.1, 33.2].forEach((x, index) => {
       const coin = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 4, 24), gold);
       coin.rotation.x = Math.PI / 2;
@@ -159,11 +263,36 @@ export class CharacterRenderer {
       finial.position.set(x * scale, groundY + 155, 8);
       this.world.add(finial);
     }
-    const mountainMaterial = this.material(0x789a83);
-    for (let x = -300; x < 3000; x += 260) {
-      const mountain = new THREE.Mesh(new THREE.ConeGeometry(180, 420, 7), mountainMaterial);
-      mountain.position.set(x, 115, -520);
-      this.world.add(mountain);
+    const farMountain = this.material(0x91aaa1);
+    const midMountain = this.material(0x587e61);
+    for (let x = -500; x < 3200; x += 380) {
+      const mountain = new THREE.Mesh(new THREE.ConeGeometry(240, 520, 9), farMountain);
+      mountain.position.set(x, 105 + (x % 3) * 12, -720);
+      mountain.rotation.y = x * 0.007;
+      this.backgroundFar.add(mountain);
+    }
+    for (let x = -350; x < 3200; x += 310) {
+      const hill = new THREE.Mesh(new THREE.IcosahedronGeometry(190, 2), midMountain);
+      hill.scale.set(1.3, 0.72, 0.45);
+      hill.position.set(x, -130 + (x % 4) * 9, -610);
+      this.backgroundMid.add(hill);
+    }
+    const cloudMaterial = new THREE.MeshStandardMaterial({
+      color: 0xf7fbf1,
+      roughness: 1,
+      transparent: true,
+      opacity: 0.78
+    });
+    for (let x = -300; x < 2700; x += 520) {
+      const cloud = new THREE.Group();
+      for (const [dx, radius] of [[-55, 42], [0, 62], [58, 38]]) {
+        const puff = new THREE.Mesh(new THREE.SphereGeometry(radius, 18, 12), cloudMaterial);
+        puff.scale.y = 0.55;
+        puff.position.x = dx;
+        cloud.add(puff);
+      }
+      cloud.position.set(x, 245 + (x % 5) * 9, -760);
+      this.backgroundFar.add(cloud);
     }
   }
 
@@ -237,6 +366,95 @@ export class CharacterRenderer {
     this.world.add(group);
   }
 
+  prepareImportedAsset(root) {
+    root.traverse(object => {
+      object.frustumCulled = false;
+      if (!object.isMesh) return;
+      object.castShadow = true;
+      object.receiveShadow = true;
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      for (const importedMaterial of materials) {
+        if (!importedMaterial) continue;
+        importedMaterial.side = THREE.DoubleSide;
+        importedMaterial.needsUpdate = true;
+      }
+    });
+    return root;
+  }
+
+  async loadMeadowWakeAssets() {
+    this.onProgress('Loading Meadow Wake production-intent assets...');
+    try {
+      const [environmentGltf, critterGltf, shellbackGltf, breakableGltf, hargoldBlockGltf, ledgeGltf] = await Promise.all([
+        this.loader.loadAsync(new URL('../assets/exports/world-1/meadow_wake_opening_environment.glb', import.meta.url).href),
+        this.loader.loadAsync(new URL('../assets/exports/world-1/camp_critter.glb', import.meta.url).href),
+        this.loader.loadAsync(new URL('../assets/exports/world-1/shellback.glb', import.meta.url).href),
+        this.loader.loadAsync(new URL('../assets/exports/world-1/breakable_block.glb', import.meta.url).href),
+        this.loader.loadAsync(new URL('../assets/exports/world-1/hargold_block.glb', import.meta.url).href),
+        this.loader.loadAsync(new URL('../assets/exports/world-1/meadow_ledge.glb', import.meta.url).href)
+      ]);
+      const environment = this.prepareImportedAsset(environmentGltf.scene);
+      environment.name = 'MeadowWake_AuthoredOpeningEnvironment';
+      environment.scale.setScalar(70);
+      environment.position.set(0, this.height / 2 - 7.9 * 70, -12);
+      this.world.add(environment);
+
+      const templates = {
+        camp_critter: this.prepareImportedAsset(critterGltf.scene),
+        shellback: this.prepareImportedAsset(shellbackGltf.scene)
+      };
+      for (const [id, group] of this.mobMeshes) {
+        const type = id.includes('shellback') ? 'shellback' : 'camp_critter';
+        const warning = group.getObjectByName('warning');
+        for (const child of [...group.children]) {
+          if (child !== warning) group.remove(child);
+        }
+        const model = templates[type].clone(true);
+        model.name = type === 'shellback' ? 'ShellbackVisual' : 'CampCritterVisual';
+        model.scale.setScalar(type === 'shellback' ? 58 : 54);
+        model.rotation.y = Math.PI / 2;
+        group.add(model);
+      }
+      const blockTemplates = {
+        breakable: this.prepareImportedAsset(breakableGltf.scene),
+        hargold: this.prepareImportedAsset(hargoldBlockGltf.scene)
+      };
+      for (const slot of this.blockSlots) {
+        const importedBlock = blockTemplates[slot.type].clone(true);
+        importedBlock.name = slot.type === 'hargold' ? 'HargoldOnlyBlockVisual' : 'BreakableBlockVisual';
+        importedBlock.scale.setScalar(slot.type === 'hargold' ? 44 : 40);
+        importedBlock.position.set(
+          slot.placeholder.position.x,
+          slot.placeholder.position.y - (slot.type === 'hargold' ? 22 : 20),
+          slot.placeholder.position.z + 4
+        );
+        importedBlock.rotation.y = slot.type === 'breakable' ? Math.PI : 0;
+        slot.placeholder.visible = false;
+        this.world.add(importedBlock);
+      }
+      const ledgeTemplate = this.prepareImportedAsset(ledgeGltf.scene);
+      for (const slot of this.platformSlots) {
+        const ledge = ledgeTemplate.clone(true);
+        ledge.name = 'AuthoredMeadowLedgeVisual';
+        ledge.scale.set(70 * slot.width / 2, 70, 70);
+        ledge.position.set(
+          slot.x * 70,
+          this.height / 2 - slot.y * 70 - slot.height * 35,
+          2
+        );
+        slot.core.visible = false;
+        slot.cap.visible = false;
+        this.world.add(ledge);
+      }
+      this.courseAssetsReady = true;
+      this.onProgress(this.statusText());
+    } catch (error) {
+      console.error('Unable to load Meadow Wake production-intent assets', error);
+      this.failed.add('Meadow Wake art kit');
+      this.onProgress(this.statusText());
+    }
+  }
+
   async loadHero(hero, spec) {
     this.onProgress(`Loading ${hero} 3D model...`);
     try {
@@ -276,7 +494,9 @@ export class CharacterRenderer {
   }
 
   statusText() {
-    if (this.models.size === Object.keys(MODEL_SPECS).length) return '3D characters ready';
+    if (this.models.size === Object.keys(MODEL_SPECS).length && this.courseAssetsReady) {
+      return '3D characters + Meadow Wake art kit ready';
+    }
     if (this.failed.size) return `3D fallback active (${[...this.failed].join(', ')} failed)`;
     return `Loading 3D characters ${this.models.size}/${Object.keys(MODEL_SPECS).length}`;
   }
@@ -318,7 +538,7 @@ export class CharacterRenderer {
       group.position.set(mob.x * 70, this.height / 2 - mob.y * 70, 42);
       group.scale.x = mob.direction < 0 ? -1 : 1;
       const shellShape = ['shell-idle', 'shell-wake', 'shell-roll'].includes(mob.state);
-      const head = group.getObjectByName('head');
+      const head = group.getObjectByName('head') || group.getObjectByName('ShellbackHead');
       if (head) head.visible = mob.type !== 'shellback' || !shellShape;
       const warning = group.getObjectByName('warning');
       if (warning) warning.visible = Boolean(mob.warning);
@@ -379,6 +599,8 @@ export class CharacterRenderer {
     projectiles = []
   }, deltaSeconds) {
     this.world.position.x = -cameraX - this.width / 2;
+    this.backgroundFar.position.x = -cameraX * 0.06;
+    this.backgroundMid.position.x = -cameraX * 0.16;
     for (const mesh of this.collectibleMeshes) {
       const source = mesh.userData.kind === 'coin' ? coins[mesh.userData.index] : compassCoins[mesh.userData.index];
       mesh.visible = !source?.taken;

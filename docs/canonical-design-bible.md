@@ -63,19 +63,34 @@ The latest approved Hargold and Mebble model is locked. Do not change proportion
 - Text printed on a PNG such as “fully rigged,” topology counts, software names, or material claims is descriptive reference content, not proof that editable meshes, armatures, weights, materials, or animation files exist in the repository.
 - The separate gameplay-quality image supplied on July 25, 2026 is a lighting, rendering, environment-density, camera, UI-polish, and overall finish target only. It does not override the locked hero sheets or canonical gameplay rules.
 
+### Production character quality
+
+- The rejected blockout geometry and its animation clips are superseded. Replacement hero sources must be built from empty Blender scenes and must not reuse prior character geometry.
+- The replacement must preserve the locked identities, silhouettes, proportions, clothing, colors, accessories, and defining facial features above.
+- Production meshes require smooth rounded topology, clean deformation edge flow, sculpted faces, expressive brows, detailed hands and boots, layered garments, authored cloth folds, clean UVs, optimized game topology, and planned LODs.
+- Final materials require authored PBR texture sets, including base color, roughness, normal detail, and ambient-occlusion support where appropriate. Procedural flat-color materials are not a final substitute.
+- Production rigs require IK/FK limbs, finger articulation, eye, brow, jaw and mouth controls, gameplay sockets, and secondary controls for Hargold's hat, feather and scarf and Mebble's hat, cape and clothing.
+- Every gameplay clip must be newly authored with readable anticipation, controlled squash and stretch, follow-through, overlapping secondary motion, lively idle posing, reliable foot contacts, and seamless state blending.
+- Nintendo games may be used only as a broad craftsmanship, readability, responsiveness, and finish benchmark. Do not copy proprietary tuning values, poses, animation data, code, meshes, materials, textures, or protected designs.
+
 ## 4. Core movement
 
 - Smooth acceleration and responsive deceleration.
+- Both heroes use the same shared horizontal base-controller tuning for walking, running, sprinting, turning, braking, and air control.
+- Walk, run, and sprint are separate locomotion targets with seamless speed-driven blending.
 - Precise, readable jump arcs.
 - Variable jump height based on input hold duration.
 - Coyote time and jump buffering are allowed for responsiveness.
 - Wall jumps are universal for both Hargold and Mebble.
 - All required main-route jumps must be possible for Hargold in the intended state.
 - Mebble jumps slightly higher than Hargold.
+- The required character state set includes crouch, crawl, slide, rolling momentum, wall reaction, ledge stop, look up, duck, landing recovery, hurt, and victory in addition to the existing universal movement baseline.
+- Animation presentation cannot alter deterministic gameplay outcomes or introduce unrestricted depth movement.
 - Normal control mapping remains consistent through cinematic camera movement.
 
 ### Hargold movement/ability
 
+- Uses the shared horizontal base controller without a speed penalty.
 - Can break Hargold-only blocks and heavy barriers.
 - Heavy-rock enemies can only be defeated by Hargold’s ground slam.
 - Gains double jump as a learned progression skill.
@@ -84,6 +99,7 @@ The latest approved Hargold and Mebble model is locked. Do not change proportion
 
 ### Mebble movement/ability
 
+- Uses the shared horizontal base controller and retains the slightly higher jump.
 - Innate cape parachute/slow-fall.
 - Holding glide during descent slows vertical speed and permits limited horizontal correction.
 - Glide cannot generate infinite height or unrestricted flight.

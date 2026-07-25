@@ -27,10 +27,14 @@ This is the authoritative gameplay specification for Codex and all collaborators
 
 - Use smooth acceleration rather than immediately snapping to maximum speed.
 - Deceleration must remain responsive enough for precise landings.
+- Hargold and Mebble share identical horizontal base-controller tuning for walk, run, sprint, turning, braking, and air control.
+- Walk, run, and sprint are distinct speed targets and animation states.
 - Jump height should respond to how long the jump control is held.
 - Coyote time and jump buffering may be used to improve responsiveness without making jumps automatic.
 - All mandatory progression jumps must be possible with Hargold in the intended state.
 - Mebble jumps slightly higher than Hargold.
+- Required presentation states include crouch, crawl, slide, rolling momentum, wall reaction, ledge stop, look up, duck, landing recovery, hurt, and victory.
+- Movement and animation blending should be energetic and readable while deterministic simulation remains authoritative and root motion remains disabled by default.
 - The gameplay plane remains linear even when visual paths curve or the camera moves through depth.
 
 ## 4. Hero swapping
@@ -45,6 +49,7 @@ This is the authoritative gameplay specification for Codex and all collaborators
 ## 5. Hargold mechanics
 
 - Shorter, wider, heavier hero.
+- Uses the shared horizontal base controller without a movement-speed penalty.
 - Can break Hargold-only blocks and designated heavy barriers.
 - Must be capable of all required progression jumps.
 - Gains a double jump as a learned progression skill.
@@ -55,6 +60,7 @@ This is the authoritative gameplay specification for Codex and all collaborators
 ## 6. Mebble mechanics
 
 - Taller, thinner hero.
+- Uses the shared horizontal base controller.
 - Jumps slightly higher than Hargold.
 - Has an innate cape parachute/glide.
 - Holding glide while descending slows the fall and permits limited horizontal correction or a short glide.

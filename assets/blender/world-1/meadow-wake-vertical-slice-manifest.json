@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "courseId": "1-1",
+  "courseName": "Meadow Wake",
+  "status": "production-intent-opening-vertical-slice-wip",
+  "canonSource": [
+    "docs/canonical-design-bible.md",
+    "docs/level-production-plan.md",
+    "archive/imported-packages/20260725-110552/loose-files/world_1_construction_plan.md"
+  ],
+  "scope": {
+    "implemented": [
+      "authored camp-opening environment GLB",
+      "layered X/Z gameplay and Y-depth scenery",
+      "Camp Critter production-intent mesh",
+      "Shellback production-intent mesh",
+      "standard breakable block mesh",
+      "Hargold-only reinforced block mesh",
+      "scalable meadow ledge mesh",
+      "runtime GLB loading and state-driven mob presentation"
+    ],
+    "remaining": [
+      "final sculpt and topology review",
+      "authored UV texture maps",
+      "enemy armatures and complete animation clips",
+      "destruction fragments and VFX",
+      "complete Meadow Wake environment art pass",
+      "LOD and compressed-texture mobile optimization",
+      "final lighting and target-device art approval"
+    ]
+  },
+  "assets": {
+    "environment": {
+      "source": "meadow_wake_opening_environment.blend",
+      "runtime": "../../exports/world-1/meadow_wake_opening_environment.glb"
+    },
+    "campCritter": {
+      "source": "camp_critter.blend",
+      "runtime": "../../exports/world-1/camp_critter.glb"
+    },
+    "shellback": {
+      "source": "shellback.blend",
+      "runtime": "../../exports/world-1/shellback.glb"
+    },
+    "breakableBlock": {
+      "source": "breakable_block.blend",
+      "runtime": "../../exports/world-1/breakable_block.glb"
+    },
+    "hargoldBlock": {
+      "source": "hargold_block.blend",
+      "runtime": "../../exports/world-1/hargold_block.glb"
+    },
+    "meadowLedge": {
+      "source": "meadow_ledge.blend",
+      "runtime": "../../exports/world-1/meadow_ledge.glb"
+    }
+  },
+  "originality": "Original Hargold & Mebble assets. Nintendo materials were not copied."
+}

@@ -9,8 +9,10 @@ export const PROVISIONAL_MOTION_TUNING = Object.freeze({
   source: 'algorithmic extraction from archived Build 009; values retuned to proxy meter units',
   walkSpeed: 3.2,
   runSpeed: 5.7,
+  sprintSpeed: 7.15,
   groundAccelerationWalk: 18,
   groundAccelerationRun: 22,
+  groundAccelerationSprint: 25,
   releaseDeceleration: 16,
   lowSpeedTurnAcceleration: 25,
   highSpeedSkidDeceleration: 30,
@@ -20,6 +22,7 @@ export const PROVISIONAL_MOTION_TUNING = Object.freeze({
   airReverseAcceleration: 14,
   airMaximumWalkSpeed: 3.6,
   airMaximumRunSpeed: 5.9,
+  airMaximumSprintSpeed: 7.2,
   baseJumpSpeed: 10.4,
   runningJumpBonus: 1.55,
   heldJumpGravity: 22.6,
@@ -78,6 +81,6 @@ export const PROVISIONAL_HERO_PROFILES = Object.freeze({
     width: 1.16,
     height: 3.68,
     jumpSpeedAddition: 1.16,
-    airControlMultiplier: 1.08
+    airControlMultiplier: 1
   })
 });

@@ -19,7 +19,9 @@ Both Hargold and Mebble share this complete baseline:
 
 - walk;
 - run;
+- sprint;
 - separate walk/run acceleration targets;
+- a separate sprint target and acceleration target;
 - release deceleration;
 - low-speed turnaround;
 - high-speed skid;
@@ -36,8 +38,13 @@ Both Hargold and Mebble share this complete baseline:
 - brief post-wall-jump steering lock;
 - same-wall regrab suppression;
 - crouch;
+- crawl;
 - blocked stand-up under low ceilings;
 - high-speed duck slide;
+- rolling momentum;
+- wall-collision reaction without penetration;
+- ledge-stop presentation when input is released near an exposed edge;
+- look-up and duck presentation states;
 - slope-driven slide acceleration;
 - momentum-preserving jump from a slide;
 - spin jump from the ground;
@@ -71,6 +78,8 @@ Both Hargold and Mebble share this complete baseline:
 - hurt knockback;
 - hurt input lock;
 - damage invulnerability timing;
+- landing recovery;
+- victory presentation state;
 - hero switching that preserves foot origin and momentum;
 - rejection of unsafe swaps when Mebble’s taller collider cannot fit.
 
@@ -79,6 +88,7 @@ Both Hargold and Mebble share this complete baseline:
 ### Hargold
 
 - Shorter, wider, heavier collider profile.
+- Uses the shared horizontal base-controller tuning without a speed penalty.
 - Stronger ground-slam and stomp values.
 - Hargold-only block-breaking interaction.
 - Heavy-rock enemies require Hargold ground slam.
@@ -88,7 +98,7 @@ Both Hargold and Mebble share this complete baseline:
 ### Mebble
 
 - Narrower but taller collider profile.
-- Slightly faster movement and higher base jump.
+- Uses the shared horizontal base-controller tuning and has a slightly higher base jump.
 - Cape glide with open, sustained, and close states.
 - Glide slows descent and permits limited horizontal correction.
 - Glide cannot generate infinite flight or height.
@@ -221,10 +231,12 @@ The movement layer should expose animation intent without hard-coding a particul
 - ground-slam/hard-landing events;
 - stomp-bounce events;
 - hurt/knockback state.
+- crawl, rolling-momentum, wall-reaction, ledge-stop, look-up, landing-recovery, and victory presentation state.
 
 ## 12. Required movement tests
 
-- Walk/run target speeds and transitions.
+- Walk/run/sprint target speeds and transitions.
+- Identical horizontal base tuning for Hargold and Mebble.
 - Release stopping distance.
 - Low-speed turn and high-speed skid.
 - Short jump lower than full jump.
@@ -239,6 +251,7 @@ The movement layer should expose animation intent without hard-coding a particul
 - Wall-coyote timing.
 - Same-wall regrab suppression.
 - Crouch and blocked stand-up.
+- Crawl, rolling momentum, wall reaction, ledge stop, look-up, duck, landing recovery, and victory intent.
 - Duck slide and downhill slide.
 - Momentum retention on slide jump.
 - Spin jump and one-air-spin limit.

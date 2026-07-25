@@ -74,7 +74,7 @@ export function trySwapHero(
 
 function startJump(state, profile, tuning) {
   const runRatio = clamp(
-    Math.abs(state.velocityX) / tuning.runSpeed,
+    Math.abs(state.velocityX) / tuning.sprintSpeed,
     0,
     1
   );
@@ -94,7 +94,9 @@ function startJump(state, profile, tuning) {
 function updateGroundedHorizontal(state, input, deltaSeconds, tuning) {
   const direction = (input.right ? 1 : 0) - (input.left ? 1 : 0);
   const speed = Math.abs(state.velocityX);
-  const maximum = input.run ? tuning.runSpeed : tuning.walkSpeed;
+  const maximum = input.sprint
+    ? tuning.sprintSpeed
+    : input.run ? tuning.runSpeed : tuning.walkSpeed;
   const reversing = (
     state.velocityX !== 0
     && direction !== 0
@@ -111,7 +113,9 @@ function updateGroundedHorizontal(state, input, deltaSeconds, tuning) {
     if (Math.abs(state.velocityX) < 1e-6) state.velocityX = 0;
     state.locomotion = state.velocityX === 0
       ? 'idle'
-      : speed > tuning.walkSpeed * 0.92 ? 'run' : 'walk';
+      : speed > tuning.runSpeed * 1.02
+        ? 'sprint'
+        : speed > tuning.walkSpeed * 0.92 ? 'run' : 'walk';
     return;
   }
 
@@ -138,12 +142,14 @@ function updateGroundedHorizontal(state, input, deltaSeconds, tuning) {
     direction * maximum,
     reversing
       ? tuning.lowSpeedTurnAcceleration
-      : input.run ? tuning.groundAccelerationRun : tuning.groundAccelerationWalk,
+      : input.sprint
+        ? tuning.groundAccelerationSprint
+        : input.run ? tuning.groundAccelerationRun : tuning.groundAccelerationWalk,
     deltaSeconds
   );
-  state.locomotion = Math.abs(state.velocityX) > tuning.walkSpeed * 0.94
-    ? 'run'
-    : 'walk';
+  state.locomotion = Math.abs(state.velocityX) > tuning.runSpeed * 1.02
+    ? 'sprint'
+    : Math.abs(state.velocityX) > tuning.walkSpeed * 0.94 ? 'run' : 'walk';
 }
 
 function updateAirborne(state, input, deltaSeconds, profile, tuning) {
@@ -153,9 +159,9 @@ function updateAirborne(state, input, deltaSeconds, profile, tuning) {
       state.velocityX !== 0
       && Math.sign(state.velocityX) !== direction
     );
-    const maximum = input.run
-      ? tuning.airMaximumRunSpeed
-      : tuning.airMaximumWalkSpeed;
+    const maximum = input.sprint
+      ? tuning.airMaximumSprintSpeed
+      : input.run ? tuning.airMaximumRunSpeed : tuning.airMaximumWalkSpeed;
     const acceleration = reversing
       ? tuning.airReverseAcceleration
       : tuning.airAcceleration;
@@ -279,4 +285,3 @@ export function stepMotion(
 
   return state;
 }
-

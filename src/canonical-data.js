@@ -1,4 +1,4 @@
-export const CANON_VERSION = '2026-07-25';
+export const CANON_VERSION = '2026-07-25-character-overhaul-1';
 
 export const GAME_RULES = Object.freeze({
   platform: {
@@ -13,6 +13,15 @@ export const GAME_RULES = Object.freeze({
     variableJump: true,
     coyoteTimeAllowed: true,
     jumpBufferAllowed: true,
+    sharedHorizontalBaseTuning: true,
+    locomotionTargets: Object.freeze(['walk', 'run', 'sprint']),
+    requiredCharacterStates: Object.freeze([
+      'idle', 'walk', 'run', 'sprint', 'crouch', 'crawl', 'slide',
+      'rolling-momentum', 'wall-reaction', 'ledge-stop', 'jump',
+      'variable-jump', 'stomp-bounce', 'ground-slam', 'skid',
+      'quick-direction-reversal', 'look-up', 'duck', 'landing-recovery',
+      'hurt', 'victory'
+    ]),
     wallJump: { Hargold: true, Mebble: true },
     hargoldDoubleJump: { learnedSkill: true, availableByDefault: false },
     mebbleHigherJump: true,
@@ -213,14 +222,20 @@ export const LOCKED_HERO_DESIGN = Object.freeze({
     build: 'very short, very round/heavy and wider than Mebble',
     clothing: ['layered olive-green explorer jacket', 'tan shirt', 'wide-brim olive-green hat with brown band and orange feather', 'deep red-brown wrapped scarf/cape collar', 'brown field backpack with leaf badge', 'brown belt and explorer pouches', 'brown boots', 'brass-colored hardware'],
     face: ['dark moustache and rounded chin beard/goatee treatment from locked sheet', 'round friendly features', 'moderate—not exaggerated—smile'],
-    gameplay: ['Hargold-only block breaking', 'heavy-rock ground-slam defeats', 'learned double jump']
+    gameplay: ['shared horizontal base-controller tuning', 'Hargold-only block breaking', 'heavy-rock ground-slam defeats', 'exclusive learned double jump'],
+    productionModel: ['new geometry built from an empty Blender scene', 'smooth rounded deformation topology', 'sculpted face and expressive eyebrows', 'detailed hands and boots', 'layered clothing with authored folds', 'clean UVs and optimized LOD-ready topology'],
+    productionRig: ['IK/FK limbs', 'finger articulation', 'eye, eyebrow, jaw and mouth controls', 'gameplay sockets', 'hat, feather and scarf secondary controls'],
+    productionAnimation: ['new gameplay clips', 'anticipation and controlled squash/stretch', 'follow-through and overlapping secondary motion', 'reliable foot contacts', 'seamless state blending']
   },
   Mebble: {
     reference: 'assets/references/Mebble locked production character sheet.png',
     build: 'taller and thinner than Hargold',
     definingFeatures: ['very long skinny neck', 'clearly visible protruding Adam’s apple', 'small brown top hat with green band and leaf detail', 'slightly crooked less-round glasses', 'very bushy eyebrows'],
     clothing: ['cream rolled-sleeve shirt', 'brown vest', 'dark trousers', 'double belts and explorer pouches', 'tall brown lace-up boots', 'green emblem cape that opens as parachute/glider'],
-    gameplay: ['slightly higher jump', 'innate slow-fall and short glide'],
+    gameplay: ['shared horizontal base-controller tuning', 'slightly higher jump', 'innate slow-fall and short glide'],
+    productionModel: ['new geometry built from an empty Blender scene', 'smooth rounded deformation topology', 'sculpted face and expressive eyebrows', 'detailed hands and boots', 'layered clothing with authored folds', 'clean UVs and optimized LOD-ready topology'],
+    productionRig: ['IK/FK limbs', 'finger articulation', 'eye, eyebrow, jaw and mouth controls', 'gameplay sockets', 'neck corrective and cape secondary controls'],
+    productionAnimation: ['new gameplay clips', 'anticipation and controlled squash/stretch', 'follow-through and overlapping secondary motion', 'reliable foot contacts', 'seamless state blending'],
     visibilityRule: 'neck and Adam’s apple may not be hidden by collar, cape, pose or lighting'
   }
 });

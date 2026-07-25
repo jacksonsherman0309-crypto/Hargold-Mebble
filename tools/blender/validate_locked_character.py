@@ -12,6 +12,21 @@ import bpy
 
 ROOT = Path(__file__).resolve().parents[2]
 
+SHARED_REPLACEMENT_CLIPS = {
+    "idle", "walk", "run", "sprint", "start", "stop", "turn-low", "skid",
+    "takeoff", "rise", "apex", "fall", "land-soft", "land-hard",
+    "landing-recovery", "jump-running", "jump-triple-1", "jump-triple-2",
+    "jump-triple-3", "wall-slide", "wall-jump", "wall-reaction",
+    "ledge-stop", "crouch", "crawl", "stand", "duck", "duck-slide",
+    "slope-slide", "rolling-momentum", "slide-jump", "spin-jump", "air-spin",
+    "fast-fall", "ground-slam", "stomp-bounce", "swim", "dive",
+    "surface-breach", "look-up", "climb-fence", "climb-vine",
+    "climb-ladder", "climb-detach", "rope-grab", "rope-swing", "rope-climb",
+    "rope-release", "carry-light-idle", "carry-light-walk",
+    "carry-heavy-idle", "carry-heavy-walk", "carry-jump", "drop", "throw",
+    "hurt", "knockback", "defeat", "swap-in", "swap-out", "victory"
+}
+
 
 def fail(message: str, errors: list[str]) -> None:
     errors.append(message)
@@ -40,7 +55,11 @@ def validate() -> dict:
 
     required_bones = {
         "Root", "DEF_hips", "DEF_spine", "DEF_chest", "DEF_neck", "DEF_head",
-        "DEF_jaw", "DEF_eye.L", "DEF_eye.R", "CTRL_root", "CTRL_face",
+        "DEF_jaw", "DEF_eye.L", "DEF_eye.R", "DEF_lid.L", "DEF_lid.R",
+        "DEF_brow.L", "DEF_brow.R", "DEF_mouth_corner.L",
+        "DEF_mouth_corner.R", "DEF_hat_secondary", "CTRL_root", "CTRL_face",
+        "CTRL_eyes", "CTRL_brow.L", "CTRL_brow.R", "CTRL_mouth.L",
+        "CTRL_mouth.R", "CTRL_hat_secondary",
         "SOCKET_hand_l", "SOCKET_hand_r", "SOCKET_head", "SOCKET_hat",
         "SOCKET_glasses", "SOCKET_back", "SOCKET_vfx_feet", "SOCKET_vfx_center",
     }
@@ -97,7 +116,7 @@ def validate() -> dict:
             foot_control["ik_fk"] = 0.0
 
     face_control = arm.pose.bones.get("CTRL_face")
-    for prop in ("blink_L", "blink_R", "smile"):
+    for prop in ("blink_L", "blink_R", "smile", "mouth_open", "brow_raise_L", "brow_raise_R"):
         if not face_control or prop not in face_control:
             fail(f"missing facial control property {prop}", errors)
     if face_control:
@@ -145,13 +164,46 @@ def validate() -> dict:
     ]
     if len(visible_geometry) < 40:
         fail(f"unexpectedly sparse model: only {len(visible_geometry)} render meshes", errors)
+    for obj in visible_geometry:
+        if not obj.data.uv_layers:
+            fail(f"render mesh lacks UV0: {obj.name}", errors)
+        if obj.get("geometry_generation") != "full-rebuild-2026-07-25":
+            fail(f"render mesh lacks replacement provenance: {obj.name}", errors)
 
-    required_core = {"idle", "walk", "run", "takeoff", "rise", "fall", "land-soft"}
+    for mat in {material for obj in visible_geometry for material in obj.data.materials if material}:
+        image_nodes = [
+            node for node in mat.node_tree.nodes
+            if node.bl_idname == "ShaderNodeTexImage" and node.image
+        ] if mat.use_nodes else []
+        if len(image_nodes) < 4 or mat.get("pbr_texture_resolution") != 1024:
+            fail(f"material lacks packed 1K PBR texture set: {mat.name}", errors)
+
+    required_core = set(SHARED_REPLACEMENT_CLIPS)
     if hero == "Mebble":
-        required_core |= {"glide-open", "glide-sustain", "glide-close"}
+        required_core |= {
+            "glide-open", "glide-sustain", "glide-steer-left",
+            "glide-steer-right", "glide-close"
+        }
+    else:
+        required_core |= {
+            "double-jump", "break-hargold-block",
+            "heavy-ground-slam", "stonefist-strike"
+        }
     missing_actions = required_core - set(bpy.data.actions.keys())
     if missing_actions:
-        fail(f"missing core actions: {', '.join(sorted(missing_actions))}", errors)
+        fail(f"missing replacement actions: {', '.join(sorted(missing_actions))}", errors)
+    for action_name in required_core & set(bpy.data.actions.keys()):
+        action = bpy.data.actions[action_name]
+        if action.get("clip_status") != "new-replacement-authored":
+            fail(f"action is not a replacement-authored clip: {action_name}", errors)
+
+    scene = bpy.context.scene
+    if scene.get("geometryGeneration") != "full-rebuild-2026-07-25":
+        fail("scene lacks full-rebuild geometry provenance", errors)
+    if scene.get("reusesPriorGeometry") is not False:
+        fail("scene does not explicitly reject prior geometry reuse", errors)
+    if scene.get("sourceScene") != "factory-empty":
+        fail("scene was not marked as factory-empty", errors)
 
     glb_path = ROOT / "assets" / "exports" / f"{hero.lower()}_character.glb"
     glb_summary = {}
@@ -192,7 +244,12 @@ def validate() -> dict:
         "controls": sum(1 for bone in arm.data.bones if bone.name.startswith("CTRL_")),
         "renderMeshes": len(visible_geometry),
         "actions": sorted(bpy.data.actions.keys()),
-        "facialProperties": ["blink_L", "blink_R", "smile"],
+        "facialProperties": [
+            "blink_L", "blink_R", "smile", "mouth_open",
+            "brow_raise_L", "brow_raise_R"
+        ],
+        "geometryGeneration": bpy.context.scene.get("geometryGeneration"),
+        "reusesPriorGeometry": bpy.context.scene.get("reusesPriorGeometry"),
         "glb": glb_summary,
         "errors": errors,
     }

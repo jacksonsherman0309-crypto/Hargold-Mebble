@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js?v=world-mobs-2';
+import { CharacterRenderer } from './character-renderer.js?v=meadow-wake-art-kit-1';
 import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
 import {
   attackMob,

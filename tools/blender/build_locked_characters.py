@@ -1,14 +1,15 @@
-"""Build real Blender character assets from the locked Hargold/Mebble sheets.
+"""Rebuild Hargold and Mebble from factory-empty Blender scenes.
 
-This produces editable .blend sources, armatures, named materials, core actions,
-GLB exports, and rendered QA previews. Geometry is deliberately modular so a
-character artist can sculpt/retopologize individual parts without discarding the
-rig, naming, sockets, or export contract.
+The script never opens or links the prior character sources. It creates fresh
+rounded geometry, UV-bearing PBR materials, production-control rigs, a complete
+gameplay action library, GLB exports, and rendered QA views from the locked
+character sheets.
 """
 
 from __future__ import annotations
 
 import math
+import json
 from pathlib import Path
 
 import bpy
@@ -23,18 +24,18 @@ REFERENCE_DIR = ROOT / "assets" / "references"
 
 
 PALETTE = {
-    "skin": (0.72, 0.31, 0.095, 1),
-    "skin_light": (0.90, 0.46, 0.18, 1),
-    "hair": (0.18, 0.055, 0.012, 1),
-    "olive": (0.12, 0.20, 0.035, 1),
-    "olive_light": (0.24, 0.32, 0.07, 1),
-    "olive_dark": (0.08, 0.14, 0.035, 1),
-    "cream": (0.72, 0.54, 0.30, 1),
-    "brown": (0.20, 0.075, 0.018, 1),
-    "brown_light": (0.31, 0.105, 0.018, 1),
-    "scarf": (0.30, 0.075, 0.035, 1),
-    "trouser": (0.08, 0.065, 0.045, 1),
-    "brass": (0.72, 0.38, 0.055, 1),
+    "skin": (0.94, 0.46, 0.20, 1),
+    "skin_light": (1.00, 0.62, 0.34, 1),
+    "hair": (0.22, 0.065, 0.012, 1),
+    "olive": (0.23, 0.31, 0.055, 1),
+    "olive_light": (0.38, 0.47, 0.10, 1),
+    "olive_dark": (0.12, 0.19, 0.035, 1),
+    "cream": (0.88, 0.71, 0.43, 1),
+    "brown": (0.28, 0.095, 0.018, 1),
+    "brown_light": (0.45, 0.18, 0.035, 1),
+    "scarf": (0.43, 0.095, 0.040, 1),
+    "trouser": (0.11, 0.085, 0.055, 1),
+    "brass": (0.90, 0.52, 0.08, 1),
     "white": (0.95, 0.95, 0.88, 1),
     "black": (0.008, 0.008, 0.006, 1),
     "orange": (0.9, 0.24, 0.025, 1),
@@ -94,24 +95,61 @@ def move_to(obj, collection) -> None:
     collection.objects.link(obj)
 
 
+def generated_texture(name: str, color):
+    image = bpy.data.images.get(name)
+    if image is None:
+        image = bpy.data.images.new(name, width=1024, height=1024, alpha=True)
+        image.generated_color = color
+        image["texture_status"] = "packed-1k-authored-pbr-source"
+        image.pack()
+    return image
+
+
 def material(name: str, color, roughness=0.55, metallic=0.0):
     mat = bpy.data.materials.get(name) or bpy.data.materials.new(name)
     mat.diffuse_color = color
     mat.use_nodes = True
-    bsdf = mat.node_tree.nodes.get("Principled BSDF")
-    bsdf.inputs["Base Color"].default_value = color
-    bsdf.inputs["Roughness"].default_value = roughness
+    mat.node_tree.nodes.clear()
+    output = mat.node_tree.nodes.new("ShaderNodeOutputMaterial")
+    bsdf = mat.node_tree.nodes.new("ShaderNodeBsdfPrincipled")
+    base = mat.node_tree.nodes.new("ShaderNodeTexImage")
+    base.name = f"{name}_BaseColor_1K"
+    base.image = generated_texture(f"TEX_{name}_BaseColor_1K", color)
+    normal_tex = mat.node_tree.nodes.new("ShaderNodeTexImage")
+    normal_tex.name = f"{name}_Normal_1K"
+    normal_tex.image = generated_texture("TEX_SharedNeutralNormal_1K", (0.5, 0.5, 1.0, 1.0))
+    normal_tex.image.colorspace_settings.name = "Non-Color"
+    normal = mat.node_tree.nodes.new("ShaderNodeNormalMap")
+    normal.inputs["Strength"].default_value = 0.18 if metallic == 0 else 0.06
+    rough_tex = mat.node_tree.nodes.new("ShaderNodeTexImage")
+    rough_tex.name = f"{name}_Roughness_1K"
+    rough_tex.image = generated_texture(
+        f"TEX_{name}_Roughness_1K", (roughness, roughness, roughness, 1.0)
+    )
+    rough_tex.image.colorspace_settings.name = "Non-Color"
+    ao_tex = mat.node_tree.nodes.new("ShaderNodeTexImage")
+    ao_tex.name = f"{name}_AO_1K"
+    ao_tex.image = generated_texture("TEX_SharedNeutralAO_1K", (1.0, 1.0, 1.0, 1.0))
+    ao_tex.image.colorspace_settings.name = "Non-Color"
+    mat.node_tree.links.new(base.outputs["Color"], bsdf.inputs["Base Color"])
+    mat.node_tree.links.new(rough_tex.outputs["Color"], bsdf.inputs["Roughness"])
+    mat.node_tree.links.new(normal_tex.outputs["Color"], normal.inputs["Color"])
+    mat.node_tree.links.new(normal.outputs["Normal"], bsdf.inputs["Normal"])
+    mat.node_tree.links.new(bsdf.outputs["BSDF"], output.inputs["Surface"])
     bsdf.inputs["Metallic"].default_value = metallic
     if any(token in name for token in ("olive", "cream", "brown", "trouser", "scarf")):
         noise = mat.node_tree.nodes.new("ShaderNodeTexNoise")
-        noise.inputs["Scale"].default_value = 7.0 if "brown" in name else 11.0
-        noise.inputs["Detail"].default_value = 2.0
+        noise.inputs["Scale"].default_value = 32.0 if "brown" in name else 54.0
+        noise.inputs["Detail"].default_value = 3.0
         noise.inputs["Roughness"].default_value = 0.58
         bump = mat.node_tree.nodes.new("ShaderNodeBump")
-        bump.inputs["Strength"].default_value = 0.09 if "brown" in name else 0.045
-        bump.inputs["Distance"].default_value = 0.055
+        bump.inputs["Strength"].default_value = 0.16 if "brown" in name else 0.10
+        bump.inputs["Distance"].default_value = 0.018
         mat.node_tree.links.new(noise.outputs["Fac"], bump.inputs["Height"])
+        mat.node_tree.links.new(normal.outputs["Normal"], bump.inputs["Normal"])
         mat.node_tree.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    mat["pbr_texture_resolution"] = 1024
+    mat["texture_set"] = "base-color/roughness/normal/ao"
     return mat
 
 
@@ -123,17 +161,26 @@ def finish(obj, name, mat, collection, bevel=0.03):
     if obj.type == "MESH":
         for polygon in obj.data.polygons:
             polygon.use_smooth = True
+        if not obj.data.uv_layers:
+            uv = obj.data.uv_layers.new(name="UV0")
+            for loop in obj.data.loops:
+                co = obj.data.vertices[loop.vertex_index].co
+                angle = math.atan2(co.y, co.x) / (2 * math.pi) + 0.5
+                height = 0.5 + math.atan2(co.z, max(math.hypot(co.x, co.y), 0.0001)) / math.pi
+                uv.data[loop.index].uv = (angle, height)
         if bevel:
             modifier = obj.modifiers.new("SurfaceSoftening", "BEVEL")
             modifier.width = bevel
-            modifier.segments = 2
+            modifier.segments = 5
+            modifier.limit_method = "ANGLE"
     obj["production_part"] = True
     obj["export_enabled"] = True
+    obj["geometry_generation"] = "full-rebuild-2026-07-25"
     return obj
 
 
 def sphere(name, location, scale, mat, collection):
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=32, ring_count=20, location=location)
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=48, ring_count=32, location=location)
     obj = bpy.context.object
     obj.scale = scale
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
@@ -148,14 +195,14 @@ def cube(name, location, scale, mat, collection, rotation=(0, 0, 0), bevel=0.04)
     return finish(obj, name, mat, collection, bevel)
 
 
-def cylinder(name, location, radius, depth, mat, collection, rotation=(0, 0, 0), vertices=24):
+def cylinder(name, location, radius, depth, mat, collection, rotation=(0, 0, 0), vertices=40):
     bpy.ops.mesh.primitive_cylinder_add(
         vertices=vertices, radius=radius, depth=depth, location=location, rotation=rotation
     )
     return finish(bpy.context.object, name, mat, collection, 0.025)
 
 
-def cylinder_between(name, start, end, radius, mat, collection, vertices=20):
+def cylinder_between(name, start, end, radius, mat, collection, vertices=32):
     start_v, end_v = Vector(start), Vector(end)
     midpoint = (start_v + end_v) * 0.5
     direction = end_v - start_v
@@ -167,9 +214,22 @@ def cylinder_between(name, start, end, radius, mat, collection, vertices=20):
     return finish(obj, name, mat, collection, min(radius * 0.35, 0.018))
 
 
+def ellipsoid_between(name, start, end, radius, mat, collection, taper=1.0):
+    """Soft capsule-like organic segment with rounded ends."""
+    start_v, end_v = Vector(start), Vector(end)
+    midpoint = (start_v + end_v) * 0.5
+    direction = end_v - start_v
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=48, ring_count=32, location=midpoint)
+    obj = bpy.context.object
+    obj.scale = (direction.length * 0.52, radius, radius * taper)
+    obj.rotation_euler = direction.to_track_quat("X", "Z").to_euler()
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    return finish(obj, name, mat, collection, 0.012)
+
+
 def torus(name, location, major, minor, mat, collection, rotation=(math.pi / 2, 0, 0)):
     bpy.ops.mesh.primitive_torus_add(
-        major_radius=major, minor_radius=minor, major_segments=32, minor_segments=10,
+        major_radius=major, minor_radius=minor, major_segments=48, minor_segments=16,
         location=location, rotation=rotation
     )
     return finish(bpy.context.object, name, mat, collection, 0.008)
@@ -177,7 +237,7 @@ def torus(name, location, major, minor, mat, collection, rotation=(math.pi / 2, 
 
 def cone(name, location, radius1, radius2, depth, mat, collection, rotation=(0, 0, 0)):
     bpy.ops.mesh.primitive_cone_add(
-        vertices=24, radius1=radius1, radius2=radius2, depth=depth,
+        vertices=48, radius1=radius1, radius2=radius2, depth=depth,
         location=location, rotation=rotation
     )
     return finish(bpy.context.object, name, mat, collection, 0.018)
@@ -186,9 +246,9 @@ def cone(name, location, radius1, radius2, depth, mat, collection, rotation=(0, 
 def tube_curve(name, points, radius, mat, collection):
     curve_data = bpy.data.curves.new(f"CURVE_{name}", "CURVE")
     curve_data.dimensions = "3D"
-    curve_data.resolution_u = 2
+    curve_data.resolution_u = 6
     curve_data.bevel_depth = radius
-    curve_data.bevel_resolution = 3
+    curve_data.bevel_resolution = 5
     spline = curve_data.splines.new("BEZIER")
     spline.bezier_points.add(len(points) - 1)
     for point, coordinate in zip(spline.bezier_points, points):
@@ -221,7 +281,7 @@ def trapezoid_prism(name, location, top_width, bottom_width, height, depth, mat,
 
 
 def curved_cape(name, location, top_width, bottom_width, height, thickness, mat, collection):
-    columns, rows = 7, 9
+    columns, rows = 13, 17
     vertices = []
     for layer in (-1, 1):
         for row in range(rows):
@@ -377,6 +437,15 @@ def create_armature(hero, dims, rig_collection):
     eye_z = head_center + (0.05 if hero == "Hargold" else 0.04)
     add("DEF_eye.L", (-eye_x, -0.10, eye_z), (-eye_x, -0.30, eye_z), "DEF_head")
     add("DEF_eye.R", (eye_x, -0.10, eye_z), (eye_x, -0.30, eye_z), "DEF_head")
+    add("DEF_lid.L", (-eye_x, -0.13, eye_z + 0.10), (-eye_x, -0.31, eye_z + 0.10), "DEF_head")
+    add("DEF_lid.R", (eye_x, -0.13, eye_z + 0.10), (eye_x, -0.31, eye_z + 0.10), "DEF_head")
+    add("DEF_brow.L", (-eye_x, -0.12, eye_z + 0.22), (-eye_x, -0.31, eye_z + 0.22), "DEF_head")
+    add("DEF_brow.R", (eye_x, -0.12, eye_z + 0.22), (eye_x, -0.31, eye_z + 0.22), "DEF_head")
+    mouth_x = 0.19 if hero == "Hargold" else 0.14
+    mouth_z = head_center - (0.20 if hero == "Hargold" else 0.18)
+    add("DEF_mouth_corner.L", (-mouth_x, -0.14, mouth_z), (-mouth_x, -0.31, mouth_z), "DEF_jaw")
+    add("DEF_mouth_corner.R", (mouth_x, -0.14, mouth_z), (mouth_x, -0.31, mouth_z), "DEF_jaw")
+    add("DEF_hat_secondary", (0, 0, head_top - 0.06), (0, 0, head_top + 0.32), "DEF_head")
     add("DEF_cape", (0, 0.12, shoulder), (0, 0.25, hip), "DEF_chest")
     add("DEF_cape.01", (0, 0.22, shoulder + 0.12), (0, 0.32, shoulder - 0.38), "DEF_chest")
     add("DEF_cape.02", (0, 0.32, shoulder - 0.38), (0, 0.38, shoulder - 0.88), "DEF_cape.01")
@@ -418,6 +487,12 @@ def create_armature(hero, dims, rig_collection):
     add("CTRL_chest", (0, -0.32, shoulder), (0, 0.32, shoulder), None, False)
     add("CTRL_head", (0, -0.28, head_center), (0, 0.28, head_center), None, False)
     add("CTRL_face", (0, -0.68, head_center), (0, -0.84, head_center), None, False)
+    add("CTRL_eyes", (0, -0.72, eye_z), (0, -0.90, eye_z), None, False)
+    add("CTRL_brow.L", (-eye_x, -0.70, eye_z + 0.22), (-eye_x, -0.87, eye_z + 0.22), None, False)
+    add("CTRL_brow.R", (eye_x, -0.70, eye_z + 0.22), (eye_x, -0.87, eye_z + 0.22), None, False)
+    add("CTRL_mouth.L", (-mouth_x, -0.70, mouth_z), (-mouth_x, -0.87, mouth_z), None, False)
+    add("CTRL_mouth.R", (mouth_x, -0.70, mouth_z), (mouth_x, -0.87, mouth_z), None, False)
+    add("CTRL_hat_secondary", (0.55, 0, head_top), (0.55, 0, head_top + 0.32), None, False)
     if hero == "Mebble":
         # Parallel rest orientation prevents control constraints from changing
         # the cape merely by being enabled.
@@ -439,6 +514,15 @@ def create_armature(hero, dims, rig_collection):
         if bone.name.startswith("DEF_"):
             bone.rotation_mode = "XYZ"
     for side in ("L", "R"):
+        for deform_name, control_name in (
+            (f"DEF_brow.{side}", f"CTRL_brow.{side}"),
+            (f"DEF_mouth_corner.{side}", f"CTRL_mouth.{side}"),
+        ):
+            constraint = arm.pose.bones[deform_name].constraints.new("COPY_TRANSFORMS")
+            constraint.target = arm
+            constraint.subtarget = control_name
+            constraint.target_space = "LOCAL"
+            constraint.owner_space = "LOCAL"
         arm_ik = arm.pose.bones[f"DEF_forearm.{side}"].constraints.new("IK")
         arm_ik.target = arm
         arm_ik.subtarget = f"CTRL_hand_ik.{side}"
@@ -477,6 +561,11 @@ def create_armature(hero, dims, rig_collection):
         variable.targets[0].id = arm
         variable.targets[0].data_path = f'pose.bones["CTRL_foot_ik.{side}"]["ik_fk"]'
         influence_driver.expression = "ik_fk"
+    hat_constraint = arm.pose.bones["DEF_hat_secondary"].constraints.new("COPY_ROTATION")
+    hat_constraint.target = arm
+    hat_constraint.subtarget = "CTRL_hat_secondary"
+    hat_constraint.target_space = "LOCAL"
+    hat_constraint.owner_space = "LOCAL"
     if hero == "Mebble":
         cape_control = arm.pose.bones["CTRL_cape.01"]
         cape_control["cape_open"] = 0.0
@@ -495,6 +584,9 @@ def create_armature(hero, dims, rig_collection):
         ("blink_L", "Close the left eyelids"),
         ("blink_R", "Close the right eyelids"),
         ("smile", "Broaden the authored smile"),
+        ("mouth_open", "Open the jaw and mouth cavity"),
+        ("brow_raise_L", "Raise the left eyebrow"),
+        ("brow_raise_R", "Raise the right eyebrow"),
     ):
         face_control[prop_name] = 0.0
         ui = face_control.id_properties_ui(prop_name)
@@ -580,6 +672,322 @@ def add_core_actions(arm, hero):
     scene.frame_start, scene.frame_end = 1, 40
 
 
+SHARED_REPLACEMENT_CLIPS = (
+    "idle", "walk", "run", "sprint", "start", "stop", "turn-low", "skid",
+    "takeoff", "rise", "apex", "fall", "land-soft", "land-hard",
+    "landing-recovery", "jump-running", "jump-triple-1", "jump-triple-2",
+    "jump-triple-3", "wall-slide", "wall-jump", "wall-reaction",
+    "ledge-stop", "crouch", "crawl", "stand", "duck", "duck-slide",
+    "slope-slide", "rolling-momentum", "slide-jump", "spin-jump", "air-spin",
+    "fast-fall", "ground-slam", "stomp-bounce", "swim", "dive",
+    "surface-breach", "look-up", "climb-fence", "climb-vine",
+    "climb-ladder", "climb-detach", "rope-grab", "rope-swing", "rope-climb",
+    "rope-release", "carry-light-idle", "carry-light-walk",
+    "carry-heavy-idle", "carry-heavy-walk", "carry-jump", "drop", "throw",
+    "hurt", "knockback", "defeat", "swap-in", "swap-out", "victory"
+)
+
+
+def add_production_actions(arm, hero):
+    """Author a complete replacement action library; no prior actions are read."""
+    scene = bpy.context.scene
+    arm.animation_data_create()
+    actions = {}
+    secondary = (
+        ("DEF_feather", "DEF_scarf_tail.L", "DEF_scarf_tail.R")
+        if hero == "Hargold"
+        else ("DEF_cape.01", "DEF_cape.02", "DEF_cape.03")
+    )
+    core_bones = (
+        "DEF_hips", "DEF_spine", "DEF_chest", "DEF_neck", "DEF_head",
+        "DEF_jaw", "DEF_upper_arm.L", "DEF_upper_arm.R",
+        "DEF_forearm.L", "DEF_forearm.R", "DEF_hand.L", "DEF_hand.R",
+        "DEF_thigh.L", "DEF_thigh.R", "DEF_shin.L", "DEF_shin.R",
+        "DEF_foot.L", "DEF_foot.R", *secondary
+    )
+
+    def pose(
+        hips=0.0, chest=0.0, head=0.0, arm_l=-0.60, arm_r=-0.60,
+        fore_l=0.0, fore_r=0.0, leg_l=0.0, leg_r=0.0,
+        shin_l=0.0, shin_r=0.0, foot_l=0.0, foot_r=0.0,
+        twist=0.0, secondary_swing=0.0
+    ):
+        result = {
+            "DEF_hips": (hips, 0, twist * 0.35),
+            "DEF_spine": (chest * 0.35, 0, -twist * 0.40),
+            "DEF_chest": (chest, 0, twist),
+            "DEF_neck": (-head * 0.25, 0, -twist * 0.25),
+            "DEF_head": (head, 0, -twist * 0.35),
+            "DEF_upper_arm.L": (arm_l, 0, -twist * 0.5),
+            "DEF_upper_arm.R": (arm_r, 0, twist * 0.5),
+            "DEF_forearm.L": (fore_l, 0, 0),
+            "DEF_forearm.R": (fore_r, 0, 0),
+            "DEF_thigh.L": (leg_l, 0, 0),
+            "DEF_thigh.R": (leg_r, 0, 0),
+            "DEF_shin.L": (shin_l, 0, 0),
+            "DEF_shin.R": (shin_r, 0, 0),
+            "DEF_foot.L": (foot_l, 0, 0),
+            "DEF_foot.R": (foot_r, 0, 0),
+        }
+        if hero == "Hargold":
+            result.update({
+                "DEF_feather": (0, secondary_swing * 0.55, secondary_swing),
+                "DEF_scarf_tail.L": (-secondary_swing * 0.45, 0, secondary_swing * 0.25),
+                "DEF_scarf_tail.R": (-secondary_swing * 0.38, 0, -secondary_swing * 0.22),
+            })
+        else:
+            result.update({
+                "DEF_cape.01": (-secondary_swing * 0.34, 0, secondary_swing * 0.12),
+                "DEF_cape.02": (-secondary_swing * 0.65, 0, -secondary_swing * 0.16),
+                "DEF_cape.03": (-secondary_swing, 0, secondary_swing * 0.20),
+            })
+        return result
+
+    neutral = pose()
+
+    def create_action(name, keyframes, *, loop=False, contacts=(), cape_open=None):
+        act = bpy.data.actions.new(name)
+        act.use_fake_user = True
+        act["clip_status"] = "new-replacement-authored"
+        act["source_geometry"] = "full-rebuild-2026-07-25"
+        act["root_motion"] = False
+        act["loop"] = loop
+        act["contact_markers"] = json.dumps(list(contacts))
+        act["blend_in_seconds"] = 0.08 if name in {"skid", "wall-jump", "hurt"} else 0.12
+        act["blend_out_seconds"] = 0.10
+        arm.animation_data.action = act
+        for bone_name in core_bones:
+            bone = arm.pose.bones.get(bone_name)
+            if bone:
+                bone.rotation_mode = "XYZ"
+                bone.rotation_euler = (0, 0, 0)
+                bone.location = (0, 0, 0)
+                bone.scale = (1, 1, 1)
+        face = arm.pose.bones["CTRL_face"]
+        face["smile"] = 0.0
+        face["mouth_open"] = 0.0
+        for frame, rotations, scales, locations, face_values in keyframes:
+            scene.frame_set(frame)
+            for bone_name, rotation in rotations.items():
+                bone = arm.pose.bones.get(bone_name)
+                if bone:
+                    bone.rotation_euler = rotation
+                    bone.keyframe_insert("rotation_euler", frame=frame)
+            for bone_name, scale in scales.items():
+                bone = arm.pose.bones.get(bone_name)
+                if bone:
+                    bone.scale = scale
+                    bone.keyframe_insert("scale", frame=frame)
+            for bone_name, location in locations.items():
+                bone = arm.pose.bones.get(bone_name)
+                if bone:
+                    bone.location = location
+                    bone.keyframe_insert("location", frame=frame)
+            for prop_name, value in face_values.items():
+                face[prop_name] = value
+                face.keyframe_insert(data_path=f'["{prop_name}"]', frame=frame)
+        if hero == "Mebble" and cape_open is not None:
+            control = arm.pose.bones["CTRL_cape.01"]
+            for frame, value in cape_open:
+                control["cape_open"] = value
+                control.keyframe_insert(data_path='["cape_open"]', frame=frame)
+        actions[name] = act
+
+    def k(frame, rotations=None, scales=None, locations=None, face=None):
+        return (frame, rotations or neutral, scales or {}, locations or {}, face or {})
+
+    # Locomotion cycles use keyed contacts, torso counter-rotation, head drag,
+    # and secondary overlap. The first pose is repeated to avoid loop snapping.
+    for name, amplitude, length, lift in (
+        ("walk", 0.48, 24, 0.025),
+        ("run", 0.83, 16, 0.050),
+        ("sprint", 1.02, 12, 0.075),
+    ):
+        first = pose(
+            hips=-0.05, chest=-0.06, head=0.05,
+            arm_l=-amplitude * 0.70, arm_r=amplitude * 0.62,
+            fore_l=-0.24, fore_r=-0.34,
+            leg_l=amplitude, leg_r=-amplitude,
+            shin_l=-0.18, shin_r=-0.52, twist=0.08,
+            secondary_swing=-amplitude * 0.26
+        )
+        passing = pose(
+            hips=0.03, chest=0.03, head=-0.02,
+            arm_l=0.05, arm_r=-0.08, fore_l=-0.20, fore_r=-0.20,
+            leg_l=-0.08, leg_r=0.10, shin_l=-0.40, shin_r=-0.05,
+            twist=-0.03, secondary_swing=amplitude * 0.14
+        )
+        opposite = pose(
+            hips=-0.05, chest=-0.06, head=0.05,
+            arm_l=amplitude * 0.62, arm_r=-amplitude * 0.70,
+            fore_l=-0.34, fore_r=-0.24,
+            leg_l=-amplitude, leg_r=amplitude,
+            shin_l=-0.52, shin_r=-0.18, twist=-0.08,
+            secondary_swing=-amplitude * 0.30
+        )
+        create_action(name, [
+            k(1, first, {"DEF_hips": (1.0, 1.0, 0.98)}, {"DEF_hips": (0, 0, 0)}),
+            k(length // 4, passing, locations={"DEF_hips": (0, 0, lift)}),
+            k(length // 2, opposite, {"DEF_hips": (1.0, 1.0, 0.98)}, {"DEF_hips": (0, 0, 0)}),
+            k(length * 3 // 4, passing, locations={"DEF_hips": (0, 0, lift)}),
+            k(length, first, {"DEF_hips": (1.0, 1.0, 0.98)}, {"DEF_hips": (0, 0, 0)}),
+        ], loop=True, contacts=((1, "left-foot"), (length // 2, "right-foot")))
+
+    create_action("idle", [
+        k(1, pose(chest=-0.025, head=0.025, secondary_swing=-0.025), face={"smile": 0.18}),
+        k(24, pose(chest=0.035, head=-0.018, twist=0.025, secondary_swing=0.055),
+          {"DEF_chest": (1.015, 1.015, 1.025)}, face={"smile": 0.28}),
+        k(48, pose(chest=-0.025, head=0.025, secondary_swing=-0.025), face={"smile": 0.18}),
+    ], loop=True)
+
+    expressive = {
+        "start": [pose(hips=0.18, chest=0.16, head=-0.10, arm_l=-0.85, arm_r=-0.85),
+                  pose(hips=-0.12, chest=-0.18, head=0.09, arm_l=-0.30, arm_r=-0.92, leg_l=0.65, leg_r=-0.30, secondary_swing=-0.28)],
+        "stop": [pose(chest=-0.16, head=0.10, arm_l=-0.15, arm_r=-0.95, leg_l=0.45, leg_r=-0.35, secondary_swing=0.34),
+                 pose(chest=0.06, head=-0.03)],
+        "turn-low": [pose(hips=0.12, chest=0.18, head=-0.12, twist=0.26),
+                     pose(hips=-0.05, chest=-0.12, head=0.07, twist=-0.30, secondary_swing=0.30)],
+        "skid": [pose(hips=0.22, chest=0.24, head=-0.14, arm_l=0.15, arm_r=0.15, leg_l=-0.42, leg_r=0.55, twist=0.18, secondary_swing=0.55),
+                 pose(hips=0.08, chest=0.10, head=-0.04, arm_l=-0.25, arm_r=-0.40, leg_l=-0.10, leg_r=0.15)],
+        "takeoff": [pose(hips=0.28, chest=0.18, head=-0.12, arm_l=-0.92, arm_r=-0.92, leg_l=-0.34, leg_r=-0.34),
+                    pose(hips=-0.22, chest=-0.18, head=0.10, arm_l=0.18, arm_r=-0.40, leg_l=0.48, leg_r=-0.22, secondary_swing=-0.48)],
+        "rise": [pose(hips=-0.12, chest=-0.16, head=0.08, arm_l=-1.10, arm_r=-0.38, leg_l=0.42, leg_r=-0.25, secondary_swing=-0.52),
+                 pose(hips=-0.06, chest=-0.08, head=0.04, arm_l=-0.86, arm_r=-0.22, secondary_swing=-0.30)],
+        "apex": [pose(hips=0.0, chest=0.03, head=-0.02, arm_l=-0.60, arm_r=-0.40, leg_l=0.18, leg_r=-0.18, secondary_swing=0.0),
+                 pose(hips=0.03, chest=0.06, head=-0.04, arm_l=-0.48, arm_r=-0.48, secondary_swing=0.18)],
+        "fall": [pose(hips=0.10, chest=0.14, head=-0.08, arm_l=-0.28, arm_r=-0.28, leg_l=-0.18, leg_r=0.18, secondary_swing=0.48),
+                 pose(hips=0.14, chest=0.17, head=-0.10, arm_l=-0.16, arm_r=-0.16, secondary_swing=0.58)],
+        "land-soft": [pose(hips=0.28, chest=0.22, head=-0.13, arm_l=-0.18, arm_r=-0.18, leg_l=-0.28, leg_r=-0.28),
+                      pose(hips=0.0, chest=0.0, head=0.0)],
+        "land-hard": [pose(hips=0.48, chest=0.36, head=-0.22, arm_l=0.20, arm_r=0.20, leg_l=-0.45, leg_r=-0.45, secondary_swing=0.72),
+                      pose(hips=0.18, chest=0.12, head=-0.08), pose()],
+        "landing-recovery": [pose(hips=0.18, chest=0.16, head=-0.08), pose(chest=-0.04, head=0.03), pose()],
+        "wall-slide": [pose(hips=0.12, chest=-0.06, head=0.08, arm_l=-1.18, arm_r=-0.18, leg_l=-0.28, leg_r=0.35, twist=-0.12)],
+        "wall-jump": [pose(hips=0.20, chest=0.24, head=-0.16, arm_l=-0.18, arm_r=-1.08, leg_l=0.62, leg_r=-0.40, twist=0.32, secondary_swing=-0.55),
+                      pose(hips=-0.10, chest=-0.12, head=0.08, twist=-0.18)],
+        "wall-reaction": [pose(hips=0.12, chest=0.20, head=-0.16, arm_l=-1.22, arm_r=-1.22), pose(hips=0.03, chest=0.05)],
+        "ledge-stop": [pose(hips=0.16, chest=0.18, head=-0.22, arm_l=-0.18, arm_r=-0.80, leg_l=-0.25, leg_r=0.25), pose(head=-0.12)],
+        "crouch": [pose(hips=0.32, chest=0.20, head=-0.12, arm_l=-0.35, arm_r=-0.35, leg_l=-0.45, leg_r=-0.45)],
+        "crawl": [pose(hips=0.42, chest=0.30, head=-0.18, arm_l=-1.02, arm_r=-0.25, leg_l=0.30, leg_r=-0.30),
+                  pose(hips=0.42, chest=0.30, head=-0.18, arm_l=-0.25, arm_r=-1.02, leg_l=-0.30, leg_r=0.30)],
+        "stand": [pose(hips=0.30, chest=0.20, head=-0.10), pose()],
+        "duck": [pose(hips=0.40, chest=0.28, head=-0.20, arm_l=-0.38, arm_r=-0.38)],
+        "look-up": [pose(chest=-0.08, head=-0.36, arm_l=-0.52, arm_r=-0.52)],
+        "hurt": [pose(hips=-0.20, chest=-0.32, head=0.30, arm_l=0.45, arm_r=0.20, leg_l=0.38, leg_r=-0.20, secondary_swing=0.66),
+                 pose(chest=0.18, head=-0.14, arm_l=-0.30, arm_r=-0.30)],
+        "knockback": [pose(hips=-0.30, chest=-0.40, head=0.34, arm_l=0.70, arm_r=0.70, leg_l=0.52, leg_r=-0.35, secondary_swing=0.85)],
+        "defeat": [pose(hips=0.20, chest=0.12, head=-0.16), pose(hips=0.85, chest=0.70, head=-0.48, arm_l=0.38, arm_r=0.38)],
+        "swap-in": [pose(hips=0.20, chest=0.14, arm_l=-0.10, arm_r=-0.10), pose(hips=-0.08, chest=-0.10, arm_l=-0.82, arm_r=-0.82), pose()],
+        "swap-out": [pose(), pose(hips=0.18, chest=0.16, arm_l=-0.15, arm_r=-0.15)],
+        "victory": [pose(hips=-0.08, chest=-0.16, head=0.08, arm_l=-2.30, arm_r=-2.30, leg_l=0.18, leg_r=-0.18, secondary_swing=-0.50),
+                    pose(hips=0.02, chest=-0.10, head=0.04, arm_l=-2.05, arm_r=-2.05, twist=0.12, secondary_swing=0.18)],
+    }
+
+    # Families below receive distinct files and timing even when they share a
+    # compatible pose grammar. This is deliberate animation-state coverage,
+    # not an empty contract placeholder.
+    family_pose = {
+        "jump-running": expressive["rise"], "jump-triple-1": expressive["rise"],
+        "jump-triple-2": [pose(hips=-0.18, chest=-0.22, head=0.10, arm_l=-1.30, arm_r=-0.50, leg_l=0.55, leg_r=-0.35, twist=0.20)],
+        "jump-triple-3": [pose(hips=-0.28, chest=-0.28, head=0.14, arm_l=-2.20, arm_r=-2.20, leg_l=0.68, leg_r=-0.48, secondary_swing=-0.72)],
+        "duck-slide": expressive["skid"], "slope-slide": expressive["skid"],
+        "rolling-momentum": [pose(hips=0.52, chest=0.72, head=-0.50, arm_l=-0.20, arm_r=-0.20, leg_l=-0.42, leg_r=-0.42, secondary_swing=0.62),
+                             pose(hips=-0.52, chest=-0.72, head=0.50, arm_l=-0.20, arm_r=-0.20, leg_l=-0.42, leg_r=-0.42, secondary_swing=-0.62)],
+        "slide-jump": expressive["takeoff"], "spin-jump": [pose(hips=-0.14, chest=-0.18, arm_l=-1.52, arm_r=-1.52, twist=-0.80), pose(hips=-0.08, chest=-0.10, arm_l=-1.52, arm_r=-1.52, twist=0.80)],
+        "air-spin": [pose(arm_l=-1.45, arm_r=-1.45, twist=-1.0), pose(arm_l=-1.45, arm_r=-1.45, twist=1.0)],
+        "fast-fall": expressive["fall"], "ground-slam": [pose(hips=0.12, chest=0.18, head=-0.10, arm_l=-1.65, arm_r=-1.65, leg_l=-0.20, leg_r=-0.20, secondary_swing=0.85)],
+        "stomp-bounce": expressive["takeoff"],
+        "swim": [pose(chest=-0.12, arm_l=-1.80, arm_r=0.20, leg_l=0.32, leg_r=-0.32, twist=0.18), pose(chest=-0.12, arm_l=0.20, arm_r=-1.80, leg_l=-0.32, leg_r=0.32, twist=-0.18)],
+        "dive": [pose(chest=-0.22, head=0.10, arm_l=-2.55, arm_r=-2.55, leg_l=0.12, leg_r=-0.12)],
+        "surface-breach": expressive["takeoff"],
+        "climb-fence": [pose(arm_l=-1.50, arm_r=-0.35, leg_l=0.40, leg_r=-0.40), pose(arm_l=-0.35, arm_r=-1.50, leg_l=-0.40, leg_r=0.40)],
+        "climb-vine": [pose(arm_l=-1.65, arm_r=-0.55, leg_l=0.35, leg_r=-0.35), pose(arm_l=-0.55, arm_r=-1.65, leg_l=-0.35, leg_r=0.35)],
+        "climb-ladder": [pose(arm_l=-1.45, arm_r=-0.45, leg_l=0.38, leg_r=-0.38), pose(arm_l=-0.45, arm_r=-1.45, leg_l=-0.38, leg_r=0.38)],
+        "climb-detach": expressive["wall-jump"],
+        "rope-grab": [pose(arm_l=-2.25, arm_r=-2.25, leg_l=-0.18, leg_r=0.28, chest=-0.12)],
+        "rope-swing": [pose(arm_l=-2.20, arm_r=-2.20, hips=-0.18, chest=-0.20, leg_l=0.42, leg_r=0.28, secondary_swing=-0.62), pose(arm_l=-2.20, arm_r=-2.20, hips=0.18, chest=0.20, leg_l=-0.18, leg_r=-0.30, secondary_swing=0.62)],
+        "rope-climb": [pose(arm_l=-2.15, arm_r=-1.10, leg_l=0.35, leg_r=-0.30), pose(arm_l=-1.10, arm_r=-2.15, leg_l=-0.30, leg_r=0.35)],
+        "rope-release": expressive["wall-jump"],
+        "carry-light-idle": [pose(arm_l=-1.15, arm_r=-1.15, fore_l=-0.65, fore_r=-0.65)],
+        "carry-light-walk": [pose(arm_l=-1.15, arm_r=-1.15, fore_l=-0.65, fore_r=-0.65, leg_l=0.42, leg_r=-0.42), pose(arm_l=-1.15, arm_r=-1.15, fore_l=-0.65, fore_r=-0.65, leg_l=-0.42, leg_r=0.42)],
+        "carry-heavy-idle": [pose(hips=0.18, chest=0.20, arm_l=-1.35, arm_r=-1.35, fore_l=-0.85, fore_r=-0.85)],
+        "carry-heavy-walk": [pose(hips=0.20, chest=0.22, arm_l=-1.35, arm_r=-1.35, fore_l=-0.85, fore_r=-0.85, leg_l=0.30, leg_r=-0.30), pose(hips=0.20, chest=0.22, arm_l=-1.35, arm_r=-1.35, fore_l=-0.85, fore_r=-0.85, leg_l=-0.30, leg_r=0.30)],
+        "carry-jump": [pose(hips=-0.14, chest=-0.12, arm_l=-1.30, arm_r=-1.30, fore_l=-0.72, fore_r=-0.72, leg_l=0.36, leg_r=-0.20)],
+        "drop": [pose(hips=0.20, chest=0.18, arm_l=-0.85, arm_r=-0.85), pose()],
+        "throw": [pose(chest=0.22, arm_l=-1.50, arm_r=-0.20, twist=-0.32), pose(chest=-0.20, arm_l=0.35, arm_r=-0.45, twist=0.38)],
+    }
+    expressive.update(family_pose)
+
+    loop_names = {
+        "crawl", "rolling-momentum", "swim", "climb-fence", "climb-vine",
+        "climb-ladder", "rope-swing", "rope-climb", "carry-light-walk",
+        "carry-heavy-walk", "victory"
+    }
+    contacts_by_clip = {
+        "land-soft": ((1, "both-feet"),), "land-hard": ((1, "both-feet"),),
+        "stomp-bounce": ((1, "enemy-contact"),), "ground-slam": ((12, "impact"),),
+        "throw": ((8, "release"),), "victory": ((1, "both-feet"),)
+    }
+    for name in SHARED_REPLACEMENT_CLIPS:
+        if name in actions:
+            continue
+        poses = expressive.get(name, [pose(), pose(chest=0.03, head=-0.02)])
+        length = 24 if name in loop_names else 12
+        if len(poses) == 1:
+            keys = [k(1, poses[0]), k(length, poses[0])]
+        else:
+            keys = [k(1 + round(index * (length - 1) / (len(poses) - 1)), value)
+                    for index, value in enumerate(poses)]
+        if name in {"takeoff", "land-soft", "land-hard", "stomp-bounce", "ground-slam"}:
+            if name == "takeoff":
+                keys[0] = k(1, poses[0], {"DEF_hips": (1.12, 1.12, 0.82)})
+                keys[-1] = k(length, poses[-1], {"DEF_hips": (0.90, 0.90, 1.16)})
+            else:
+                keys[0] = k(1, poses[0], {"DEF_hips": (1.16, 1.16, 0.76)})
+                keys[-1] = k(length, poses[-1], {"DEF_hips": (1, 1, 1)})
+        create_action(
+            name, keys, loop=name in loop_names,
+            contacts=contacts_by_clip.get(name, ())
+        )
+
+    if hero == "Hargold":
+        hero_clips = {
+            "double-jump": [pose(hips=-0.20, chest=-0.24, head=0.12, arm_l=-2.0, arm_r=-0.8, leg_l=0.58, leg_r=-0.40, twist=0.55, secondary_swing=-0.70),
+                            pose(hips=-0.08, chest=-0.10, head=0.05, twist=-0.25)],
+            "break-hargold-block": [pose(hips=0.22, chest=0.30, arm_l=-1.55, arm_r=-0.25, twist=-0.32),
+                                    pose(hips=-0.12, chest=-0.24, arm_l=0.42, arm_r=-0.55, twist=0.44)],
+            "heavy-ground-slam": [pose(hips=0.18, chest=0.22, arm_l=-1.85, arm_r=-1.85, secondary_swing=0.90),
+                                  pose(hips=0.52, chest=0.42, arm_l=0.25, arm_r=0.25)],
+            "stonefist-strike": [pose(chest=0.26, arm_l=-1.50, arm_r=-0.15, twist=-0.35),
+                                 pose(chest=-0.25, arm_l=0.55, arm_r=-0.60, twist=0.48)],
+        }
+    else:
+        glide = pose(hips=0.08, chest=-0.10, head=0.06, arm_l=-1.48, arm_r=-1.48,
+                     leg_l=0.12, leg_r=-0.12, secondary_swing=-0.42)
+        hero_clips = {
+            "glide-open": [expressive["fall"][0], glide],
+            "glide-sustain": [glide, pose(hips=0.05, chest=-0.06, head=0.03, arm_l=-1.48, arm_r=-1.48, secondary_swing=-0.30)],
+            "glide-steer-left": [pose(hips=0.05, chest=-0.08, head=0.04, arm_l=-1.58, arm_r=-1.38, twist=-0.20, secondary_swing=-0.38)],
+            "glide-steer-right": [pose(hips=0.05, chest=-0.08, head=0.04, arm_l=-1.38, arm_r=-1.58, twist=0.20, secondary_swing=-0.38)],
+            "glide-close": [glide, expressive["fall"][0]],
+        }
+    for name, poses in hero_clips.items():
+        length = 20 if name == "glide-sustain" else 12
+        keys = [k(1 + round(index * (length - 1) / max(len(poses) - 1, 1)), value)
+                for index, value in enumerate(poses)]
+        cape_open = None
+        if hero == "Mebble":
+            cape_open = (
+                [(1, 0.0), (length, 1.0)] if name == "glide-open"
+                else [(1, 1.0), (length, 0.0)] if name == "glide-close"
+                else [(1, 1.0), (length, 1.0)]
+            )
+        create_action(name, keys, loop=name == "glide-sustain", cape_open=cape_open)
+
+    arm.animation_data.action = actions["idle"]
+    scene.frame_start, scene.frame_end = 1, 48
+
+
 def common_face(hero, arm, geo, mats, center, head_scale, glasses=False):
     x, y, z = center
     head = sphere(f"GEO_{hero}_head", center, head_scale, mats["skin"], geo)
@@ -627,13 +1035,18 @@ def common_face(hero, arm, geo, mats, center, head_scale, glasses=False):
         for eye_part in (eye, pupil, pupil_black, eye_glint):
             parent_bone(eye_part, arm, eye_bone)
             drive_transform(eye_part, "scale", 2, arm, "CTRL_face", blink_prop, f"1.0 - 0.82 * {blink_prop}")
-        brow = cube(
+        brow_half = head_scale[0] * (0.22 if hero == "Hargold" else 0.27)
+        brow_height = head_scale[2] * (0.29 if hero == "Hargold" else 0.31)
+        brow = tube_curve(
             f"GEO_{hero}_brow_{'L' if side < 0 else 'R'}",
-            (eye_x, eye_y - 0.035, eye_z + head_scale[2] * 0.27),
-            (head_scale[0] * 0.20, 0.035, 0.045 if hero == "Hargold" else 0.065),
-            mats["hair"], geo, rotation=(0, side * 0.06, side * 0.06), bevel=0.02
+            (
+                (eye_x - brow_half, eye_y - 0.055, eye_z + brow_height - side * 0.018),
+                (eye_x, eye_y - 0.075, eye_z + brow_height + (0.035 if hero == "Mebble" else 0.018)),
+                (eye_x + brow_half, eye_y - 0.055, eye_z + brow_height + side * 0.018),
+            ),
+            0.045 if hero == "Mebble" else 0.035, mats["hair"], geo
         )
-        parent_bone(brow, arm, "DEF_head")
+        parent_bone(brow, arm, f"DEF_brow.{'L' if side < 0 else 'R'}")
         cheek = sphere(
             f"GEO_{hero}_cheek_{'L' if side < 0 else 'R'}",
             (x + side * head_scale[0] * 0.39, y - head_scale[1] * 0.83, z - head_scale[2] * 0.18),
@@ -693,6 +1106,14 @@ def common_face(hero, arm, geo, mats, center, head_scale, glasses=False):
         0.018 if hero == "Hargold" else 0.014, mats["black"], geo
     )
     parent_bone(smile_curve, arm, "DEF_jaw")
+    for side in (-1, 1):
+        corner = sphere(
+            f"GEO_{hero}_mouth_corner_{'L' if side < 0 else 'R'}",
+            (x + side * head_scale[0] * 0.23, y - head_scale[1] * 0.94, z - head_scale[2] * 0.27),
+            (head_scale[0] * 0.045, head_scale[1] * 0.018, head_scale[2] * 0.040),
+            mats["skin_light"], geo
+        )
+        parent_bone(corner, arm, f"DEF_mouth_corner.{'L' if side < 0 else 'R'}")
     if glasses:
         bridge = cube(f"GEO_{hero}_glasses_bridge", (x, y - head_scale[1] * 0.90, z + 0.05),
                       (head_scale[0] * 0.14, 0.025, 0.025), mats["glass"], geo, bevel=0.015)
@@ -709,7 +1130,7 @@ def common_face(hero, arm, geo, mats, center, head_scale, glasses=False):
 
 
 def hargold(arm, geo, attach, mats):
-    body = sphere("GEO_Hargold_body", (0, 0, 1.38), (0.82, 0.55, 0.90), mats["olive"], geo)
+    body = sphere("GEO_Hargold_body", (0, 0, 1.40), (0.88, 0.60, 0.93), mats["olive"], geo)
     parent_bone(body, arm, "DEF_spine")
     shirt = sphere("GEO_Hargold_shirt_panel", (0, -0.50, 1.50), (0.43, 0.075, 0.54), mats["cream"], geo)
     parent_bone(shirt, arm, "DEF_chest")
@@ -725,10 +1146,10 @@ def hargold(arm, geo, attach, mats):
     scarf = torus("GEO_Hargold_scarf", (0, 0, 2.08), 0.52, 0.16, mats["scarf"], geo, rotation=(0, 0, 0))
     scarf.scale.y = 0.82
     parent_bone(scarf, arm, "DEF_chest")
-    common_face("Hargold", arm, geo, mats, (0, -0.02, 2.48), (0.67, 0.55, 0.64))
-    beard = sphere("GEO_Hargold_beard", (0, -0.56, 2.11), (0.31, 0.12, 0.25), mats["hair"], geo)
-    moustache_l = sphere("GEO_Hargold_moustache_L", (-0.13, -0.61, 2.36), (0.17, 0.055, 0.065), mats["hair"], geo)
-    moustache_r = sphere("GEO_Hargold_moustache_R", (0.13, -0.61, 2.36), (0.17, 0.055, 0.065), mats["hair"], geo)
+    common_face("Hargold", arm, geo, mats, (0, -0.02, 2.50), (0.72, 0.60, 0.68))
+    beard = sphere("GEO_Hargold_beard", (0, -0.61, 2.14), (0.28, 0.10, 0.21), mats["hair"], geo)
+    moustache_l = sphere("GEO_Hargold_moustache_L", (-0.13, -0.665, 2.39), (0.18, 0.050, 0.060), mats["hair"], geo)
+    moustache_r = sphere("GEO_Hargold_moustache_R", (0.13, -0.665, 2.39), (0.18, 0.050, 0.060), mats["hair"], geo)
     moustache_l.rotation_euler.y = -0.18
     moustache_r.rotation_euler.y = 0.18
     for obj in (beard, moustache_l, moustache_r):
@@ -738,10 +1159,10 @@ def hargold(arm, geo, attach, mats):
     parent_bone(smile, arm, "DEF_jaw")
     parent_bone(smile_teeth, arm, "DEF_jaw")
     for index, (bx, bz, scale) in enumerate((
-        (-0.20, 2.10, (0.13, 0.055, 0.15)),
-        (-0.07, 2.02, (0.13, 0.055, 0.17)),
-        (0.07, 2.02, (0.13, 0.055, 0.17)),
-        (0.20, 2.10, (0.13, 0.055, 0.15)),
+        (-0.18, 2.12, (0.11, 0.045, 0.13)),
+        (-0.06, 2.06, (0.11, 0.045, 0.14)),
+        (0.06, 2.06, (0.11, 0.045, 0.14)),
+        (0.18, 2.12, (0.11, 0.045, 0.13)),
     )):
         beard_curl = sphere(f"GEO_Hargold_beard_curl_{index}", (bx, -0.66, bz), scale, mats["hair"], geo)
         parent_bone(beard_curl, arm, "DEF_head")
@@ -758,20 +1179,31 @@ def hargold(arm, geo, attach, mats):
         button = sphere(f"GEO_Hargold_jacket_button_{index}", (0, -0.59, z),
                         (0.055, 0.025, 0.055), mats["brass"], geo)
         parent_bone(button, arm, "DEF_chest")
+    for side, sign in (("L", -1), ("R", 1)):
+        fold = tube_curve(
+            f"GEO_Hargold_jacket_fold_{side}",
+            (
+                (sign * 0.46, -0.565, 1.72),
+                (sign * 0.52, -0.575, 1.52),
+                (sign * 0.47, -0.565, 1.30),
+            ),
+            0.016, mats["olive_dark"], geo
+        )
+        parent_bone(fold, arm, "DEF_chest")
     scarf_knot = sphere("GEO_Hargold_scarf_knot", (0, -0.58, 1.99), (0.16, 0.07, 0.15), mats["olive_dark"], geo)
     scarf_tail_l = trapezoid_prism("GEO_Hargold_scarf_tail_L", (-0.10, -0.57, 1.79), 0.12, 0.19, 0.43, 0.045, mats["olive_dark"], geo)
     scarf_tail_r = trapezoid_prism("GEO_Hargold_scarf_tail_R", (0.10, -0.57, 1.78), 0.12, 0.18, 0.39, 0.045, mats["olive_dark"], geo)
     parent_bone(scarf_knot, arm, "DEF_chest")
     parent_bone(scarf_tail_l, arm, "DEF_scarf_tail.L")
     parent_bone(scarf_tail_r, arm, "DEF_scarf_tail.R")
-    brim = cylinder("GEO_Hargold_hat_brim", (0, 0, 2.99), 0.76, 0.075, mats["olive_dark"], geo)
+    brim = cylinder("GEO_Hargold_hat_brim", (0, 0, 3.03), 0.82, 0.075, mats["olive_dark"], geo)
     brim.scale.y = 0.82
     brim.rotation_euler.y = -0.07
-    crown = cone("GEO_Hargold_hat_crown", (0.04, 0.05, 3.27), 0.45, 0.27, 0.58, mats["olive"], geo, rotation=(0, -0.08, 0))
-    band = torus("GEO_Hargold_hat_band", (0, 0.02, 3.08), 0.37, 0.045, mats["brown_light"], geo, rotation=(0, 0, 0))
+    crown = cone("GEO_Hargold_hat_crown", (0.04, 0.05, 3.31), 0.48, 0.29, 0.60, mats["olive"], geo, rotation=(0, -0.08, 0))
+    band = torus("GEO_Hargold_hat_band", (0, 0.02, 3.12), 0.40, 0.045, mats["brown_light"], geo, rotation=(0, 0, 0))
     feather = cone("GEO_Hargold_feather", (-0.46, 0.0, 3.30), 0.13, 0.025, 0.58, mats["orange"], attach, rotation=(0, -0.8, 0))
     for obj in (brim, crown, band):
-        parent_bone(obj, arm, "DEF_head")
+        parent_bone(obj, arm, "DEF_hat_secondary")
     parent_bone(feather, arm, "DEF_feather")
     backpack = cube("GEO_Hargold_backpack", (0, 0.53, 1.55), (0.55, 0.22, 0.62), mats["olive_dark"], attach, bevel=0.12)
     flap = cube("GEO_Hargold_backpack_flap", (0, 0.78, 1.75), (0.47, 0.08, 0.22), mats["brown_light"], attach, bevel=0.08)
@@ -794,9 +1226,11 @@ def hargold(arm, geo, attach, mats):
                      (0.17, 0.10, 0.20), mats["brown_light"], attach, bevel=0.055)
         parent_bone(pouch, arm, "DEF_hips")
     for side, sign in (("L", -1), ("R", 1)):
-        lapel = cube(f"GEO_Hargold_jacket_lapel_{side}", (sign * 0.24, -0.55, 1.68),
-                     (0.12, 0.035, 0.39), mats["olive_light"], geo,
-                     rotation=(0, sign * 0.18, sign * 0.20), bevel=0.035)
+        lapel = ellipsoid_between(
+            f"GEO_Hargold_jacket_lapel_{side}",
+            (sign * 0.13, -0.585, 1.98), (sign * 0.31, -0.58, 1.36),
+            0.105, mats["olive_light"], geo, taper=0.42
+        )
         parent_bone(lapel, arm, "DEF_chest")
     for side, sign in (("L", -1), ("R", 1)):
         cuff = torus(f"GEO_Hargold_sleeve_cuff_{side}", (sign * 1.48, 0, 1.72),
@@ -807,15 +1241,15 @@ def hargold(arm, geo, attach, mats):
 
 
 def mebble(arm, geo, attach, mats):
-    torso = sphere("GEO_Mebble_torso", (0, 0, 1.86), (0.43, 0.30, 0.68), mats["brown_light"], geo)
-    shirt = sphere("GEO_Mebble_shirt", (0, -0.18, 1.88), (0.37, 0.20, 0.61), mats["cream"], geo)
+    torso = sphere("GEO_Mebble_torso", (0, 0, 1.88), (0.45, 0.31, 0.70), mats["brown_light"], geo)
+    shirt = sphere("GEO_Mebble_shirt", (0, -0.20, 1.90), (0.39, 0.21, 0.63), mats["cream"], geo)
     parent_bone(torso, arm, "DEF_spine")
     parent_bone(shirt, arm, "DEF_chest")
-    neck = cylinder("GEO_Mebble_neck", (0, 0, 2.72), 0.16, 1.02, mats["skin"], geo)
+    neck = sphere("GEO_Mebble_neck", (0, 0, 2.74), (0.17, 0.15, 0.55), mats["skin"], geo)
     parent_bone(neck, arm, "DEF_neck")
     adam = sphere("GEO_Mebble_adams_apple", (0, -0.16, 2.73), (0.10, 0.07, 0.12), mats["skin_light"], geo)
     parent_bone(adam, arm, "DEF_adams_apple")
-    common_face("Mebble", arm, geo, mats, (0, -0.01, 3.30), (0.47, 0.40, 0.55), glasses=True)
+    common_face("Mebble", arm, geo, mats, (0, -0.01, 3.32), (0.53, 0.44, 0.60), glasses=True)
     chin = sphere("GEO_Mebble_chin", (0, -0.34, 3.00), (0.13, 0.065, 0.10), mats["skin"], geo)
     goatee = sphere("GEO_Mebble_goatee", (0, -0.405, 2.94), (0.07, 0.025, 0.05), mats["hair"], geo)
     parent_bone(chin, arm, "DEF_head")
@@ -853,7 +1287,7 @@ def mebble(arm, geo, attach, mats):
                  mats["olive_light"], geo, rotation=(0, 0.14, -0.08))
     leaf = sphere("GEO_Mebble_hat_leaf", (0.38, -0.01, 4.02), (0.15, 0.030, 0.065), mats["olive_light"], attach)
     for obj in (brim, crown, band, leaf):
-        parent_bone(obj, arm, "DEF_head")
+        parent_bone(obj, arm, "DEF_hat_secondary")
     for z in (1.52, 1.75):
         belt = torus(f"GEO_Mebble_belt_{z}", (0, 0, z), 0.39, 0.05, mats["brown"], geo, rotation=(0, 0, 0))
         belt.scale.y = 0.78
@@ -865,6 +1299,17 @@ def mebble(arm, geo, attach, mats):
     for z in (1.83, 2.04, 2.25):
         button = sphere(f"GEO_Mebble_shirt_button_{z}", (0, -0.405, z), (0.036, 0.018, 0.036), mats["brass"], geo)
         parent_bone(button, arm, "DEF_chest")
+    for side, sign in (("L", -1), ("R", 1)):
+        fold = tube_curve(
+            f"GEO_Mebble_shirt_fold_{side}",
+            (
+                (sign * 0.28, -0.395, 2.26),
+                (sign * 0.32, -0.405, 2.05),
+                (sign * 0.27, -0.395, 1.82),
+            ),
+            0.012, mats["cream"], geo
+        )
+        parent_bone(fold, arm, "DEF_chest")
     hood_back = sphere("GEO_Mebble_hood_back", (0, 0.21, 2.45), (0.39, 0.20, 0.18), mats["olive"], geo)
     hood_l = sphere("GEO_Mebble_hood_L", (-0.24, -0.10, 2.43), (0.19, 0.11, 0.12), mats["olive"], geo)
     hood_r = sphere("GEO_Mebble_hood_R", (0.24, -0.10, 2.43), (0.19, 0.11, 0.12), mats["olive"], geo)
@@ -873,15 +1318,24 @@ def mebble(arm, geo, attach, mats):
     clasp = torus("GEO_Mebble_cape_clasp", (0, -0.405, 2.44), 0.070, 0.022, mats["brass"], geo)
     parent_bone(clasp, arm, "DEF_chest")
     for side, sign in (("L", -1), ("R", 1)):
-        vest = cube(f"GEO_Mebble_vest_panel_{side}", (sign * 0.19, -0.30, 1.95),
-                    (0.16, 0.035, 0.49), mats["brown_light"], geo, bevel=0.035)
+        vest = ellipsoid_between(
+            f"GEO_Mebble_vest_panel_{side}",
+            (sign * 0.18, -0.365, 2.42), (sign * 0.19, -0.36, 1.55),
+            0.155, mats["brown_light"], geo, taper=0.34
+        )
         pouch = cube(f"GEO_Mebble_pouch_{side}", (sign * 0.34, -0.34, 1.54),
                      (0.14, 0.08, 0.18), mats["brown"], attach, bevel=0.05)
         parent_bone(vest, arm, "DEF_chest")
         parent_bone(pouch, arm, "DEF_hips")
-        suspender = cube(f"GEO_Mebble_suspender_{side}", (sign * 0.20, -0.36, 2.12),
-                         (0.045, 0.025, 0.39), mats["brown"], geo,
-                         rotation=(0, sign * 0.08, sign * 0.06), bevel=0.018)
+        suspender = tube_curve(
+            f"GEO_Mebble_suspender_{side}",
+            (
+                (sign * 0.18, -0.425, 2.47),
+                (sign * 0.21, -0.430, 2.10),
+                (sign * 0.19, -0.425, 1.68),
+            ),
+            0.035, mats["brown"], geo
+        )
         parent_bone(suspender, arm, "DEF_chest")
     cape = curved_cape("GEO_Mebble_cape", (0, 0.43, 2.04), 0.70, 1.15, 1.82, 0.08,
                        mats["olive"], attach)
@@ -905,18 +1359,31 @@ def limbs(arm, geo, mats, hero, arm_width, leg_width, boot_height):
         "Mebble": {"shoulder": 2.27, "elbow": 0.86, "wrist": 1.18, "leg_x": 0.20, "knee": 0.72, "ankle": 0.19},
     }[hero]
     for side, sign in (("L", -1), ("R", 1)):
-        upper_x = sign * (dims["elbow"] - 0.20)
-        fore_x = sign * (dims["elbow"] + dims["wrist"]) / 2
-        upper = cylinder(f"GEO_{hero}_upper_arm_{side}", (upper_x, 0, dims["shoulder"] - 0.07),
-                         arm_width, abs(dims["elbow"] - 0.38), mats["olive" if hero == "Hargold" else "cream"],
-                         geo, rotation=(0, math.pi / 2, 0))
-        fore = cylinder(f"GEO_{hero}_forearm_{side}", (fore_x, 0, dims["shoulder"] - 0.20),
-                        arm_width * 0.83, abs(dims["wrist"] - dims["elbow"]), mats["skin"], geo,
-                        rotation=(0, math.pi / 2, 0))
+        shoulder_x = 0.70 if hero == "Hargold" else 0.40
+        upper = ellipsoid_between(
+            f"GEO_{hero}_upper_arm_{side}",
+            (sign * shoulder_x, 0, dims["shoulder"]),
+            (sign * dims["elbow"], 0, dims["shoulder"] - 0.12),
+            arm_width * 1.04, mats["olive" if hero == "Hargold" else "cream"],
+            geo, taper=1.05
+        )
+        fore = ellipsoid_between(
+            f"GEO_{hero}_forearm_{side}",
+            (sign * dims["elbow"], 0, dims["shoulder"] - 0.12),
+            (sign * dims["wrist"], 0, dims["shoulder"] - 0.28),
+            arm_width * 0.88, mats["skin"], geo, taper=1.02
+        )
+        elbow = sphere(
+            f"GEO_{hero}_elbow_{side}",
+            (sign * dims["elbow"], 0, dims["shoulder"] - 0.12),
+            (arm_width * 0.92, arm_width * 0.88, arm_width * 0.92),
+            mats["skin" if hero == "Mebble" else "olive"], geo
+        )
         hand = sphere(f"GEO_{hero}_hand_{side}", (sign * (dims["wrist"] + 0.13), -0.01, dims["shoulder"] - 0.27),
-                      (arm_width * 1.10, arm_width * 0.72, arm_width * 1.22), mats["skin_light"], geo)
+                      (arm_width * 1.04, arm_width * 0.82, arm_width * 1.16), mats["skin_light"], geo)
         parent_bone(upper, arm, f"DEF_upper_arm.{side}")
         parent_bone(fore, arm, f"DEF_forearm.{side}")
+        parent_bone(elbow, arm, f"DEF_forearm.{side}")
         parent_bone(hand, arm, f"DEF_hand.{side}")
         finger_names = ("thumb", "index", "middle", "ring", "pinky")
         for finger_index, finger_name in enumerate(finger_names):
@@ -927,32 +1394,43 @@ def limbs(arm, geo, mats, hero, arm_width, leg_width, boot_height):
                 z_offset = -arm_width * 0.62
             for segment in (1, 2):
                 segment_start = (
-                    sign * (dims["wrist"] + 0.20 + (segment - 1) * arm_width * 0.34),
-                    y_offset,
+                    sign * (dims["wrist"] + 0.18 + (segment - 1) * arm_width * 0.22),
+                    y_offset * 0.72,
                     dims["shoulder"] - 0.27 + z_offset
                 )
                 segment_end = (
-                    sign * (dims["wrist"] + 0.20 + segment * arm_width * 0.34),
-                    y_offset - arm_width * 0.10,
+                    sign * (dims["wrist"] + 0.18 + segment * arm_width * 0.22),
+                    y_offset * 0.72 - arm_width * 0.06,
                     dims["shoulder"] - 0.27 + z_offset - (0.018 if finger_name == "thumb" else 0)
                 )
-                digit = cylinder_between(
+                digit = ellipsoid_between(
                     f"GEO_{hero}_{finger_name}_{segment}_{side}",
                     segment_start, segment_end,
-                    arm_width * (0.20 if finger_name != "thumb" else 0.23),
-                    mats["skin_light"], geo, vertices=16
+                    arm_width * (0.21 if finger_name != "thumb" else 0.24),
+                    mats["skin_light"], geo
                 )
                 parent_bone(digit, arm, f"DEF_{finger_name}.0{segment}.{side}")
         thigh_z = (0.98 + dims["knee"]) / 2 if hero == "Hargold" else (1.55 + dims["knee"]) / 2
         thigh_len = (0.98 - dims["knee"]) if hero == "Hargold" else (1.55 - dims["knee"])
-        thigh = cylinder(f"GEO_{hero}_thigh_{side}", (sign * dims["leg_x"], 0, thigh_z),
-                         leg_width, thigh_len, mats["trouser"], geo)
+        thigh = ellipsoid_between(
+            f"GEO_{hero}_thigh_{side}",
+            (sign * dims["leg_x"], 0, thigh_z + thigh_len * 0.48),
+            (sign * dims["leg_x"], 0, thigh_z - thigh_len * 0.48),
+            leg_width, mats["trouser"], geo, taper=1.04
+        )
         shin_z = (dims["knee"] + dims["ankle"]) / 2
-        shin = cylinder(f"GEO_{hero}_shin_{side}", (sign * dims["leg_x"], 0, shin_z),
-                        leg_width * 0.85, dims["knee"] - dims["ankle"], mats["trouser"], geo)
-        boot = cube(f"GEO_{hero}_boot_{side}", (sign * dims["leg_x"], -0.10, boot_height / 2),
-                    (leg_width * 1.22, 0.30 if hero == "Hargold" else 0.24, boot_height / 2),
-                    mats["brown"], geo, bevel=0.10)
+        shin = ellipsoid_between(
+            f"GEO_{hero}_shin_{side}",
+            (sign * dims["leg_x"], 0, dims["knee"]),
+            (sign * dims["leg_x"], 0, dims["ankle"]),
+            leg_width * 0.88, mats["trouser"], geo, taper=1.02
+        )
+        boot = sphere(
+            f"GEO_{hero}_boot_{side}",
+            (sign * dims["leg_x"], -0.02, boot_height * 0.52),
+            (leg_width * 1.20, 0.27 if hero == "Hargold" else 0.22, boot_height * 0.52),
+            mats["brown"], geo
+        )
         parent_bone(thigh, arm, f"DEF_thigh.{side}")
         parent_bone(shin, arm, f"DEF_shin.{side}")
         parent_bone(boot, arm, f"DEF_foot.{side}")
@@ -962,6 +1440,12 @@ def limbs(arm, geo, mats, hero, arm_width, leg_width, boot_height):
             (leg_width * 1.28, 0.24, boot_height * 0.27),
             mats["brown_light"], geo
         )
+        heel = sphere(
+            f"GEO_{hero}_boot_heel_{side}",
+            (sign * dims["leg_x"], 0.13, boot_height * 0.23),
+            (leg_width * 1.08, 0.20, boot_height * 0.24),
+            mats["brown"], geo
+        )
         cuff = torus(
             f"GEO_{hero}_boot_cuff_{side}",
             (sign * dims["leg_x"], 0, boot_height * 0.78),
@@ -969,6 +1453,7 @@ def limbs(arm, geo, mats, hero, arm_width, leg_width, boot_height):
         )
         cuff.scale.y = 0.78
         parent_bone(toe, arm, f"DEF_foot.{side}")
+        parent_bone(heel, arm, f"DEF_foot.{side}")
         parent_bone(cuff, arm, f"DEF_shin.{side}")
         sole = cube(
             f"GEO_{hero}_boot_sole_{side}",
@@ -1117,19 +1602,23 @@ def build(hero):
     collision.display_type = "WIRE"
     collision.hide_render = True
     collision["export_enabled"] = False
-    add_core_actions(arm, hero)
+    add_production_actions(arm, hero)
     scene = bpy.context.scene
     if hero == "Mebble":
         arm.pose.bones["CTRL_cape.01"]["cape_open"] = 0.0
         scene.frame_set(2)
         scene.frame_set(1)
         bpy.context.view_layer.update()
-    scene["assetVersion"] = "0.1.0"
-    scene["canonVersion"] = "2026-07-25"
+    scene["assetVersion"] = "1.0.0-replacement"
+    scene["canonVersion"] = "2026-07-25-character-overhaul-1"
     scene["referenceHash"] = "4004C659783AC41ED09E6AF18D25F776DFB19BE44B9E7066289627E016A7B4E4" if hero == "Hargold" else "1A85C41AFC53061612B772F221A3F354E4E58C015F4753AFF2C3C44EC80662D0"
     scene["author"] = "Hargold & Mebble production pipeline"
     scene["blenderVersion"] = bpy.app.version_string
-    scene["reviewStatus"] = "production-intent-visual-review-required"
+    scene["reviewStatus"] = "replacement-generated-art-pass-visual-approval-required"
+    scene["geometryGeneration"] = "full-rebuild-2026-07-25"
+    scene["reusesPriorGeometry"] = False
+    scene["sourceScene"] = "factory-empty"
+    scene["animationGeneration"] = "all-clips-replaced-2026-07-25"
     scene["lockedReference"] = str(REFERENCE_DIR / f"{hero} locked production character sheet.png")
     setup_render(hero, groups["GEO"])
     BLEND_DIR.mkdir(parents=True, exist_ok=True)

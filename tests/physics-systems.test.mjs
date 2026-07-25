@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { createMotionState } from '../src/runtime/motion/motion-controller.js';
 import {
   animationIntent, applyHurt, createActionState, stompBounce, tryAirJump,
-  updateAirActions, updateStanceActions, updateWallActions
+  setVictory, updateAirActions, updateStanceActions,
+  updateTraversalPresentation, updateWallActions
 } from '../src/runtime/motion/action-controller.js';
 import {
   attachClimb, createRopeState, stepClimb, stepRope, stepWater,
@@ -38,8 +39,12 @@ assert.equal(hargoldAction.crouched, false, 'airborne heroes do not crouch');
 hargold.grounded = true;
 updateStanceActions(hargold, hargoldAction, { downHeld: true }, {});
 assert.equal(hargoldAction.crouched, true);
+updateStanceActions(hargold, hargoldAction, { downHeld: true, right: true }, {});
+assert.equal(hargoldAction.crawling, true);
 updateStanceActions(hargold, hargoldAction, { downHeld: false }, { canStand: () => false });
 assert.equal(hargoldAction.crouched, true, 'blocked stand remains crouched');
+updateTraversalPresentation(hargoldAction, { wallCollision: true, nearLedge: true, movementInput: 0 });
+setVictory(hargoldAction);
 
 hargold.grounded = false; hargold.velocityY = 1;
 updateAirActions(hargold, hargoldAction, { spinPressed: true, fastFallHeld: true }, dt);
@@ -80,6 +85,10 @@ assert.deepEqual(fatal.bypasses, ['hearts', 'invulnerability', 'activePowerUp'])
 const intent = animationIntent(hargold, hargoldAction, { material: 'ice', slope: 0.1 });
 assert.equal(intent.hero, 'Hargold');
 assert.equal(intent.surfaceMaterial, 'ice');
+assert.equal(intent.crawling, true);
+assert.equal(intent.wallReacting, true);
+assert.equal(intent.ledgeStopping, true);
+assert.equal(intent.victory, true);
 assert.ok(Object.isFrozen(intent));
 
 console.log('Reusable physics-system checks passed.');

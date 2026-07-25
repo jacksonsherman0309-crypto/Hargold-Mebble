@@ -18,6 +18,7 @@ const noInput = Object.freeze({
   left: false,
   right: false,
   run: false,
+  sprint: false,
   jumpPressed: false,
   jumpHeld: false,
   glideHeld: false
@@ -40,6 +41,11 @@ const runState = createMotionState();
 simulate(runState, 1, () => ({ right: true, run: true }));
 assert.ok(Math.abs(runState.velocityX - TUNING.runSpeed) < 1e-9);
 assert.equal(runState.locomotion, 'run');
+
+const sprintState = createMotionState();
+simulate(sprintState, 1, () => ({ right: true, run: true, sprint: true }));
+assert.ok(Math.abs(sprintState.velocityX - TUNING.sprintSpeed) < 1e-9);
+assert.equal(sprintState.locomotion, 'sprint');
 
 simulate(runState, 1, () => ({}));
 assert.equal(runState.velocityX, 0);
@@ -185,7 +191,11 @@ function deterministicReplay() {
 assert.deepEqual(deterministicReplay(), deterministicReplay());
 
 assert.equal(PROVISIONAL_HERO_PROFILES.Hargold.status, 'proxy-collider-pending-production-mesh');
+assert.equal(
+  PROVISIONAL_HERO_PROFILES.Hargold.airControlMultiplier,
+  PROVISIONAL_HERO_PROFILES.Mebble.airControlMultiplier,
+  'both heroes use identical shared horizontal air-control tuning'
+);
 assert.equal(TUNING.status, 'provisional-engineering-tuning');
 
 console.log('Modular motion extraction checks passed.');
-

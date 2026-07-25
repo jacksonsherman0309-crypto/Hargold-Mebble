@@ -14,6 +14,10 @@ assert.equal(
 assert.deepEqual(GAME_RULES.campaign.difficultyModes, ['Easy', 'Normal', 'Hard', 'Nightmare']);
 assert.deepEqual(GAME_RULES.movement.wallJump, { Hargold: true, Mebble: true });
 assert.equal(GAME_RULES.movement.allRequiredJumpsReachableByHargold, true);
+assert.equal(GAME_RULES.movement.sharedHorizontalBaseTuning, true);
+assert.deepEqual(GAME_RULES.movement.locomotionTargets, ['walk', 'run', 'sprint']);
+assert.ok(GAME_RULES.movement.requiredCharacterStates.includes('crawl'));
+assert.ok(GAME_RULES.movement.requiredCharacterStates.includes('victory'));
 assert.equal(GAME_RULES.heroGating.avoidRepeatedMainRouteBacktrackingSwaps, true);
 
 assert.equal(GAME_RULES.health.heartsAndLivesSeparate, true);
@@ -45,6 +49,9 @@ assert.equal(LOCKED_HERO_DESIGN.Hargold.reference, 'assets/references/Hargold lo
 assert.equal(LOCKED_HERO_DESIGN.Mebble.reference, 'assets/references/Mebble locked production character sheet.png');
 assert.match(LOCKED_HERO_DESIGN.Hargold.clothing.join(' '), /backpack/);
 assert.match(LOCKED_HERO_DESIGN.Mebble.clothing.join(' '), /double belts/);
+assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /new geometry/);
+assert.match(LOCKED_HERO_DESIGN.Mebble.productionAnimation.join(' '), /new gameplay clips/);
+assert.match(LOCKED_HERO_DESIGN.Hargold.gameplay.join(' '), /exclusive learned double jump/);
 
 for (const world of CAMPAIGN) {
   assert.equal(world.routeStructure.mainCompletionSlots, 8);
