@@ -3,12 +3,12 @@ import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 
 const MODEL_SPECS = Object.freeze({
   Hargold: Object.freeze({
-    url: '../assets/exports/hargold_character.glb',
+    url: new URL('../assets/exports/hargold_character.glb', import.meta.url).href,
     pixelsPerMetre: 67,
     yaw: 0
   }),
   Mebble: Object.freeze({
-    url: '../assets/exports/mebble_character.glb',
+    url: new URL('../assets/exports/mebble_character.glb', import.meta.url).href,
     pixelsPerMetre: 61,
     yaw: 0
   })
