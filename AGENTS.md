@@ -1,6 +1,6 @@
 # Codex Instructions for Hargold & Mebble
 
-Codex must load the current design, mechanics, movement, level-planning, and machine-readable contract files before planning, editing, reviewing, or testing this repository.
+Codex must load the current design, mechanics, movement, level-planning, machine-readable contracts, and source inventory before planning, editing, reviewing, or testing this repository.
 
 ## Required reading order
 
@@ -10,7 +10,8 @@ Codex must load the current design, mechanics, movement, level-planning, and mac
 4. `docs/movement-and-collision-spec.md` — complete universal movement, collision, terrain, water, climbing, carrying, and deterministic-simulation contract.
 5. `src/canonical-data.js` — machine-readable rules, campaign accounting, World 1 plans, and locked hero data.
 6. `docs/historical-build-handoff.md` — older Build 025–030 plans and explicit production boundaries.
-7. The current implementation files relevant to the task.
+7. `docs/archived-source-inventory.md` — actual earlier standalone code artifacts, their known contents, and whether they are committed or File-Library-only.
+8. The current implementation files relevant to the task.
 
 ## Authority and conflict rules
 
@@ -21,6 +22,7 @@ Codex must load the current design, mechanics, movement, level-planning, and mac
 - Do not silently simplify, omit, reinterpret, or replace locked mechanics and designs.
 - Clearly mark unresolved design items and temporary implementations as provisional.
 - Do not adopt historical world names, themes, bosses, or level plans as current canon when they conflict with newer documents.
+- Do not claim a File-Library-only artifact has been imported into GitHub.
 
 ## Implementation expectations
 
@@ -58,9 +60,9 @@ Also run any task-specific checks available for gameplay, rendering, level data,
 
 1. Read the relevant canonical documents in the order above.
 2. Inspect current code and data for conflicts.
-3. Distinguish current canon from historical reference material.
+3. Distinguish current canon from historical reference material and File-Library-only source artifacts.
 4. Implement the requested behavior without breaking other locked mechanics.
 5. Update canonical docs/data when the user has approved a new rule.
 6. Add or update tests.
 7. Run the most relevant checks.
-8. Report what is actually implemented, what remains provisional, which production assets are missing, and any unresolved design decisions.
+8. Report what is actually implemented, what remains provisional, which production assets/source files are missing, and any unresolved design decisions.
