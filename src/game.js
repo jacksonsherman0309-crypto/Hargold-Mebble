@@ -1,3 +1,5 @@
+import { CharacterRenderer } from './character-renderer.js';
+
 /*
  * Browser-compatible test entry.
  *
@@ -246,6 +248,15 @@ const WORLD_END = 36;
 const keys = new Set();
 const touch = { left: false, right: false, run: false, jump: false, action: false };
 const loop = new FixedStepLoop({ hz: 120 });
+let characterLoadStatus = 'Loading 3D characters...';
+const characterRenderer = new CharacterRenderer({
+  mount: canvas.parentElement,
+  width: W,
+  height: H,
+  onProgress(message) {
+    characterLoadStatus = message;
+  }
+});
 
 const terrain = createLinearGround([
   [0, 7.9], [5, 7.9], [8, 7.25], [12, 7.85], [16, 7.15],
@@ -497,6 +508,7 @@ function drawMarkers() {
 }
 
 function drawPlayer() {
+  if (characterRenderer.isReady(player.hero)) return;
   const body = motionBody(player);
   const x = worldToScreenX(body.x);
   const y = worldToScreenY(body.y);
@@ -577,8 +589,16 @@ function frame(now) {
   noticeSeconds = Math.max(0, noticeSeconds - elapsed);
   const targetCamera = Math.max(0, player.footX * SCALE - W * 0.34);
   cameraX += (targetCamera - cameraX) * Math.min(1, elapsed * 5);
-  status.textContent = `${session.state === 'playing' ? 'PLAYING' : session.state.toUpperCase()} · 120 Hz · Provisional tuning`;
+  status.textContent = `${session.state === 'playing' ? 'PLAYING' : session.state.toUpperCase()} · 120 Hz · ${characterLoadStatus}`;
   draw();
+  characterRenderer.render({
+    hero: player.hero,
+    screenX: worldToScreenX(player.footX),
+    screenY: worldToScreenY(player.footY),
+    facing: player.facing,
+    locomotion: player.locomotion,
+    glide: player.glide
+  }, elapsed);
   requestAnimationFrame(frame);
 }
 

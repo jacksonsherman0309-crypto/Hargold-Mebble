@@ -31,6 +31,13 @@ The approved Hargold and Mebble designs are locked. This template is a neutral
 one-meter calibration asset and does not create or modify either character.
 Character changes require explicit approval before editing.
 
+`build_locked_characters.py` is the separate locked-sheet character builder. It
+currently generates editable WIP character sources, GLBs, orthographic QA
+renders, and deformation-pose renders. `validate_locked_character.py` verifies
+the implemented rig controls, facial drivers, secondary rigs, runtime GLB skin,
+core clips, and Mebble's cape morph. Passing that WIP validator is not the same
+as passing final art, topology, animation-completeness, or engine approval.
+
 ## Commands
 
 From the repository root:
@@ -51,4 +58,3 @@ Validate or export another source file:
 The exporter validates first and stops on contract errors. It exports only
 eligible objects in `GAMEPLAY` as a binary glTF (`.glb`), with transforms
 applied for runtime use.
-

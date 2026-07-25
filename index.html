@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#17281d">
-  <title>Hargold & Mebble — Test Build</title>
+  <title>Hargold &amp; Mebble — 3D Motion Test</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="shell">
     <header class="hud">
-      <div><strong>Hargold &amp; Mebble</strong><span>Modular Motion Test Build</span></div>
-      <div id="status">Loading…</div>
+      <div><strong>Hargold &amp; Mebble</strong><span>Rigged 3D Motion Test Build</span></div>
+      <div id="status">Loading 3D characters…</div>
     </header>
 
     <section class="game-wrap" aria-label="Playable game prototype">
@@ -35,6 +35,19 @@
       Move: A/D or arrows · Run: Shift/X · Jump: Space/W/↑ · Glide/Fast fall: E/S/↓ · Swap: Q · Restart: R
     </footer>
   </main>
-  <script defer src="src/game.js"></script>
+  <script>
+    document.documentElement.dataset.javascript = 'enabled';
+    document.querySelector('#status').textContent = 'Starting 3D runtime…';
+    addEventListener('error', event => {
+      const status = document.querySelector('#status');
+      if (status) status.textContent = `STARTUP ERROR · ${event.message || 'module failed to load'}`;
+    });
+    addEventListener('unhandledrejection', event => {
+      const status = document.querySelector('#status');
+      const detail = event.reason?.message || String(event.reason || 'asset promise rejected');
+      if (status) status.textContent = `ASSET ERROR · ${detail}`;
+    });
+  </script>
+  <script type="module" src="src/game.js" onerror="document.querySelector('#status').textContent='STARTUP ERROR · game module failed to load'"></script>
 </body>
 </html>
