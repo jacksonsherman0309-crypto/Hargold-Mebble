@@ -2,53 +2,69 @@
 
 Development repository for the mobile-first Hargold & Mebble side-scrolling platformer.
 
-## Easiest way to give Codex old files
+## Import the complete earlier game work
 
-After pulling the latest repository changes in GitHub Desktop:
+The earlier campaign must be imported as world-specific and level-specific authored material—not converted into a universal level generator.
+
+After pulling the latest changes in GitHub Desktop:
 
 1. Open the `Hargold-Mebble` folder.
 2. Open `DROP_FILES_HERE`.
-3. Drag any downloaded old build, character image, Blender file, or editor file into that folder.
+3. Drag downloaded old files, complete folders, or ZIP packages into it.
 4. Return to the main `Hargold-Mebble` folder.
 5. Double-click `IMPORT_FILES.bat`.
 6. Tell Codex:
 
 ```text
-Read AGENTS.md first. Then inspect IMPORT_STATUS.txt and every newly imported file.
+Read AGENTS.md, docs/world-specific-archive-policy.md, and IMPORT_STATUS.txt. Inventory the complete imported package before changing code. Preserve every authored world's and level's mechanics, enemy placements, encounter waves, and boss structure. Do not replace them with a universal level template.
 ```
 
-The importer automatically sorts files into the correct archive, reference-image, Blender, or export folder. It copies files instead of deleting the originals.
+The importer:
+
+- accepts files, folders, and ZIP packages;
+- keeps original filenames and folder structure;
+- expands ZIPs while preserving the original ZIP;
+- stores every import under a timestamped `archive/imported-packages` folder;
+- creates `IMPORT_STATUS.txt` with the complete imported-file inventory;
+- copies files without deleting the originals.
+
+## World-specific implementation policy
+
+Codex must follow [`docs/world-specific-archive-policy.md`](docs/world-specific-archive-policy.md).
+
+Each course retains its authored identity, mechanics, beat flow, enemy roster and purpose, encounter waves, checkpoint, power-up support, Compass Coin solutions, hero requirements, routes, difficulty variants, and final set piece. Boss courses also retain their exact approach, arena, attacks, five earned damage events, mutations, retry rules, and playable escape where specified.
+
+Shared schemas, loaders, validators, pooling, simulation, and editor tools may support the campaign. They may not generate generic replacements for authored courses.
 
 ## Archived files already added directly
 
-These smaller files were transferred into GitHub already:
+These smaller files are already in GitHub:
 
 - `archive/full-motion/hargold_mebble_full_motion_build_009_qa.json`
 - `archive/physics/build-017-movement-spec.md`
 - `archive/physics/physics_completion_matrix.json`
 
-The oversized standalone full-motion HTML build and character-reference PNG files still require the simple drag-and-import process above because the File Library connection cannot transfer their complete binary contents directly to GitHub.
+The larger standalone HTML builds, complete archived preproduction files, character-reference images, and any package folders still require the drag-and-import step because the File Library connection cannot transfer their complete contents directly into GitHub.
 
 ## Codex source of truth
 
-Codex must begin with [`AGENTS.md`](AGENTS.md). The complete current handoff is divided into:
+Codex must begin with [`AGENTS.md`](AGENTS.md). Key sources include:
 
-- [`docs/canonical-design-bible.md`](docs/canonical-design-bible.md) — complete current design direction, hero canon, campaign, visuals, audio, save, and production rules.
-- [`docs/level-production-plan.md`](docs/level-production-plan.md) — World 1 plans, universal level requirements, Worlds 2–10 status, and historical-plan conflict handling.
-- [`docs/game-mechanics.md`](docs/game-mechanics.md) — detailed gameplay mechanics.
-- [`docs/movement-and-collision-spec.md`](docs/movement-and-collision-spec.md) — full universal movement, terrain, water, climbing, rope, carrying, moving-platform, and deterministic-simulation contract.
-- [`src/canonical-data.js`](src/canonical-data.js) — executable rules and campaign data for 10 worlds, 90 completion slots, and 270 Compass Coin slots.
-- [`src/runtime/fixed-step.js`](src/runtime/fixed-step.js) — reusable deterministic 120 Hz simulation foundation.
-- [`tests/canonical-contract.test.mjs`](tests/canonical-contract.test.mjs) and [`tests/fixed-step.test.mjs`](tests/fixed-step.test.mjs) — current automated contract checks.
-- [`docs/historical-build-handoff.md`](docs/historical-build-handoff.md) — preserved Build 025–030 planning information and honest production boundaries.
-
-Newly approved mechanics, level plans, or designs should update the relevant documents, machine-readable data, implementation, and tests in the same change.
+- [`docs/canonical-design-bible.md`](docs/canonical-design-bible.md) — current design direction and hero canon.
+- [`docs/world-specific-archive-policy.md`](docs/world-specific-archive-policy.md) — mandatory authored-course preservation policy.
+- [`docs/level-production-plan.md`](docs/level-production-plan.md) — current campaign requirements.
+- [`docs/game-mechanics.md`](docs/game-mechanics.md) — gameplay mechanics.
+- [`docs/movement-and-collision-spec.md`](docs/movement-and-collision-spec.md) — movement and interaction contract.
+- [`src/canonical-data.js`](src/canonical-data.js) — current executable rules and campaign facts.
+- [`src/runtime/fixed-step.js`](src/runtime/fixed-step.js) — deterministic 120 Hz simulation foundation.
+- [`docs/historical-build-handoff.md`](docs/historical-build-handoff.md) — archived Build 025–030 scope and production boundaries.
+- `archive/imported-packages` — preserved complete world, level, mob, boss, and runtime archives after import.
 
 ## Run the current browser prototype
 
-Open `index.html` directly in a modern browser, or serve the repository through any static web server.
+Open `index.html` directly in a modern browser, or serve the repository through a static web server.
 
-Current prototype controls:
+Current controls:
 
 - Move: `A` / `D` or arrow keys
 - Jump: `Space`, `W`, or up arrow
@@ -61,31 +77,12 @@ Current prototype controls:
 npm test
 ```
 
-## Current implemented prototype
+## Current production boundary
 
-- Landscape-first browser test build.
-- Strict linear side-scrolling movement plane.
-- Keyboard and on-screen controls.
-- Basic movement, jumping, coins, pits, checkpoint, hero swapping, camera follow, and level goal.
-- Placeholder canvas rendering pending approved production assets.
-- Machine-readable canonical campaign and mechanics data.
-- Deterministic fixed-step runtime foundation.
-- Automated canonical and fixed-step contract tests.
+The repository currently contains a playable browser prototype, canonical specifications, partial runtime foundations, and whichever archived packages have actually been imported.
 
-## Current production status
+The archived Build 018–030 work includes substantial enemy catalogs, combat and interaction rules, boss runtimes and plans, encounter scheduling, pooling, save/progression, editor data, and distinct plans for 90 courses. Some archived geometry outputs deliberately contain pending positions rather than finished collision coordinates.
 
-This repository gives Codex the current approved information available for mechanics, movement/collision behavior, design direction, campaign accounting, World 1 level plans, later-world themes/bosses, universal level requirements, historical build concepts, and open decisions.
+The project still does not contain finished production 3D meshes, skeletons, skin weights, materials, textures, animation clips, completed 90-level collision geometry, a full Unity project, final audio, or target-device profiling.
 
-It does **not** yet contain a complete commercial 3D game. The following still require real implementation and assets:
-
-- Full 90-level collision geometry and playable layouts.
-- Complete enemies, bosses, combat, power-ups, saves, world map, houses, inventory, replay, pooling, editor, and audio integration.
-- Production 3D models, skeletons, skin weights, materials, textures, and animation clips.
-- Final music, sound effects, nonverbal recordings, and localization content.
-- A complete Unity project, mobile build pipeline, and target-device profiling.
-
-Planning documents, manifests, tests, and contracts must never be reported as finished production assets.
-
-## Development rule
-
-Gameplay code, level data, approved assets, tests, progress notes, and every newly approved mechanic or design decision should be committed here so Codex and collaborators work from the actual project state rather than chat-only history.
+Planning documents, schemas, manifests, tests, and contracts must never be reported as completed production assets.
