@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js';
+import { CharacterRenderer } from './character-renderer.js?v=rigged-3d-path-fix-1';
 
 /*
  * Browser-compatible test entry.
