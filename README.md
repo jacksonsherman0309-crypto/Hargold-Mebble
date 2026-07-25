@@ -9,8 +9,10 @@ Codex must begin with [`AGENTS.md`](AGENTS.md). The complete current handoff is 
 - [`docs/canonical-design-bible.md`](docs/canonical-design-bible.md) — complete current design direction, hero canon, campaign, visuals, audio, save, and production rules.
 - [`docs/level-production-plan.md`](docs/level-production-plan.md) — World 1 plans, universal level requirements, Worlds 2–10 status, and historical-plan conflict handling.
 - [`docs/game-mechanics.md`](docs/game-mechanics.md) — detailed gameplay mechanics.
+- [`docs/movement-and-collision-spec.md`](docs/movement-and-collision-spec.md) — full universal movement, terrain, water, climbing, rope, carrying, moving-platform, and deterministic-simulation contract.
 - [`src/canonical-data.js`](src/canonical-data.js) — executable rules and campaign data for 10 worlds, 90 completion slots, and 270 Compass Coin slots.
-- [`tests/canonical-contract.test.mjs`](tests/canonical-contract.test.mjs) — invariant checks for the approved game contract.
+- [`src/runtime/fixed-step.js`](src/runtime/fixed-step.js) — reusable deterministic 120 Hz simulation foundation.
+- [`tests/canonical-contract.test.mjs`](tests/canonical-contract.test.mjs) and [`tests/fixed-step.test.mjs`](tests/fixed-step.test.mjs) — current automated contract checks.
 - [`docs/historical-build-handoff.md`](docs/historical-build-handoff.md) — preserved Build 025–030 planning information and honest production boundaries.
 
 Newly approved mechanics, level plans, or designs should update the relevant documents, machine-readable data, implementation, and tests in the same change.
@@ -26,7 +28,7 @@ Current prototype controls:
 - Swap hero: `Q`
 - Restart: `R`
 
-## Run canonical contract checks
+## Run contract checks
 
 ```bash
 npm test
@@ -40,11 +42,12 @@ npm test
 - Basic movement, jumping, coins, pits, checkpoint, hero swapping, camera follow, and level goal.
 - Placeholder canvas rendering pending approved production assets.
 - Machine-readable canonical campaign and mechanics data.
-- Automated contract tests.
+- Deterministic fixed-step runtime foundation.
+- Automated canonical and fixed-step contract tests.
 
 ## Current production status
 
-This repository now gives Codex the complete **current approved information** available for mechanics, design direction, campaign accounting, World 1 level plans, later-world themes/bosses, universal level requirements, historical build concepts, and open decisions.
+This repository now gives Codex the complete **current approved information** available for mechanics, movement/collision behavior, design direction, campaign accounting, World 1 level plans, later-world themes/bosses, universal level requirements, historical build concepts, and open decisions.
 
 It does **not** yet contain a complete commercial 3D game. The following still require real implementation and assets:
 
