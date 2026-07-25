@@ -264,6 +264,11 @@ The 100-coin reward must correctly award extra lives and obey the 99-life cap.
 - Target average completion time is about 2 minutes at a moderately quick pace.
 - Levels must include real platforming content: terrain variation, pits, blocks, enemies, coin routes, hazards, and optional exploration.
 - Avoid empty walking stretches.
+- Normal courses target approximately 80–90% supported terrain and 10–20% meaningful pit spans, with exact placement authored per course.
+- Foreground flow alternates hills, layered ledges, bridges, vertical climbs, ruins, camps, clearings, and elevated or concealed routes.
+- Moving, falling, rotating, lift, and seesaw platforms are collision-bearing mechanisms, not decorative motion.
+- Dense coin trails, arcs, stacks, optional paths, and interrupted secret clues teach movement and reward exploration.
+- Environmental structures such as camp decks, fallen logs, stumps, fences, and ruins may carry traversal and block formations when their collision remains readable.
 - Teach a mechanic safely, test it, then combine it with prior mechanics.
 - Required paths remain possible for Hargold.
 - Optional routes may reward Mebble’s jump/glide, Hargold’s block breaking, switches, power-ups, or learned skills.

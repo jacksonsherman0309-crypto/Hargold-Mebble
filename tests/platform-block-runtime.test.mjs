@@ -6,13 +6,22 @@ import {
   resolveBlockHeadHit,
   resolveOneWayPlatformLanding,
   resolveSolidBlockSideCollision,
+  resetCoursePlatforms,
   stepBlockFeedback,
+  stepCoursePlatforms,
+  transportRiderWithPlatform,
   supportHeightAt
 } from '../src/gameplay/levels/platform-block-runtime.js';
 import {
   MEADOW_WAKE_BLOCK_DEFINITIONS,
+  MEADOW_WAKE_COIN_DEFINITIONS,
+  MEADOW_WAKE_COMPASS_COIN_DEFINITIONS,
+  MEADOW_WAKE_PITS,
   MEADOW_WAKE_PLATFORMS,
-  createMeadowWakeBlocks
+  MEADOW_WAKE_SECTIONS,
+  createMeadowWakeBlocks,
+  createMeadowWakePlatforms,
+  meadowWakePitRatio
 } from '../src/content/meadow-wake-course.js';
 
 const platform = MEADOW_WAKE_PLATFORMS[0];
@@ -137,5 +146,83 @@ const instantiated = createMeadowWakeBlocks(() => 8);
 assert.equal(instantiated.length, MEADOW_WAKE_BLOCK_DEFINITIONS.length);
 assert.ok(instantiated.every(block => block.broken === false));
 assert.ok(instantiated.some(block => block.type === 'hargold-only'));
+
+const hiddenCoinBlock = {
+  id: 'hidden-coin',
+  type: 'coin',
+  x: 2,
+  y: 4,
+  width: 0.74,
+  height: 0.74,
+  broken: false,
+  consumed: false,
+  hidden: true,
+  revealed: false,
+  reward: 10,
+  bumpSeconds: 0
+};
+assert.ok(!activeCourseSurfaces([], [hiddenCoinBlock]).length);
+const hiddenBody = { x: 1.6, y: 4.2, width: 0.8, height: 1.82 };
+const hiddenState = {
+  hero: 'Mebble',
+  footY: hiddenBody.y + hiddenBody.height,
+  velocityY: -6,
+  grounded: false,
+  supportPlatformId: null,
+  locomotion: 'rise'
+};
+const hiddenReward = resolveBlockHeadHit(hiddenState, 4.48, [hiddenCoinBlock], hiddenBody);
+assert.equal(hiddenReward?.type, 'block-coin');
+assert.equal(hiddenReward?.reward, 10);
+assert.equal(hiddenCoinBlock.revealed, true);
+assert.equal(hiddenCoinBlock.consumed, true);
+assert.ok(activeCourseSurfaces([], [hiddenCoinBlock]).length);
+
+const movingPlatforms = createMeadowWakePlatforms();
+const movingStep = movingPlatforms.find(item => item.id === 'first-moving-step');
+const movingStartX = movingStep.x;
+stepCoursePlatforms(movingPlatforms, 0.5);
+assert.notEqual(movingStep.x, movingStartX);
+const rider = {
+  grounded: true,
+  supportPlatformId: movingStep.id,
+  footX: movingStep.previousX,
+  footY: platformTop(movingStep)
+};
+assert.equal(transportRiderWithPlatform(rider, movingPlatforms), true);
+assert.equal(rider.footY, platformTop(movingStep, rider.footX));
+
+const seesaw = movingPlatforms.find(item => item.id === 'fallen-log-launch');
+stepCoursePlatforms(movingPlatforms, 0.25, {
+  supportPlatformId: seesaw.id,
+  riderX: seesaw.x + seesaw.width / 2
+});
+assert.ok(seesaw.angle > 0, 'seesaw should tilt toward its rider');
+
+const falling = movingPlatforms.find(item => item.id === 'final-falling-step');
+for (let index = 0; index < 90; index += 1) {
+  stepCoursePlatforms(movingPlatforms, 1 / 60, {
+    supportPlatformId: falling.id,
+    riderX: falling.x
+  });
+}
+assert.ok(falling.y > falling.baseY, 'falling platform should descend after its telegraph');
+resetCoursePlatforms(movingPlatforms);
+assert.equal(falling.y, falling.baseY);
+assert.equal(falling.fallState, 'idle');
+
+assert.equal(MEADOW_WAKE_SECTIONS.length, 7);
+assert.equal(MEADOW_WAKE_COMPASS_COIN_DEFINITIONS.length, 3);
+assert.ok(MEADOW_WAKE_COIN_DEFINITIONS.length >= 120);
+assert.ok(MEADOW_WAKE_PLATFORMS.length >= 35);
+assert.ok(MEADOW_WAKE_BLOCK_DEFINITIONS.length >= 30);
+assert.ok(meadowWakePitRatio() >= 0.1 && meadowWakePitRatio() <= 0.2);
+assert.ok(Math.abs(
+  MEADOW_WAKE_PITS.reduce((total, pit) => total + pit.to - pit.from, 0) - 19
+) < 1e-9);
+assert.deepEqual(
+  [...new Set(MEADOW_WAKE_BLOCK_DEFINITIONS.map(block => block.type))].sort(),
+  ['coin', 'hargold-only', 'power-up', 'standard-breakable']
+);
 
 console.log('Meadow Wake platform and block runtime checks passed.');

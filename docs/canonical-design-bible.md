@@ -322,6 +322,12 @@ Visible course blocks and traversable platforms are gameplay geometry. A rendere
 - Average completion target: about two minutes at a moderately quick pace.
 - Levels need actual platforming density: terrain changes, pits, blocks, enemies, coin routes, hazards, optional rooms, and secrets.
 - Avoid long empty walking sections.
+- Preserve the approved World 1 environmental art direction: layered valley depth, warm daylight, atmospheric haze, saturated natural color, and detailed 3D scenery. Foreground construction must rise to that bar without restarting or flattening the art direction.
+- Handcraft the playable foreground around movement decisions. Alternate rolling hills, ledges, bridges, vertical climbs, ruins, camps, clearings, elevated routes, and secrets rather than relying on broad uninterrupted ground.
+- Standard courses should target approximately 80–90% supported terrain and 10–20% memorable pit spans. This is a course-level pacing ratio, not a command to distribute pits evenly.
+- Terrain and mechanisms should provide substantial obstacle variety: narrow ledges, moving/falling/rotating platforms, lifts, seesaws, bridges, breakable formations, and optional routes.
+- Use dense coin lines, arcs, vertical stacks, interrupted clues, and concealed rewards to teach jumps, guide momentum, and signpost route choices.
+- Camps, fallen logs, stumps, fences, cliffs, and ruins should serve environmental storytelling and readable platforming roles rather than appearing as disconnected decoration.
 - Teach a mechanic safely, test it, then combine it with previous mechanics.
 - Use approximately seven encounter/camera beats as a planning scaffold where appropriate, but do not force identical pacing on every level.
 - Spawn enemies offscreen or with a readable telegraph.

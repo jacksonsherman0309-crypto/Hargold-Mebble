@@ -1,4 +1,4 @@
-export const CANON_VERSION = '2026-07-25-course-scale-interactions-1';
+export const CANON_VERSION = '2026-07-25-authored-foreground-density-1';
 
 export const GAME_RULES = Object.freeze({
   platform: {
@@ -39,6 +39,23 @@ export const GAME_RULES = Object.freeze({
     hargoldOnlyBlocksPerLevel: 'several',
     avoidRepeatedMainRouteBacktrackingSwaps: true,
     extraSwapsReservedForOptionalRoutesSecretsAndCompassCoins: true
+  },
+  levelConstruction: {
+    individuallyAuthoredCourses: true,
+    supportedTerrainRatio: Object.freeze({ minimum: 0.8, maximum: 0.9 }),
+    pitRatio: Object.freeze({ minimum: 0.1, maximum: 0.2 }),
+    avoidLongFlatRuns: true,
+    terrainDrivenChallenge: true,
+    denseCoinGuidance: true,
+    preserveApprovedWorldOneBackgroundDirection: true,
+    mechanismTypes: Object.freeze([
+      'moving-platform',
+      'falling-platform',
+      'rotating-platform',
+      'lift',
+      'seesaw',
+      'bridge'
+    ])
   },
   health: {
     heartsAndLivesSeparate: true,
@@ -113,7 +130,13 @@ const WORLD_ONE_LEVELS = [
     id: '1-1',
     name: 'Meadow Wake',
     role: 'movement, jumping, swapping and basic-block tutorial',
-    enemies: ['Camp Critter', 'Shellback']
+    enemies: ['Camp Critter', 'Shellback'],
+    foregroundDirective: Object.freeze({
+      targetSupportedTerrainRatio: 0.85,
+      authoredCourseLength: 124,
+      preserveExistingValleyArtDirection: true,
+      obstacleEmphasis: 'terrain, blocks, coins, routes, and platform mechanisms'
+    })
   },
   {
     slot: 2,

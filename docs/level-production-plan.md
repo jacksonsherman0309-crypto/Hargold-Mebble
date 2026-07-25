@@ -40,6 +40,12 @@ Every production level must satisfy these rules unless an explicit newer instruc
 - Checkpoint placement should fall after the mechanic has been introduced and safely demonstrated, before its hardest combination.
 - Normal course construction should include terrain changes, pits or other risk, blocks, coin routes, enemies, optional exploration, and a clear ending challenge.
 - No long empty walking stretches.
+- Handcraft playable foregrounds with rolling terrain, layered grassy ledges, detailed earth/stone faces, bridges, stumps, camps, cliffs, ruins, varied platforms, elevated routes, and secret shelves.
+- Target approximately 80–90% supported terrain and 10–20% meaningful pit spans across a normal course; pit rhythm remains individually authored per course.
+- Use terrain mechanisms—including moving, falling, rotating, lift, and seesaw platforms—to create timing and route decisions without depending on increased enemy density.
+- Place standard, Hargold-only, coin, power-up, and hidden instances only through the four canonical block types; a hidden block is a reveal state, not a fifth type.
+- Use dense coins as movement language: ground trails, jump arcs, vertical stacks, optional challenge paths, interrupted secret clues, and rewards.
+- Integrate camp structures, logs, stumps, fences, and ruins into traversal so each course reads as a place as well as a platforming sequence.
 - Fatal pits, lava, and poison use dedicated hazard volumes and bypass hearts and power-ups.
 - Foreground art cannot hide required hazards or landing surfaces.
 - Enemy spawns must be offscreen or visibly telegraphed and never occur inside a safe landing area.
@@ -119,6 +125,8 @@ Construction direction:
 - Use an interrupted low coin trail and concealed creek shelf for the hidden Compass Coin.
 - After the checkpoint, alternate visible upper ledges and a lower creek route so route choice feels intentional.
 - Include one grouped Mebble section and one Hargold-only block group.
+- Preserve the approved bright layered valley background, lighting, atmosphere, depth, and color palette while bringing the collision-bearing foreground to the same visual finish.
+- Construct the seven authored beats as a continuously evolving approximately two-minute course with roughly 85% supported ground, meaningful ravines, dense coin guidance, camp decks, a fallen-log launch, breakable ruins, lifts, falling ledges, a rope bridge, creek routes, rotating stonework, and three graduated final gaps.
 
 ### 1-2 — Acorn Run
 

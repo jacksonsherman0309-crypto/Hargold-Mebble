@@ -19,6 +19,11 @@ assert.deepEqual(GAME_RULES.movement.locomotionTargets, ['walk', 'run', 'sprint'
 assert.ok(GAME_RULES.movement.requiredCharacterStates.includes('crawl'));
 assert.ok(GAME_RULES.movement.requiredCharacterStates.includes('victory'));
 assert.equal(GAME_RULES.heroGating.avoidRepeatedMainRouteBacktrackingSwaps, true);
+assert.deepEqual(GAME_RULES.levelConstruction.supportedTerrainRatio, { minimum: 0.8, maximum: 0.9 });
+assert.deepEqual(GAME_RULES.levelConstruction.pitRatio, { minimum: 0.1, maximum: 0.2 });
+assert.equal(GAME_RULES.levelConstruction.individuallyAuthoredCourses, true);
+assert.ok(GAME_RULES.levelConstruction.mechanismTypes.includes('seesaw'));
+assert.equal(getLevel('1-1').foregroundDirective.targetSupportedTerrainRatio, 0.85);
 assert.deepEqual(
   GAME_RULES.platform.gameplayReadabilityScale.hargoldApproximateCommonEnemyHeights,
   { minimum: 2, maximum: 3 }

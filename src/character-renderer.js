@@ -2,9 +2,15 @@ import * as THREE from '../vendor/three/three.module.js';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import {
   MEADOW_WAKE_BLOCK_DEFINITIONS,
-  MEADOW_WAKE_PLATFORMS
-} from './content/meadow-wake-course.js?v=course-interactions-1';
-import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=environment-art-1';
+  MEADOW_WAKE_FOREGROUND_PROPS,
+  MEADOW_WAKE_PITS,
+  MEADOW_WAKE_PLATFORMS,
+  MEADOW_WAKE_TERRAIN_POINTS,
+  MEADOW_WAKE_WORLD_END,
+  createMeadowWakeCoins,
+  createMeadowWakeCompassCoins
+} from './content/meadow-wake-course.js?v=authored-foreground-1';
+import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=authored-foreground-1';
 
 const MODEL_SPECS = Object.freeze({
   Hargold: Object.freeze({
@@ -182,11 +188,143 @@ export class CharacterRenderer {
     return mesh;
   }
 
+  buildPlatformVisual(definition) {
+    const scale = 70;
+    const root = new THREE.Group();
+    root.name = `${definition.id}_${definition.visual}`;
+    root.position.set(
+      definition.x * scale,
+      this.height / 2 - definition.y * scale,
+      0
+    );
+    this.world.add(root);
+
+    const makeBox = (name, width, height, depth, material, x = 0, y = 0, z = 0) => {
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
+      mesh.name = name;
+      mesh.position.set(x, y, z);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      root.add(mesh);
+      return mesh;
+    };
+    const width = definition.width * scale;
+    const height = definition.height * scale;
+    const grass = this.environmentArt.turfMaterial;
+    const soil = this.environmentArt.soilMaterial;
+    const stone = this.environmentArt.stoneMaterial;
+    const wood = this.environmentArt.woodMaterial;
+    const core = makeBox('platform-soil-core', width, height, 125, soil);
+    const cap = makeBox('platform-living-turf', width + 3, 9, 132, grass, 0, height / 2);
+
+    if (['camp-deck', 'timber-lift', 'timber-slat', 'rope-bridge'].includes(definition.visual)) {
+      core.visible = false;
+      cap.visible = false;
+      const plankCount = definition.visual === 'rope-bridge'
+        ? Math.max(7, Math.round(width / 18))
+        : Math.max(3, Math.round(width / 40));
+      const plankWidth = width / plankCount;
+      for (let index = 0; index < plankCount; index += 1) {
+        const localX = -width / 2 + plankWidth * (index + 0.5);
+        const sag = definition.visual === 'rope-bridge'
+          ? -Math.sin((index / Math.max(1, plankCount - 1)) * Math.PI) * 14
+          : 0;
+        const plank = makeBox(
+          `${definition.visual}-plank`,
+          plankWidth - 2,
+          Math.max(12, height),
+          116,
+          wood,
+          localX,
+          sag,
+          0
+        );
+        if (definition.visual === 'rope-bridge') {
+          plank.rotation.z = -Math.cos((index / Math.max(1, plankCount - 1)) * Math.PI) * 0.08;
+        }
+      }
+      if (definition.visual === 'camp-deck' || definition.visual === 'timber-lift') {
+        makeBox('timber-cross-brace', width * 0.7, 8, 18, wood, 0, -height - 15, 56).rotation.z = 0.16;
+        makeBox('timber-cross-brace', width * 0.7, 8, 18, wood, 0, -height - 15, 56).rotation.z = -0.16;
+      }
+      if (definition.visual === 'rope-bridge') {
+        for (const side of [-1, 1]) {
+          makeBox('bridge-end-post', 9, 78, 12, wood, side * width / 2, 24, 48);
+          const rope = new THREE.Mesh(
+            new THREE.TorusGeometry(width / 2, 2.2, 6, 36, Math.PI),
+            this.material(0x8c6741)
+          );
+          rope.name = 'bridge-hand-rope';
+          rope.rotation.z = side < 0 ? 0 : Math.PI;
+          rope.scale.y = 0.3;
+          rope.position.set(0, 35, 49);
+          root.add(rope);
+        }
+      }
+    } else if (definition.visual === 'fallen-log' || definition.visual === 'seesaw') {
+      core.visible = false;
+      cap.visible = false;
+      const log = new THREE.Mesh(
+        new THREE.CylinderGeometry(14, 17, width, 18, 1),
+        wood
+      );
+      log.name = definition.visual;
+      log.rotation.z = Math.PI / 2;
+      log.castShadow = true;
+      log.receiveShadow = true;
+      root.add(log);
+      makeBox('log-moss-ridge', width * 0.78, 7, 76, grass, 0, 14, 0);
+      if (definition.visual === 'seesaw') {
+        const pivot = new THREE.Mesh(new THREE.CylinderGeometry(16, 23, 35, 12), stone);
+        pivot.name = 'seesaw-stone-pivot';
+        pivot.position.set(0, -25, 0);
+        root.add(pivot);
+      }
+    } else if (definition.visual === 'stump') {
+      core.visible = false;
+      cap.visible = false;
+      const stump = new THREE.Mesh(
+        new THREE.CylinderGeometry(width * 0.42, width * 0.48, Math.max(28, height + 18), 16),
+        wood
+      );
+      stump.name = 'platform-tree-stump';
+      stump.position.y = -4;
+      stump.castShadow = true;
+      stump.receiveShadow = true;
+      root.add(stump);
+      const ring = new THREE.Mesh(
+        new THREE.CylinderGeometry(width * 0.38, width * 0.38, 3, 20),
+        this.material(0xc99a5e)
+      );
+      ring.name = 'stump-growth-rings';
+      ring.position.y = Math.max(28, height + 18) / 2 - 2;
+      root.add(ring);
+    } else if (definition.visual === 'ruin-ledge' || definition.visual === 'creek-stone') {
+      core.material = stone;
+      cap.material = definition.visual === 'ruin-ledge' ? grass : stone;
+      const stones = Math.max(2, Math.round(definition.width * 1.4));
+      for (let index = 0; index < stones; index += 1) {
+        const rock = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(12 + (index % 3) * 2, 0),
+          stone
+        );
+        rock.name = 'hand-laid-platform-stone';
+        rock.scale.set(1.25, 0.72, 1.2);
+        rock.position.set(-width / 2 + (index + 0.5) * width / stones, -height * 0.22, 67);
+        rock.rotation.z = index % 2 ? 0.18 : -0.11;
+        root.add(rock);
+      }
+    }
+
+    const slot = { ...definition, root, core, cap, imported: null };
+    this.platformSlots.push(slot);
+    return slot;
+  }
+
   buildMeadowWake() {
     const scale = 70;
-    const points = [[0, 7.9], [5, 7.9], [8, 7.25], [12, 7.85], [16, 7.15], [20, 7.75], [24, 7.1], [28, 7.8], [32, 7.25], [36, 7.8]];
-    const pits = [[9.4, 10.8], [21.1, 22.7], [30.1, 31.5]];
-    const inPit = x => pits.some(([from, to]) => x > from && x < to);
+    const points = MEADOW_WAKE_TERRAIN_POINTS;
+    const inPit = x => MEADOW_WAKE_PITS.some(({ from, to }) => x > from && x < to);
     const heightAt = x => {
       for (let index = 0; index < points.length - 1; index += 1) {
         const [x0, y0] = points[index], [x1, y1] = points[index + 1];
@@ -199,16 +337,23 @@ export class CharacterRenderer {
     const stone = this.environmentArt.stoneMaterial;
     const wood = this.environmentArt.woodMaterial;
     const gold = new THREE.MeshStandardMaterial({ color: 0xf5bd32, roughness: 0.28, metalness: 0.55 });
-    for (const [start, end] of [[0, 9.4], [10.8, 21.1], [22.7, 30.1], [31.5, 36]]) {
+    const terrainRuns = [];
+    let terrainCursor = 0;
+    for (const pit of MEADOW_WAKE_PITS) {
+      terrainRuns.push([terrainCursor, pit.from]);
+      terrainCursor = pit.to;
+    }
+    terrainRuns.push([terrainCursor, MEADOW_WAKE_WORLD_END]);
+    for (const [start, end] of terrainRuns) {
       this.terrainStrip('authored-continuous-terrain', start, end, heightAt, soil);
     }
-    for (let x = 0; x < 36; x += 0.5) {
-      const x1 = Math.min(36, x + 0.5);
+    for (let x = 0; x < MEADOW_WAKE_WORLD_END; x += 0.5) {
+      const x1 = Math.min(MEADOW_WAKE_WORLD_END, x + 0.5);
       if (inPit(x + 0.25)) continue;
       const top0 = this.height / 2 - heightAt(x) * scale;
       const top1 = this.height / 2 - heightAt(x1) * scale;
       this.terrainSegment('living-grass-rim', x * scale, x1 * scale, top0 + 9, top1 + 9, grass, 178, Math.min(top0, top1) - 4);
-      if (x < 10 || Math.round(x * 2) % 3 === 0) {
+      if (x < 10 || Math.round(x * 2) % 4 === 0) {
         for (let detail = 0; detail < 2; detail += 1) {
           const detailX = (x + 0.13 + detail * 0.23) * scale;
           const detailTop = this.height / 2 - heightAt(x + 0.13 + detail * 0.23) * scale;
@@ -225,20 +370,30 @@ export class CharacterRenderer {
         }
       }
     }
-    this.environmentArt.decorateCourse({ heightAt, inPit, scale });
-    for (const { id, x, y, width, height } of MEADOW_WAKE_PLATFORMS) {
-      const core = this.box('authored-platform', x * scale, this.height / 2 - y * scale, width * scale, height * scale, 125, stone);
-      const cap = this.box('platform-grass', x * scale, this.height / 2 - y * scale + height * scale / 2, width * scale + 2, 9, 130, grass);
-      this.platformSlots.push({ id, x, y, width, height, core, cap });
-    }
-    for (let x = 18.3; x <= 20.1; x += .24) {
-      const plank = this.box('rope-bridge-plank', x * scale, this.height / 2 - 6.25 * scale + Math.sin((x - 18.3) * Math.PI) * 16, 15, 12, 105, wood);
-      plank.rotation.z = Math.cos((x - 18.3) * Math.PI) * .08;
-    }
+    this.environmentArt.decorateCourse({
+      heightAt,
+      inPit,
+      scale,
+      courseEnd: MEADOW_WAKE_WORLD_END,
+      props: MEADOW_WAKE_FOREGROUND_PROPS
+    });
+    for (const definition of MEADOW_WAKE_PLATFORMS) this.buildPlatformVisual(definition);
+
     for (const definition of MEADOW_WAKE_BLOCK_DEFINITIONS) {
       const { id, type, x, lift, width, height } = definition;
-      const artType = type === 'hargold-only' ? 'hargold' : 'breakable';
+      const artType = type === 'hargold-only'
+        ? 'hargold'
+        : type === 'standard-breakable'
+          ? 'breakable'
+          : type;
       const centreY = this.height / 2 - (heightAt(x) - lift) * scale;
+      const blockMaterial = type === 'hargold-only'
+        ? this.material(0x6d553c)
+        : type === 'coin'
+          ? this.material(0xd99a22)
+          : type === 'power-up'
+            ? this.material(0x3d8750)
+            : stone;
       const block = this.box(
         type,
         x * scale,
@@ -246,8 +401,20 @@ export class CharacterRenderer {
         width * scale,
         height * scale,
         type === 'hargold-only' ? 86 : 82,
-        type === 'hargold-only' ? this.material(0x6d553c) : stone
+        blockMaterial
       );
+      if (type === 'coin' || type === 'power-up') {
+        const emblem = new THREE.Mesh(
+          type === 'coin'
+            ? new THREE.TorusGeometry(11, 3.5, 8, 20)
+            : new THREE.ConeGeometry(10, 25, 5),
+          type === 'coin' ? gold : this.material(0xe6d477)
+        );
+        emblem.name = type === 'coin' ? 'trail-coin-emblem' : 'explorer-leaf-emblem';
+        emblem.position.set(0, 0, 43);
+        if (type === 'power-up') emblem.rotation.z = -0.35;
+        block.add(emblem);
+      }
       this.blockSlots.push({
         id,
         type: artType,
@@ -256,17 +423,18 @@ export class CharacterRenderer {
         baseY: centreY
       });
     }
-    [3.5, 6.8, 8.7, 12.5, 15.2, 18.4, 23.5, 26.2, 29.1, 33.2].forEach((x, index) => {
+    const visualCoins = createMeadowWakeCoins(heightAt);
+    visualCoins.forEach(({ x, y }, index) => {
       const coin = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 4, 24), gold);
       coin.rotation.x = Math.PI / 2;
-      coin.position.set(x * scale, this.height / 2 - (heightAt(x) - (index % 3 === 0 ? 1.55 : .8)) * scale, 35);
+      coin.position.set(x * scale, this.height / 2 - y * scale, 35);
       coin.userData = { kind: 'coin', index };
       this.collectibleMeshes.push(coin);
       this.world.add(coin);
     });
-    [[8.9, 2.2], [24.4, 2.4], [34.2, 1.7]].forEach(([x, lift], index) => {
+    createMeadowWakeCompassCoins().forEach(({ x, y }, index) => {
       const compass = new THREE.Mesh(new THREE.TorusGeometry(18, 5, 10, 32), gold);
-      compass.position.set(x * scale, this.height / 2 - (heightAt(x) - lift) * scale, 35);
+      compass.position.set(x * scale, this.height / 2 - y * scale, 35);
       compass.userData = { kind: 'compass', index };
       this.collectibleMeshes.push(compass);
       this.world.add(compass);
@@ -277,8 +445,8 @@ export class CharacterRenderer {
     this.addMobProxy('1-1-shellback-b', 'shellback');
     this.addMobProxy('1-1-critter-c', 'camp_critter');
     for (const [name, x, color] of [
-      ['checkpoint', 18, 0xf0b93d],
-      ['goal', 35.35, 0x3d8750]
+      ['checkpoint', 70.5, 0xf0b93d],
+      ['goal', 123.25, 0x3d8750]
     ]) {
       const groundY = this.height / 2 - heightAt(x) * scale;
       const pole = new THREE.Mesh(new THREE.CylinderGeometry(5, 6, 150, 10), wood);
@@ -420,6 +588,7 @@ export class CharacterRenderer {
         hargold: this.prepareImportedAsset(hargoldBlockGltf.scene)
       };
       for (const slot of this.blockSlots) {
+        if (!blockTemplates[slot.type]) continue;
         const importedBlock = blockTemplates[slot.type].clone(true);
         importedBlock.name = slot.type === 'hargold' ? 'HargoldOnlyBlockVisual' : 'BreakableBlockVisual';
         const blockDefinition = MEADOW_WAKE_BLOCK_DEFINITIONS.find(block => block.id === slot.id);
@@ -438,18 +607,16 @@ export class CharacterRenderer {
       }
       const ledgeTemplate = this.prepareImportedAsset(ledgeGltf.scene);
       for (const slot of this.platformSlots) {
+        if (slot.visual !== 'turf-ledge') continue;
         const ledge = ledgeTemplate.clone(true);
         ledge.name = 'AuthoredMeadowLedgeVisual';
         this.environmentArt.applyLedgeMaterials(ledge);
         ledge.scale.set(70 * slot.width / 2, 70, 70);
-        ledge.position.set(
-          slot.x * 70,
-          this.height / 2 - slot.y * 70 - slot.height * 35,
-          2
-        );
+        ledge.position.set(0, -slot.height * 35, 2);
         slot.core.visible = false;
         slot.cap.visible = false;
-        this.world.add(ledge);
+        slot.root.add(ledge);
+        slot.imported = ledge;
       }
       this.courseAssetsReady = true;
       this.onProgress(this.statusText());
@@ -619,10 +786,30 @@ export class CharacterRenderer {
     for (const slot of this.blockSlots) {
       const state = states.get(slot.id);
       const visual = slot.visual || slot.placeholder;
-      visual.visible = !state?.broken;
+      visual.visible = !state?.broken && (!state?.hidden || state.revealed);
       if (!visual.visible) continue;
       const bump = state?.bumpSeconds ?? 0;
       visual.position.y = slot.baseY + (bump > 0 ? Math.sin(Math.min(1, bump / 0.12) * Math.PI) * 10 : 0);
+      if ((slot.type === 'coin' || slot.type === 'power-up') && visual.material?.color) {
+        visual.material.color.setHex(
+          state?.consumed
+            ? 0x716b5d
+            : slot.type === 'coin'
+              ? 0xd99a22
+              : 0x3d8750
+        );
+      }
+    }
+  }
+
+  updatePlatforms(platforms) {
+    const states = new Map(platforms.map(platform => [platform.id, platform]));
+    for (const slot of this.platformSlots) {
+      const state = states.get(slot.id);
+      if (!state) continue;
+      slot.root.position.x = state.x * 70;
+      slot.root.position.y = this.height / 2 - state.y * 70;
+      slot.root.rotation.z = -(state.angle ?? 0);
     }
   }
 
@@ -638,6 +825,7 @@ export class CharacterRenderer {
     coins = [],
     compassCoins = [],
     blocks = [],
+    platforms = [],
     mobs = [],
     projectiles = []
   }, deltaSeconds) {
@@ -649,6 +837,7 @@ export class CharacterRenderer {
       mesh.rotation.y += deltaSeconds * 2.7;
     }
     this.updateBlocks(blocks);
+    this.updatePlatforms(platforms);
     this.updateMobs(mobs, deltaSeconds);
     this.updateProjectiles(projectiles);
     for (const [modelHero, model] of this.models) {

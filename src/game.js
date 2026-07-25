@@ -1,9 +1,14 @@
-import { CharacterRenderer } from './character-renderer.js?v=environment-art-1';
+import { CharacterRenderer } from './character-renderer.js?v=authored-foreground-1';
 import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
 import {
-  MEADOW_WAKE_PLATFORMS,
-  createMeadowWakeBlocks
-} from './content/meadow-wake-course.js?v=course-interactions-1';
+  MEADOW_WAKE_PITS,
+  MEADOW_WAKE_TERRAIN_POINTS,
+  MEADOW_WAKE_WORLD_END,
+  createMeadowWakeBlocks,
+  createMeadowWakeCoins,
+  createMeadowWakeCompassCoins,
+  createMeadowWakePlatforms
+} from './content/meadow-wake-course.js?v=authored-foreground-1';
 import {
   attackMob,
   createMob,
@@ -19,9 +24,12 @@ import {
   resolveBlockHeadHit,
   resolveOneWayPlatformLanding,
   resolveSolidBlockSideCollision,
+  resetCoursePlatforms,
   stepBlockFeedback,
+  stepCoursePlatforms,
+  transportRiderWithPlatform,
   supportHeightAt
-} from './gameplay/levels/platform-block-runtime.js?v=course-interactions-1';
+} from './gameplay/levels/platform-block-runtime.js?v=authored-foreground-1';
 
 /*
  * Browser-compatible test entry.
@@ -315,7 +323,7 @@ const status = document.querySelector('#status');
 const W = canvas.width;
 const H = canvas.height;
 const SCALE = 70;
-const WORLD_END = 36;
+const WORLD_END = MEADOW_WAKE_WORLD_END;
 const keys = new Set();
 const touch = { left: false, right: false, run: false, sprint: false, jump: false, action: false };
 const loop = new FixedStepLoop({ hz: 120 });
@@ -329,20 +337,12 @@ const characterRenderer = new CharacterRenderer({
   }
 });
 
-const terrain = createLinearGround([
-  [0, 7.9], [5, 7.9], [8, 7.25], [12, 7.85], [16, 7.15],
-  [20, 7.75], [24, 7.1], [28, 7.8], [32, 7.25], [WORLD_END, 7.8]
-]);
-const pits = [{ from: 9.4, to: 10.8 }, { from: 21.1, to: 22.7 }, { from: 30.1, to: 31.5 }];
-const coins = [3.5, 6.8, 8.7, 12.5, 15.2, 18.4, 23.5, 26.2, 29.1, 33.2]
-  .map((x, index) => ({ x, y: terrain.heightAt(x) - (index % 3 === 0 ? 1.55 : 0.8), taken: false }));
-const compassCoins = [
-  { x: 8.9, y: terrain.heightAt(8.9) - 2.2, taken: false },
-  { x: 24.4, y: terrain.heightAt(24.4) - 2.4, taken: false },
-  { x: 34.2, y: terrain.heightAt(34.2) - 1.7, taken: false }
-];
-const checkpoint = { x: 18, reached: false };
-const platforms = MEADOW_WAKE_PLATFORMS;
+const terrain = createLinearGround(MEADOW_WAKE_TERRAIN_POINTS);
+const pits = MEADOW_WAKE_PITS;
+const coins = createMeadowWakeCoins(x => terrain.heightAt(x));
+const compassCoins = createMeadowWakeCompassCoins();
+const checkpoint = { x: 70.5, reached: false };
+const platforms = createMeadowWakePlatforms();
 const blocks = createMeadowWakeBlocks(x => terrain.heightAt(x));
 const COURSE_ID = '1-1';
 const COURSE_NAME = 'Meadow Wake';
@@ -431,7 +431,7 @@ function canOccupy(candidate) {
   const lowOverhang = candidate.x < 14.6 && candidate.x + candidate.width > 13.2;
   if (lowOverhang && candidate.height > PROVISIONAL_HERO_PROFILES.Hargold.height) return false;
   return !blocks.some(block => {
-    if (block.broken) return false;
+    if (block.broken || (block.hidden && !block.revealed)) return false;
     const blockBody = {
       x: block.x - block.width / 2,
       y: block.y - block.height / 2,
@@ -452,6 +452,7 @@ function swapPlayer() {
 }
 
 function respawn() {
+  resetCoursePlatforms(platforms);
   player = createMotionState({
     hero: player.hero,
     footX: session.spawnX,
@@ -529,8 +530,11 @@ function restartCourse() {
   for (const item of [...coins, ...compassCoins]) item.taken = false;
   for (const block of blocks) {
     block.broken = false;
+    block.consumed = false;
+    block.revealed = !block.hidden;
     block.bumpSeconds = 0;
   }
+  resetCoursePlatforms(platforms);
   player = createMotionState({ footX: session.spawnX, footY: terrain.heightAt(session.spawnX) });
   mobs = createCourseMobs();
   projectiles = [];
@@ -539,11 +543,21 @@ function restartCourse() {
   noticeSeconds = 2;
 }
 
+function awardStandardCoins(amount) {
+  session.standardCoins += amount;
+  while (session.standardCoins >= 100) {
+    session.standardCoins -= 100;
+    session.lives = Math.min(99, session.lives + 1);
+    notice = '100 trail coins earned one life.';
+    noticeSeconds = 2.2;
+  }
+}
+
 function collectItems() {
   for (const coin of coins) {
     if (!coin.taken && Math.hypot(player.footX - coin.x, player.footY - coin.y) < 0.55) {
       coin.taken = true;
-      session.standardCoins += 1;
+      awardStandardCoins(1);
     }
   }
   for (const coin of compassCoins) {
@@ -688,6 +702,11 @@ function updateCombat(input, previousPlayerFootY, dt) {
 function fixedUpdate(dt) {
   if (session.state !== 'playing') return;
   const input = inputSnapshot();
+  stepCoursePlatforms(platforms, dt, {
+    supportPlatformId: player.supportPlatformId,
+    riderX: player.footX
+  });
+  transportRiderWithPlatform(player, platforms);
   const previousPlayerFootY = player.footY;
   const previousPlayerBody = motionBody(player);
   const previousHeadY = previousPlayerBody.y;
@@ -716,6 +735,15 @@ function fixedUpdate(dt) {
   } else if (blockEvent?.type === 'block-rejected') {
     notice = 'That reinforced block requires Hargold.';
     noticeSeconds = 1.8;
+  } else if (blockEvent?.type === 'block-coin') {
+    awardStandardCoins(blockEvent.reward);
+    notice = `${blockEvent.reward} trail coin${blockEvent.reward === 1 ? '' : 's'} released.`;
+    noticeSeconds = 1.3;
+  } else if (blockEvent?.type === 'block-power-up') {
+    session.maximumHealthLayers = Math.max(2, session.maximumHealthLayers);
+    session.healthLayers = session.maximumHealthLayers;
+    notice = 'Explorer protection restored.';
+    noticeSeconds = 1.8;
   }
   if (!blockEvent) {
     resolveSolidBlockSideCollision(player, previousPlayerBody, blocks, motionBody(player));
@@ -731,10 +759,10 @@ function fixedUpdate(dt) {
     noticeSeconds = 2.5;
   }
   if (player.footY > 11.5) loseLife('pit');
-  if (player.footX >= 35.4) {
+  if (player.footX >= WORLD_END - 0.75) {
     session.state = 'complete';
     player.locomotion = 'victory';
-    notice = 'Movement test complete.';
+    notice = 'Meadow Wake complete.';
     noticeSeconds = Infinity;
   }
 }
@@ -953,6 +981,7 @@ function frame(now) {
     coins,
     compassCoins,
     blocks,
+    platforms,
     mobs,
     projectiles
   }, elapsed);

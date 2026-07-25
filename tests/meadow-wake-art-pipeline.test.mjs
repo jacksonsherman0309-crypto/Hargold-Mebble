@@ -81,6 +81,7 @@ assert.match(characterValidator, /segmented rigid limb geometry is forbidden/);
 
 const liveHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 assert.match(liveHtml, /data-action="sprint"/);
-assert.match(liveHtml, /continuous-skin-3/);
+assert.match(liveHtml, /authored-foreground-1/);
+assert.match(renderer, /continuous-skin-3/);
 
 console.log(`Meadow Wake art pipeline checks passed from ${root}`);
