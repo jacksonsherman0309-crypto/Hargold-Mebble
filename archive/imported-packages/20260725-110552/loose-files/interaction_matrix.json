@@ -1,0 +1,276 @@
+{
+  "build": 21,
+  "version": 1,
+  "rules": [
+    {
+      "id": "fatal-pit",
+      "source": "pit",
+      "targetTags": [
+        "player"
+      ],
+      "outcome": "instant-life-loss",
+      "bypasses": [
+        "hearts",
+        "invulnerability",
+        "power-up"
+      ]
+    },
+    {
+      "id": "fatal-lava",
+      "source": "lava",
+      "targetTags": [
+        "player"
+      ],
+      "outcome": "instant-life-loss",
+      "bypasses": [
+        "hearts",
+        "invulnerability",
+        "power-up"
+      ]
+    },
+    {
+      "id": "fatal-poison",
+      "source": "poison",
+      "targetTags": [
+        "player"
+      ],
+      "outcome": "instant-life-loss",
+      "bypasses": [
+        "hearts",
+        "invulnerability",
+        "power-up"
+      ]
+    },
+    {
+      "id": "fatal-freezing-water",
+      "source": "fatal-freezing-water",
+      "targetTags": [
+        "player"
+      ],
+      "outcome": "instant-life-loss",
+      "bypasses": [
+        "hearts",
+        "invulnerability",
+        "power-up"
+      ]
+    },
+    {
+      "id": "fatal-heavy-crush",
+      "source": "heavy-crush",
+      "targetTags": [
+        "player"
+      ],
+      "outcome": "instant-life-loss",
+      "bypasses": [
+        "hearts",
+        "invulnerability",
+        "power-up"
+      ]
+    },
+    {
+      "id": "fire-vs-ice",
+      "source": "fire",
+      "targetTags": [
+        "ice-enemy"
+      ],
+      "outcome": "defeat"
+    },
+    {
+      "id": "ice-vs-fire",
+      "source": "ice",
+      "targetTags": [
+        "fire-enemy"
+      ],
+      "outcome": "defeat"
+    },
+    {
+      "id": "ice-vs-light",
+      "source": "ice",
+      "targetTags": [
+        "enemy",
+        "light"
+      ],
+      "outcome": "freeze-carryable"
+    },
+    {
+      "id": "ice-vs-medium",
+      "source": "ice",
+      "targetTags": [
+        "enemy",
+        "medium"
+      ],
+      "outcome": "freeze-carryable",
+      "durationScale": 0.75
+    },
+    {
+      "id": "ice-vs-heavy-rock",
+      "source": "ice",
+      "targetTags": [
+        "heavy-rock"
+      ],
+      "outcome": "temporary-freeze",
+      "canDefeat": false
+    },
+    {
+      "id": "hargold-slam-vs-heavy-rock",
+      "source": "hargold-ground-slam",
+      "targetTags": [
+        "heavy-rock"
+      ],
+      "outcome": "defeat"
+    },
+    {
+      "id": "mebble-slam-vs-heavy-rock",
+      "source": "mebble-ground-slam",
+      "targetTags": [
+        "heavy-rock"
+      ],
+      "outcome": "deflect",
+      "canDefeat": false
+    },
+    {
+      "id": "bubble-vs-light",
+      "source": "bubblebloom",
+      "targetTags": [
+        "enemy",
+        "light"
+      ],
+      "outcome": "bubble-capture"
+    },
+    {
+      "id": "bubble-vs-medium",
+      "source": "bubblebloom",
+      "targetTags": [
+        "enemy",
+        "medium"
+      ],
+      "outcome": "bubble-capture",
+      "durationScale": 0.6
+    },
+    {
+      "id": "bubble-vs-heavy",
+      "source": "bubblebloom",
+      "targetTags": [
+        "heavy"
+      ],
+      "outcome": "immune"
+    },
+    {
+      "id": "bubble-vs-boss",
+      "source": "bubblebloom",
+      "targetTags": [
+        "boss"
+      ],
+      "outcome": "immune"
+    },
+    {
+      "id": "stonefist-vs-reinforced",
+      "source": "stonefist",
+      "targetTags": [
+        "reinforced-block"
+      ],
+      "outcome": "break"
+    },
+    {
+      "id": "stonefist-vs-armor",
+      "source": "stonefist",
+      "targetTags": [
+        "armored"
+      ],
+      "outcome": "break-armor"
+    },
+    {
+      "id": "shell-vs-enemy",
+      "source": "rolling-shell",
+      "targetTags": [
+        "enemy"
+      ],
+      "outcome": "impact-damage",
+      "chainEligible": true
+    },
+    {
+      "id": "thrown-frozen-vs-enemy",
+      "source": "thrown-frozen-enemy",
+      "targetTags": [
+        "enemy"
+      ],
+      "outcome": "impact-damage",
+      "chainEligible": true
+    },
+    {
+      "id": "reflected-projectile",
+      "source": "reflected-projectile",
+      "targetTags": [
+        "enemy"
+      ],
+      "outcome": "projectile-damage",
+      "ownership": "player"
+    },
+    {
+      "id": "chronus-vs-standard-enemy",
+      "source": "chronus-flower",
+      "targetTags": [
+        "enemy"
+      ],
+      "outcome": "time-scale",
+      "scale": 0.5
+    },
+    {
+      "id": "chronus-vs-boss",
+      "source": "chronus-flower",
+      "targetTags": [
+        "boss"
+      ],
+      "outcome": "time-scale",
+      "scale": 0.9
+    },
+    {
+      "id": "chronus-vs-fatal-hazard",
+      "source": "chronus-flower",
+      "targetTags": [
+        "fatal-hazard"
+      ],
+      "outcome": "no-protection"
+    },
+    {
+      "id": "ground-slam-vs-switch",
+      "source": "ground-slam",
+      "targetTags": [
+        "slam-switch"
+      ],
+      "outcome": "activate"
+    },
+    {
+      "id": "ice-vs-water",
+      "source": "ice",
+      "targetTags": [
+        "freezable-water"
+      ],
+      "outcome": "temporary-platform"
+    },
+    {
+      "id": "fire-vs-frozen",
+      "source": "fire",
+      "targetTags": [
+        "frozen-object"
+      ],
+      "outcome": "thaw"
+    },
+    {
+      "id": "bubble-contact-player",
+      "source": "player-contact",
+      "targetTags": [
+        "active-bubble"
+      ],
+      "outcome": "pop"
+    },
+    {
+      "id": "boss-event-only",
+      "source": "standard-attack",
+      "targetTags": [
+        "boss"
+      ],
+      "outcome": "no-damage-unless-event"
+    }
+  ]
+}

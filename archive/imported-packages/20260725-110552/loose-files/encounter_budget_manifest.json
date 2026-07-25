@@ -1,0 +1,7115 @@
+{
+  "build": 27,
+  "targetDeviceClass": "landscape mobile; iPhone 14 Pro Max-class baseline",
+  "regularEnemyCount": 53,
+  "bossCount": 10,
+  "levelCount": 90,
+  "approvedExpansionPlacementCount": 28,
+  "globalRules": [
+    "Never exceed the level's simultaneous regular-enemy cap.",
+    "Projectile and VFX caps are separate from the regular-enemy cap.",
+    "Boss minions share the regular-enemy cap.",
+    "Offscreen spawns require a readable approach route and cannot appear on a safe landing.",
+    "Enemy activation is deterministic from level state, not frame-rate dependent.",
+    "Nightmare increases overlap and density but does not remove telegraphs."
+  ],
+  "levels": [
+    {
+      "id": "1-1",
+      "world": 1,
+      "name": "Meadow Wake",
+      "difficulty": 1.0,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 6,
+          "purpose": "Safe stomp and spacing lessons",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Introduces shell states and block breaking",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 3,
+          "purpose": "Teaches avoidance rather than automatic stomping",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 1,
+          "purpose": "Previews visible projectile timing",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_critter",
+        "camp_sentry",
+        "shellback",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 3,
+        "standard": 5,
+        "hard": 6,
+        "nightmare": 7
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 10.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_critter": 5,
+        "camp_sentry": 2,
+        "shellback": 3,
+        "spike_beetle": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "1-2",
+      "world": 1,
+      "name": "Acorn Run",
+      "difficulty": 1.3,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 7,
+          "purpose": "Creates predictable moving hazards tied to slope direction",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 2,
+          "purpose": "Optional momentum tool and rebound threat",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 4,
+          "purpose": "Ground pressure on hill crests",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "camp_critter",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 3,
+        "standard": 5,
+        "hard": 6,
+        "nightmare": 7
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 10.2,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 6,
+        "camp_critter": 3,
+        "shellback": 2
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "1-3",
+      "world": 1,
+      "name": "Burrowbank",
+      "difficulty": 1.6,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "dirt_squirt",
+          "displayType": "Dirt Squirt",
+          "count": 8,
+          "purpose": "Telegraphs movement through dirt and pressures lift transfers",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 4,
+          "purpose": "Controls narrow root ledges",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 3,
+          "purpose": "Maintains familiar ground rhythm",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_critter",
+        "dirt_squirt",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 15,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 3,
+        "standard": 5,
+        "hard": 6,
+        "nightmare": 7
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 9.9,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_critter": 3,
+        "dirt_squirt": 6,
+        "spike_beetle": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "1-4",
+      "world": 1,
+      "name": "Ruin Rise",
+      "difficulty": 2.0,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Projectile timing and remote switch activation",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 2,
+          "purpose": "Breaks low masonry and creates moving pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 3,
+          "purpose": "Guards narrow stair landings",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "shellback",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 10,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 3,
+        "standard": 5,
+        "hard": 6,
+        "nightmare": 7
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 9.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 4,
+        "shellback": 2,
+        "spike_beetle": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "1-5",
+      "world": 1,
+      "name": "Sentry Span",
+      "difficulty": 2.1,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 9,
+          "purpose": "Defines route timing and environmental interaction",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Cross-lane pressure and optional enemy clearing",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 3,
+          "purpose": "Prevents passive hiding behind cover",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "mossnapper",
+          "count": 3,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "camp_critter",
+        "camp_sentry",
+        "mossnapper",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 18,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 3,
+        "standard": 5,
+        "hard": 6,
+        "nightmare": 7
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 9.4,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_critter": 3,
+        "camp_sentry": 7,
+        "mossnapper": 3,
+        "shellback": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "1-6",
+      "world": 1,
+      "name": "Glideway",
+      "difficulty": 2.2,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 6,
+          "purpose": "Creates vertical timing hazards during glides",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 3,
+          "purpose": "Pressures Hargold lift landings",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 3,
+          "purpose": "Blocks obvious branch tops",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "camp_critter",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 3,
+        "standard": 5,
+        "hard": 6,
+        "nightmare": 7
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 9.3,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 5,
+        "camp_critter": 3,
+        "spike_beetle": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "1-7",
+      "world": 1,
+      "name": "Cliffline Fork",
+      "difficulty": 2.5,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 5,
+          "purpose": "Canopy pressure and rejoin complexity",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 5,
+          "purpose": "Creek route tool and final cross-route hazard",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 3,
+          "purpose": "Controls rejoin elevations",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 4,
+          "purpose": "Basic branch and log pressure",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "camp_critter",
+        "camp_sentry",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 17,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 3,
+        "standard": 5,
+        "hard": 6,
+        "nightmare": 7
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 9.0,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 4,
+        "camp_critter": 3,
+        "camp_sentry": 3,
+        "shellback": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "1-8",
+      "world": 1,
+      "name": "Rootbound Hollow",
+      "difficulty": 3.2,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 4,
+          "purpose": "Acts as movable weight and rolling hazard",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 4,
+          "purpose": "Illuminates spores and pressures hidden footing",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 5,
+          "purpose": "Marks unsafe root surfaces",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "shellback",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 3,
+        "standard": 5,
+        "hard": 6,
+        "nightmare": 7
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.3,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 3,
+        "shellback": 3,
+        "spike_beetle": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "1-9",
+      "world": 1,
+      "name": "Verdant Gate",
+      "difficulty": 3.0,
+      "bossLevel": true,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 8,
+          "purpose": "Opens mechanisms and creates fortress pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 5,
+          "purpose": "Breaks anchors and clears lanes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 5,
+          "purpose": "Restricts safe landings",
+          "source": "construction-plan"
+        },
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 4,
+          "purpose": "Adds vertical timing in exposed ruins",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 4,
+          "purpose": "Maintains ground pressure",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "camp_critter",
+        "camp_sentry",
+        "shellback",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 26,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 2,
+        "standard": 4,
+        "hard": 5,
+        "nightmare": 6
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 3,
+        "camp_critter": 3,
+        "camp_sentry": 6,
+        "shellback": 4,
+        "spike_beetle": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "2-1",
+      "world": 2,
+      "name": "Saltwind Shore",
+      "difficulty": 2.0,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 4,
+          "purpose": "Maintains familiar shore pacing",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Breaks coral barriers and threatens rebound lanes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "tidebiter",
+          "displayType": "Tidebiter",
+          "count": 4,
+          "purpose": "Water-only timing pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 2,
+          "purpose": "Projectile cover test across changing water levels",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_critter",
+        "camp_sentry",
+        "shellback",
+        "tidebiter"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 9.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_critter": 3,
+        "camp_sentry": 2,
+        "shellback": 3,
+        "tidebiter": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "2-2",
+      "world": 2,
+      "name": "Tidepool Tunnels",
+      "difficulty": 2.2,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "tidebiter",
+          "displayType": "Tidebiter",
+          "count": 7,
+          "purpose": "Controls underwater lanes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 2,
+          "purpose": "Can be lifted into switches by bubbles",
+          "source": "construction-plan"
+        },
+        {
+          "type": "bog_leech",
+          "displayType": "Bog Leech",
+          "count": 3,
+          "purpose": "Slow suction hazard in still pockets",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "bog_leech",
+        "shellback",
+        "tidebiter"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 9.3,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bog_leech": 3,
+        "shellback": 2,
+        "tidebiter": 6
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "2-3",
+      "world": 2,
+      "name": "Floodgate Grotto",
+      "difficulty": 2.4,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Remote switch activation",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 4,
+          "purpose": "Breaks coral shutters",
+          "source": "construction-plan"
+        },
+        {
+          "type": "tidebiter",
+          "displayType": "Tidebiter",
+          "count": 4,
+          "purpose": "Punishes flooded route choices",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 3,
+          "purpose": "Dry-gallery pressure",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_critter",
+        "camp_sentry",
+        "shellback",
+        "tidebiter"
+      ],
+      "declaredTotalEnemyCount": 16,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 9.1,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_critter": 3,
+        "camp_sentry": 4,
+        "shellback": 3,
+        "tidebiter": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "2-4",
+      "world": 2,
+      "name": "Beacon Breakwater",
+      "difficulty": 2.7,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Rotates jammed mirrors and pressures cover",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Breaks salt-crusted masonry",
+          "source": "construction-plan"
+        },
+        {
+          "type": "tidebiter",
+          "displayType": "Tidebiter",
+          "count": 2,
+          "purpose": "Guards submerged recovery routes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 3,
+          "purpose": "Controls narrow lighthouse ledges",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "shellback",
+        "spike_beetle",
+        "tidebiter"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 4,
+        "shellback": 3,
+        "spike_beetle": 3,
+        "tidebiter": 2
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "2-5",
+      "world": 2,
+      "name": "Glassreef Drift",
+      "difficulty": 2.8,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 4,
+          "purpose": "Adds movable weight to coral shelves",
+          "source": "construction-plan"
+        },
+        {
+          "type": "tidebiter",
+          "displayType": "Tidebiter",
+          "count": 5,
+          "purpose": "Controls underwater recovery",
+          "source": "construction-plan"
+        },
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 3,
+          "purpose": "Drops weight onto platforms from above",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "shellback",
+        "tidebiter"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.7,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 3,
+        "shellback": 3,
+        "tidebiter": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "2-6",
+      "world": 2,
+      "name": "Undertow Ferry",
+      "difficulty": 3.0,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 7,
+          "purpose": "Boarding pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 4,
+          "purpose": "Counterweight and gate tool",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 3,
+          "purpose": "Forces deck repositioning",
+          "source": "construction-plan"
+        },
+        {
+          "type": "tidebiter",
+          "displayType": "Tidebiter",
+          "count": 3,
+          "purpose": "Threatens players knocked into the water",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_critter",
+        "camp_sentry",
+        "shellback",
+        "tidebiter"
+      ],
+      "declaredTotalEnemyCount": 17,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_critter": 6,
+        "camp_sentry": 3,
+        "shellback": 3,
+        "tidebiter": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "2-7",
+      "world": 2,
+      "name": "Drowned Bellhouse",
+      "difficulty": 3.2,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "wraith_wisp",
+          "displayType": "Wraith Wisp",
+          "count": 8,
+          "purpose": "Current-bound spectral pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Persistent switch weights",
+          "source": "construction-plan"
+        },
+        {
+          "type": "bog_leech",
+          "displayType": "Bog Leech",
+          "count": 4,
+          "purpose": "Controls still-water pockets",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 2,
+          "purpose": "Remote bell activation",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "bog_leech",
+        "camp_sentry",
+        "shellback",
+        "wraith_wisp"
+      ],
+      "declaredTotalEnemyCount": 17,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.3,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bog_leech": 3,
+        "camp_sentry": 2,
+        "shellback": 3,
+        "wraith_wisp": 6
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "2-8",
+      "world": 2,
+      "name": "Moonlit Undertide",
+      "difficulty": 3.6,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "tidebiter",
+          "displayType": "Tidebiter",
+          "count": 6,
+          "purpose": "Deep-water lane pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "wraith_wisp",
+          "displayType": "Wraith Wisp",
+          "count": 6,
+          "purpose": "Follows illuminated currents",
+          "source": "construction-plan"
+        },
+        {
+          "type": "bog_leech",
+          "displayType": "Bog Leech",
+          "count": 4,
+          "purpose": "Guards air-pocket floors",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 2,
+          "purpose": "Mirror and pressure-switch tool",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "bog_leech",
+        "shellback",
+        "tidebiter",
+        "wraith_wisp"
+      ],
+      "declaredTotalEnemyCount": 18,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.9,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bog_leech": 3,
+        "shellback": 2,
+        "tidebiter": 5,
+        "wraith_wisp": 5
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "2-9",
+      "world": 2,
+      "name": "Wraithbound Lighthouse",
+      "difficulty": 3.8,
+      "bossLevel": true,
+      "declaredEnemies": [
+        {
+          "type": "wraith_wisp",
+          "displayType": "Wraith Wisp",
+          "count": 9,
+          "purpose": "Foreshadows boss current control",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 4,
+          "purpose": "Mirror and projectile pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 4,
+          "purpose": "Breaks salt seals and holds switches",
+          "source": "construction-plan"
+        },
+        {
+          "type": "tidebiter",
+          "displayType": "Tidebiter",
+          "count": 5,
+          "purpose": "Flooded shaft threat",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 3,
+          "purpose": "Narrow exterior ledges",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "shellback",
+        "spike_beetle",
+        "tidebiter",
+        "wraith_wisp"
+      ],
+      "declaredTotalEnemyCount": 25,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 2,
+        "standard": 4,
+        "hard": 5,
+        "nightmare": 6
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.7,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 3,
+        "shellback": 3,
+        "spike_beetle": 3,
+        "tidebiter": 4,
+        "wraith_wisp": 6
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "3-1",
+      "world": 3,
+      "name": "Sunshard Sands",
+      "difficulty": 2.5,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 4,
+          "purpose": "Familiar ground pacing on firm sand",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Remote crystal rotation and sand-crossing threat",
+          "source": "construction-plan"
+        },
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 3,
+          "purpose": "Destabilizes soft sand from above",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 2,
+          "purpose": "Rotates distant crystal fins with projectiles",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "camp_critter",
+        "camp_sentry",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 9.0,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 3,
+        "camp_critter": 3,
+        "camp_sentry": 2,
+        "shellback": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "3-2",
+      "world": 3,
+      "name": "Resonance Caverns",
+      "difficulty": 2.7,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 4,
+          "purpose": "Carries impacts into distant resonance chains",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 5,
+          "purpose": "Controls stable rest ledges",
+          "source": "construction-plan"
+        },
+        {
+          "type": "dirt_squirt",
+          "displayType": "Dirt Squirt",
+          "count": 3,
+          "purpose": "Interrupts timing from below",
+          "source": "construction-plan"
+        },
+        {
+          "type": "crystal_wisp",
+          "displayType": "Crystal Wisp",
+          "count": 4,
+          "purpose": "Moves only while its matching tone is active",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "sand_burrower",
+          "count": 4,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "crystal_wisp",
+        "dirt_squirt",
+        "sand_burrower",
+        "shellback",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 20,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "crystal_wisp": 3,
+        "dirt_squirt": 3,
+        "sand_burrower": 3,
+        "shellback": 3,
+        "spike_beetle": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "3-3",
+      "world": 3,
+      "name": "Mirage Run",
+      "difficulty": 2.9,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 5,
+          "purpose": "Marks real surfaces through impact dust",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Maintains momentum pressure and breaks hidden sandstone",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 5,
+          "purpose": "Occupies genuine ground while mirage copies remain empty",
+          "source": "construction-plan"
+        },
+        {
+          "type": "sand_wisp",
+          "displayType": "Sand Wisp",
+          "count": 4,
+          "purpose": "Travels between mirage images to complicate visual reading",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "camp_critter",
+        "sand_wisp",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 17,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.6,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 4,
+        "camp_critter": 4,
+        "sand_wisp": 3,
+        "shellback": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "3-4",
+      "world": 3,
+      "name": "Prism Bastion",
+      "difficulty": 3.2,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Rotates mounted prisms and pressures climbing lanes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 4,
+          "purpose": "Controls narrow fortress ledges",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Moves floor prisms and holds pressure plates",
+          "source": "construction-plan"
+        },
+        {
+          "type": "crystal_wisp",
+          "displayType": "Crystal Wisp",
+          "count": 5,
+          "purpose": "Patrols active beam paths",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "crystal_wisp",
+        "shellback",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 17,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.3,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 4,
+        "crystal_wisp": 4,
+        "shellback": 3,
+        "spike_beetle": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "3-5",
+      "world": 3,
+      "name": "Glasswind Ravine",
+      "difficulty": 3.3,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 4,
+          "purpose": "Changes rope timing with falling impacts",
+          "source": "construction-plan"
+        },
+        {
+          "type": "crystal_wisp",
+          "displayType": "Crystal Wisp",
+          "count": 6,
+          "purpose": "Occupies active gust lanes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 4,
+          "purpose": "Guards wind shelters",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 2,
+          "purpose": "Rotates distant fins through projectile impacts",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "camp_sentry",
+        "crystal_wisp",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 16,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.2,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 3,
+        "camp_sentry": 2,
+        "crystal_wisp": 5,
+        "spike_beetle": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "3-6",
+      "world": 3,
+      "name": "Shardrail Caravan",
+      "difficulty": 3.5,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 8,
+          "purpose": "Boarding pressure across linked sleds",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 5,
+          "purpose": "Track-switch tool and dangerous rolling cargo",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 4,
+          "purpose": "Forces movement between sled cover",
+          "source": "construction-plan"
+        },
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 4,
+          "purpose": "Adds weight and damages crystal sockets",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "camp_critter",
+        "camp_sentry",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 21,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.0,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 3,
+        "camp_critter": 6,
+        "camp_sentry": 3,
+        "shellback": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "3-7",
+      "world": 3,
+      "name": "Echoing Sepulcher",
+      "difficulty": 3.6,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "crystal_wisp",
+          "displayType": "Crystal Wisp",
+          "count": 8,
+          "purpose": "Travels along active sound paths",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Holds damping plates",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 3,
+          "purpose": "Remote tone activation",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 4,
+          "purpose": "Controls narrow tomb thresholds",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "crystal_wisp",
+        "shellback",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 18,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.9,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 3,
+        "crystal_wisp": 6,
+        "shellback": 3,
+        "spike_beetle": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "3-8",
+      "world": 3,
+      "name": "Starfall Quarry",
+      "difficulty": 4.0,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 5,
+          "purpose": "Triggers rails and breaks weakened supports",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 4,
+          "purpose": "Activates remote impact-marker switches",
+          "source": "construction-plan"
+        },
+        {
+          "type": "crystal_wisp",
+          "displayType": "Crystal Wisp",
+          "count": 7,
+          "purpose": "Occupies newly exposed routes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 5,
+          "purpose": "Guards permanent safe ledges",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "crystal_wisp",
+        "shellback",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 21,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 4,
+        "standard": 6,
+        "hard": 7,
+        "nightmare": 8
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 3,
+        "crystal_wisp": 6,
+        "shellback": 4,
+        "spike_beetle": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "3-9",
+      "world": 3,
+      "name": "Luminite Vault",
+      "difficulty": 4.1,
+      "bossLevel": true,
+      "declaredEnemies": [
+        {
+          "type": "crystal_wisp",
+          "displayType": "Crystal Wisp",
+          "count": 10,
+          "purpose": "Foreshadows the boss light network",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Remote prism and resonance activation",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 5,
+          "purpose": "Moves heavy crystal mechanisms",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 5,
+          "purpose": "Controls narrow vault paths",
+          "source": "construction-plan"
+        },
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 4,
+          "purpose": "Destabilizes sand and prism platforms",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "camp_sentry",
+        "crystal_wisp",
+        "shellback",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 29,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 2,
+        "standard": 4,
+        "hard": 5,
+        "nightmare": 6
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.4,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 3,
+        "camp_sentry": 4,
+        "crystal_wisp": 6,
+        "shellback": 4,
+        "spike_beetle": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "4-1",
+      "world": 4,
+      "name": "Cloudstep Cliffs",
+      "difficulty": 2.7,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 4,
+          "purpose": "Safe weight demonstration and familiar pacing",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Acts as movable weight and route tool",
+          "source": "construction-plan"
+        },
+        {
+          "type": "buzzer",
+          "displayType": "Buzzer",
+          "count": 4,
+          "purpose": "Air-space timing during cloud chains",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "buzzer",
+        "camp_critter",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 11,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "buzzer": 3,
+        "camp_critter": 3,
+        "shellback": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "4-2",
+      "world": 4,
+      "name": "Thunderhead Tunnel",
+      "difficulty": 2.9,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 4,
+          "purpose": "Player-controlled lightning timing and projectile pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "sky_gnat",
+          "displayType": "Sky Gnat",
+          "count": 6,
+          "purpose": "Short air-space interruptions",
+          "source": "construction-plan"
+        },
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 3,
+          "purpose": "Conductive moving weight on pulse switches",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "gear_bot",
+        "sky_gnat"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.6,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 3,
+        "gear_bot": 3,
+        "sky_gnat": 5
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "4-3",
+      "world": 4,
+      "name": "Kitewind Crossing",
+      "difficulty": 3.1,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 4,
+          "purpose": "Temporary moving weight and anchor-breaking tool",
+          "source": "construction-plan"
+        },
+        {
+          "type": "bomb_bird",
+          "displayType": "Bomb Bird",
+          "count": 3,
+          "purpose": "Drops explosives that alter kite balance",
+          "source": "construction-plan"
+        },
+        {
+          "type": "buzzer",
+          "displayType": "Buzzer",
+          "count": 5,
+          "purpose": "Controls transfer timing",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 2,
+          "purpose": "Carryable weight for optional route",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "bomb_bird",
+        "buzzer",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 14,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.4,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 3,
+        "bomb_bird": 3,
+        "buzzer": 4,
+        "shellback": 2
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "4-4",
+      "world": 4,
+      "name": "Stormwatch Spire",
+      "difficulty": 3.3,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 6,
+          "purpose": "Moving weight and conductive obstacle",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 4,
+          "purpose": "Remote rod activation",
+          "source": "construction-plan"
+        },
+        {
+          "type": "feather_drift",
+          "displayType": "Feather Drift",
+          "count": 3,
+          "purpose": "Slow aerial pressure outside the tower",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "feather_drift",
+        "gear_bot"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.2,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 3,
+        "feather_drift": 3,
+        "gear_bot": 5
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "4-5",
+      "world": 4,
+      "name": "Rainwheel Reservoir",
+      "difficulty": 3.4,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "wave_fin",
+          "displayType": "Wave Fin",
+          "count": 4,
+          "purpose": "Fast water-lane threat",
+          "source": "construction-plan"
+        },
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 5,
+          "purpose": "Dry-side mechanical pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "sky_gnat",
+          "displayType": "Sky Gnat",
+          "count": 5,
+          "purpose": "Interrupts gutter positioning",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "gear_bot",
+        "sky_gnat",
+        "wave_fin"
+      ],
+      "declaredTotalEnemyCount": 14,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.1,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "gear_bot": 4,
+        "sky_gnat": 4,
+        "wave_fin": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "4-6",
+      "world": 4,
+      "name": "Skyrail Convoy",
+      "difficulty": 3.6,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "bomb_bird",
+          "displayType": "Bomb Bird",
+          "count": 4,
+          "purpose": "Changes gondola weight and cuts cargo",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_chipper",
+          "displayType": "Camp Chipper",
+          "count": 3,
+          "purpose": "Mid-sized ranged pressure across cars",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 3,
+          "purpose": "Guards brake stations",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 2,
+          "purpose": "Movable counterweight",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "bomb_bird",
+        "camp_chipper",
+        "camp_sentry",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.9,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bomb_bird": 3,
+        "camp_chipper": 3,
+        "camp_sentry": 3,
+        "shellback": 2
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "4-7",
+      "world": 4,
+      "name": "Hollow Cloudhouse",
+      "difficulty": 3.7,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 5,
+          "purpose": "Airflow clue and slow pursuit",
+          "source": "construction-plan"
+        },
+        {
+          "type": "crate_mimic",
+          "displayType": "Crate Mimic",
+          "count": 4,
+          "purpose": "Punishes unobservant door choices",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shock_jelly",
+          "displayType": "Shock Jelly",
+          "count": 3,
+          "purpose": "Controls charged rooms",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "crate_mimic",
+        "lantern_wisp",
+        "shock_jelly"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "crate_mimic": 3,
+        "lantern_wisp": 4,
+        "shock_jelly": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "4-8",
+      "world": 4,
+      "name": "Above the Blue",
+      "difficulty": 4.1,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "sky_gnat",
+          "displayType": "Sky Gnat",
+          "count": 8,
+          "purpose": "Fine air-control pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "feather_drift",
+          "displayType": "Feather Drift",
+          "count": 5,
+          "purpose": "Slow moving landmarks and bounce targets",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shock_jelly",
+          "displayType": "Shock Jelly",
+          "count": 4,
+          "purpose": "Optional full-chain lightning reveal",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "feather_drift",
+        "shock_jelly",
+        "sky_gnat"
+      ],
+      "declaredTotalEnemyCount": 17,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.4,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "feather_drift": 4,
+        "shock_jelly": 3,
+        "sky_gnat": 6
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "4-9",
+      "world": 4,
+      "name": "Aerie of the Altitude Archmage",
+      "difficulty": 4.2,
+      "bossLevel": true,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Rod activation and reflected counter practice",
+          "source": "construction-plan"
+        },
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 5,
+          "purpose": "Engine weight and moving obstruction",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shock_jelly",
+          "displayType": "Shock Jelly",
+          "count": 4,
+          "purpose": "Electrical route activation",
+          "source": "construction-plan"
+        },
+        {
+          "type": "bomb_bird",
+          "displayType": "Bomb Bird",
+          "count": 3,
+          "purpose": "Breaks shutters and changes cloud weight",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "bomb_bird",
+        "camp_sentry",
+        "gear_bot",
+        "shock_jelly"
+      ],
+      "declaredTotalEnemyCount": 17,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 2,
+        "standard": 4,
+        "hard": 5,
+        "nightmare": 6
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.3,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bomb_bird": 3,
+        "camp_sentry": 4,
+        "gear_bot": 4,
+        "shock_jelly": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "5-1",
+      "world": 5,
+      "name": "Mirage March",
+      "difficulty": 3.15,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 5,
+          "purpose": "Creates moving hazards whose shadows remain readable through mirages",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Can test lower shelves and clear Bombers",
+          "source": "construction-plan"
+        },
+        {
+          "type": "cactus_crawler",
+          "displayType": "Cactus Crawler",
+          "count": 4,
+          "purpose": "Controls permanent safe ridges",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "cactus_crawler",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.3,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 4,
+        "cactus_crawler": 3,
+        "shellback": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "5-2",
+      "world": 5,
+      "name": "Sunken Glassway",
+      "difficulty": 3.25,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "rock_runt",
+          "displayType": "Rock Runt",
+          "count": 4,
+          "purpose": "Heavy floor-break catalyst and Hargold-only finisher target",
+          "source": "construction-plan"
+        },
+        {
+          "type": "dirt_squirt",
+          "displayType": "Dirt Squirt",
+          "count": 6,
+          "purpose": "Telegraphs weak tiles from below",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 4,
+          "purpose": "Discourages repeated safe stomps on fragile glass",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "dirt_squirt",
+        "rock_runt",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 14,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.2,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "dirt_squirt": 5,
+        "rock_runt": 3,
+        "spike_beetle": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "5-3",
+      "world": 5,
+      "name": "Dunevault Descent",
+      "difficulty": 3.35,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Movable pressure-plate weight",
+          "source": "construction-plan"
+        },
+        {
+          "type": "dirt_squirt",
+          "displayType": "Dirt Squirt",
+          "count": 5,
+          "purpose": "Ambushes fresh sandbanks",
+          "source": "construction-plan"
+        },
+        {
+          "type": "cactus_crawler",
+          "displayType": "Cactus Crawler",
+          "count": 4,
+          "purpose": "Controls dry ledges during fill cycles",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "sand_burrower",
+          "count": 4,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "cactus_crawler",
+        "dirt_squirt",
+        "sand_burrower",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 16,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.2,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "cactus_crawler": 3,
+        "dirt_squirt": 4,
+        "sand_burrower": 3,
+        "shellback": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "5-4",
+      "world": 5,
+      "name": "Furnace Veins",
+      "difficulty": 3.5,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 3,
+          "purpose": "Projectile timing through machinery",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Rolling tool and conveyor hazard",
+          "source": "construction-plan"
+        },
+        {
+          "type": "fire_glob",
+          "displayType": "Fire Glob",
+          "count": 4,
+          "purpose": "Heat-cycle pressure requiring Ice Power for defeat",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "fire_glob",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 10,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.0,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 3,
+        "fire_glob": 3,
+        "shellback": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "5-5",
+      "world": 5,
+      "name": "Sirocco Spires",
+      "difficulty": 3.55,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 4,
+          "purpose": "Remote vane activation",
+          "source": "construction-plan"
+        },
+        {
+          "type": "feather_drift",
+          "displayType": "Feather Drift",
+          "count": 5,
+          "purpose": "Readable drifting targets inside gusts",
+          "source": "construction-plan"
+        },
+        {
+          "type": "cactus_crawler",
+          "displayType": "Cactus Crawler",
+          "count": 3,
+          "purpose": "Controls stable landing islands",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "cactus_crawler",
+        "camp_sentry",
+        "feather_drift"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.0,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "cactus_crawler": 3,
+        "camp_sentry": 3,
+        "feather_drift": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "5-6",
+      "world": 5,
+      "name": "Scarab Sandstream",
+      "difficulty": 3.65,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 4,
+          "purpose": "Gate weight and rolling hazard",
+          "source": "construction-plan"
+        },
+        {
+          "type": "prism_scarab",
+          "displayType": "Prism Scarab",
+          "count": 4,
+          "purpose": "Drops route-changing crystal fragments",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_roll",
+          "displayType": "Spike Roll",
+          "count": 3,
+          "purpose": "Persistent stream obstacle",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "prism_scarab",
+        "shellback",
+        "spike_roll"
+      ],
+      "declaredTotalEnemyCount": 11,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "prism_scarab": 3,
+        "shellback": 3,
+        "spike_roll": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "5-7",
+      "world": 5,
+      "name": "Tomb of Turning Suns",
+      "difficulty": 3.8,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 4,
+          "purpose": "Remote light source and timing pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_pod",
+          "displayType": "Spike Pod",
+          "count": 5,
+          "purpose": "Controls shadow-bridge landings",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 3,
+          "purpose": "Follows and temporarily reveals bridge edges",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "lantern_wisp",
+        "spike_pod"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.7,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 3,
+        "lantern_wisp": 3,
+        "spike_pod": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "5-8",
+      "world": 5,
+      "name": "Wraithwind Hollow",
+      "difficulty": 4.15,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 4,
+          "purpose": "Short-range platform reveal",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_pod",
+          "displayType": "Spike Pod",
+          "count": 5,
+          "purpose": "Controls visible rest islands",
+          "source": "construction-plan"
+        },
+        {
+          "type": "sand_wraith_echo",
+          "displayType": "Sand Wraith Echo",
+          "count": 3,
+          "purpose": "Nonboss route eraser and chase pressure",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "lantern_wisp",
+        "sand_wraith_echo",
+        "spike_pod"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.3,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "lantern_wisp": 3,
+        "sand_wraith_echo": 3,
+        "spike_pod": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "5-9",
+      "world": 5,
+      "name": "Palace of the Sand Wraith",
+      "difficulty": 4.05,
+      "bossLevel": true,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Remote light and obelisk foreshadowing",
+          "source": "construction-plan"
+        },
+        {
+          "type": "rock_runt",
+          "displayType": "Rock Runt",
+          "count": 4,
+          "purpose": "Heavy environmental obstacle requiring Hargold slam only if defeated",
+          "source": "construction-plan"
+        },
+        {
+          "type": "sand_wraith_echo",
+          "displayType": "Sand Wraith Echo",
+          "count": 4,
+          "purpose": "Mirage-body tutorial for the boss",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "rock_runt",
+        "sand_wraith_echo"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 2,
+        "standard": 4,
+        "hard": 5,
+        "nightmare": 6
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 4,
+        "rock_runt": 3,
+        "sand_wraith_echo": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "6-1",
+      "world": 6,
+      "name": "Powderpath Rise",
+      "difficulty": 3.45,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "wormlet",
+          "displayType": "Wormlet",
+          "count": 5,
+          "purpose": "Creates temporary snow trenches",
+          "source": "construction-plan"
+        },
+        {
+          "type": "bounce_bunny",
+          "displayType": "Bounce Bunny",
+          "count": 5,
+          "purpose": "Movement timing and optional bounce routes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "frost_hound",
+          "displayType": "Frost Hound",
+          "count": 3,
+          "purpose": "Fast pressure on packed lanes; defeated by Fire Power",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "bounce_bunny",
+        "frost_hound",
+        "wormlet"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.1,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bounce_bunny": 4,
+        "frost_hound": 3,
+        "wormlet": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "6-2",
+      "world": 6,
+      "name": "Blackice Grotto",
+      "difficulty": 3.55,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 5,
+          "purpose": "Reflection-readable stomp hazard",
+          "source": "construction-plan"
+        },
+        {
+          "type": "frost_hound",
+          "displayType": "Frost Hound",
+          "count": 4,
+          "purpose": "Fast pursuit on slick surfaces",
+          "source": "construction-plan"
+        },
+        {
+          "type": "icicle_dropper",
+          "displayType": "Icicle Dropper",
+          "count": 6,
+          "purpose": "Ceiling hazard telegraphed by reflections",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "avalanche_hatchling",
+          "count": 4,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "avalanche_hatchling",
+        "frost_hound",
+        "icicle_dropper",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 19,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 8.0,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "avalanche_hatchling": 3,
+        "frost_hound": 3,
+        "icicle_dropper": 5,
+        "spike_beetle": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "6-3",
+      "world": 6,
+      "name": "Whiteout Wall",
+      "difficulty": 3.7,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "powdergeist_wisp",
+          "displayType": "Powdergeist Wisp",
+          "count": 4,
+          "purpose": "Creates temporary wind shadows",
+          "source": "construction-plan"
+        },
+        {
+          "type": "snowblind_stalker",
+          "displayType": "Snowblind Stalker",
+          "count": 3,
+          "purpose": "Visibility-based pressure with footprint clues",
+          "source": "construction-plan"
+        },
+        {
+          "type": "bounce_bunny",
+          "displayType": "Bounce Bunny",
+          "count": 3,
+          "purpose": "Optional vertical bounce route",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "bounce_bunny",
+        "powdergeist_wisp",
+        "snowblind_stalker"
+      ],
+      "declaredTotalEnemyCount": 10,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bounce_bunny": 3,
+        "powdergeist_wisp": 3,
+        "snowblind_stalker": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "6-4",
+      "world": 6,
+      "name": "Bellfrost Bastion",
+      "difficulty": 3.75,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Remote bell activation and projectile lanes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "icicle_dropper",
+          "displayType": "Icicle Dropper",
+          "count": 7,
+          "purpose": "Resonance-triggered ceiling hazard",
+          "source": "construction-plan"
+        },
+        {
+          "type": "coldforge_gear_bot",
+          "displayType": "Coldforge Gear Bot",
+          "count": 4,
+          "purpose": "Moving weight on rotating stairs",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "coldforge_gear_bot",
+        "icicle_dropper"
+      ],
+      "declaredTotalEnemyCount": 16,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 4,
+        "coldforge_gear_bot": 3,
+        "icicle_dropper": 6
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "6-5",
+      "world": 6,
+      "name": "Avalanche Run",
+      "difficulty": 3.9,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "frost_hound",
+          "displayType": "Frost Hound",
+          "count": 5,
+          "purpose": "Chase pressure on newly packed surfaces",
+          "source": "construction-plan"
+        },
+        {
+          "type": "ice_boulder",
+          "displayType": "Ice Boulder",
+          "count": 5,
+          "purpose": "Rolling hazard and gate breaker",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shardwing_roc",
+          "displayType": "Shardwing Roc",
+          "count": 3,
+          "purpose": "Drops marked snow loads ahead of the avalanche",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "frost_hound",
+        "ice_boulder",
+        "shardwing_roc"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.6,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "frost_hound": 4,
+        "ice_boulder": 4,
+        "shardwing_roc": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "6-6",
+      "world": 6,
+      "name": "Glacier Raft",
+      "difficulty": 3.85,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "rock_runt",
+          "displayType": "Rock Runt",
+          "count": 4,
+          "purpose": "Heavy balance obstacle; only Hargold ground slam defeats it",
+          "source": "construction-plan"
+        },
+        {
+          "type": "wave_fin",
+          "displayType": "Wave Fin",
+          "count": 5,
+          "purpose": "Water-only lateral attacks",
+          "source": "construction-plan"
+        },
+        {
+          "type": "ice_boulder",
+          "displayType": "Ice Boulder",
+          "count": 4,
+          "purpose": "Predictable slab fracture tool",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "ice_boulder",
+        "rock_runt",
+        "wave_fin"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.7,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "ice_boulder": 3,
+        "rock_runt": 3,
+        "wave_fin": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "6-7",
+      "world": 6,
+      "name": "Echoes Under Ice",
+      "difficulty": 4.0,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shock_jelly",
+          "displayType": "Shock Jelly",
+          "count": 5,
+          "purpose": "Hazardous reveal pulse in water",
+          "source": "construction-plan"
+        },
+        {
+          "type": "tidebiter",
+          "displayType": "Tidebiter",
+          "count": 4,
+          "purpose": "Water-bound pursuit",
+          "source": "construction-plan"
+        },
+        {
+          "type": "frost_hound",
+          "displayType": "Frost Hound",
+          "count": 3,
+          "purpose": "Dry-cavern pressure",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "frost_hound",
+        "shock_jelly",
+        "tidebiter"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "frost_hound": 3,
+        "shock_jelly": 4,
+        "tidebiter": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "6-8",
+      "world": 6,
+      "name": "Hollow of the Lost Expedition",
+      "difficulty": 4.3,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "snowblind_stalker",
+          "displayType": "Snowblind Stalker",
+          "count": 4,
+          "purpose": "Dark-room pressure and footprint clue",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 3,
+          "purpose": "Remote burner ignition",
+          "source": "construction-plan"
+        },
+        {
+          "type": "frost_hound",
+          "displayType": "Frost Hound",
+          "count": 4,
+          "purpose": "Chase pressure across restored routes",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "avalanche_hatchling",
+          "count": 5,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "avalanche_hatchling",
+        "camp_sentry",
+        "frost_hound",
+        "snowblind_stalker"
+      ],
+      "declaredTotalEnemyCount": 16,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 5,
+        "standard": 7,
+        "hard": 8,
+        "nightmare": 9
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.2,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "avalanche_hatchling": 4,
+        "camp_sentry": 3,
+        "frost_hound": 3,
+        "snowblind_stalker": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "6-9",
+      "world": 6,
+      "name": "Crown of Shiverpeak",
+      "difficulty": 4.25,
+      "bossLevel": true,
+      "declaredEnemies": [
+        {
+          "type": "frost_hound",
+          "displayType": "Frost Hound",
+          "count": 5,
+          "purpose": "Fast pressure across packed and slick surfaces",
+          "source": "construction-plan"
+        },
+        {
+          "type": "rock_runt",
+          "displayType": "Rock Runt",
+          "count": 4,
+          "purpose": "Heavy route obstacle and optional Hargold finisher",
+          "source": "construction-plan"
+        },
+        {
+          "type": "snowblind_stalker",
+          "displayType": "Snowblind Stalker",
+          "count": 3,
+          "purpose": "Whiteout approach pressure",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "frost_hound",
+        "rock_runt",
+        "snowblind_stalker"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 2,
+        "standard": 4,
+        "hard": 5,
+        "nightmare": 6
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.2,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "frost_hound": 4,
+        "rock_runt": 3,
+        "snowblind_stalker": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "7-1",
+      "world": 7,
+      "name": "Poisonline Crossing",
+      "difficulty": 3.8,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "mud_mite",
+          "displayType": "Mud Mite",
+          "count": 6,
+          "purpose": "Changes reed-platform weight and timing",
+          "source": "construction-plan"
+        },
+        {
+          "type": "poison_plant",
+          "displayType": "Poison Plant",
+          "count": 5,
+          "purpose": "Controls permanent safe ledges",
+          "source": "construction-plan"
+        },
+        {
+          "type": "leapfrog",
+          "displayType": "Leapfrog",
+          "count": 4,
+          "purpose": "Creates optional bounce routes above the tide",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "mossnapper",
+          "count": 2,
+          "source": "approved-14-expansion"
+        },
+        {
+          "type": "toxic_blob",
+          "count": 4,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "leapfrog",
+        "mossnapper",
+        "mud_mite",
+        "poison_plant",
+        "toxic_blob"
+      ],
+      "declaredTotalEnemyCount": 21,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.7,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "leapfrog": 3,
+        "mossnapper": 2,
+        "mud_mite": 5,
+        "poison_plant": 4,
+        "toxic_blob": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "7-2",
+      "world": 7,
+      "name": "Rootrot Burrows",
+      "difficulty": 3.9,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "dirt_squirt",
+          "displayType": "Dirt Squirt",
+          "count": 6,
+          "purpose": "Breaks seep walls and changes chamber state",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Movable valve weight",
+          "source": "construction-plan"
+        },
+        {
+          "type": "poison_plant",
+          "displayType": "Poison Plant",
+          "count": 4,
+          "purpose": "Controls dry ledges",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "fen_leecher",
+          "count": 4,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "dirt_squirt",
+        "fen_leecher",
+        "poison_plant",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 17,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.6,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "dirt_squirt": 5,
+        "fen_leecher": 3,
+        "poison_plant": 3,
+        "shellback": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "7-3",
+      "world": 7,
+      "name": "Bellows Bog",
+      "difficulty": 4.0,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "boom_barrel",
+          "displayType": "Boom Barrel",
+          "count": 4,
+          "purpose": "Triggers linked pressure sequences",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 5,
+          "purpose": "Follows the player through air currents",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 4,
+          "purpose": "Controls permanent landing stones",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "pressure_jelly",
+          "count": 3,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "boom_barrel",
+        "lantern_wisp",
+        "pressure_jelly",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 16,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "boom_barrel": 3,
+        "lantern_wisp": 4,
+        "pressure_jelly": 3,
+        "spike_beetle": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "7-4",
+      "world": 7,
+      "name": "Sluicegate Bastion",
+      "difficulty": 4.1,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Remote gate activation and projectile pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Movable counterweight and rolling hazard",
+          "source": "construction-plan"
+        },
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 5,
+          "purpose": "Patrols gate-control decks",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "gear_bot",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.4,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 4,
+        "gear_bot": 4,
+        "shellback": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "7-5",
+      "world": 7,
+      "name": "Sporelight Thicket",
+      "difficulty": 4.15,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 7,
+          "purpose": "Creates false light cues and moving illumination",
+          "source": "construction-plan"
+        },
+        {
+          "type": "poison_plant",
+          "displayType": "Poison Plant",
+          "count": 5,
+          "purpose": "Occupies hidden platforms",
+          "source": "construction-plan"
+        },
+        {
+          "type": "crate_mimic",
+          "displayType": "Crate Mimic",
+          "count": 3,
+          "purpose": "Disguises itself as a spore carrier",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "crate_mimic",
+        "lantern_wisp",
+        "poison_plant"
+      ],
+      "declaredTotalEnemyCount": 15,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.3,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "crate_mimic": 3,
+        "lantern_wisp": 6,
+        "poison_plant": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "7-6",
+      "world": 7,
+      "name": "Rotwood Raftway",
+      "difficulty": 4.2,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Movable weight and raft-clearing tool",
+          "source": "construction-plan"
+        },
+        {
+          "type": "tidebiter",
+          "displayType": "Tidebiter",
+          "count": 5,
+          "purpose": "Attacks raft sections from below",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 4,
+          "purpose": "Forces repositioning across the raft",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "lantern_wisp",
+        "shellback",
+        "tidebiter"
+      ],
+      "declaredTotalEnemyCount": 12,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.3,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "lantern_wisp": 3,
+        "shellback": 3,
+        "tidebiter": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "7-7",
+      "world": 7,
+      "name": "Mirror-Mire Manor",
+      "difficulty": 4.3,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "crate_mimic",
+          "displayType": "Crate Mimic",
+          "count": 5,
+          "purpose": "Reflection-revealed ambushes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 6,
+          "purpose": "Temporarily obscures mirror clues",
+          "source": "construction-plan"
+        },
+        {
+          "type": "mud_mite",
+          "displayType": "Mud Mite",
+          "count": 5,
+          "purpose": "Pressure on real floor panels",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "crate_mimic",
+        "lantern_wisp",
+        "mud_mite"
+      ],
+      "declaredTotalEnemyCount": 16,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.2,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "crate_mimic": 4,
+        "lantern_wisp": 5,
+        "mud_mite": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "7-8",
+      "world": 7,
+      "name": "Sunken Reliquary",
+      "difficulty": 4.55,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "tidebiter",
+          "displayType": "Tidebiter",
+          "count": 5,
+          "purpose": "Changes water displacement and pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 5,
+          "purpose": "Obscures seal markings",
+          "source": "construction-plan"
+        },
+        {
+          "type": "poison_plant",
+          "displayType": "Poison Plant",
+          "count": 5,
+          "purpose": "Controls dry air shelves",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "fen_leecher",
+          "count": 3,
+          "source": "approved-14-expansion"
+        },
+        {
+          "type": "pressure_jelly",
+          "count": 3,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "fen_leecher",
+        "lantern_wisp",
+        "poison_plant",
+        "pressure_jelly",
+        "tidebiter"
+      ],
+      "declaredTotalEnemyCount": 21,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.0,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "fen_leecher": 3,
+        "lantern_wisp": 4,
+        "poison_plant": 4,
+        "pressure_jelly": 3,
+        "tidebiter": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "7-9",
+      "world": 7,
+      "name": "The Fen Throne",
+      "difficulty": 4.8,
+      "bossLevel": true,
+      "declaredEnemies": [
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 6,
+          "purpose": "Approach-route reflection pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "poison_plant",
+          "displayType": "Poison Plant",
+          "count": 6,
+          "purpose": "Controls fortress safe ledges",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 4,
+          "purpose": "Provides projectile-redirection counters before the boss",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "toxic_blob",
+          "count": 3,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "lantern_wisp",
+        "poison_plant",
+        "toxic_blob"
+      ],
+      "declaredTotalEnemyCount": 19,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 2,
+        "standard": 4,
+        "hard": 5,
+        "nightmare": 6
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.7,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 3,
+        "lantern_wisp": 5,
+        "poison_plant": 5,
+        "toxic_blob": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "8-1",
+      "world": 8,
+      "name": "Echo Drop",
+      "difficulty": 4.35,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 6,
+          "purpose": "Distorts echo outlines",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_roll",
+          "displayType": "Spike Roll",
+          "count": 5,
+          "purpose": "Moving hazard on temporary revealed ledges",
+          "source": "construction-plan"
+        },
+        {
+          "type": "rock_runt",
+          "displayType": "Rock Runt",
+          "count": 4,
+          "purpose": "Heavy echo source and Hargold-only finisher target",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "bone_bat",
+          "count": 4,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "bone_bat",
+        "lantern_wisp",
+        "rock_runt",
+        "spike_roll"
+      ],
+      "declaredTotalEnemyCount": 19,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.2,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bone_bat": 3,
+        "lantern_wisp": 5,
+        "rock_runt": 3,
+        "spike_roll": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "8-2",
+      "world": 8,
+      "name": "Ribcage Rails",
+      "difficulty": 4.45,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 4,
+          "purpose": "Rail switch activator and moving hazard",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 5,
+          "purpose": "Controls vertebra transfer points",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 5,
+          "purpose": "Temporarily suppresses junction audio",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "lantern_wisp",
+        "shellback",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 14,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.0,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "lantern_wisp": 4,
+        "shellback": 3,
+        "spike_beetle": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "8-3",
+      "world": 8,
+      "name": "Hollowbeat Vault",
+      "difficulty": 4.5,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "spike_roll",
+          "displayType": "Spike Roll",
+          "count": 5,
+          "purpose": "Rhythm pressure in narrow corridors",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Remote beat generator",
+          "source": "construction-plan"
+        },
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 5,
+          "purpose": "Moving weight on sound plates",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "echo_wisp",
+          "count": 3,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "echo_wisp",
+        "gear_bot",
+        "shellback",
+        "spike_roll"
+      ],
+      "declaredTotalEnemyCount": 16,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.0,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "echo_wisp": 3,
+        "gear_bot": 4,
+        "shellback": 3,
+        "spike_roll": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "8-4",
+      "world": 8,
+      "name": "Ossuary Lift",
+      "difficulty": 4.6,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Movable counterweight",
+          "source": "construction-plan"
+        },
+        {
+          "type": "rock_runt",
+          "displayType": "Rock Runt",
+          "count": 4,
+          "purpose": "Heavy plate load and Hargold-only finisher",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 4,
+          "purpose": "Projectile pressure across the shaft",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "rattle_skeleton",
+          "count": 4,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "rattle_skeleton",
+        "rock_runt",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 15,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.9,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 3,
+        "rattle_skeleton": 3,
+        "rock_runt": 3,
+        "shellback": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "8-5",
+      "world": 8,
+      "name": "Whisperglass Caverns",
+      "difficulty": 4.65,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 5,
+          "purpose": "Readable source for visual refraction",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 5,
+          "purpose": "Hazard identified through sound",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 5,
+          "purpose": "Creates false whisper sources",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "gear_bot",
+        "lantern_wisp",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 15,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "gear_bot": 4,
+        "lantern_wisp": 4,
+        "spike_beetle": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "8-6",
+      "world": 8,
+      "name": "Gravewind Descent",
+      "difficulty": 4.7,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 6,
+          "purpose": "Possesses and reverses pendulums",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_roll",
+          "displayType": "Spike Roll",
+          "count": 5,
+          "purpose": "Moves along curved rib paths",
+          "source": "construction-plan"
+        },
+        {
+          "type": "rock_runt",
+          "displayType": "Rock Runt",
+          "count": 3,
+          "purpose": "Creates heavy wind-blocking platforms",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "bone_bat",
+          "count": 5,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "bone_bat",
+        "lantern_wisp",
+        "rock_runt",
+        "spike_roll"
+      ],
+      "declaredTotalEnemyCount": 19,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bone_bat": 4,
+        "lantern_wisp": 5,
+        "rock_runt": 3,
+        "spike_roll": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "8-7",
+      "world": 8,
+      "name": "Silent Bell Catacombs",
+      "difficulty": 4.75,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 6,
+          "purpose": "Carries false stored sounds",
+          "source": "construction-plan"
+        },
+        {
+          "type": "crate_mimic",
+          "displayType": "Crate Mimic",
+          "count": 4,
+          "purpose": "Disguises itself as bell hardware",
+          "source": "construction-plan"
+        },
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 5,
+          "purpose": "Provides visible vibration cues",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "echo_wisp",
+          "count": 4,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "crate_mimic",
+        "echo_wisp",
+        "gear_bot",
+        "lantern_wisp"
+      ],
+      "declaredTotalEnemyCount": 19,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "crate_mimic": 3,
+        "echo_wisp": 3,
+        "gear_bot": 4,
+        "lantern_wisp": 5
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "8-8",
+      "world": 8,
+      "name": "Chasm Choir",
+      "difficulty": 4.9,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 4,
+          "purpose": "Remote sustained pitch source",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 7,
+          "purpose": "Detunes echo sources",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 5,
+          "purpose": "Controls conductor platforms",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "lantern_wisp",
+        "shellback",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 16,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.6,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "lantern_wisp": 6,
+        "shellback": 3,
+        "spike_beetle": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "8-9",
+      "world": 8,
+      "name": "Marrow Foundry",
+      "difficulty": 5.0,
+      "bossLevel": true,
+      "declaredEnemies": [
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 6,
+          "purpose": "Operates bone machinery in the approach",
+          "source": "construction-plan"
+        },
+        {
+          "type": "rock_runt",
+          "displayType": "Rock Runt",
+          "count": 4,
+          "purpose": "Heavy crusher and Hargold-finisher interaction",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 5,
+          "purpose": "Disrupts echo drums",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "rattle_skeleton",
+          "count": 3,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "gear_bot",
+        "lantern_wisp",
+        "rattle_skeleton",
+        "rock_runt"
+      ],
+      "declaredTotalEnemyCount": 18,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 2,
+        "standard": 4,
+        "hard": 5,
+        "nightmare": 6
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "gear_bot": 5,
+        "lantern_wisp": 4,
+        "rattle_skeleton": 3,
+        "rock_runt": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "9-1",
+      "world": 9,
+      "name": "Secondhand Steps",
+      "difficulty": 4.45,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 6,
+          "purpose": "Changes recorded platform positions through added weight",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 5,
+          "purpose": "Temporarily conceals replay timing tells",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 5,
+          "purpose": "Controls permanent landing shelves",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "gear_bot",
+        "lantern_wisp",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 16,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.0,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "gear_bot": 5,
+        "lantern_wisp": 4,
+        "spike_beetle": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "9-2",
+      "world": 9,
+      "name": "Agebound Stacks",
+      "difficulty": 4.55,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "crate_mimic",
+          "displayType": "Crate Mimic",
+          "count": 5,
+          "purpose": "Age-state difference reveals disguised enemies",
+          "source": "construction-plan"
+        },
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 6,
+          "purpose": "Operates material-specific age selectors",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 4,
+          "purpose": "Obscures state markings",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "clockwork_mite",
+          "count": 5,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "clockwork_mite",
+        "crate_mimic",
+        "gear_bot",
+        "lantern_wisp"
+      ],
+      "declaredTotalEnemyCount": 20,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 7.0,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "clockwork_mite": 4,
+        "crate_mimic": 4,
+        "gear_bot": 5,
+        "lantern_wisp": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "9-3",
+      "world": 9,
+      "name": "Pendulum Paradox",
+      "difficulty": 4.65,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Remote time-anchor activator",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shock_jelly",
+          "displayType": "Shock Jelly",
+          "count": 5,
+          "purpose": "Controls pendulum apexes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 5,
+          "purpose": "Hides future previews",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "lantern_wisp",
+        "shellback",
+        "shock_jelly"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "lantern_wisp": 4,
+        "shellback": 3,
+        "shock_jelly": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "9-4",
+      "world": 9,
+      "name": "Rewind Reservoir",
+      "difficulty": 4.7,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "tidebiter",
+          "displayType": "Tidebiter",
+          "count": 5,
+          "purpose": "Replays predictable swim paths through reverse currents",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Projectiles retrace paths during rewind",
+          "source": "construction-plan"
+        },
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 6,
+          "purpose": "Operates anchor selectors",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "gear_bot",
+        "tidebiter"
+      ],
+      "declaredTotalEnemyCount": 16,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 4,
+        "gear_bot": 5,
+        "tidebiter": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "9-5",
+      "world": 9,
+      "name": "Futureproof Foundry",
+      "difficulty": 4.75,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 6,
+          "purpose": "Stasis-held pressure-switch operator",
+          "source": "construction-plan"
+        },
+        {
+          "type": "steamgor",
+          "displayType": "Steamgor",
+          "count": 4,
+          "purpose": "Timed explosive machinery interaction",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 4,
+          "purpose": "Projectile paths through stasis",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "clockwork_mite",
+          "count": 4,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "clockwork_mite",
+        "gear_bot",
+        "steamgor"
+      ],
+      "declaredTotalEnemyCount": 18,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 3,
+        "clockwork_mite": 3,
+        "gear_bot": 5,
+        "steamgor": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "9-6",
+      "world": 9,
+      "name": "Clockrail Relay",
+      "difficulty": 4.8,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 4,
+          "purpose": "Remote parallel-rail junction activator",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shock_jelly",
+          "displayType": "Shock Jelly",
+          "count": 5,
+          "purpose": "Controls elevated junction clocks",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_roll",
+          "displayType": "Spike Roll",
+          "count": 5,
+          "purpose": "Moves along curved rail surfaces",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "shellback",
+        "shock_jelly",
+        "spike_roll"
+      ],
+      "declaredTotalEnemyCount": 14,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.7,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "shellback": 3,
+        "shock_jelly": 4,
+        "spike_roll": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "9-7",
+      "world": 9,
+      "name": "Yesterday's Maze",
+      "difficulty": 4.85,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 6,
+          "purpose": "Obscures recorded paths",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Replay-duplicated movable tool",
+          "source": "construction-plan"
+        },
+        {
+          "type": "crate_mimic",
+          "displayType": "Crate Mimic",
+          "count": 4,
+          "purpose": "Creates false recording props",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "time_splinter",
+          "count": 4,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "crate_mimic",
+        "lantern_wisp",
+        "shellback",
+        "time_splinter"
+      ],
+      "declaredTotalEnemyCount": 17,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.7,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "crate_mimic": 3,
+        "lantern_wisp": 5,
+        "shellback": 3,
+        "time_splinter": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "9-8",
+      "world": 9,
+      "name": "Null Minute",
+      "difficulty": 5.0,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 4,
+          "purpose": "Provides frozen projectile tools",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Stored moving switch activator",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shock_jelly",
+          "displayType": "Shock Jelly",
+          "count": 6,
+          "purpose": "Controls clock sockets",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "camp_sentry",
+        "shellback",
+        "shock_jelly"
+      ],
+      "declaredTotalEnemyCount": 13,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 6,
+        "standard": 8,
+        "hard": 9,
+        "nightmare": 10
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_sentry": 3,
+        "shellback": 3,
+        "shock_jelly": 5
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "9-9",
+      "world": 9,
+      "name": "The Three-Hour Archive",
+      "difficulty": 5.0,
+      "bossLevel": true,
+      "declaredEnemies": [
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 6,
+          "purpose": "Operates timeline selectors in the fortress approach",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 5,
+          "purpose": "Obscures future and replay tells",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shock_jelly",
+          "displayType": "Shock Jelly",
+          "count": 5,
+          "purpose": "Controls pendulum transfer heights",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "time_splinter",
+          "count": 3,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "gear_bot",
+        "lantern_wisp",
+        "shock_jelly",
+        "time_splinter"
+      ],
+      "declaredTotalEnemyCount": 19,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 2,
+        "standard": 4,
+        "hard": 5,
+        "nightmare": 6
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "gear_bot": 5,
+        "lantern_wisp": 4,
+        "shock_jelly": 4,
+        "time_splinter": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "10-1",
+      "world": 10,
+      "name": "Timberline Breach",
+      "difficulty": 4.75,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 7,
+          "purpose": "Demonstrates command-state patrol movement",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Banner-controlled projectile lanes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_chipper",
+          "displayType": "Camp Chipper",
+          "count": 4,
+          "purpose": "Removes wooden cover and remains a one-hit enemy",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Movable bridge counterweight",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "siege_rammy",
+          "count": 3,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "camp_chipper",
+        "camp_critter",
+        "camp_sentry",
+        "shellback",
+        "siege_rammy"
+      ],
+      "declaredTotalEnemyCount": 22,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 7,
+        "standard": 9,
+        "hard": 10,
+        "nightmare": 11
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.8,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_chipper": 3,
+        "camp_critter": 6,
+        "camp_sentry": 4,
+        "shellback": 3,
+        "siege_rammy": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "10-2",
+      "world": 10,
+      "name": "Snarewood Run",
+      "difficulty": 4.8,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "crate_mimic",
+          "displayType": "Crate Mimic",
+          "count": 5,
+          "purpose": "Disguises itself as trap-control weight",
+          "source": "construction-plan"
+        },
+        {
+          "type": "acorn_bomber",
+          "displayType": "Acorn Bomber",
+          "count": 5,
+          "purpose": "Accidentally or intentionally triggers trip lines",
+          "source": "construction-plan"
+        },
+        {
+          "type": "spike_beetle",
+          "displayType": "Spike Beetle",
+          "count": 5,
+          "purpose": "Controls safe root platforms",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 5,
+          "purpose": "Adds readable patrol pressure",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "acorn_bomber",
+        "camp_critter",
+        "crate_mimic",
+        "spike_beetle"
+      ],
+      "declaredTotalEnemyCount": 20,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 7,
+        "standard": 9,
+        "hard": 10,
+        "nightmare": 11
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.7,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "acorn_bomber": 4,
+        "camp_critter": 4,
+        "crate_mimic": 4,
+        "spike_beetle": 4
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "10-3",
+      "world": 10,
+      "name": "Canopy Cannonade",
+      "difficulty": 4.9,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "bomb_bird",
+          "displayType": "Bomb Bird",
+          "count": 6,
+          "purpose": "Changes bridge weight and damages cannon shields",
+          "source": "construction-plan"
+        },
+        {
+          "type": "flutterbug",
+          "displayType": "Flutterbug",
+          "count": 5,
+          "purpose": "Aerial transfer and bounce timing",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Controls permanent tree crowns",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Movable bridge tension weight",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "bomb_bird",
+        "camp_sentry",
+        "flutterbug",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 19,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 7,
+        "standard": 9,
+        "hard": 10,
+        "nightmare": 11
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.6,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bomb_bird": 5,
+        "camp_sentry": 4,
+        "flutterbug": 4,
+        "shellback": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "10-4",
+      "world": 10,
+      "name": "Stockade Sabotage",
+      "difficulty": 4.9,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 6,
+          "purpose": "Repairs alarm cords and operates maintenance routes",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 6,
+          "purpose": "Alarm-linked projectile pressure",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_chipper",
+          "displayType": "Camp Chipper",
+          "count": 5,
+          "purpose": "Removes cover and remains one-hit",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 3,
+          "purpose": "Movable gate counterweight",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "siege_rammy",
+          "count": 3,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "camp_chipper",
+        "camp_sentry",
+        "gear_bot",
+        "shellback",
+        "siege_rammy"
+      ],
+      "declaredTotalEnemyCount": 23,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 7,
+        "standard": 9,
+        "hard": 10,
+        "nightmare": 11
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.6,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_chipper": 4,
+        "camp_sentry": 5,
+        "gear_bot": 5,
+        "shellback": 3,
+        "siege_rammy": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "10-5",
+      "world": 10,
+      "name": "Chipperworks",
+      "difficulty": 4.95,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_chipper",
+          "displayType": "Camp Chipper",
+          "count": 7,
+          "purpose": "Core mill worker; changes diverters and dies in one hit",
+          "source": "construction-plan"
+        },
+        {
+          "type": "rock_runt",
+          "displayType": "Rock Runt",
+          "count": 4,
+          "purpose": "Heavy conveyor weight; avoidable or contained in one Hargold section",
+          "source": "construction-plan"
+        },
+        {
+          "type": "boom_barrel",
+          "displayType": "Boom Barrel",
+          "count": 4,
+          "purpose": "Splits logs and overloads machinery",
+          "source": "construction-plan"
+        },
+        {
+          "type": "gear_bot",
+          "displayType": "Gear Bot",
+          "count": 5,
+          "purpose": "Operates conveyor selectors",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "boom_barrel",
+        "camp_chipper",
+        "gear_bot",
+        "rock_runt"
+      ],
+      "declaredTotalEnemyCount": 20,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 7,
+        "standard": 9,
+        "hard": 10,
+        "nightmare": 11
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "boom_barrel": 3,
+        "camp_chipper": 6,
+        "gear_bot": 4,
+        "rock_runt": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "10-6",
+      "world": 10,
+      "name": "Dreadnought Convoy",
+      "difficulty": 5.0,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 6,
+          "purpose": "Damages wheel braces and controls convoy decks",
+          "source": "construction-plan"
+        },
+        {
+          "type": "bomb_bird",
+          "displayType": "Bomb Bird",
+          "count": 6,
+          "purpose": "Changes vehicle speed by striking engines",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 4,
+          "purpose": "Movable grapple-hook payload",
+          "source": "construction-plan"
+        },
+        {
+          "type": "rock_runt",
+          "displayType": "Rock Runt",
+          "count": 3,
+          "purpose": "Contained heavy weight used on one lower vehicle",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [],
+      "distinctEnemyTypes": [
+        "bomb_bird",
+        "camp_sentry",
+        "rock_runt",
+        "shellback"
+      ],
+      "declaredTotalEnemyCount": 19,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 7,
+        "standard": 9,
+        "hard": 10,
+        "nightmare": 11
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bomb_bird": 5,
+        "camp_sentry": 5,
+        "rock_runt": 3,
+        "shellback": 3
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "10-7",
+      "world": 10,
+      "name": "Black-Pine Orders",
+      "difficulty": 5.0,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_critter",
+          "displayType": "Camp Critter",
+          "count": 8,
+          "purpose": "Whistle-controlled patrol formations",
+          "source": "construction-plan"
+        },
+        {
+          "type": "lantern_wisp",
+          "displayType": "Lantern Wisp",
+          "count": 6,
+          "purpose": "Creates false whistle cues",
+          "source": "construction-plan"
+        },
+        {
+          "type": "crate_mimic",
+          "displayType": "Crate Mimic",
+          "count": 4,
+          "purpose": "Disguises itself as route supplies",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 5,
+          "purpose": "Controls decoy trails",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "camp_drummer",
+          "count": 2,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "camp_critter",
+        "camp_drummer",
+        "camp_sentry",
+        "crate_mimic",
+        "lantern_wisp"
+      ],
+      "declaredTotalEnemyCount": 25,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 7,
+        "standard": 9,
+        "hard": 10,
+        "nightmare": 11
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "camp_critter": 6,
+        "camp_drummer": 2,
+        "camp_sentry": 4,
+        "crate_mimic": 3,
+        "lantern_wisp": 5
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "10-8",
+      "world": 10,
+      "name": "The Last Muster",
+      "difficulty": 5.0,
+      "bossLevel": false,
+      "declaredEnemies": [
+        {
+          "type": "camp_chipper",
+          "displayType": "Camp Chipper",
+          "count": 6,
+          "purpose": "Operates the mobilization mill and remains one-hit",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 6,
+          "purpose": "Links cannon and alarm systems",
+          "source": "construction-plan"
+        },
+        {
+          "type": "bomb_bird",
+          "displayType": "Bomb Bird",
+          "count": 5,
+          "purpose": "Interacts with unresolved stations",
+          "source": "construction-plan"
+        },
+        {
+          "type": "shellback",
+          "displayType": "Shellback",
+          "count": 4,
+          "purpose": "Movable station weight",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "camp_drummer",
+          "count": 3,
+          "source": "approved-14-expansion"
+        },
+        {
+          "type": "war_chief_totem",
+          "count": 2,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "bomb_bird",
+        "camp_chipper",
+        "camp_drummer",
+        "camp_sentry",
+        "shellback",
+        "war_chief_totem"
+      ],
+      "declaredTotalEnemyCount": 26,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 7,
+        "standard": 9,
+        "hard": 10,
+        "nightmare": 11
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bomb_bird": 4,
+        "camp_chipper": 5,
+        "camp_drummer": 3,
+        "camp_sentry": 5,
+        "shellback": 3,
+        "war_chief_totem": 2
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    },
+    {
+      "id": "10-9",
+      "world": 10,
+      "name": "Gobbler Command Citadel",
+      "difficulty": 5.0,
+      "bossLevel": true,
+      "declaredEnemies": [
+        {
+          "type": "camp_sentry",
+          "displayType": "Camp Sentry",
+          "count": 6,
+          "purpose": "Citadel approach and command-grid projectile counters",
+          "source": "construction-plan"
+        },
+        {
+          "type": "camp_chipper",
+          "displayType": "Camp Chipper",
+          "count": 5,
+          "purpose": "Removes approach cover and remains one-hit",
+          "source": "construction-plan"
+        },
+        {
+          "type": "bomb_bird",
+          "displayType": "Bomb Bird",
+          "count": 6,
+          "purpose": "Approach pressure and boss counter setup",
+          "source": "construction-plan"
+        },
+        {
+          "type": "rock_runt",
+          "displayType": "Rock Runt",
+          "count": 3,
+          "purpose": "Contained optional Hargold route before the boss",
+          "source": "construction-plan"
+        }
+      ],
+      "approvedExpansionAdditions": [
+        {
+          "type": "war_chief_totem",
+          "count": 1,
+          "source": "approved-14-expansion"
+        }
+      ],
+      "distinctEnemyTypes": [
+        "bomb_bird",
+        "camp_chipper",
+        "camp_sentry",
+        "rock_runt",
+        "war_chief_totem"
+      ],
+      "declaredTotalEnemyCount": 21,
+      "simultaneousRegularEnemyCaps": {
+        "easy": 2,
+        "standard": 4,
+        "hard": 5,
+        "nightmare": 6
+      },
+      "projectileCaps": {
+        "easy": 8,
+        "standard": 12,
+        "hard": 16,
+        "nightmare": 20
+      },
+      "effectCaps": {
+        "easy": 18,
+        "standard": 26,
+        "hard": 34,
+        "nightmare": 42
+      },
+      "minimumRecoveryGapSeconds": 6.5,
+      "offscreenSpawnPolicy": {
+        "minimumHorizontalDistanceFromCameraEdge": 96,
+        "maximumPreloadDistance": 768,
+        "neverSpawnInsideVisibleSafeLanding": true,
+        "neverSpawnDirectlyOnPlayer": true
+      },
+      "poolPrewarm": {
+        "bomb_bird": 5,
+        "camp_chipper": 4,
+        "camp_sentry": 5,
+        "rock_runt": 3,
+        "war_chief_totem": 2
+      },
+      "performancePolicy": {
+        "target": "landscape-mobile",
+        "inactiveEnemySleepDistance": 1280,
+        "inactiveProjectileSleepDistance": 960,
+        "bossMinionsShareRegularEnemyCap": true
+      }
+    }
+  ]
+}

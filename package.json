@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/canonical-contract.test.mjs && node tests/fixed-step.test.mjs && node tests/motion-controller.test.mjs && node tests/physics-systems.test.mjs"
+    "test": "node tests/canonical-contract.test.mjs && node tests/fixed-step.test.mjs && node tests/motion-controller.test.mjs && node tests/physics-systems.test.mjs && node tests/world-specific-runtime.test.mjs"
   }
 }

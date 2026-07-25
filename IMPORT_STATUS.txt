@@ -1,7 +1,38 @@
-﻿Hargold & Mebble import completed: 2026-07-25 09:43:19 
-Character design evolution of Mebble.png -> assets\references\Character design evolution of Mebble.png
-hargold_mebble_full_motion_build_009.html -> archive\full-motion\hargold_mebble_full_motion_build_009.html
-hargold_mebble_level_editor.html -> archive\level-editor\hargold_mebble_level_editor.html
+﻿Hargold & Mebble world-specific archive import completed: 2026-07-25 11:05:53 Imported package root: archive/imported-packages/20260725-110552 Imported file count: 15  Import actions:
+File preserved: boss_fight_master_plan.md -> archive/imported-packages/20260725-110552/loose-files/boss_fight_master_plan.md
+File preserved: Character design evolution of Mebble.png -> archive/imported-packages/20260725-110552/loose-files/Character design evolution of Mebble.png
+File preserved: encounter_budget_manifest.json -> archive/imported-packages/20260725-110552/loose-files/encounter_budget_manifest.json
+File preserved: encounter_zone_manifest.json -> archive/imported-packages/20260725-110552/loose-files/encounter_zone_manifest.json
+File preserved: enemy_catalog.json -> archive/imported-packages/20260725-110552/loose-files/enemy_catalog.json
+File preserved: enemy_framework_spec.md -> archive/imported-packages/20260725-110552/loose-files/enemy_framework_spec.md
+File preserved: hargold_mebble_full_motion_build_009.html -> archive/imported-packages/20260725-110552/loose-files/hargold_mebble_full_motion_build_009.html
+File preserved: hargold_mebble_level_editor.html -> archive/imported-packages/20260725-110552/loose-files/hargold_mebble_level_editor.html
+File preserved: hargold_mebble_meadow_wake_mob_motion_build_003 (1).html -> archive/imported-packages/20260725-110552/loose-files/hargold_mebble_meadow_wake_mob_motion_build_003 (1).html
+File preserved: hargold_mebble_meadow_wake_mob_motion_build_003.html -> archive/imported-packages/20260725-110552/loose-files/hargold_mebble_meadow_wake_mob_motion_build_003.html
+File preserved: interaction_matrix.json -> archive/imported-packages/20260725-110552/loose-files/interaction_matrix.json
+File preserved: level_geometry_scaffolds.json -> archive/imported-packages/20260725-110552/loose-files/level_geometry_scaffolds.json
+File preserved: world_10_construction_plan.md -> archive/imported-packages/20260725-110552/loose-files/world_10_construction_plan.md
+File preserved: world_1_construction_plan.md -> archive/imported-packages/20260725-110552/loose-files/world_1_construction_plan.md
+File preserved: world_9_construction_plan.md -> archive/imported-packages/20260725-110552/loose-files/world_9_construction_plan.md
+
+Imported files:
+archive/imported-packages/20260725-110552/loose-files/boss_fight_master_plan.md
+archive/imported-packages/20260725-110552/loose-files/Character design evolution of Mebble.png
+archive/imported-packages/20260725-110552/loose-files/encounter_budget_manifest.json
+archive/imported-packages/20260725-110552/loose-files/encounter_zone_manifest.json
+archive/imported-packages/20260725-110552/loose-files/enemy_catalog.json
+archive/imported-packages/20260725-110552/loose-files/enemy_framework_spec.md
+archive/imported-packages/20260725-110552/loose-files/hargold_mebble_full_motion_build_009.html
+archive/imported-packages/20260725-110552/loose-files/hargold_mebble_level_editor.html
+archive/imported-packages/20260725-110552/loose-files/hargold_mebble_meadow_wake_mob_motion_build_003 (1).html
+archive/imported-packages/20260725-110552/loose-files/hargold_mebble_meadow_wake_mob_motion_build_003.html
+archive/imported-packages/20260725-110552/loose-files/interaction_matrix.json
+archive/imported-packages/20260725-110552/loose-files/level_geometry_scaffolds.json
+archive/imported-packages/20260725-110552/loose-files/world_1_construction_plan.md
+archive/imported-packages/20260725-110552/loose-files/world_10_construction_plan.md
+archive/imported-packages/20260725-110552/loose-files/world_9_construction_plan.md
 
 Codex instruction:
-Read AGENTS.md first, then inspect every file listed above. Do not replace current canon with obsolete archived values.
+Read AGENTS.md and docs/world-specific-archive-policy.md first. Then inspect this entire imported package, not only summary files.
+Treat every world and level as authored, world-specific content. Do not flatten the archive into a universal level template.
+Current canon overrides conflicting historical names, but reusable code, mechanics, enemy behavior, encounter data, and boss logic must be preserved and realigned rather than discarded.

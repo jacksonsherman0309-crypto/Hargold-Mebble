@@ -1,0 +1,489 @@
+{
+  "build": 18,
+  "count": 39,
+  "enemies": {
+    "camp_critter": {
+      "type": "camp_critter",
+      "behavior": "walker",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "dirt_squirt": {
+      "type": "dirt_squirt",
+      "behavior": "burrower",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "stomppable",
+        "burrower"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "shellback": {
+      "type": "shellback",
+      "behavior": "shellback",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "armored",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "armored",
+      "massClass": "light"
+    },
+    "spike_beetle": {
+      "type": "spike_beetle",
+      "behavior": "walker",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "spiked"
+      ],
+      "oneHit": true,
+      "armorClass": "spiked",
+      "massClass": "light"
+    },
+    "rock_runt": {
+      "type": "rock_runt",
+      "behavior": "roller",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "armored"
+      ],
+      "oneHit": true,
+      "armorClass": "armored",
+      "massClass": "medium"
+    },
+    "acorn_bomber": {
+      "type": "acorn_bomber",
+      "behavior": "thrower",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "crabbler": {
+      "type": "crabbler",
+      "behavior": "walker",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "mud_mite": {
+      "type": "mud_mite",
+      "behavior": "walker",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "wormlet": {
+      "type": "wormlet",
+      "behavior": "burrower",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "stomppable",
+        "burrower"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "leapfrog": {
+      "type": "leapfrog",
+      "behavior": "hopper",
+      "tags": [
+        "enemy",
+        "hopper",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "bounce_bunny": {
+      "type": "bounce_bunny",
+      "behavior": "hopper",
+      "tags": [
+        "enemy",
+        "hopper",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "hare_hopper": {
+      "type": "hare_hopper",
+      "behavior": "hopper",
+      "tags": [
+        "enemy",
+        "hopper",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "flutterbug": {
+      "type": "flutterbug",
+      "behavior": "flyer",
+      "tags": [
+        "enemy",
+        "flying-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "buzzer": {
+      "type": "buzzer",
+      "behavior": "zigzag",
+      "tags": [
+        "enemy",
+        "flying-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "sky_gnat": {
+      "type": "sky_gnat",
+      "behavior": "flyer",
+      "tags": [
+        "enemy",
+        "flying-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "feather_drift": {
+      "type": "feather_drift",
+      "behavior": "drifter",
+      "tags": [
+        "enemy",
+        "flying-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "bomb_bird": {
+      "type": "bomb_bird",
+      "behavior": "dropper",
+      "tags": [
+        "enemy",
+        "flying-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "spike_roll": {
+      "type": "spike_roll",
+      "behavior": "roller",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "spiked"
+      ],
+      "oneHit": true,
+      "armorClass": "spiked",
+      "massClass": "light"
+    },
+    "fire_glob": {
+      "type": "fire_glob",
+      "behavior": "hopper",
+      "tags": [
+        "enemy",
+        "fire-enemy",
+        "elemental",
+        "special-defeat-required"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "lava_hopper": {
+      "type": "lava_hopper",
+      "behavior": "hopper",
+      "tags": [
+        "enemy",
+        "fire-enemy",
+        "elemental",
+        "special-defeat-required"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "torch_imp": {
+      "type": "torch_imp",
+      "behavior": "thrower",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "fire-enemy",
+        "special-defeat-required"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "molten_slug": {
+      "type": "molten_slug",
+      "behavior": "walker",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "fire-enemy",
+        "special-defeat-required"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "poison_plant": {
+      "type": "poison_plant",
+      "behavior": "plant",
+      "tags": [
+        "enemy",
+        "stationary",
+        "hazardous"
+      ],
+      "oneHit": true,
+      "armorClass": "spiked",
+      "massClass": "light"
+    },
+    "cactus_crawler": {
+      "type": "cactus_crawler",
+      "behavior": "walker",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "spiked"
+      ],
+      "oneHit": true,
+      "armorClass": "spiked",
+      "massClass": "light"
+    },
+    "spike_pod": {
+      "type": "spike_pod",
+      "behavior": "burrower",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "spiked",
+        "burrower"
+      ],
+      "oneHit": true,
+      "armorClass": "spiked",
+      "massClass": "light"
+    },
+    "steamgor": {
+      "type": "steamgor",
+      "behavior": "exploder",
+      "tags": [
+        "enemy",
+        "mechanical-enemy",
+        "elemental",
+        "explosive",
+        "special-defeat-required"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "medium"
+    },
+    "frost_hound": {
+      "type": "frost_hound",
+      "behavior": "hopper",
+      "tags": [
+        "enemy",
+        "ice-enemy",
+        "elemental",
+        "special-defeat-required"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "shock_jelly": {
+      "type": "shock_jelly",
+      "behavior": "flyer",
+      "tags": [
+        "enemy",
+        "electric-enemy",
+        "elemental",
+        "special-defeat-required"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "tidebiter": {
+      "type": "tidebiter",
+      "behavior": "swimmer",
+      "tags": [
+        "enemy",
+        "water-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "wave_fin": {
+      "type": "wave_fin",
+      "behavior": "swimmer",
+      "tags": [
+        "enemy",
+        "water-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "bubble_puff": {
+      "type": "bubble_puff",
+      "behavior": "swimmer",
+      "tags": [
+        "enemy",
+        "water-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "ink_squid": {
+      "type": "ink_squid",
+      "behavior": "swimmer",
+      "tags": [
+        "enemy",
+        "water-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "shell_crab": {
+      "type": "shell_crab",
+      "behavior": "walker",
+      "tags": [
+        "enemy",
+        "water-enemy",
+        "ground-enemy",
+        "armored"
+      ],
+      "oneHit": true,
+      "armorClass": "armored",
+      "massClass": "light"
+    },
+    "gear_bot": {
+      "type": "gear_bot",
+      "behavior": "walker",
+      "tags": [
+        "enemy",
+        "mechanical-enemy",
+        "ground-enemy",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "lantern_wisp": {
+      "type": "lantern_wisp",
+      "behavior": "follower",
+      "tags": [
+        "enemy",
+        "flying-enemy",
+        "spirit",
+        "stomppable"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "boom_barrel": {
+      "type": "boom_barrel",
+      "behavior": "exploder",
+      "tags": [
+        "enemy",
+        "stationary",
+        "explosive"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "camp_sentry": {
+      "type": "camp_sentry",
+      "behavior": "sentry",
+      "tags": [
+        "enemy",
+        "mechanical-enemy",
+        "stationary"
+      ],
+      "oneHit": true,
+      "armorClass": "none",
+      "massClass": "light"
+    },
+    "crate_mimic": {
+      "type": "crate_mimic",
+      "behavior": "mimic",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "mimic"
+      ],
+      "oneHit": false,
+      "armorClass": "none",
+      "massClass": "medium"
+    },
+    "camp_chipper": {
+      "type": "camp_chipper",
+      "behavior": "chipper",
+      "tags": [
+        "enemy",
+        "ground-enemy",
+        "camp-worker"
+      ],
+      "oneHit": false,
+      "armorClass": "none",
+      "massClass": "medium"
+    }
+  }
+}

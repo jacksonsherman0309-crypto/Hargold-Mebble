@@ -1,4 +1,14 @@
-import { CharacterRenderer } from './character-renderer.js?v=rigged-3d-path-fix-1';
+import { CharacterRenderer } from './character-renderer.js?v=world-mobs-2';
+import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
+import {
+  attackMob,
+  createMob,
+  createProjectile,
+  defeatMob,
+  stepMob,
+  stepProjectile,
+  stompMob
+} from './gameplay/enemies/mob-simulation.js?v=world-mobs-1';
 
 /*
  * Browser-compatible test entry.
@@ -271,17 +281,56 @@ const compassCoins = [
   { x: 34.2, y: terrain.heightAt(34.2) - 1.7, taken: false }
 ];
 const checkpoint = { x: 18, reached: false };
+const COURSE_ID = '1-1';
+const COURSE_NAME = 'Meadow Wake';
+const COURSE_ROSTER = getCourseEnemyRoster(COURSE_ID);
+const MOB_PLACEMENTS = Object.freeze([
+  Object.freeze({ id: '1-1-critter-a', type: 'camp_critter', x: 6.4, patrolFrom: 5.1, patrolTo: 7.6 }),
+  Object.freeze({ id: '1-1-shellback-a', type: 'shellback', x: 8.7, patrolFrom: 8.05, patrolTo: 9.05 }),
+  Object.freeze({ id: '1-1-critter-b', type: 'camp_critter', x: 13.1, patrolFrom: 11.5, patrolTo: 14.8 }),
+  Object.freeze({ id: '1-1-shellback-b', type: 'shellback', x: 17.1, patrolFrom: 15.8, patrolTo: 19.4 }),
+  Object.freeze({ id: '1-1-critter-c', type: 'camp_critter', x: 25.6, patrolFrom: 24.1, patrolTo: 27.4 })
+]);
 
 let player = createMotionState({ footX: 1.8, footY: terrain.heightAt(1.8) });
-let previousInput = { jump: false, swap: false };
+let previousInput = { jump: false, swap: false, action: false };
 let cameraX = 0;
 let lastFrame = performance.now();
 let session = createSession();
-let notice = 'Reach the trail marker. Hold Action as Mebble to glide.';
+let mobs = createCourseMobs();
+let projectiles = [];
+let notice = 'Meadow Wake: stomp Critters; stomp then kick Shellbacks.';
 let noticeSeconds = 5;
 
 function createSession() {
-  return { healthLayers: 1, lives: 3, standardCoins: 0, compass: 0, state: 'playing', spawnX: 1.8 };
+  return {
+    healthLayers: 1,
+    maximumHealthLayers: 1,
+    lives: 3,
+    standardCoins: 0,
+    compass: 0,
+    state: 'playing',
+    spawnX: 1.8,
+    invulnerabilitySeconds: 0,
+    attackSeconds: 0,
+    enemiesDefeated: 0
+  };
+}
+
+function createCourseMobs() {
+  return MOB_PLACEMENTS.map(placement => {
+    if (!COURSE_ROSTER.includes(placement.type)) {
+      throw new Error(`${placement.type} does not belong to ${COURSE_ID}`);
+    }
+    const mob = createMob(placement);
+    mob.y = groundHeightAt(mob.x);
+    mob.previousY = mob.y;
+    mob.spawnX = placement.x;
+    mob.patrolFrom = placement.patrolFrom;
+    mob.patrolTo = placement.patrolTo;
+    mob.activated = false;
+    return mob;
+  });
 }
 
 function inPit(x) {
@@ -295,18 +344,20 @@ function groundHeightAt(x) {
 function inputSnapshot() {
   const jump = keys.has('Space') || keys.has('ArrowUp') || keys.has('KeyW') || touch.jump;
   const swap = keys.has('KeyQ');
-  const action = keys.has('KeyE') || keys.has('ArrowDown') || keys.has('KeyS') || touch.action;
+  const action = keys.has('KeyE') || touch.action;
+  const down = keys.has('ArrowDown') || keys.has('KeyS');
   const snapshot = {
     left: keys.has('ArrowLeft') || keys.has('KeyA') || touch.left,
     right: keys.has('ArrowRight') || keys.has('KeyD') || touch.right,
     run: keys.has('ShiftLeft') || keys.has('ShiftRight') || keys.has('KeyX') || touch.run,
     jumpPressed: jump && !previousInput.jump,
     jumpHeld: jump,
+    actionPressed: action && !previousInput.action,
     glideHeld: action,
-    fastFallHeld: action
+    fastFallHeld: down
   };
   if (swap && !previousInput.swap) swapPlayer();
-  previousInput = { jump, swap };
+  previousInput = { jump, swap, action };
   return snapshot;
 }
 
@@ -331,7 +382,30 @@ function respawn() {
     footX: session.spawnX,
     footY: terrain.heightAt(session.spawnX)
   });
-  previousInput = { jump: false, swap: false };
+  session.healthLayers = session.maximumHealthLayers;
+  session.invulnerabilitySeconds = 1;
+  session.attackSeconds = 0;
+  previousInput = { jump: false, swap: false, action: false };
+  projectiles = [];
+  for (const mob of mobs) {
+    if (mob.spawnX < session.spawnX && !mob.alive) continue;
+    const replacement = createMob({
+      id: mob.id,
+      type: mob.type,
+      x: mob.spawnX,
+      direction: -1
+    });
+    const patrolFrom = mob.patrolFrom;
+    const patrolTo = mob.patrolTo;
+    Object.assign(mob, replacement, {
+      spawnX: mob.spawnX,
+      patrolFrom,
+      patrolTo,
+      activated: false,
+      y: groundHeightAt(mob.spawnX),
+      previousY: groundHeightAt(mob.spawnX)
+    });
+  }
 }
 
 function loseLife(hazardType) {
@@ -349,12 +423,40 @@ function loseLife(hazardType) {
   respawn();
 }
 
+function damagePlayer(source, direction = 1) {
+  if (session.state !== 'playing' || session.invulnerabilitySeconds > 0) return false;
+  session.healthLayers = Math.max(0, session.healthLayers - 1);
+  player.velocityX = direction * 4.2;
+  player.velocityY = -5.4;
+  player.grounded = false;
+  if (session.healthLayers === 0) {
+    session.lives = Math.max(0, session.lives - 1);
+    notice = `${source}: health depleted; one life lost.`;
+    noticeSeconds = 2.5;
+    if (session.lives === 0) {
+      session.state = 'game-over';
+      player.velocityX = 0;
+      player.velocityY = 0;
+    } else {
+      respawn();
+    }
+  } else {
+    session.invulnerabilitySeconds = 0.8;
+    notice = `${source}: one health layer lost.`;
+    noticeSeconds = 1.8;
+  }
+  return true;
+}
+
 function restartCourse() {
   session = createSession();
   checkpoint.reached = false;
   for (const item of [...coins, ...compassCoins]) item.taken = false;
   player = createMotionState({ footX: session.spawnX, footY: terrain.heightAt(session.spawnX) });
-  notice = 'Course restarted.';
+  mobs = createCourseMobs();
+  projectiles = [];
+  previousInput = { jump: false, swap: false, action: false };
+  notice = 'Course restarted with the Meadow Wake mob roster.';
   noticeSeconds = 2;
 }
 
@@ -375,15 +477,141 @@ function collectItems() {
   }
 }
 
+function overlaps(left, right) {
+  return left.x < right.x + right.width && left.x + left.width > right.x &&
+    left.y < right.y + right.height && left.y + left.height > right.y;
+}
+
+function mobBody(mob) {
+  return {
+    x: mob.x - mob.width / 2,
+    y: mob.y - mob.height,
+    width: mob.width,
+    height: mob.height
+  };
+}
+
+function defeatForPlayer(mob) {
+  if (!mob.alive) return;
+  defeatMob(mob);
+  session.enemiesDefeated += 1;
+  notice = `${mob.type.replaceAll('_', ' ')} defeated.`;
+  noticeSeconds = 1.2;
+}
+
+function updateCombat(input, previousPlayerFootY, dt) {
+  session.invulnerabilitySeconds = Math.max(0, session.invulnerabilitySeconds - dt);
+  session.attackSeconds = Math.max(0, session.attackSeconds - dt);
+  if (input.actionPressed && (player.grounded || player.hero === 'Hargold')) {
+    session.attackSeconds = player.hero === 'Hargold' ? 0.28 : 0.22;
+  }
+
+  const playerBody = motionBody(player);
+  const target = { x: player.footX, y: player.footY - playerBody.height * 0.55 };
+  for (const mob of mobs) {
+    if (!mob.activated && mob.x - player.footX < 10.6 && mob.x >= player.footX - 2) mob.activated = true;
+    if (!mob.activated) continue;
+    const events = stepMob(mob, dt, {
+      groundHeightAt,
+      hasGroundAhead: x => !inPit(x),
+      minimumX: mob.state === 'shell-roll' ? 0.7 : mob.patrolFrom,
+      maximumX: mob.state === 'shell-roll' ? WORLD_END - 0.7 : mob.patrolTo,
+      target
+    });
+    for (const event of events) {
+      if (event.type === 'projectile-fired') projectiles.push(createProjectile(event.projectile));
+    }
+    if (!mob.alive) continue;
+    const body = mobBody(mob);
+
+    if (session.attackSeconds > 0) {
+      const attackReach = player.hero === 'Hargold' ? 1.35 : 1.05;
+      const inFront = (mob.x - player.footX) * player.facing >= -0.15;
+      const verticalOverlap = playerBody.y < body.y + body.height && playerBody.y + playerBody.height > body.y;
+      if (inFront && verticalOverlap && Math.abs(mob.x - player.footX) <= attackReach) {
+        const result = attackMob(mob, { direction: player.facing });
+        if (result.outcome === 'defeat') {
+          session.enemiesDefeated += 1;
+          notice = `${mob.type.replaceAll('_', ' ')} defeated.`;
+          noticeSeconds = 1.2;
+        } else if (result.outcome === 'shell-launched') {
+          notice = 'Shellback launched — it can defeat other mobs.';
+          noticeSeconds = 1.8;
+        }
+        session.attackSeconds = 0;
+      }
+    }
+
+    if (!overlaps(playerBody, body) || !mob.damaging) continue;
+    const mobTop = body.y;
+    const stompedFromAbove = player.velocityY > 0 &&
+      previousPlayerFootY <= mobTop + 0.16 &&
+      player.footY >= mobTop;
+    if (stompedFromAbove) {
+      const result = stompMob(mob);
+      if (result.outcome === 'damage-player') {
+        damagePlayer('Unsafe spiked stomp', player.footX < mob.x ? -1 : 1);
+      } else {
+        player.footY = mobTop;
+        player.velocityY = -7.2;
+        player.grounded = false;
+        if (result.outcome === 'defeat') {
+          session.enemiesDefeated += 1;
+          notice = `${mob.type.replaceAll('_', ' ')} stomped.`;
+        } else {
+          notice = result.outcome === 'shell-retracted'
+            ? 'Shellback retracted. Press Action beside it to kick.'
+            : 'Rolling Shellback stopped.';
+        }
+        noticeSeconds = 1.8;
+      }
+    } else if (!(mob.type === 'shellback' && mob.state === 'shell-roll' && mob.launchGraceSeconds > 0)) {
+      damagePlayer('Enemy contact', player.footX < mob.x ? -1 : 1);
+    }
+  }
+
+  for (const shell of mobs) {
+    if (!shell.alive || shell.type !== 'shellback' || shell.state !== 'shell-roll') continue;
+    const shellBody = mobBody(shell);
+    for (const targetMob of mobs) {
+      if (targetMob === shell || !targetMob.alive) continue;
+      if (overlaps(shellBody, mobBody(targetMob))) {
+        defeatForPlayer(targetMob);
+        shell.direction *= -1;
+      }
+    }
+  }
+
+  for (const projectile of projectiles) {
+    stepProjectile(projectile, dt, {
+      terrainCollision: shot => shot.y >= groundHeightAt(shot.x) || shot.x < 0 || shot.x > WORLD_END
+    });
+    if (!projectile.alive) continue;
+    const projectileBody = {
+      x: projectile.x - projectile.radius,
+      y: projectile.y - projectile.radius,
+      width: projectile.radius * 2,
+      height: projectile.radius * 2
+    };
+    if (overlaps(playerBody, projectileBody)) {
+      projectile.alive = false;
+      damagePlayer('Enemy projectile', projectile.velocityX < 0 ? -1 : 1);
+    }
+  }
+  projectiles = projectiles.filter(projectile => projectile.alive);
+}
+
 function fixedUpdate(dt) {
   if (session.state !== 'playing') return;
   const input = inputSnapshot();
+  const previousPlayerFootY = player.footY;
   stepMotion(player, input, dt, {
     groundHeightAt,
     minimumX: 0.8,
     maximumX: WORLD_END
   });
   collectItems();
+  updateCombat(input, previousPlayerFootY, dt);
 
   if (!checkpoint.reached && player.footX >= checkpoint.x) {
     checkpoint.reached = true;
@@ -548,7 +776,17 @@ function drawOverlay() {
   ctx.fillText(`${player.hero}  ${hearts}  Lives ${session.lives}`, 34, 48);
   ctx.fillStyle = '#f4cf53';
   ctx.font = '700 16px system-ui';
-  ctx.fillText(`Coins ${session.standardCoins}/100  ·  Compass ${session.compass}/3`, 34, 76);
+  ctx.fillText(`Coins ${session.standardCoins}/100  ·  Compass ${session.compass}/3  ·  Mobs ${session.enemiesDefeated}/${mobs.length}`, 34, 76);
+  ctx.fillStyle = 'rgba(7, 20, 12, .78)';
+  ctx.fillRect(W - 330, 18, 312, 58);
+  ctx.fillStyle = '#fff6d8';
+  ctx.textAlign = 'right';
+  ctx.font = '800 18px system-ui';
+  ctx.fillText(`${COURSE_ID} ${COURSE_NAME}`, W - 34, 44);
+  ctx.fillStyle = '#b8dd90';
+  ctx.font = '700 13px system-ui';
+  ctx.fillText('Verdant Vale roster: Critter + Shellback', W - 34, 66);
+  ctx.textAlign = 'left';
 
   if (noticeSeconds > 0) {
     ctx.font = '700 16px system-ui';
@@ -574,10 +812,7 @@ function drawOverlay() {
 }
 
 function draw() {
-  drawBackground();
-  drawTerrain();
-  drawCollectibles();
-  drawMarkers();
+  ctx.clearRect(0, 0, W, H);
   drawPlayer();
   drawOverlay();
 }
@@ -597,7 +832,12 @@ function frame(now) {
     screenY: worldToScreenY(player.footY),
     facing: player.facing,
     locomotion: player.locomotion,
-    glide: player.glide
+    glide: player.glide,
+    cameraX,
+    coins,
+    compassCoins,
+    mobs,
+    projectiles
   }, elapsed);
   requestAnimationFrame(frame);
 }
