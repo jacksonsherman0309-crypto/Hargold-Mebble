@@ -1,16 +1,240 @@
-import { FixedStepLoop } from './runtime/fixed-step.js';
-import { createLinearGround } from './runtime/terrain/linear-ground.js';
-import {
-  createMotionState,
-  motionBody,
-  stepMotion,
-  trySwapHero
-} from './runtime/motion/motion-controller.js';
-import {
-  PROVISIONAL_HERO_PROFILES,
-  PROVISIONAL_MOTION_TUNING
-} from './runtime/motion/motion-tuning.js';
-import { fatalHazardEvent } from './runtime/hazards/fatal-hazards.js';
+/*
+ * Browser-compatible test entry.
+ *
+ * Keep this file dependency-free so index.html also works when opened directly
+ * from disk. The production-quality reusable implementations remain under
+ * src/runtime and are covered by the automated tests.
+ */
+function clamp(value, minimum, maximum) {
+  return Math.max(minimum, Math.min(maximum, value));
+}
+
+function lerp(from, to, amount) {
+  return from + (to - from) * amount;
+}
+
+function approach(value, target, rate, deltaSeconds) {
+  if (value < target) return Math.min(target, value + rate * deltaSeconds);
+  return Math.max(target, value - rate * deltaSeconds);
+}
+
+class FixedStepLoop {
+  constructor({ hz = 120, maximumFrameSeconds = 0.25, maximumStepsPerFrame = 30 } = {}) {
+    this.stepSeconds = 1 / hz;
+    this.maximumFrameSeconds = maximumFrameSeconds;
+    this.maximumStepsPerFrame = maximumStepsPerFrame;
+    this.accumulator = 0;
+    this.totalSteps = 0;
+  }
+
+  advance(elapsedSeconds, step) {
+    const boundedElapsed = Math.min(elapsedSeconds, this.maximumFrameSeconds);
+    this.accumulator += boundedElapsed;
+    let executed = 0;
+    while (this.accumulator + Number.EPSILON >= this.stepSeconds && executed < this.maximumStepsPerFrame) {
+      step(this.stepSeconds, this.totalSteps);
+      this.accumulator -= this.stepSeconds;
+      this.totalSteps += 1;
+      executed += 1;
+    }
+    if (this.accumulator >= this.stepSeconds) this.accumulator %= this.stepSeconds;
+  }
+}
+
+function createLinearGround(points) {
+  function heightAt(positionX) {
+    const x = clamp(positionX, points[0][0], points.at(-1)[0]);
+    for (let index = 0; index < points.length - 1; index += 1) {
+      const from = points[index];
+      const to = points[index + 1];
+      if (x >= from[0] && x <= to[0]) {
+        return lerp(from[1], to[1], (x - from[0]) / (to[0] - from[0]));
+      }
+    }
+    return points.at(-1)[1];
+  }
+  return { heightAt };
+}
+
+const PROVISIONAL_MOTION_TUNING = Object.freeze({
+  status: 'provisional-engineering-tuning',
+  walkSpeed: 3.2,
+  runSpeed: 5.7,
+  groundAccelerationWalk: 18,
+  groundAccelerationRun: 22,
+  releaseDeceleration: 16,
+  lowSpeedTurnAcceleration: 25,
+  highSpeedSkidDeceleration: 30,
+  skidThreshold: 3,
+  skidExitSpeed: 1.1,
+  airAcceleration: 11,
+  airReverseAcceleration: 14,
+  airMaximumWalkSpeed: 3.6,
+  airMaximumRunSpeed: 5.9,
+  baseJumpSpeed: 10.4,
+  runningJumpBonus: 1.55,
+  heldJumpGravity: 22.6,
+  releasedJumpGravity: 39.2,
+  fallGravity: 36.8,
+  apexGravity: 16,
+  apexVelocityWindow: 0.84,
+  maximumFallSpeed: 15.8,
+  jumpBufferSeconds: 5 / 60,
+  coyoteSeconds: 4 / 60,
+  hardLandingSpeed: 13.2,
+  minimumJumpCutVelocity: -4.7,
+  glideGravity: 5.6,
+  glideMaximumFallSpeed: 2.9
+});
+
+const PROVISIONAL_HERO_PROFILES = Object.freeze({
+  Hargold: Object.freeze({ width: 1.52, height: 3.32, jumpSpeedAddition: 0, airControlMultiplier: 1 }),
+  Mebble: Object.freeze({ width: 1.16, height: 3.68, jumpSpeedAddition: 1.16, airControlMultiplier: 1.08 })
+});
+
+function createMotionState({
+  hero = 'Hargold',
+  footX = 0,
+  footY = 0,
+  grounded = true
+} = {}) {
+  return {
+    hero, footX, footY,
+    velocityX: 0, velocityY: 0, grounded, facing: 1,
+    locomotion: grounded ? 'idle' : 'fall', stateSeconds: 0,
+    coyoteSeconds: grounded ? PROVISIONAL_MOTION_TUNING.coyoteSeconds : 0,
+    jumpBufferSeconds: 0, glide: 'closed', landingSpeed: 0
+  };
+}
+
+function motionBody(state) {
+  const profile = PROVISIONAL_HERO_PROFILES[state.hero];
+  return {
+    x: state.footX - profile.width / 2,
+    y: state.footY - profile.height,
+    width: profile.width,
+    height: profile.height
+  };
+}
+
+function trySwapHero(state, { canOccupy = () => true } = {}) {
+  const nextHero = state.hero === 'Hargold' ? 'Mebble' : 'Hargold';
+  const profile = PROVISIONAL_HERO_PROFILES[nextHero];
+  const candidate = {
+    x: state.footX - profile.width / 2,
+    y: state.footY - profile.height,
+    width: profile.width,
+    height: profile.height
+  };
+  if (!canOccupy(candidate, nextHero)) return { accepted: false, hero: state.hero };
+  state.hero = nextHero;
+  return { accepted: true, hero: nextHero };
+}
+
+function stepMotion(state, input, deltaSeconds, {
+  groundHeightAt = () => 0,
+  minimumX = -Infinity,
+  maximumX = Infinity
+} = {}) {
+  const tuning = PROVISIONAL_MOTION_TUNING;
+  const profile = PROVISIONAL_HERO_PROFILES[state.hero];
+  const previousFootY = state.footY;
+  state.stateSeconds += deltaSeconds;
+  state.jumpBufferSeconds = input.jumpPressed
+    ? tuning.jumpBufferSeconds
+    : Math.max(0, state.jumpBufferSeconds - deltaSeconds);
+  state.coyoteSeconds = state.grounded
+    ? tuning.coyoteSeconds
+    : Math.max(0, state.coyoteSeconds - deltaSeconds);
+
+  if (state.jumpBufferSeconds > 0 && (state.grounded || state.coyoteSeconds > 0)) {
+    const runRatio = clamp(Math.abs(state.velocityX) / tuning.runSpeed, 0, 1);
+    state.velocityY = -(tuning.baseJumpSpeed + profile.jumpSpeedAddition + tuning.runningJumpBonus * runRatio);
+    state.grounded = false;
+    state.coyoteSeconds = 0;
+    state.jumpBufferSeconds = 0;
+    state.glide = 'closed';
+  }
+
+  const direction = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+  if (state.grounded) {
+    const speed = Math.abs(state.velocityX);
+    const maximum = input.run ? tuning.runSpeed : tuning.walkSpeed;
+    const reversing = state.velocityX !== 0 && direction !== 0 && Math.sign(state.velocityX) !== direction;
+    if (direction === 0) {
+      state.velocityX = approach(state.velocityX, 0, tuning.releaseDeceleration, deltaSeconds);
+      state.locomotion = Math.abs(state.velocityX) < 1e-6 ? 'idle' : speed > tuning.walkSpeed * 0.92 ? 'run' : 'walk';
+    } else if (reversing && speed >= tuning.skidThreshold) {
+      state.velocityX = approach(state.velocityX, 0, tuning.highSpeedSkidDeceleration, deltaSeconds);
+      state.locomotion = 'skid';
+    } else {
+      state.facing = direction;
+      state.velocityX = approach(
+        state.velocityX,
+        direction * maximum,
+        reversing ? tuning.lowSpeedTurnAcceleration : input.run ? tuning.groundAccelerationRun : tuning.groundAccelerationWalk,
+        deltaSeconds
+      );
+      state.locomotion = Math.abs(state.velocityX) > tuning.walkSpeed * 0.94 ? 'run' : 'walk';
+    }
+    state.footX = clamp(state.footX + state.velocityX * deltaSeconds, minimumX, maximumX);
+    state.footY = groundHeightAt(state.footX);
+    state.velocityY = 0;
+  } else {
+    if (direction !== 0) {
+      const reversing = state.velocityX !== 0 && Math.sign(state.velocityX) !== direction;
+      const maximum = input.run ? tuning.airMaximumRunSpeed : tuning.airMaximumWalkSpeed;
+      state.velocityX = approach(
+        state.velocityX,
+        direction * maximum,
+        (reversing ? tuning.airReverseAcceleration : tuning.airAcceleration) * profile.airControlMultiplier,
+        deltaSeconds
+      );
+      state.facing = direction;
+    }
+    const absoluteVerticalSpeed = Math.abs(state.velocityY);
+    let gravity = absoluteVerticalSpeed <= tuning.apexVelocityWindow
+      ? tuning.apexGravity
+      : state.velocityY < 0
+        ? input.jumpHeld ? tuning.heldJumpGravity : tuning.releasedJumpGravity
+        : tuning.fallGravity;
+    const shouldGlide = state.hero === 'Mebble' && input.glideHeld && state.velocityY > tuning.apexVelocityWindow;
+    if (shouldGlide) {
+      gravity = tuning.glideGravity;
+      state.velocityY = Math.min(state.velocityY, tuning.glideMaximumFallSpeed);
+      state.glide = state.glide === 'closed' ? 'opening' : 'sustained';
+    } else {
+      state.glide = state.glide === 'opening' || state.glide === 'sustained' ? 'closing' : 'closed';
+    }
+    state.velocityY = Math.min(tuning.maximumFallSpeed, state.velocityY + gravity * deltaSeconds);
+    if (!input.jumpHeld && state.velocityY < tuning.minimumJumpCutVelocity) {
+      state.velocityY = tuning.minimumJumpCutVelocity;
+    }
+    state.footX = clamp(state.footX + state.velocityX * deltaSeconds, minimumX, maximumX);
+    state.footY += state.velocityY * deltaSeconds;
+    const groundY = groundHeightAt(state.footX);
+    if (state.velocityY >= 0 && state.footY >= groundY && previousFootY <= groundY) {
+      state.landingSpeed = state.velocityY;
+      state.footY = groundY;
+      state.velocityY = 0;
+      state.grounded = true;
+      state.glide = 'closed';
+      state.locomotion = state.landingSpeed >= tuning.hardLandingSpeed ? 'land-hard' : 'land-soft';
+    } else {
+      state.locomotion = state.velocityY < -tuning.apexVelocityWindow
+        ? 'rise'
+        : state.velocityY <= tuning.apexVelocityWindow ? 'apex' : 'fall';
+    }
+  }
+}
+
+function fatalHazardEvent(type) {
+  return {
+    type: 'fatal-hazard',
+    hazardType: type,
+    bypasses: ['hearts', 'invulnerability', 'activePowerUp']
+  };
+}
 
 const canvas = document.querySelector('#game');
 const ctx = canvas.getContext('2d');
