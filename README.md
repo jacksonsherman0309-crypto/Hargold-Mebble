@@ -2,6 +2,33 @@
 
 Development repository for the mobile-first Hargold & Mebble side-scrolling platformer.
 
+## Easiest way to give Codex old files
+
+After pulling the latest repository changes in GitHub Desktop:
+
+1. Open the `Hargold-Mebble` folder.
+2. Open `DROP_FILES_HERE`.
+3. Drag any downloaded old build, character image, Blender file, or editor file into that folder.
+4. Return to the main `Hargold-Mebble` folder.
+5. Double-click `IMPORT_FILES.bat`.
+6. Tell Codex:
+
+```text
+Read AGENTS.md first. Then inspect IMPORT_STATUS.txt and every newly imported file.
+```
+
+The importer automatically sorts files into the correct archive, reference-image, Blender, or export folder. It copies files instead of deleting the originals.
+
+## Archived files already added directly
+
+These smaller files were transferred into GitHub already:
+
+- `archive/full-motion/hargold_mebble_full_motion_build_009_qa.json`
+- `archive/physics/build-017-movement-spec.md`
+- `archive/physics/physics_completion_matrix.json`
+
+The oversized standalone full-motion HTML build and character-reference PNG files still require the simple drag-and-import process above because the File Library connection cannot transfer their complete binary contents directly to GitHub.
+
 ## Codex source of truth
 
 Codex must begin with [`AGENTS.md`](AGENTS.md). The complete current handoff is divided into:
@@ -47,7 +74,7 @@ npm test
 
 ## Current production status
 
-This repository now gives Codex the complete **current approved information** available for mechanics, movement/collision behavior, design direction, campaign accounting, World 1 level plans, later-world themes/bosses, universal level requirements, historical build concepts, and open decisions.
+This repository gives Codex the current approved information available for mechanics, movement/collision behavior, design direction, campaign accounting, World 1 level plans, later-world themes/bosses, universal level requirements, historical build concepts, and open decisions.
 
 It does **not** yet contain a complete commercial 3D game. The following still require real implementation and assets:
 
