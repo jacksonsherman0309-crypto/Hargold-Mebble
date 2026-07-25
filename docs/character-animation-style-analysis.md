@@ -52,6 +52,12 @@ The active `build_deformable_characters.py` pipeline now:
 - validates that rigid upper-arm, forearm, elbow, hand, thigh, and shin pieces
   are absent;
 - renders locomotion/glide action poses as deformation QA;
+- maps body and leg motion onto the bone-local axes that bend in the visible
+  X/Z gameplay plane, eliminating the prior twist-only mannequin motion;
+- holds the arms in relaxed/action silhouettes instead of leaving the neutral
+  pose near a T-pose;
+- uses softer peach skin with subsurface response and rougher cloth/leather
+  values instead of the saturated glossy finish that read as varnished wood;
 - exports all 65 Hargold and 66 Mebble original gameplay actions to GLB.
 
 ## Remaining art work

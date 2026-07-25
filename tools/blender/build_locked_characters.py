@@ -707,25 +707,31 @@ def add_production_actions(arm, hero):
     )
 
     def pose(
-        hips=0.0, chest=0.0, head=0.0, arm_l=-0.60, arm_r=-0.60,
+        hips=0.0, chest=0.0, head=0.0, arm_l=-1.12, arm_r=-1.12,
         fore_l=0.0, fore_r=0.0, leg_l=0.0, leg_r=0.0,
         shin_l=0.0, shin_r=0.0, foot_l=0.0, foot_r=0.0,
         twist=0.0, secondary_swing=0.0
     ):
         result = {
-            "DEF_hips": (hips, 0, twist * 0.35),
-            "DEF_spine": (chest * 0.35, 0, -twist * 0.40),
-            "DEF_chest": (chest, 0, twist),
-            "DEF_neck": (-head * 0.25, 0, -twist * 0.25),
-            "DEF_head": (head, 0, -twist * 0.35),
+            # Gameplay is read from the X/Z side-scrolling plane while the
+            # camera looks down -Y.  Blender pose rotations are bone-local:
+            # the vertical torso/leg chains bend visibly around local Z,
+            # while the horizontal arm chains bend around local X.  The old
+            # one-axis-for-every-chain mapping left the legs twisting in depth
+            # and made the motion read like a posed wooden doll.
+            "DEF_hips": (0, twist * 0.35, hips),
+            "DEF_spine": (0, -twist * 0.40, chest * 0.35),
+            "DEF_chest": (0, twist, chest),
+            "DEF_neck": (0, -twist * 0.25, -head * 0.25),
+            "DEF_head": (0, -twist * 0.35, head),
             "DEF_upper_arm.L": (arm_l, 0, -twist * 0.5),
             "DEF_upper_arm.R": (arm_r, 0, twist * 0.5),
             "DEF_forearm.L": (fore_l, 0, 0),
             "DEF_forearm.R": (fore_r, 0, 0),
-            "DEF_thigh.L": (leg_l, 0, 0),
-            "DEF_thigh.R": (leg_r, 0, 0),
-            "DEF_shin.L": (shin_l, 0, 0),
-            "DEF_shin.R": (shin_r, 0, 0),
+            "DEF_thigh.L": (0, 0, leg_l),
+            "DEF_thigh.R": (0, 0, leg_r),
+            "DEF_shin.L": (0, 0, shin_l),
+            "DEF_shin.R": (0, 0, shin_r),
             "DEF_foot.L": (foot_l, 0, 0),
             "DEF_foot.R": (foot_r, 0, 0),
         }
@@ -799,30 +805,32 @@ def add_production_actions(arm, hero):
     # Locomotion cycles use keyed contacts, torso counter-rotation, head drag,
     # and secondary overlap. The first pose is repeated to avoid loop snapping.
     for name, amplitude, length, lift in (
-        ("walk", 0.48, 24, 0.025),
-        ("run", 0.83, 16, 0.050),
-        ("sprint", 1.02, 12, 0.075),
+        ("walk", 0.32, 24, 0.025),
+        ("run", 0.50, 16, 0.050),
+        ("sprint", 0.68, 12, 0.075),
     ):
         first = pose(
             hips=-0.05, chest=-0.06, head=0.05,
-            arm_l=-amplitude * 0.70, arm_r=amplitude * 0.62,
-            fore_l=-0.24, fore_r=-0.34,
+            arm_l=-1.12 - amplitude * 0.45,
+            arm_r=-1.12 + amplitude * 0.42,
+            fore_l=-0.42, fore_r=-0.58,
             leg_l=amplitude, leg_r=-amplitude,
-            shin_l=-0.18, shin_r=-0.52, twist=0.08,
+            shin_l=-0.12, shin_r=-0.34, twist=0.08,
             secondary_swing=-amplitude * 0.26
         )
         passing = pose(
             hips=0.03, chest=0.03, head=-0.02,
-            arm_l=0.05, arm_r=-0.08, fore_l=-0.20, fore_r=-0.20,
-            leg_l=-0.08, leg_r=0.10, shin_l=-0.40, shin_r=-0.05,
+            arm_l=-1.04, arm_r=-1.10, fore_l=-0.44, fore_r=-0.44,
+            leg_l=-0.05, leg_r=0.07, shin_l=-0.26, shin_r=-0.04,
             twist=-0.03, secondary_swing=amplitude * 0.14
         )
         opposite = pose(
             hips=-0.05, chest=-0.06, head=0.05,
-            arm_l=amplitude * 0.62, arm_r=-amplitude * 0.70,
-            fore_l=-0.34, fore_r=-0.24,
+            arm_l=-1.12 + amplitude * 0.42,
+            arm_r=-1.12 - amplitude * 0.45,
+            fore_l=-0.58, fore_r=-0.42,
             leg_l=-amplitude, leg_r=amplitude,
-            shin_l=-0.52, shin_r=-0.18, twist=-0.08,
+            shin_l=-0.34, shin_r=-0.12, twist=-0.08,
             secondary_swing=-amplitude * 0.30
         )
         create_action(name, [
@@ -962,13 +970,13 @@ def add_production_actions(arm, hero):
                                  pose(chest=-0.25, arm_l=0.55, arm_r=-0.60, twist=0.48)],
         }
     else:
-        glide = pose(hips=0.08, chest=-0.10, head=0.06, arm_l=-1.48, arm_r=-1.48,
+        glide = pose(hips=0.08, chest=-0.10, head=0.06, arm_l=-0.78, arm_r=-0.78,
                      leg_l=0.12, leg_r=-0.12, secondary_swing=-0.42)
         hero_clips = {
             "glide-open": [expressive["fall"][0], glide],
-            "glide-sustain": [glide, pose(hips=0.05, chest=-0.06, head=0.03, arm_l=-1.48, arm_r=-1.48, secondary_swing=-0.30)],
-            "glide-steer-left": [pose(hips=0.05, chest=-0.08, head=0.04, arm_l=-1.58, arm_r=-1.38, twist=-0.20, secondary_swing=-0.38)],
-            "glide-steer-right": [pose(hips=0.05, chest=-0.08, head=0.04, arm_l=-1.38, arm_r=-1.58, twist=0.20, secondary_swing=-0.38)],
+            "glide-sustain": [glide, pose(hips=0.05, chest=-0.06, head=0.03, arm_l=-0.72, arm_r=-0.82, secondary_swing=-0.30)],
+            "glide-steer-left": [pose(hips=0.05, chest=-0.08, head=0.04, arm_l=-0.92, arm_r=-0.62, twist=-0.20, secondary_swing=-0.38)],
+            "glide-steer-right": [pose(hips=0.05, chest=-0.08, head=0.04, arm_l=-0.62, arm_r=-0.92, twist=0.20, secondary_swing=-0.38)],
             "glide-close": [glide, expressive["fall"][0]],
         }
     for name, poses in hero_clips.items():

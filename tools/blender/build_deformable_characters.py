@@ -592,14 +592,14 @@ def tune_materials(mats):
             continue
         if name in {"skin", "skin_light"}:
             if "Subsurface Weight" in bsdf.inputs:
-                bsdf.inputs["Subsurface Weight"].default_value = 0.075
-            bsdf.inputs["Roughness"].default_value = 0.48
+                bsdf.inputs["Subsurface Weight"].default_value = 0.11
+            bsdf.inputs["Roughness"].default_value = 0.58
         elif name in {"brown", "brown_light"}:
-            bsdf.inputs["Roughness"].default_value = 0.42
+            bsdf.inputs["Roughness"].default_value = 0.58
             if "Coat Weight" in bsdf.inputs:
-                bsdf.inputs["Coat Weight"].default_value = 0.14
+                bsdf.inputs["Coat Weight"].default_value = 0.07
         elif name in {"olive", "olive_light", "olive_dark", "cream", "scarf", "trouser"}:
-            bsdf.inputs["Roughness"].default_value = 0.64
+            bsdf.inputs["Roughness"].default_value = 0.72
     return mats
 
 
@@ -608,8 +608,10 @@ def build(hero):
     bpy.context.preferences.filepaths.save_version = 0
     groups = riglib.collections()
     palette = dict(riglib.PALETTE)
-    palette["skin"] = (0.82, 0.34, 0.13, 1)
-    palette["skin_light"] = (0.95, 0.48, 0.20, 1)
+    # Warm peach skin with enough shared RGB energy to avoid the saturated
+    # orange/varnished-wood look of the previous material.
+    palette["skin"] = (0.72, 0.43, 0.29, 1)
+    palette["skin_light"] = (0.83, 0.54, 0.38, 1)
     mats = tune_materials({
         key: riglib.material(
             f"MAT_{key}", value,

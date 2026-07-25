@@ -8,12 +8,12 @@ import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.
 
 const MODEL_SPECS = Object.freeze({
   Hargold: Object.freeze({
-    url: new URL('../assets/exports/hargold_character.glb?v=continuous-skin-2', import.meta.url).href,
+    url: new URL('../assets/exports/hargold_character.glb?v=continuous-skin-3', import.meta.url).href,
     pixelsPerMetre: 43,
     yaw: Math.PI / 2
   }),
   Mebble: Object.freeze({
-    url: new URL('../assets/exports/mebble_character.glb?v=continuous-skin-2', import.meta.url).href,
+    url: new URL('../assets/exports/mebble_character.glb?v=continuous-skin-3', import.meta.url).href,
     pixelsPerMetre: 40,
     yaw: Math.PI / 2
   })
