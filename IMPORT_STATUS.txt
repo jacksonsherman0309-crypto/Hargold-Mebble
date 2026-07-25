@@ -1,0 +1,7 @@
+﻿Hargold & Mebble import completed: 2026-07-25 09:43:19 
+Character design evolution of Mebble.png -> assets\references\Character design evolution of Mebble.png
+hargold_mebble_full_motion_build_009.html -> archive\full-motion\hargold_mebble_full_motion_build_009.html
+hargold_mebble_level_editor.html -> archive\level-editor\hargold_mebble_level_editor.html
+
+Codex instruction:
+Read AGENTS.md first, then inspect every file listed above. Do not replace current canon with obsolete archived values.

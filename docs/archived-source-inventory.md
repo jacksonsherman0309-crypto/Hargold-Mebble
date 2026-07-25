@@ -14,7 +14,7 @@ Codex must not claim they are imported or use their absence as permission to for
 
 ### `hargold_mebble_full_motion_build_009.html`
 
-Status: **File Library only**.
+Status: **Imported unchanged at `archive/full-motion/hargold_mebble_full_motion_build_009.html`**.
 
 Type: large standalone landscape HTML/Canvas playable build with embedded image assets.
 
@@ -44,7 +44,7 @@ Use:
 
 ### `hargold_mebble_level_editor.html`
 
-Status: **File Library only**.
+Status: **Imported unchanged at `archive/level-editor/hargold_mebble_level_editor.html`**.
 
 Type: standalone visual browser level editor.
 
