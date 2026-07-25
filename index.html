@@ -10,7 +10,7 @@
 <body>
   <main class="shell">
     <header class="hud">
-      <div><strong>Hargold & Mebble</strong><span>Repository Test Build</span></div>
+      <div><strong>Hargold &amp; Mebble</strong><span>Modular Motion Test Build</span></div>
       <div id="status">Loading…</div>
     </header>
 
@@ -20,16 +20,19 @@
         <div class="left-controls">
           <button data-action="left" aria-label="Move left">◀</button>
           <button data-action="right" aria-label="Move right">▶</button>
+          <button class="utility" data-action="run" aria-label="Run">RUN</button>
         </div>
         <div class="right-controls">
+          <button class="utility" data-action="restart" aria-label="Restart course">RESTART</button>
           <button data-action="swap" aria-label="Swap hero">SWAP</button>
+          <button class="action" data-action="action" aria-label="Glide as Mebble or fast fall">ACTION</button>
           <button class="jump" data-action="jump" aria-label="Jump">JUMP</button>
         </div>
       </div>
     </section>
 
     <footer>
-      Move: A/D or arrows · Jump: Space/W/↑ · Swap: Q · Restart: R
+      Move: A/D or arrows · Run: Shift/X · Jump: Space/W/↑ · Glide/Fast fall: E/S/↓ · Swap: Q · Restart: R
     </footer>
   </main>
   <script type="module" src="src/game.js"></script>
