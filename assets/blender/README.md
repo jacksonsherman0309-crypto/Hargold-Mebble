@@ -10,8 +10,14 @@ templates. They are not Hargold or Mebble models.
 2. Locked reference sheets in `assets/references/`.
 3. `character-production-manifest.json`.
 
-Only Mebble's locked sheet is currently present. Hargold's locked sheet must be
-added before visual sign-off; the written canon remains binding meanwhile.
+Both newest locked production sheets are present:
+
+- `assets/references/Hargold locked production character sheet.png`
+- `assets/references/Mebble locked production character sheet.png`
+
+They are authoritative modeling references. They are PNGs rather than editable
+3D assets; rig diagrams and technical labels in the artwork are requirements,
+not evidence that the depicted production files already exist.
 
 ## Scene and export contract
 
@@ -42,4 +48,3 @@ meshes, rigs, materials, and required actions exist.
 5. Complete in-place animation set and foot-contact markers.
 6. Proxy collider measurement fed back into runtime tuning.
 7. GLB import, animation, scale, plane alignment, and target-device validation.
-

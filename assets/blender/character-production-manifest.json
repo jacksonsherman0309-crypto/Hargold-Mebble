@@ -3,25 +3,25 @@
   "status": "pipeline-only-no-production-character-assets",
   "coordinateSystem": {"units": "metres", "up": "Z", "characterForward": "-Y", "origin": "between-feet-on-ground"},
   "references": {
-    "Mebble": {"path": "../references/Character design evolution of Mebble.png", "status": "present-locked"},
-    "Hargold": {"path": null, "status": "missing-locked-sheet-written-canon-only"}
+    "Mebble": {"path": "../references/Mebble locked production character sheet.png", "status": "present-locked-newest-authority", "historicalPath": "../references/Character design evolution of Mebble.png"},
+    "Hargold": {"path": "../references/Hargold locked production character sheet.png", "status": "present-locked-newest-authority"}
   },
   "characters": {
     "Hargold": {
       "blend": "hargold_character.blend",
       "status": "not-created",
-      "modelsRequired": ["body/head", "eyes/teeth/tongue", "hair/goatee", "green explorer outfit", "wide-brim green feather hat", "red-brown cape/scarf", "belt", "boots", "hands"],
+      "modelsRequired": ["body/head", "eyes/teeth/tongue", "hair/moustache/rounded chin beard", "olive explorer jacket and tan shirt", "wide-brim olive hat with brown band and orange feather", "deep red-brown wrapped scarf/cape collar", "belt and explorer pouches", "brown field backpack with leaf badge", "boots", "hands"],
       "rigsRequired": ["gameplay deformation/control rig", "facial/eye rig", "cape/scarf secondary-motion rig", "hat-feather secondary rig"],
       "materialsRequired": ["skin", "eyes", "mouth", "hair/goatee", "green cloth", "red-brown cape/scarf", "brown leather", "metal hardware", "hat feather"],
-      "lockedChecks": ["very short", "very round and heavy", "wider than Mebble", "moderate cheerful expression"]
+      "lockedChecks": ["matches locked Hargold sheet", "very short", "very round and heavy", "wider than Mebble", "moderate cheerful expression", "backpack silhouette and leaf badge preserved"]
     },
     "Mebble": {
       "blend": "mebble_character.blend",
       "status": "not-created",
-      "modelsRequired": ["body/head and long skinny neck", "protruding Adam's apple", "eyes/teeth/tongue", "hair/bushy eyebrows", "crooked less-round glasses", "small top hat", "shirt/vest/trousers", "belt/pouches", "boots/gloves", "cape/glider"],
+      "modelsRequired": ["body/head and long skinny neck", "protruding Adam's apple", "eyes/teeth/tongue", "hair/bushy eyebrows", "crooked less-round glasses", "small brown top hat with green band and leaf", "cream shirt/brown vest/dark trousers", "double belts/pouches", "tall lace-up boots", "hands", "green emblem cape/glider"],
       "rigsRequired": ["gameplay deformation/control rig", "facial/eye/brow rig", "Adam's-apple/neck corrective rig", "glasses and hat sockets", "cape fold/open/glide rig with secondary motion"],
       "materialsRequired": ["skin", "eyes", "mouth", "hair/eyebrows", "glasses", "hat", "shirt", "vest/trousers", "leather", "metal hardware", "green cape"],
-      "lockedChecks": ["taller and significantly thinner than Hargold", "very long skinny neck", "Adam's apple visible in every gameplay pose", "less-round slightly crooked glasses", "very bushy eyebrows"]
+      "lockedChecks": ["matches locked Mebble sheet", "taller and significantly thinner than Hargold", "very long skinny neck", "Adam's apple visible in every gameplay pose", "less-round slightly crooked glasses", "very bushy eyebrows", "cape emblem preserved"]
     }
   },
   "sharedAnimationClipsRequired": [

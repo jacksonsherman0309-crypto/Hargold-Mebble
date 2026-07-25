@@ -41,6 +41,10 @@ assert.equal(getLevel('1-9')?.secret, true);
 
 assert.match(LOCKED_HERO_DESIGN.Mebble.definingFeatures.join(' '), /Adam/);
 assert.match(LOCKED_HERO_DESIGN.Hargold.build, /very short/);
+assert.equal(LOCKED_HERO_DESIGN.Hargold.reference, 'assets/references/Hargold locked production character sheet.png');
+assert.equal(LOCKED_HERO_DESIGN.Mebble.reference, 'assets/references/Mebble locked production character sheet.png');
+assert.match(LOCKED_HERO_DESIGN.Hargold.clothing.join(' '), /backpack/);
+assert.match(LOCKED_HERO_DESIGN.Mebble.clothing.join(' '), /double belts/);
 
 for (const world of CAMPAIGN) {
   assert.equal(world.routeStructure.mainCompletionSlots, 8);

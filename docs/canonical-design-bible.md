@@ -28,27 +28,40 @@ The latest approved Hargold and Mebble model is locked. Do not change proportion
 
 ### Hargold
 
+- Locked visual authority: `assets/references/Hargold locked production character sheet.png`.
 - Very short.
 - Very round, heavy, and wider/fatter than Mebble.
-- Green explorer outfit.
-- Wide-brim green hat with feather.
-- Red-brown cape/scarf.
+- Layered olive-green explorer jacket over a tan shirt, matching the locked sheet.
+- Wide-brim olive-green hat with brown band and orange feather.
+- Deep red-brown wrapped scarf/cape collar.
 - Brown belt and boots.
-- Dark goatee.
+- Dark moustache and rounded chin beard/goatee treatment exactly as shown in the locked sheet.
+- Brown field backpack with flap, straps, pockets, and leaf badge.
+- Belt-mounted explorer pouches and brass-colored hardware.
 - Cheerful round facial structure with a moderate expression rather than an exaggerated permanent smile.
 - Smooth polished 3D game-model finish.
 
 ### Mebble
 
+- Locked visual authority: `assets/references/Mebble locked production character sheet.png`.
 - Taller and significantly thinner than Hargold.
 - Very long, skinny neck.
 - Clearly protruding Adam’s apple that must remain visible while standing, moving, jumping, gliding, and posing.
-- Small top hat.
+- Small brown top hat with green band and leaf detail.
 - Less-round glasses, slightly crooked.
 - Very bushy eyebrows.
-- Cape expands as a parachute/glider.
+- Cream rolled-sleeve shirt, brown vest, dark trousers, double belts, and explorer pouches as shown in the locked sheet.
+- Tall brown lace-up boots.
+- Green cape with the locked back emblem; cape expands as a parachute/glider.
 - Do not hide the long neck or Adam’s apple with collar, cape, pose, cropping, or lighting.
 - Smooth polished 3D game-model finish.
+
+### Reference-use rule
+
+- The two locked production character sheets above override older character renderings where they differ.
+- Their orthographic views, detail callouts, silhouettes, colors, clothing, and visible rig-layout intent are modeling requirements.
+- Text printed on a PNG such as “fully rigged,” topology counts, software names, or material claims is descriptive reference content, not proof that editable meshes, armatures, weights, materials, or animation files exist in the repository.
+- The separate gameplay-quality image supplied on July 25, 2026 is a lighting, rendering, environment-density, camera, UI-polish, and overall finish target only. It does not override the locked hero sheets or canonical gameplay rules.
 
 ## 4. Core movement
 

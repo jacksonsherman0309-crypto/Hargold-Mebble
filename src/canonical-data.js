@@ -209,15 +209,17 @@ export const CAMPAIGN = Object.freeze(WORLD_DEFINITIONS.map(world => Object.free
 
 export const LOCKED_HERO_DESIGN = Object.freeze({
   Hargold: {
+    reference: 'assets/references/Hargold locked production character sheet.png',
     build: 'very short, very round/heavy and wider than Mebble',
-    clothing: ['green explorer outfit', 'wide-brim green hat with feather', 'red-brown cape/scarf', 'brown belt', 'brown boots'],
-    face: ['dark goatee', 'round friendly features', 'moderate—not exaggerated—smile'],
+    clothing: ['layered olive-green explorer jacket', 'tan shirt', 'wide-brim olive-green hat with brown band and orange feather', 'deep red-brown wrapped scarf/cape collar', 'brown field backpack with leaf badge', 'brown belt and explorer pouches', 'brown boots', 'brass-colored hardware'],
+    face: ['dark moustache and rounded chin beard/goatee treatment from locked sheet', 'round friendly features', 'moderate—not exaggerated—smile'],
     gameplay: ['Hargold-only block breaking', 'heavy-rock ground-slam defeats', 'learned double jump']
   },
   Mebble: {
+    reference: 'assets/references/Mebble locked production character sheet.png',
     build: 'taller and thinner than Hargold',
-    definingFeatures: ['very long skinny neck', 'clearly visible protruding Adam’s apple', 'small top hat', 'slightly crooked less-round glasses', 'very bushy eyebrows'],
-    clothing: ['cape that opens as parachute/glider'],
+    definingFeatures: ['very long skinny neck', 'clearly visible protruding Adam’s apple', 'small brown top hat with green band and leaf detail', 'slightly crooked less-round glasses', 'very bushy eyebrows'],
+    clothing: ['cream rolled-sleeve shirt', 'brown vest', 'dark trousers', 'double belts and explorer pouches', 'tall brown lace-up boots', 'green emblem cape that opens as parachute/glider'],
     gameplay: ['slightly higher jump', 'innate slow-fall and short glide'],
     visibilityRule: 'neck and Adam’s apple may not be hidden by collar, cape, pose or lighting'
   }
