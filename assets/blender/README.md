@@ -4,9 +4,9 @@ This directory contains editable full-replacement Hargold and Mebble Blender
 sources in addition to the production contracts and generic template. Each
 source is regenerated from a factory-empty scene and records
 `reusesPriorGeometry = false`; no mesh from the rejected blockouts is linked or
-imported. The sources now contain rounded replacement geometry, UVs, packed 1K
-PBR channels, expanded production-control rigs, and the complete required
-animation library.
+imported. The active generator creates continuous union-remeshed skin and
+garment surfaces, binds them with normalized deformation weights, and rejects
+the former bone-parented limb-piece construction.
 
 Structural completeness is not final AAA art approval. A senior character
 artist still needs to approve or refine the sculpt/retopology, skin weights,
@@ -50,8 +50,11 @@ not evidence that the depicted production files already exist.
 Rebuild the current generated sources with:
 
 ```powershell
-& 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background --factory-startup --python-exit-code 1 --python tools\blender\build_locked_characters.py
+& 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background --factory-startup --python-exit-code 1 --python tools\blender\build_deformable_characters.py
 ```
+
+`build_locked_characters.py` remains as the rig/action library and historical
+segmented-builder record. It is not the active geometry build entry point.
 
 Run the implemented structural/runtime-export checks with:
 
@@ -72,3 +75,6 @@ gate. Both replacement sources are expected to pass it.
 5. Complete in-place animation set and foot-contact markers.
 6. Proxy collider measurement fed back into runtime tuning.
 7. GLB import, animation, scale, plane alignment, and target-device validation.
+
+The strict validator also fails any character that brings back rigid
+bone-parented upper-arm, forearm, elbow, hand, thigh, or shin pieces.

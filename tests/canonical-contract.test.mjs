@@ -56,6 +56,8 @@ assert.equal(LOCKED_HERO_DESIGN.Mebble.reference, 'assets/references/Mebble lock
 assert.match(LOCKED_HERO_DESIGN.Hargold.clothing.join(' '), /backpack/);
 assert.match(LOCKED_HERO_DESIGN.Mebble.clothing.join(' '), /double belts/);
 assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /new geometry/);
+assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /continuous skinned/);
+assert.match(LOCKED_HERO_DESIGN.Mebble.productionModel.join(' '), /no rigid segmented limbs/);
 assert.match(LOCKED_HERO_DESIGN.Mebble.productionAnimation.join(' '), /new gameplay clips/);
 assert.match(LOCKED_HERO_DESIGN.Hargold.gameplay.join(' '), /exclusive learned double jump/);
 

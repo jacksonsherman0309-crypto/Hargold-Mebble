@@ -4,15 +4,16 @@ import {
   MEADOW_WAKE_BLOCK_DEFINITIONS,
   MEADOW_WAKE_PLATFORMS
 } from './content/meadow-wake-course.js?v=course-interactions-1';
+import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=environment-art-1';
 
 const MODEL_SPECS = Object.freeze({
   Hargold: Object.freeze({
-    url: new URL('../assets/exports/hargold_character.glb', import.meta.url).href,
+    url: new URL('../assets/exports/hargold_character.glb?v=continuous-skin-2', import.meta.url).href,
     pixelsPerMetre: 43,
     yaw: Math.PI / 2
   }),
   Mebble: Object.freeze({
-    url: new URL('../assets/exports/mebble_character.glb', import.meta.url).href,
+    url: new URL('../assets/exports/mebble_character.glb?v=continuous-skin-2', import.meta.url).href,
     pixelsPerMetre: 40,
     yaw: Math.PI / 2
   })
@@ -28,6 +29,7 @@ export class CharacterRenderer {
     this.models = new Map();
     this.failed = new Set();
     this.courseAssetsReady = false;
+    this.environmentArtReady = false;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x78c9e7);
     this.camera = new THREE.OrthographicCamera(
@@ -78,12 +80,22 @@ export class CharacterRenderer {
     this.mobMeshes = new Map();
     this.projectileMeshes = new Map();
     this.loader = new GLTFLoader();
+    this.environmentArt = new MeadowWakeEnvironmentArt({
+      scene: this.scene,
+      world: this.world,
+      backgroundFar: this.backgroundFar,
+      backgroundMid: this.backgroundMid,
+      renderer: this.renderer,
+      width,
+      height
+    });
     this.buildMeadowWake();
 
     this.loadPromise = Promise.allSettled(
       [
         ...Object.entries(MODEL_SPECS).map(([hero, spec]) => this.loadHero(hero, spec)),
-        this.loadMeadowWakeAssets()
+        this.loadMeadowWakeAssets(),
+        this.loadEnvironmentTextures()
       ]
     ).then(() => this.onProgress(this.statusText()));
   }
@@ -117,6 +129,11 @@ export class CharacterRenderer {
     ];
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    const uSpan = Math.max(0.18, (x1 - x0) / 180);
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute([
+      0, 1, uSpan, 1, 0, 0, uSpan, 0,
+      0, 1, uSpan, 1, 0, 0, uSpan, 0
+    ], 2));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
     const mesh = new THREE.Mesh(geometry, material);
@@ -134,10 +151,13 @@ export class CharacterRenderer {
     for (let x = start; x < end; x += 0.25) samples.push(x);
     samples.push(end);
     const vertices = [];
+    const uvs = [];
     for (const x of samples) {
       const top = this.height / 2 - heightAt(x) * scale;
       vertices.push(x * scale, top, front, x * scale, bottom, front);
       vertices.push(x * scale, top, back, x * scale, bottom, back);
+      const u = (x - start) / 2.35;
+      uvs.push(u, 1, u, 0, u, 1, u, 0);
     }
     const indices = [];
     for (let index = 0; index < samples.length - 1; index += 1) {
@@ -152,6 +172,7 @@ export class CharacterRenderer {
     }
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
     const mesh = new THREE.Mesh(geometry, material);
@@ -173,8 +194,10 @@ export class CharacterRenderer {
       }
       return points.at(-1)[1];
     };
-    const grass = this.material(0x5f9d42), soil = this.material(0x4a3423);
-    const stone = this.material(0x53605a), wood = this.material(0x704523), leaf = this.material(0x2f6c35);
+    const grass = this.environmentArt.turfMaterial;
+    const soil = this.environmentArt.soilMaterial;
+    const stone = this.environmentArt.stoneMaterial;
+    const wood = this.environmentArt.woodMaterial;
     const gold = new THREE.MeshStandardMaterial({ color: 0xf5bd32, roughness: 0.28, metalness: 0.55 });
     for (const [start, end] of [[0, 9.4], [10.8, 21.1], [22.7, 30.1], [31.5, 36]]) {
       this.terrainStrip('authored-continuous-terrain', start, end, heightAt, soil);
@@ -191,7 +214,7 @@ export class CharacterRenderer {
           const detailTop = this.height / 2 - heightAt(x + 0.13 + detail * 0.23) * scale;
           const rock = new THREE.Mesh(
             new THREE.DodecahedronGeometry(9 + ((x * 7 + detail * 3) % 5), 0),
-            this.material(detail % 2 ? 0x59442f : 0x6b5035)
+            stone
           );
           rock.name = 'terrain-rock-cladding';
           rock.scale.set(1.25, 0.76, 0.45);
@@ -202,17 +225,7 @@ export class CharacterRenderer {
         }
       }
     }
-    for (const x of [2.2, 5.8, 12.4, 17.2, 25.6, 33.8]) {
-      const top = this.height / 2 - heightAt(x) * scale;
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(16, 23, 150, 10), wood);
-      trunk.position.set(x * scale, top - 75, -135);
-      this.world.add(trunk);
-      for (const [offsetX, offsetY, radius] of [[0, -34, 62], [-42, -4, 47], [43, 0, 50]]) {
-        const crown = new THREE.Mesh(new THREE.IcosahedronGeometry(radius, 2), leaf);
-        crown.position.set(x * scale + offsetX, top + offsetY, -138);
-        this.world.add(crown);
-      }
-    }
+    this.environmentArt.decorateCourse({ heightAt, inPit, scale });
     for (const { id, x, y, width, height } of MEADOW_WAKE_PLATFORMS) {
       const core = this.box('authored-platform', x * scale, this.height / 2 - y * scale, width * scale, height * scale, 125, stone);
       const cap = this.box('platform-grass', x * scale, this.height / 2 - y * scale + height * scale / 2, width * scale + 2, 9, 130, grass);
@@ -277,37 +290,6 @@ export class CharacterRenderer {
       const finial = new THREE.Mesh(new THREE.SphereGeometry(10, 14, 10), gold);
       finial.position.set(x * scale, groundY + 155, 8);
       this.world.add(finial);
-    }
-    const farMountain = this.material(0x91aaa1);
-    const midMountain = this.material(0x587e61);
-    for (let x = -500; x < 3200; x += 380) {
-      const mountain = new THREE.Mesh(new THREE.ConeGeometry(240, 520, 9), farMountain);
-      mountain.position.set(x, 105 + (x % 3) * 12, -720);
-      mountain.rotation.y = x * 0.007;
-      this.backgroundFar.add(mountain);
-    }
-    for (let x = -350; x < 3200; x += 310) {
-      const hill = new THREE.Mesh(new THREE.IcosahedronGeometry(190, 2), midMountain);
-      hill.scale.set(1.3, 0.72, 0.45);
-      hill.position.set(x, -130 + (x % 4) * 9, -610);
-      this.backgroundMid.add(hill);
-    }
-    const cloudMaterial = new THREE.MeshStandardMaterial({
-      color: 0xf7fbf1,
-      roughness: 1,
-      transparent: true,
-      opacity: 0.78
-    });
-    for (let x = -300; x < 2700; x += 520) {
-      const cloud = new THREE.Group();
-      for (const [dx, radius] of [[-55, 42], [0, 62], [58, 38]]) {
-        const puff = new THREE.Mesh(new THREE.SphereGeometry(radius, 18, 12), cloudMaterial);
-        puff.scale.y = 0.55;
-        puff.position.x = dx;
-        cloud.add(puff);
-      }
-      cloud.position.set(x, 245 + (x % 5) * 9, -760);
-      this.backgroundFar.add(cloud);
     }
   }
 
@@ -410,6 +392,9 @@ export class CharacterRenderer {
       ]);
       const environment = this.prepareImportedAsset(environmentGltf.scene);
       environment.name = 'MeadowWake_AuthoredOpeningEnvironment';
+      environment.traverse(node => {
+        if (/^(TreeCrown|TreeTrunk|MeadowBush)/i.test(node.name)) node.visible = false;
+      });
       environment.scale.setScalar(70);
       environment.position.set(0, this.height / 2 - 7.9 * 70, -12);
       this.world.add(environment);
@@ -455,6 +440,7 @@ export class CharacterRenderer {
       for (const slot of this.platformSlots) {
         const ledge = ledgeTemplate.clone(true);
         ledge.name = 'AuthoredMeadowLedgeVisual';
+        this.environmentArt.applyLedgeMaterials(ledge);
         ledge.scale.set(70 * slot.width / 2, 70, 70);
         ledge.position.set(
           slot.x * 70,
@@ -470,6 +456,19 @@ export class CharacterRenderer {
     } catch (error) {
       console.error('Unable to load Meadow Wake production-intent assets', error);
       this.failed.add('Meadow Wake art kit');
+      this.onProgress(this.statusText());
+    }
+  }
+
+  async loadEnvironmentTextures() {
+    this.onProgress('Loading Meadow Wake valley and terrain textures...');
+    try {
+      await this.environmentArt.loadTextures();
+      this.environmentArtReady = true;
+      this.onProgress(this.statusText());
+    } catch (error) {
+      console.error('Unable to load Meadow Wake environment textures', error);
+      this.failed.add('Meadow Wake environment textures');
       this.onProgress(this.statusText());
     }
   }
@@ -513,8 +512,12 @@ export class CharacterRenderer {
   }
 
   statusText() {
-    if (this.models.size === Object.keys(MODEL_SPECS).length && this.courseAssetsReady) {
-      return '3D characters + Meadow Wake art kit ready';
+    if (
+      this.models.size === Object.keys(MODEL_SPECS).length
+      && this.courseAssetsReady
+      && this.environmentArtReady
+    ) {
+      return '3D characters + layered Meadow Wake environment ready';
     }
     if (this.failed.size) return `3D fallback active (${[...this.failed].join(', ')} failed)`;
     return `Loading 3D characters ${this.models.size}/${Object.keys(MODEL_SPECS).length}`;
@@ -639,8 +642,7 @@ export class CharacterRenderer {
     projectiles = []
   }, deltaSeconds) {
     this.world.position.x = -cameraX - this.width / 2;
-    this.backgroundFar.position.x = -cameraX * 0.06;
-    this.backgroundMid.position.x = -cameraX * 0.16;
+    this.environmentArt.update(cameraX, deltaSeconds);
     for (const mesh of this.collectibleMeshes) {
       const source = mesh.userData.kind === 'coin' ? coins[mesh.userData.index] : compassCoins[mesh.userData.index];
       mesh.visible = !source?.taken;

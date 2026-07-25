@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "full-replacement-generated-structural-validation-passed-visual-approval-required",
+  "status": "full-replacement-continuous-skin-generated-structural-validation-passed-visual-approval-required",
   "coordinateSystem": {"units": "metres", "up": "Z", "characterForward": "-Y", "origin": "between-feet-on-ground"},
   "references": {
     "Mebble": {"path": "../references/Mebble locked production character sheet.png", "status": "present-locked-newest-authority", "historicalPath": "../references/Character design evolution of Mebble.png"},
@@ -9,13 +9,13 @@
   "characters": {
     "Hargold": {
       "blend": "hargold_character.blend",
-      "status": "full-replacement-generated-no-prior-geometry-reused-visual-approval-required",
+      "status": "full-replacement-continuous-skin-generated-no-prior-geometry-reused-visual-approval-required",
       "implemented": {
-        "model": ["fresh factory-empty replacement geometry", "rounded locked-sheet silhouette", "modeled face/eyes/mouth/hair/beard", "layered explorer clothing with fold details", "hat/feather/scarf", "backpack with pocket/buckle/leaf badge", "articulated hands/fingers", "rounded boots/laces/soles"],
+        "model": ["fresh factory-empty replacement geometry", "continuous union-remeshed skin body", "continuous skinned jacket/sleeves and trousers", "soft locked-sheet silhouette", "modeled face/eyes/mouth/hair/beard", "layered explorer clothing", "hat/feather/scarf", "backpack", "integrated hand/finger volumes", "skinned organic boots/laces/soles"],
         "rig": ["82-bone armature", "19 controls", "driven IK/FK switches", "jaw, eye, lid, eyebrow and mouth-corner bones", "six facial properties", "finger chains", "hat/scarf/feather secondary bones", "gameplay sockets"],
         "materials": ["packed 1K base-color/roughness/normal/AO texture channels", "Principled skin", "eyes/mouth", "hair", "cloth", "leather", "metal", "feather"],
         "animations": ["65 newly authored gameplay clips", "walk/run/sprint cycles", "jump and landing family", "crawl/slide/roll/wall/ledge states", "combat/hurt/victory", "Hargold-specific double-jump and block/strike clips"],
-        "validation": ["front/three-quarter/side/back renders", "run deformation render", "Blender structural validator", "GLB skin/mesh/animation inspection"]
+        "validation": ["front/three-quarter/side/back renders", "run deformation render", "segmented-limb rejection gate", "continuous-skin and adjacent-bone weight checks", "Blender structural validator", "GLB skin/mesh/morph/animation inspection"]
       },
       "remainingProductionWork": ["senior character-artist sculpt/retopology and skin-weight review", "hand-painted texture detail beyond packed pipeline maps", "shoulder/hip/finger corrective shapes", "LOD and mobile material-budget pass", "engine deformation/scale review across every clip", "final locked-sheet art-director approval"],
       "modelsRequired": ["body/head", "eyes/teeth/tongue", "hair/moustache/rounded chin beard", "olive explorer jacket and tan shirt", "wide-brim olive hat with brown band and orange feather", "deep red-brown wrapped scarf/cape collar", "belt and explorer pouches", "brown field backpack with leaf badge", "boots", "hands"],
@@ -25,13 +25,13 @@
     },
     "Mebble": {
       "blend": "mebble_character.blend",
-      "status": "full-replacement-generated-no-prior-geometry-reused-visual-approval-required",
+      "status": "full-replacement-continuous-skin-generated-no-prior-geometry-reused-visual-approval-required",
       "implemented": {
-        "model": ["fresh factory-empty replacement geometry", "rounded locked-sheet tall/thin silhouette", "long neck and visible Adam's apple", "face/eyes/mouth/hair/bushy brows", "crooked glasses", "small tilted top hat/leaf", "curved shirt/vest/suspenders/double belts/pouches", "articulated hands/fingers", "rounded tall lace-up boots", "curved emblem cape"],
+        "model": ["fresh factory-empty replacement geometry", "continuous union-remeshed skin body including long neck and visible Adam's apple", "continuous skinned shirt/sleeves, trousers, vest and hood", "soft locked-sheet tall/thin silhouette", "face/eyes/mouth/hair/bushy brows", "crooked glasses", "small tilted top hat/leaf", "double belts/pouches", "integrated hand/finger volumes", "skinned organic tall lace-up boots", "weighted morphing cape"],
         "rig": ["83-bone armature", "22 controls", "driven IK/FK switches", "jaw, eye, lid, eyebrow and mouth-corner bones", "six facial properties", "finger chains", "Adam's-apple bone", "three-bone weighted cape chain", "cape-open controller and GlideOpen morph", "gameplay sockets"],
         "materials": ["packed 1K base-color/roughness/normal/AO texture channels", "Principled skin", "eyes/mouth", "hair", "glasses", "cloth/cape", "leather", "metal"],
         "animations": ["66 newly authored gameplay clips", "walk/run/sprint cycles", "jump and landing family", "crawl/slide/roll/wall/ledge states", "combat/hurt/victory", "five Mebble glide clips"],
-        "validation": ["front/three-quarter/side/back renders", "glide-open deformation render", "Blender structural validator", "GLB skin/mesh/animation/morph inspection"]
+        "validation": ["front/three-quarter/side/back renders", "glide-open deformation render", "segmented-limb rejection gate", "continuous-skin and adjacent-bone weight checks", "Blender structural validator", "GLB skin/mesh/animation/morph inspection"]
       },
       "remainingProductionWork": ["senior character-artist sculpt/retopology and skin-weight review", "hand-painted texture detail beyond packed pipeline maps", "shoulder/hip/neck/finger corrective shapes", "cape collision and dynamic-secondary-motion tuning", "LOD and mobile material-budget pass", "engine deformation/scale review across every clip", "final locked-sheet art-director approval"],
       "modelsRequired": ["body/head and long skinny neck", "protruding Adam's apple", "eyes/teeth/tongue", "hair/bushy eyebrows", "crooked less-round glasses", "small brown top hat with green band and leaf", "cream shirt/brown vest/dark trousers", "double belts/pouches", "tall lace-up boots", "hands", "green emblem cape/glider"],

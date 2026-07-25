@@ -68,6 +68,8 @@ The latest approved Hargold and Mebble model is locked. Do not change proportion
 - The rejected blockout geometry and its animation clips are superseded. Replacement hero sources must be built from empty Blender scenes and must not reuse prior character geometry.
 - The replacement must preserve the locked identities, silhouettes, proportions, clothing, colors, accessories, and defining facial features above.
 - Production meshes require smooth rounded topology, clean deformation edge flow, sculpted faces, expressive brows, detailed hands and boots, layered garments, authored cloth folds, clean UVs, optimized game topology, and planned LODs.
+- Hero bodies and soft garments must deform as continuous skinned surfaces. Bone-parented upper-arm, forearm, elbow, hand, thigh, or shin pieces that read as an articulated wooden doll are not acceptable production geometry.
+- Character approval requires action-pose and gameplay-camera deformation review; a neutral T-pose or still turntable is not sufficient evidence of an animated production character.
 - Final materials require authored PBR texture sets, including base color, roughness, normal detail, and ambient-occlusion support where appropriate. Procedural flat-color materials are not a final substitute.
 - Production rigs require IK/FK limbs, finger articulation, eye, brow, jaw and mouth controls, gameplay sockets, and secondary controls for Hargold's hat, feather and scarf and Mebble's hat, cape and clothing.
 - Every gameplay clip must be newly authored with readable anticipation, controlled squash and stretch, follow-through, overlapping secondary motion, lively idle posing, reliable foot contacts, and seamless state blending.

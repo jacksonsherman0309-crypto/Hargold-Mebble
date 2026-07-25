@@ -67,19 +67,30 @@ def validate() -> dict:
     if missing_bones:
         fail(f"missing bones: {', '.join(missing_bones)}", errors)
 
-    head = bpy.data.objects.get(f"GEO_{hero}_head")
-    if not head:
-        fail("missing head mesh", errors)
+    body = bpy.data.objects.get(f"GEO_{hero}_skin_body")
+    if not body:
+        fail("missing continuous skin-body mesh", errors)
     else:
-        bone_center_z = sum(arm.data.bones["DEF_head"].head_local[i] for i in (2,)) + (
-            arm.data.bones["DEF_head"].tail_local.z - arm.data.bones["DEF_head"].head_local.z
-        ) * 0.5
-        if abs(head.matrix_world.translation.z - bone_center_z) > 0.12:
+        if body.get("surface_construction") != "union-remeshed-continuous-surface":
+            fail("skin body is not marked as a continuous remeshed surface", errors)
+        armature_modifiers = [
+            modifier for modifier in body.modifiers
+            if modifier.type == "ARMATURE" and modifier.object == arm
+        ]
+        if not armature_modifiers:
+            fail("skin body lacks armature deformation", errors)
+        weighted_deform_groups = {
+            group.name for group in body.vertex_groups
+            if group.name.startswith("DEF_")
+        }
+        if len(weighted_deform_groups) < 18:
             fail(
-                f"head pivot mismatch: mesh {head.matrix_world.translation.z:.3f}, "
-                f"bone {bone_center_z:.3f}",
+                f"skin body has insufficient full-body deformation coverage: "
+                f"{len(weighted_deform_groups)} groups",
                 errors,
             )
+        if not body.data.shape_keys or "SmileSoft" not in body.data.shape_keys.key_blocks:
+            fail("skin body lacks facial shape deformation", errors)
 
     for side in ("L", "R"):
         eye = bpy.data.objects.get(f"GEO_{hero}_eye_{side}")
@@ -162,12 +173,27 @@ def validate() -> dict:
         for obj in bpy.data.collections[collection_name].objects
         if obj.type == "MESH" and not obj.hide_render
     ]
-    if len(visible_geometry) < 40:
+    segmented_tokens = (
+        "_upper_arm_", "_forearm_", "_elbow_", "_hand_",
+        "_thigh_", "_shin_"
+    )
+    segmented_geometry = [
+        obj.name for obj in visible_geometry
+        if any(token in obj.name for token in segmented_tokens)
+        and obj.parent_type == "BONE"
+    ]
+    if segmented_geometry:
+        fail(
+            "segmented rigid limb geometry is forbidden: "
+            + ", ".join(sorted(segmented_geometry)),
+            errors,
+        )
+    if len(visible_geometry) < 16:
         fail(f"unexpectedly sparse model: only {len(visible_geometry)} render meshes", errors)
     for obj in visible_geometry:
         if not obj.data.uv_layers:
             fail(f"render mesh lacks UV0: {obj.name}", errors)
-        if obj.get("geometry_generation") != "full-rebuild-2026-07-25":
+        if obj.get("geometry_generation") != "continuous-skinned-rebuild-2026-07-25":
             fail(f"render mesh lacks replacement provenance: {obj.name}", errors)
 
     for mat in {material for obj in visible_geometry for material in obj.data.materials if material}:
@@ -198,8 +224,8 @@ def validate() -> dict:
             fail(f"action is not a replacement-authored clip: {action_name}", errors)
 
     scene = bpy.context.scene
-    if scene.get("geometryGeneration") != "full-rebuild-2026-07-25":
-        fail("scene lacks full-rebuild geometry provenance", errors)
+    if scene.get("geometryGeneration") != "continuous-skinned-rebuild-2026-07-25":
+        fail("scene lacks continuous-skin geometry provenance", errors)
     if scene.get("reusesPriorGeometry") is not False:
         fail("scene does not explicitly reject prior geometry reuse", errors)
     if scene.get("sourceScene") != "factory-empty":

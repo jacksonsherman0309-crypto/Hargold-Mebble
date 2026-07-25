@@ -2,11 +2,12 @@
 
 Last verified: July 25, 2026
 
-The locked PNG sheets were references, not pre-existing 3D assets. This
-repository now contains newly generated replacement Blender sources and GLB
-exports created after the overhaul request. The generator starts from a
-factory-empty scene and does not open, link, append, or reuse geometry from the
-rejected blockouts.
+The locked PNG sheets are references, not pre-existing 3D assets. This
+repository contains generated Blender sources and GLB exports created from a
+factory-empty scene. The July 25 continuous-skin rebuild replaces the rejected
+rounded-part construction: body, sleeve, torso, trouser, hand, and boot volumes
+are now union-remeshed surfaces with normalized armature weights instead of
+separate rigid limb pieces.
 
 ## Verified replacement assets
 
@@ -14,9 +15,13 @@ rejected blockouts.
 
 - Source: `assets/blender/hargold_character.blend`
 - Runtime export: `assets/exports/hargold_character.glb`
-- Technical result: 112 render meshes, 82 bones, 19 controls, 65 animations,
-  one GLB skin, UV0 on every render mesh, and packed 1K base-color, roughness,
-  normal, and AO channels.
+- Technical result: 36 render meshes, 82 bones, 19 controls, 65 animations,
+  one GLB skin, two facial morph targets, UV0 on every render mesh, and packed
+  1K base-color, roughness, normal, and AO channels.
+- Deformation result: one continuous skin-body surface, one continuous
+  jacket-and-sleeves surface, one continuous trouser surface, and skinned
+  organic boot surfaces. The structural validator rejects reintroduced rigid
+  limb sections.
 - Rig coverage: IK/FK arms and legs; fingers; eyes; lids; eyebrows; jaw; mouth
   corners; six facial properties; hat, feather, and scarf secondary controls;
   hand, head, hat, glasses, back, feet-VFX, and center-VFX sockets.
@@ -27,9 +32,13 @@ rejected blockouts.
 
 - Source: `assets/blender/mebble_character.blend`
 - Runtime export: `assets/exports/mebble_character.glb`
-- Technical result: 120 render meshes, 83 bones, 22 controls, 66 animations,
-  one GLB skin, one cape morph target, UV0 on every render mesh, and packed 1K
-  base-color, roughness, normal, and AO channels.
+- Technical result: 41 render meshes, 83 bones, 22 controls, 66 animations,
+  one GLB skin, two facial morph targets plus the cape morph target, UV0 on
+  every render mesh, and packed 1K base-color, roughness, normal, and AO
+  channels.
+- Deformation result: one continuous skin-body surface preserving the long
+  neck and Adam's apple, continuous shirt-and-sleeves, trousers, vest/hood
+  layers, skinned organic boots, and the weighted morphing cape.
 - Rig coverage: IK/FK arms and legs; fingers; eyes; lids; eyebrows; jaw; mouth
   corners; six facial properties; Adam's-apple/neck bone; hat and three-bone
   cape controls; hand, head, hat, glasses, back, feet-VFX, and center-VFX
@@ -47,12 +56,13 @@ transition, looping, root-motion, and contact-marker metadata.
 
 ## What still requires production approval
 
-The automated Blender and GLB gates pass, but that is not a claim of final
-AAA-quality approval. The remaining work is:
+The automated Blender and GLB gates pass, and action-pose renders now verify
+that facial volume stays attached during locomotion. This is still not a claim
+of final AAA-quality approval. The remaining work is:
 
 1. Senior character-artist sculpt and retopology review against every locked
    orthographic view.
-2. Full skin-weight and corrective-shape review at shoulders, hips, fingers,
+2. Senior skin-weight and corrective-shape polish at shoulders, hips, fingers,
    Hargold's round torso, and Mebble's long neck.
 3. Hand-painted texture detail beyond the packed pipeline maps.
 4. Mebble cape collision/dynamic-secondary-motion tuning and Hargold
@@ -63,6 +73,6 @@ AAA-quality approval. The remaining work is:
    the live 2.75D camera.
 7. Final art-director approval that both characters match the locked sheets.
 
-Until those reviews are signed off, the assets are technically complete
-replacement sources and playable runtime exports, not final shipped character
-art.
+Until those reviews are signed off, these are animated, continuous-skin
+production prototypes and playable runtime exports, not final shipped
+character art.

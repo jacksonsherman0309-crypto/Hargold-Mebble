@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js?v=course-interactions-1';
+import { CharacterRenderer } from './character-renderer.js?v=environment-art-1';
 import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
 import {
   MEADOW_WAKE_PLATFORMS,

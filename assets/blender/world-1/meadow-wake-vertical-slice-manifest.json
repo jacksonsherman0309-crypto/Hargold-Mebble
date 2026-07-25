@@ -17,14 +17,18 @@
       "standard breakable block mesh",
       "Hargold-only reinforced block mesh",
       "scalable meadow ledge mesh",
-      "runtime GLB loading and state-driven mob presentation"
+      "runtime GLB loading and state-driven mob presentation",
+      "original far-valley art plate",
+      "transparent midground forest-ridge parallax layer",
+      "texture-mapped 3D soil and turf terrain",
+      "course-specific 3D foreground foliage dressing"
     ],
     "remaining": [
       "final sculpt and topology review",
-      "authored UV texture maps",
+      "UV review for all imported prop assets",
       "enemy armatures and complete animation clips",
       "destruction fragments and VFX",
-      "complete Meadow Wake environment art pass",
+      "remaining course-section environment set dressing",
       "LOD and compressed-texture mobile optimization",
       "final lighting and target-device art approval"
     ]
@@ -54,6 +58,14 @@
       "source": "meadow_ledge.blend",
       "runtime": "../../exports/world-1/meadow_ledge.glb"
     }
+  },
+  "environmentTextures": {
+    "farValley": "../../textures/world-1/meadow-wake/verdant-vale-background-v1.png",
+    "forestRidge": "../../textures/world-1/meadow-wake/meadow-midground-ridge-v1.png",
+    "soilAlbedo": "../../textures/world-1/meadow-wake/meadow-soil-stone-albedo-v2.png",
+    "turfAlbedo": "../../textures/world-1/meadow-wake/meadow-turf-albedo-v1.png",
+    "runtimeModule": "../../../src/environment/meadow-wake-environment.js",
+    "provenance": "Original built-in image generation, chroma-key matte processing, and authored Three.js 3D integration."
   },
   "originality": "Original Hargold & Mebble assets. Nintendo materials were not copied."
 }
