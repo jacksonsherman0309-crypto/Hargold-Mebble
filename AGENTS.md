@@ -1,15 +1,16 @@
 # Codex Instructions for Hargold & Mebble
 
-Codex must load the current design, mechanics, level-planning, and machine-readable contract files before planning, editing, reviewing, or testing this repository.
+Codex must load the current design, mechanics, movement, level-planning, and machine-readable contract files before planning, editing, reviewing, or testing this repository.
 
 ## Required reading order
 
 1. `docs/canonical-design-bible.md` — highest-level current design source of truth.
 2. `docs/level-production-plan.md` — current campaign and level-construction requirements.
 3. `docs/game-mechanics.md` — detailed gameplay mechanics.
-4. `src/canonical-data.js` — machine-readable rules, campaign accounting, World 1 plans, and locked hero data.
-5. `docs/historical-build-handoff.md` — older Build 025–030 plans and explicit production boundaries.
-6. The current implementation files relevant to the task.
+4. `docs/movement-and-collision-spec.md` — complete universal movement, collision, terrain, water, climbing, carrying, and deterministic-simulation contract.
+5. `src/canonical-data.js` — machine-readable rules, campaign accounting, World 1 plans, and locked hero data.
+6. `docs/historical-build-handoff.md` — older Build 025–030 plans and explicit production boundaries.
+7. The current implementation files relevant to the task.
 
 ## Authority and conflict rules
 
@@ -26,7 +27,8 @@ Codex must load the current design, mechanics, level-planning, and machine-reada
 - Preserve the strict linear side-scrolling gameplay plane and mobile-first landscape design.
 - Preserve the fully rendered 3D “2.75D” production target without adding free depth-lane movement.
 - Keep hearts/current health separate from lives.
-- Preserve universal wall jumps, approved hero differences, hero-gating rules, checkpoint/death behavior, 100-coin life rule, four-block roster, power-up rules, enemy rules, five-damage-event bosses, 10-world/90-slot campaign accounting, 270 Compass Coin slots, and World 1 teaching sequence.
+- Preserve the complete shared movement baseline: walking/running, skids, variable/running/triple jumps, coyote time, buffering, wall slides/jumps, crouch and slides, spin actions, fast fall, ground slam, stomp bounce, one-way platforms, swimming/diving, climbing, ropes, carrying/throwing, moving-platform transport, and safe hero swapping.
+- Preserve universal wall jumps, approved hero additions, hero-gating rules, checkpoint/death behavior, 100-coin life rule, four-block roster, power-up rules, enemy rules, five-damage-event bosses, 10-world/90-slot campaign accounting, 270 Compass Coin slots, and World 1 teaching sequence.
 - Preserve the locked Hargold and Mebble appearance requirements.
 - Do not copy Nintendo code, art, characters, enemies, levels, maps, music, names, vocal performances, or protected identifiers.
 - Add or update tests for every mechanic, data contract, save rule, progression rule, or level-plan invariant changed.
@@ -35,6 +37,7 @@ Codex must load the current design, mechanics, level-planning, and machine-reada
 ## Code and data requirements
 
 - Put shared approved constants and campaign facts in `src/canonical-data.js` rather than duplicating incompatible values.
+- Use deterministic fixed-step simulation for production movement systems; `src/runtime/fixed-step.js` is the current reusable foundation.
 - Keep level implementation data separate from design-only placeholders.
 - Do not invent coordinates for historical coordinate-free level scaffolds and then present them as approved geometry.
 - Do not claim a level, model, animation, audio asset, Unity scene, or system is complete unless the actual implementation is committed and verified.
