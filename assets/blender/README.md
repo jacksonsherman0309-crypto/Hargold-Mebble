@@ -1,11 +1,17 @@
 # Blender character asset pipeline
 
-This directory now contains generated, editable work-in-progress Hargold and
-Mebble Blender sources in addition to the production contracts and generic
-template. The character files are real modeled and rigged assets, but they are
-not production-approved: their final sculpt/retopology, UV/textures, complete
-deformation pass, full animation library, LODs, engine import test, and art
-approval remain open.
+This directory contains editable full-replacement Hargold and Mebble Blender
+sources in addition to the production contracts and generic template. Each
+source is regenerated from a factory-empty scene and records
+`reusesPriorGeometry = false`; no mesh from the rejected blockouts is linked or
+imported. The sources now contain rounded replacement geometry, UVs, packed 1K
+PBR channels, expanded production-control rigs, and the complete required
+animation library.
+
+Structural completeness is not final AAA art approval. A senior character
+artist still needs to approve or refine the sculpt/retopology, skin weights,
+correctives, hand-painted texture detail, LODs, and every-clip deformation on
+target hardware.
 
 `gameplay_asset_template.blend` and its matching GLB remain generic templates.
 They are not Hargold or Mebble models.
@@ -54,9 +60,8 @@ Run the implemented structural/runtime-export checks with:
 & 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background assets\blender\mebble_character.blend --python-exit-code 1 --python tools\blender\validate_locked_character.py
 ```
 
-`validate_character_asset.py` remains the final animation-completeness gate and
-will continue to fail until every required gameplay clip in the manifest is
-authored.
+`validate_character_asset.py` is the manifest-level animation-completeness
+gate. Both replacement sources are expected to pass it.
 
 ## Approval gates
 

@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js?v=meadow-wake-art-kit-1';
+import { CharacterRenderer } from './character-renderer.js?v=character-overhaul-1';
 import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
 import {
   attackMob,
@@ -72,8 +72,10 @@ const PROVISIONAL_MOTION_TUNING = Object.freeze({
   status: 'provisional-engineering-tuning',
   walkSpeed: 3.2,
   runSpeed: 5.7,
+  sprintSpeed: 7.15,
   groundAccelerationWalk: 18,
   groundAccelerationRun: 22,
+  groundAccelerationSprint: 25,
   releaseDeceleration: 16,
   lowSpeedTurnAcceleration: 25,
   highSpeedSkidDeceleration: 30,
@@ -83,6 +85,7 @@ const PROVISIONAL_MOTION_TUNING = Object.freeze({
   airReverseAcceleration: 14,
   airMaximumWalkSpeed: 3.6,
   airMaximumRunSpeed: 5.9,
+  airMaximumSprintSpeed: 7.2,
   baseJumpSpeed: 10.4,
   runningJumpBonus: 1.55,
   heldJumpGravity: 22.6,
@@ -98,10 +101,11 @@ const PROVISIONAL_MOTION_TUNING = Object.freeze({
   glideGravity: 5.6,
   glideMaximumFallSpeed: 2.9
 });
+const DEVELOPER_HARGOLD_DOUBLE_JUMP_UNLOCKED = true;
 
 const PROVISIONAL_HERO_PROFILES = Object.freeze({
   Hargold: Object.freeze({ width: 1.52, height: 3.32, jumpSpeedAddition: 0, airControlMultiplier: 1 }),
-  Mebble: Object.freeze({ width: 1.16, height: 3.68, jumpSpeedAddition: 1.16, airControlMultiplier: 1.08 })
+  Mebble: Object.freeze({ width: 1.16, height: 3.68, jumpSpeedAddition: 1.16, airControlMultiplier: 1 })
 });
 
 function createMotionState({
@@ -115,7 +119,9 @@ function createMotionState({
     velocityX: 0, velocityY: 0, grounded, facing: 1,
     locomotion: grounded ? 'idle' : 'fall', stateSeconds: 0,
     coyoteSeconds: grounded ? PROVISIONAL_MOTION_TUNING.coyoteSeconds : 0,
-    jumpBufferSeconds: 0, glide: 'closed', landingSpeed: 0
+    jumpBufferSeconds: 0, glide: 'closed', landingSpeed: 0,
+    doubleJumpUsed: false, doubleJumpAnimationSeconds: 0,
+    groundSlamming: false
   };
 }
 
@@ -152,6 +158,7 @@ function stepMotion(state, input, deltaSeconds, {
   const profile = PROVISIONAL_HERO_PROFILES[state.hero];
   const previousFootY = state.footY;
   state.stateSeconds += deltaSeconds;
+  state.doubleJumpAnimationSeconds = Math.max(0, state.doubleJumpAnimationSeconds - deltaSeconds);
   state.jumpBufferSeconds = input.jumpPressed
     ? tuning.jumpBufferSeconds
     : Math.max(0, state.jumpBufferSeconds - deltaSeconds);
@@ -159,8 +166,21 @@ function stepMotion(state, input, deltaSeconds, {
     ? tuning.coyoteSeconds
     : Math.max(0, state.coyoteSeconds - deltaSeconds);
 
-  if (state.jumpBufferSeconds > 0 && (state.grounded || state.coyoteSeconds > 0)) {
-    const runRatio = clamp(Math.abs(state.velocityX) / tuning.runSpeed, 0, 1);
+  if (
+    input.jumpPressed
+    && !state.grounded
+    && state.coyoteSeconds <= 0
+    && state.hero === 'Hargold'
+    && DEVELOPER_HARGOLD_DOUBLE_JUMP_UNLOCKED
+    && !state.doubleJumpUsed
+  ) {
+    state.doubleJumpUsed = true;
+    state.doubleJumpAnimationSeconds = 0.22;
+    state.velocityY = -tuning.baseJumpSpeed;
+    state.glide = 'closed';
+    state.locomotion = 'double-jump';
+  } else if (state.jumpBufferSeconds > 0 && (state.grounded || state.coyoteSeconds > 0)) {
+    const runRatio = clamp(Math.abs(state.velocityX) / tuning.sprintSpeed, 0, 1);
     state.velocityY = -(tuning.baseJumpSpeed + profile.jumpSpeedAddition + tuning.runningJumpBonus * runRatio);
     state.grounded = false;
     state.coyoteSeconds = 0;
@@ -171,11 +191,20 @@ function stepMotion(state, input, deltaSeconds, {
   const direction = (input.right ? 1 : 0) - (input.left ? 1 : 0);
   if (state.grounded) {
     const speed = Math.abs(state.velocityX);
-    const maximum = input.run ? tuning.runSpeed : tuning.walkSpeed;
+    const maximum = input.sprint
+      ? tuning.sprintSpeed
+      : input.run ? tuning.runSpeed : tuning.walkSpeed;
     const reversing = state.velocityX !== 0 && direction !== 0 && Math.sign(state.velocityX) !== direction;
-    if (direction === 0) {
+    if (input.downHeld) {
+      state.velocityX = approach(state.velocityX, 0, 20, deltaSeconds);
+      state.locomotion = speed >= tuning.skidThreshold
+        ? 'duck-slide'
+        : direction !== 0 ? 'crawl' : 'crouch';
+    } else if (direction === 0) {
       state.velocityX = approach(state.velocityX, 0, tuning.releaseDeceleration, deltaSeconds);
-      state.locomotion = Math.abs(state.velocityX) < 1e-6 ? 'idle' : speed > tuning.walkSpeed * 0.92 ? 'run' : 'walk';
+      state.locomotion = Math.abs(state.velocityX) < 1e-6
+        ? 'idle'
+        : speed > tuning.runSpeed * 1.02 ? 'sprint' : speed > tuning.walkSpeed * 0.92 ? 'run' : 'walk';
     } else if (reversing && speed >= tuning.skidThreshold) {
       state.velocityX = approach(state.velocityX, 0, tuning.highSpeedSkidDeceleration, deltaSeconds);
       state.locomotion = 'skid';
@@ -184,10 +213,16 @@ function stepMotion(state, input, deltaSeconds, {
       state.velocityX = approach(
         state.velocityX,
         direction * maximum,
-        reversing ? tuning.lowSpeedTurnAcceleration : input.run ? tuning.groundAccelerationRun : tuning.groundAccelerationWalk,
+        reversing
+          ? tuning.lowSpeedTurnAcceleration
+          : input.sprint
+            ? tuning.groundAccelerationSprint
+            : input.run ? tuning.groundAccelerationRun : tuning.groundAccelerationWalk,
         deltaSeconds
       );
-      state.locomotion = Math.abs(state.velocityX) > tuning.walkSpeed * 0.94 ? 'run' : 'walk';
+      state.locomotion = Math.abs(state.velocityX) > tuning.runSpeed * 1.02
+        ? 'sprint'
+        : Math.abs(state.velocityX) > tuning.walkSpeed * 0.94 ? 'run' : 'walk';
     }
     state.footX = clamp(state.footX + state.velocityX * deltaSeconds, minimumX, maximumX);
     state.footY = groundHeightAt(state.footX);
@@ -195,7 +230,9 @@ function stepMotion(state, input, deltaSeconds, {
   } else {
     if (direction !== 0) {
       const reversing = state.velocityX !== 0 && Math.sign(state.velocityX) !== direction;
-      const maximum = input.run ? tuning.airMaximumRunSpeed : tuning.airMaximumWalkSpeed;
+      const maximum = input.sprint
+        ? tuning.airMaximumSprintSpeed
+        : input.run ? tuning.airMaximumRunSpeed : tuning.airMaximumWalkSpeed;
       state.velocityX = approach(
         state.velocityX,
         direction * maximum,
@@ -219,6 +256,10 @@ function stepMotion(state, input, deltaSeconds, {
       state.glide = state.glide === 'opening' || state.glide === 'sustained' ? 'closing' : 'closed';
     }
     state.velocityY = Math.min(tuning.maximumFallSpeed, state.velocityY + gravity * deltaSeconds);
+    if (input.fastFallHeld && state.velocityY > tuning.apexVelocityWindow) {
+      state.groundSlamming = true;
+      state.velocityY = Math.max(state.velocityY, 18);
+    }
     if (!input.jumpHeld && state.velocityY < tuning.minimumJumpCutVelocity) {
       state.velocityY = tuning.minimumJumpCutVelocity;
     }
@@ -231,11 +272,17 @@ function stepMotion(state, input, deltaSeconds, {
       state.velocityY = 0;
       state.grounded = true;
       state.glide = 'closed';
-      state.locomotion = state.landingSpeed >= tuning.hardLandingSpeed ? 'land-hard' : 'land-soft';
+      state.doubleJumpUsed = false;
+      state.locomotion = state.groundSlamming || state.landingSpeed >= tuning.hardLandingSpeed
+        ? 'land-hard'
+        : 'land-soft';
+      state.groundSlamming = false;
     } else {
       state.locomotion = state.velocityY < -tuning.apexVelocityWindow
         ? 'rise'
         : state.velocityY <= tuning.apexVelocityWindow ? 'apex' : 'fall';
+      if (state.doubleJumpAnimationSeconds > 0) state.locomotion = 'double-jump';
+      else if (state.groundSlamming) state.locomotion = 'ground-slam';
     }
   }
 }
@@ -256,7 +303,7 @@ const H = canvas.height;
 const SCALE = 70;
 const WORLD_END = 36;
 const keys = new Set();
-const touch = { left: false, right: false, run: false, jump: false, action: false };
+const touch = { left: false, right: false, run: false, sprint: false, jump: false, action: false };
 const loop = new FixedStepLoop({ hz: 120 });
 let characterLoadStatus = 'Loading 3D characters...';
 const characterRenderer = new CharacterRenderer({
@@ -349,12 +396,14 @@ function inputSnapshot() {
   const snapshot = {
     left: keys.has('ArrowLeft') || keys.has('KeyA') || touch.left,
     right: keys.has('ArrowRight') || keys.has('KeyD') || touch.right,
-    run: keys.has('ShiftLeft') || keys.has('ShiftRight') || keys.has('KeyX') || touch.run,
+    run: keys.has('KeyX') || keys.has('ShiftLeft') || keys.has('ShiftRight') || touch.run || touch.sprint,
+    sprint: keys.has('ShiftLeft') || keys.has('ShiftRight') || touch.sprint,
     jumpPressed: jump && !previousInput.jump,
     jumpHeld: jump,
     actionPressed: action && !previousInput.action,
     glideHeld: action,
-    fastFallHeld: down
+    fastFallHeld: down,
+    downHeld: down
   };
   if (swap && !previousInput.swap) swapPlayer();
   previousInput = { jump, swap, action };
@@ -622,6 +671,7 @@ function fixedUpdate(dt) {
   if (player.footY > 11.5) loseLife('pit');
   if (player.footX >= 35.4) {
     session.state = 'complete';
+    player.locomotion = 'victory';
     notice = 'Movement test complete.';
     noticeSeconds = Infinity;
   }
@@ -822,7 +872,10 @@ function frame(now) {
   lastFrame = now;
   loop.advance(elapsed, fixedUpdate);
   noticeSeconds = Math.max(0, noticeSeconds - elapsed);
-  const targetCamera = Math.max(0, player.footX * SCALE - W * 0.34);
+  const sprintLookAhead = player.locomotion === 'sprint'
+    ? clamp(player.velocityX * 24, -150, 150)
+    : 0;
+  const targetCamera = Math.max(0, player.footX * SCALE - W * 0.34 + sprintLookAhead);
   cameraX += (targetCamera - cameraX) * Math.min(1, elapsed * 5);
   status.textContent = `${session.state === 'playing' ? 'PLAYING' : session.state.toUpperCase()} · 120 Hz · ${characterLoadStatus}`;
   draw();
@@ -833,6 +886,7 @@ function frame(now) {
     facing: player.facing,
     locomotion: player.locomotion,
     glide: player.glide,
+    horizontalSpeed: player.velocityX,
     cameraX,
     coins,
     compassCoins,

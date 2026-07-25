@@ -14,11 +14,7 @@ const MODEL_SPECS = Object.freeze({
   })
 });
 
-const FALLBACK_CLIPS = Object.freeze({
-  apex: 'rise',
-  'land-hard': 'land-soft',
-  skid: 'run'
-});
+const FALLBACK_CLIPS = Object.freeze({});
 
 export class CharacterRenderer {
   constructor({ mount, width, height, onProgress = () => {} }) {
@@ -514,18 +510,25 @@ export class CharacterRenderer {
     return FALLBACK_CLIPS[locomotion] || locomotion || 'idle';
   }
 
-  play(model, requestedName) {
+  play(model, requestedName, horizontalSpeed = 0) {
     const name = model.clips.has(requestedName) ? requestedName : 'idle';
-    if (model.actionName === name) return;
-    const next = model.mixer.clipAction(model.clips.get(name));
-    next.reset();
-    next.enabled = true;
-    next.setEffectiveTimeScale(1);
-    next.setEffectiveWeight(1);
-    next.play();
-    if (model.action) model.action.crossFadeTo(next, 0.13, true);
-    model.action = next;
-    model.actionName = name;
+    if (model.actionName !== name) {
+      const next = model.mixer.clipAction(model.clips.get(name));
+      next.reset();
+      next.enabled = true;
+      next.setEffectiveWeight(1);
+      next.play();
+      const blendSeconds = ['skid', 'wall-jump', 'hurt'].includes(name) ? 0.08 : 0.12;
+      if (model.action) model.action.crossFadeTo(next, blendSeconds, true);
+      model.action = next;
+      model.actionName = name;
+    }
+    if (model.action) {
+      const authoredSpeed = name === 'walk' ? 3.2 : name === 'run' ? 5.7 : name === 'sprint' ? 7.15 : 0;
+      model.action.setEffectiveTimeScale(
+        authoredSpeed ? THREE.MathUtils.clamp(Math.abs(horizontalSpeed) / authoredSpeed, 0.65, 1.35) : 1
+      );
+    }
   }
 
   updateMobs(mobs, deltaSeconds) {
@@ -592,6 +595,7 @@ export class CharacterRenderer {
     facing,
     locomotion,
     glide,
+    horizontalSpeed = 0,
     cameraX = 0,
     coins = [],
     compassCoins = [],
@@ -623,7 +627,7 @@ export class CharacterRenderer {
         this.height / 2 - screenY,
         0
       );
-      this.play(model, this.selectClip(hero, locomotion, glide));
+      this.play(model, this.selectClip(hero, locomotion, glide), horizontalSpeed);
       model.mixer.update(deltaSeconds);
     }
     this.renderer.render(this.scene, this.camera);

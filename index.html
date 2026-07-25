@@ -21,6 +21,7 @@
           <button data-action="left" aria-label="Move left">◀</button>
           <button data-action="right" aria-label="Move right">▶</button>
           <button class="utility" data-action="run" aria-label="Run">RUN</button>
+          <button class="utility sprint" data-action="sprint" aria-label="Sprint">SPRINT</button>
         </div>
         <div class="right-controls">
           <button class="utility" data-action="restart" aria-label="Restart course">RESTART</button>
@@ -32,7 +33,7 @@
     </section>
 
     <footer>
-      Move: A/D or arrows · Run: Shift/X · Jump: Space/W/↑ · Attack / Mebble glide: E · Fast fall: S/↓ · Swap: Q · Restart: R
+      Move: A/D or arrows · Run: X · Sprint: Shift · Jump: Space/W/↑ · Attack / Mebble glide: E · Fast fall / slam: S/↓ · Swap: Q · Restart: R
     </footer>
   </main>
   <script>
@@ -48,6 +49,6 @@
       if (status) status.textContent = `ASSET ERROR · ${detail}`;
     });
   </script>
-  <script type="module" src="src/game.js?v=meadow-wake-art-kit-1" onerror="document.querySelector('#status').textContent='STARTUP ERROR · game module failed to load'"></script>
+  <script type="module" src="src/game.js?v=character-overhaul-1" onerror="document.querySelector('#status').textContent='STARTUP ERROR · game module failed to load'"></script>
 </body>
 </html>
