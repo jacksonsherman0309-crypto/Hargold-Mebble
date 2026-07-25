@@ -1,15 +1,19 @@
 import * as THREE from '../vendor/three/three.module.js';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
+import {
+  MEADOW_WAKE_BLOCK_DEFINITIONS,
+  MEADOW_WAKE_PLATFORMS
+} from './content/meadow-wake-course.js?v=course-interactions-1';
 
 const MODEL_SPECS = Object.freeze({
   Hargold: Object.freeze({
     url: new URL('../assets/exports/hargold_character.glb', import.meta.url).href,
-    pixelsPerMetre: 67,
+    pixelsPerMetre: 43,
     yaw: Math.PI / 2
   }),
   Mebble: Object.freeze({
     url: new URL('../assets/exports/mebble_character.glb', import.meta.url).href,
-    pixelsPerMetre: 61,
+    pixelsPerMetre: 40,
     yaw: Math.PI / 2
   })
 });
@@ -209,21 +213,36 @@ export class CharacterRenderer {
         this.world.add(crown);
       }
     }
-    for (const [x, y, width, height] of [[7.9, 6.25, 2.2, .35], [11.6, 6.5, 1.5, .3], [15.1, 5.55, 1.8, .32], [23.7, 5.65, 2, .32], [27.3, 6.1, 1.5, .3], [32.8, 5.7, 1.8, .32]]) {
+    for (const { id, x, y, width, height } of MEADOW_WAKE_PLATFORMS) {
       const core = this.box('authored-platform', x * scale, this.height / 2 - y * scale, width * scale, height * scale, 125, stone);
       const cap = this.box('platform-grass', x * scale, this.height / 2 - y * scale + height * scale / 2, width * scale + 2, 9, 130, grass);
-      this.platformSlots.push({ x, y, width, height, core, cap });
+      this.platformSlots.push({ id, x, y, width, height, core, cap });
     }
     for (let x = 18.3; x <= 20.1; x += .24) {
       const plank = this.box('rope-bridge-plank', x * scale, this.height / 2 - 6.25 * scale + Math.sin((x - 18.3) * Math.PI) * 16, 15, 12, 105, wood);
       plank.rotation.z = Math.cos((x - 18.3) * Math.PI) * .08;
     }
-    for (const x of [6.4, 6.95, 13.5, 14.05, 26.15, 26.7]) {
-      const block = this.box('breakable-block', x * scale, this.height / 2 - (heightAt(x) - 1.45) * scale, 36, 36, 82, stone);
-      this.blockSlots.push({ type: 'breakable', placeholder: block });
+    for (const definition of MEADOW_WAKE_BLOCK_DEFINITIONS) {
+      const { id, type, x, lift, width, height } = definition;
+      const artType = type === 'hargold-only' ? 'hargold' : 'breakable';
+      const centreY = this.height / 2 - (heightAt(x) - lift) * scale;
+      const block = this.box(
+        type,
+        x * scale,
+        centreY,
+        width * scale,
+        height * scale,
+        type === 'hargold-only' ? 86 : 82,
+        type === 'hargold-only' ? this.material(0x6d553c) : stone
+      );
+      this.blockSlots.push({
+        id,
+        type: artType,
+        gameplayType: type,
+        placeholder: block,
+        baseY: centreY
+      });
     }
-    const hargoldBlock = this.box('hargold-only-block', 28.7 * scale, this.height / 2 - (heightAt(28.7) - 1.45) * scale, 44, 44, 86, this.material(0x6d553c));
-    this.blockSlots.push({ type: 'hargold', placeholder: hargoldBlock });
     [3.5, 6.8, 8.7, 12.5, 15.2, 18.4, 23.5, 26.2, 29.1, 33.2].forEach((x, index) => {
       const coin = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 4, 24), gold);
       coin.rotation.x = Math.PI / 2;
@@ -418,14 +437,18 @@ export class CharacterRenderer {
       for (const slot of this.blockSlots) {
         const importedBlock = blockTemplates[slot.type].clone(true);
         importedBlock.name = slot.type === 'hargold' ? 'HargoldOnlyBlockVisual' : 'BreakableBlockVisual';
-        importedBlock.scale.setScalar(slot.type === 'hargold' ? 44 : 40);
+        const blockDefinition = MEADOW_WAKE_BLOCK_DEFINITIONS.find(block => block.id === slot.id);
+        const renderedSize = (blockDefinition?.height ?? 0.74) * 70;
+        importedBlock.scale.setScalar(renderedSize);
         importedBlock.position.set(
           slot.placeholder.position.x,
-          slot.placeholder.position.y - (slot.type === 'hargold' ? 22 : 20),
+          slot.placeholder.position.y - renderedSize / 2,
           slot.placeholder.position.z + 4
         );
         importedBlock.rotation.y = slot.type === 'breakable' ? Math.PI : 0;
         slot.placeholder.visible = false;
+        slot.visual = importedBlock;
+        slot.baseY = importedBlock.position.y;
         this.world.add(importedBlock);
       }
       const ledgeTemplate = this.prepareImportedAsset(ledgeGltf.scene);
@@ -588,6 +611,18 @@ export class CharacterRenderer {
     }
   }
 
+  updateBlocks(blocks) {
+    const states = new Map(blocks.map(block => [block.id, block]));
+    for (const slot of this.blockSlots) {
+      const state = states.get(slot.id);
+      const visual = slot.visual || slot.placeholder;
+      visual.visible = !state?.broken;
+      if (!visual.visible) continue;
+      const bump = state?.bumpSeconds ?? 0;
+      visual.position.y = slot.baseY + (bump > 0 ? Math.sin(Math.min(1, bump / 0.12) * Math.PI) * 10 : 0);
+    }
+  }
+
   render({
     hero,
     screenX,
@@ -599,6 +634,7 @@ export class CharacterRenderer {
     cameraX = 0,
     coins = [],
     compassCoins = [],
+    blocks = [],
     mobs = [],
     projectiles = []
   }, deltaSeconds) {
@@ -610,6 +646,7 @@ export class CharacterRenderer {
       mesh.visible = !source?.taken;
       mesh.rotation.y += deltaSeconds * 2.7;
     }
+    this.updateBlocks(blocks);
     this.updateMobs(mobs, deltaSeconds);
     this.updateProjectiles(projectiles);
     for (const [modelHero, model] of this.models) {
@@ -625,7 +662,7 @@ export class CharacterRenderer {
       model.root.position.set(
         screenX - this.width / 2,
         this.height / 2 - screenY,
-        0
+        110
       );
       this.play(model, this.selectClip(hero, locomotion, glide), horizontalSpeed);
       model.mixer.update(deltaSeconds);

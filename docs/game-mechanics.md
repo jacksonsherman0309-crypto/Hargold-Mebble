@@ -143,6 +143,8 @@ Keep the standard roster at four types unless explicitly expanded:
 
 Block hits need animation, sound, and clear feedback. Consumed blocks must not duplicate contents unless intentionally reusable. Hidden progression switches may be placed inside hittable blocks.
 
+Rendered blocks and platforms are never scenery-only substitutes. Blocks need collision and authored hit behavior; one-way platforms accept landings from above and allow upward movement through their underside. Gameplay-camera scale should keep Hargold at roughly two to three common-enemy heights, with Mebble visibly taller and thinner.
+
 ## 12. Coin-block reward table
 
 When a randomized coin block uses the approved reward table, use exactly:

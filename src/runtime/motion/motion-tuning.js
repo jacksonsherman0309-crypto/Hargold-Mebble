@@ -71,15 +71,15 @@ export const PROVISIONAL_MOTION_TUNING = Object.freeze({
 export const PROVISIONAL_HERO_PROFILES = Object.freeze({
   Hargold: Object.freeze({
     status: 'proxy-collider-pending-production-mesh',
-    width: 1.52,
-    height: 3.32,
+    width: 1.02,
+    height: 1.82,
     jumpSpeedAddition: 0,
     airControlMultiplier: 1
   }),
   Mebble: Object.freeze({
     status: 'proxy-collider-pending-production-mesh',
-    width: 1.16,
-    height: 3.68,
+    width: 0.72,
+    height: 2.18,
     jumpSpeedAddition: 1.16,
     airControlMultiplier: 1
   })

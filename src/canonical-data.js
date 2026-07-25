@@ -1,4 +1,4 @@
-export const CANON_VERSION = '2026-07-25-character-overhaul-1';
+export const CANON_VERSION = '2026-07-25-course-scale-interactions-1';
 
 export const GAME_RULES = Object.freeze({
   platform: {
@@ -7,7 +7,13 @@ export const GAME_RULES = Object.freeze({
     targetViewport: 'iPhone 14 Pro Max',
     strictSideScrollingPlane: true,
     freeDepthMovement: false,
-    presentation: 'fully rendered 3D assets on a linear 2.75D gameplay plane'
+    presentation: 'fully rendered 3D assets on a linear 2.75D gameplay plane',
+    gameplayReadabilityScale: Object.freeze({
+      commonEnemyRelativeToHargold: 'knee-to-waist height',
+      hargoldApproximateCommonEnemyHeights: Object.freeze({ minimum: 2, maximum: 3 }),
+      terrainBlocksAreCollisionBearing: true,
+      visiblePlatformsAreCollisionBearing: true
+    })
   },
   movement: {
     variableJump: true,

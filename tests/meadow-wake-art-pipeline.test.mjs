@@ -53,6 +53,6 @@ for (const hero of ['Hargold', 'Mebble']) {
 
 const liveHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 assert.match(liveHtml, /data-action="sprint"/);
-assert.match(liveHtml, /character-overhaul-1/);
+assert.match(liveHtml, /course-interactions-1/);
 
 console.log(`Meadow Wake art pipeline checks passed from ${root}`);

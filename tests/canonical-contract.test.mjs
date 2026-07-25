@@ -19,6 +19,12 @@ assert.deepEqual(GAME_RULES.movement.locomotionTargets, ['walk', 'run', 'sprint'
 assert.ok(GAME_RULES.movement.requiredCharacterStates.includes('crawl'));
 assert.ok(GAME_RULES.movement.requiredCharacterStates.includes('victory'));
 assert.equal(GAME_RULES.heroGating.avoidRepeatedMainRouteBacktrackingSwaps, true);
+assert.deepEqual(
+  GAME_RULES.platform.gameplayReadabilityScale.hargoldApproximateCommonEnemyHeights,
+  { minimum: 2, maximum: 3 }
+);
+assert.equal(GAME_RULES.platform.gameplayReadabilityScale.terrainBlocksAreCollisionBearing, true);
+assert.equal(GAME_RULES.platform.gameplayReadabilityScale.visiblePlatformsAreCollisionBearing, true);
 
 assert.equal(GAME_RULES.health.heartsAndLivesSeparate, true);
 assert.equal(GAME_RULES.health.maximumSurvivableHealthLayers, 3);

@@ -1,5 +1,9 @@
-import { CharacterRenderer } from './character-renderer.js?v=character-overhaul-1';
+import { CharacterRenderer } from './character-renderer.js?v=course-interactions-1';
 import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
+import {
+  MEADOW_WAKE_PLATFORMS,
+  createMeadowWakeBlocks
+} from './content/meadow-wake-course.js?v=course-interactions-1';
 import {
   attackMob,
   createMob,
@@ -9,6 +13,15 @@ import {
   stepProjectile,
   stompMob
 } from './gameplay/enemies/mob-simulation.js?v=world-mobs-1';
+import {
+  activeCourseSurfaces,
+  breakBlocksWithRollingShell,
+  resolveBlockHeadHit,
+  resolveOneWayPlatformLanding,
+  resolveSolidBlockSideCollision,
+  stepBlockFeedback,
+  supportHeightAt
+} from './gameplay/levels/platform-block-runtime.js?v=course-interactions-1';
 
 /*
  * Browser-compatible test entry.
@@ -104,8 +117,8 @@ const PROVISIONAL_MOTION_TUNING = Object.freeze({
 const DEVELOPER_HARGOLD_DOUBLE_JUMP_UNLOCKED = true;
 
 const PROVISIONAL_HERO_PROFILES = Object.freeze({
-  Hargold: Object.freeze({ width: 1.52, height: 3.32, jumpSpeedAddition: 0, airControlMultiplier: 1 }),
-  Mebble: Object.freeze({ width: 1.16, height: 3.68, jumpSpeedAddition: 1.16, airControlMultiplier: 1 })
+  Hargold: Object.freeze({ width: 1.02, height: 1.82, jumpSpeedAddition: 0, airControlMultiplier: 1 }),
+  Mebble: Object.freeze({ width: 0.72, height: 2.18, jumpSpeedAddition: 1.16, airControlMultiplier: 1 })
 });
 
 function createMotionState({
@@ -121,7 +134,8 @@ function createMotionState({
     coyoteSeconds: grounded ? PROVISIONAL_MOTION_TUNING.coyoteSeconds : 0,
     jumpBufferSeconds: 0, glide: 'closed', landingSpeed: 0,
     doubleJumpUsed: false, doubleJumpAnimationSeconds: 0,
-    groundSlamming: false
+    groundSlamming: false,
+    supportPlatformId: null
   };
 }
 
@@ -328,6 +342,8 @@ const compassCoins = [
   { x: 34.2, y: terrain.heightAt(34.2) - 1.7, taken: false }
 ];
 const checkpoint = { x: 18, reached: false };
+const platforms = MEADOW_WAKE_PLATFORMS;
+const blocks = createMeadowWakeBlocks(x => terrain.heightAt(x));
 const COURSE_ID = '1-1';
 const COURSE_NAME = 'Meadow Wake';
 const COURSE_ROSTER = getCourseEnemyRoster(COURSE_ID);
@@ -413,7 +429,17 @@ function inputSnapshot() {
 function canOccupy(candidate) {
   if (candidate.x < 0 || candidate.x + candidate.width > WORLD_END) return false;
   const lowOverhang = candidate.x < 14.6 && candidate.x + candidate.width > 13.2;
-  return !(lowOverhang && candidate.height > PROVISIONAL_HERO_PROFILES.Hargold.height);
+  if (lowOverhang && candidate.height > PROVISIONAL_HERO_PROFILES.Hargold.height) return false;
+  return !blocks.some(block => {
+    if (block.broken) return false;
+    const blockBody = {
+      x: block.x - block.width / 2,
+      y: block.y - block.height / 2,
+      width: block.width,
+      height: block.height
+    };
+    return overlaps(candidate, blockBody);
+  });
 }
 
 function swapPlayer() {
@@ -501,6 +527,10 @@ function restartCourse() {
   session = createSession();
   checkpoint.reached = false;
   for (const item of [...coins, ...compassCoins]) item.taken = false;
+  for (const block of blocks) {
+    block.broken = false;
+    block.bumpSeconds = 0;
+  }
   player = createMotionState({ footX: session.spawnX, footY: terrain.heightAt(session.spawnX) });
   mobs = createCourseMobs();
   projectiles = [];
@@ -622,6 +652,11 @@ function updateCombat(input, previousPlayerFootY, dt) {
   for (const shell of mobs) {
     if (!shell.alive || shell.type !== 'shellback' || shell.state !== 'shell-roll') continue;
     const shellBody = mobBody(shell);
+    const shellBrokenBlocks = breakBlocksWithRollingShell(shellBody, blocks);
+    if (shellBrokenBlocks.length) {
+      notice = `Rolling Shellback smashed ${shellBrokenBlocks.length} breakable block${shellBrokenBlocks.length === 1 ? '' : 's'}.`;
+      noticeSeconds = 1.8;
+    }
     for (const targetMob of mobs) {
       if (targetMob === shell || !targetMob.alive) continue;
       if (overlaps(shellBody, mobBody(targetMob))) {
@@ -654,11 +689,38 @@ function fixedUpdate(dt) {
   if (session.state !== 'playing') return;
   const input = inputSnapshot();
   const previousPlayerFootY = player.footY;
+  const previousPlayerBody = motionBody(player);
+  const previousHeadY = previousPlayerBody.y;
+  const previousSupportPlatformId = player.supportPlatformId;
+  const activeSurfaces = activeCourseSurfaces(platforms, blocks);
   stepMotion(player, input, dt, {
-    groundHeightAt,
+    groundHeightAt: x => supportHeightAt(player, x, groundHeightAt, activeSurfaces),
     minimumX: 0.8,
     maximumX: WORLD_END
   });
+  if (previousSupportPlatformId && !player.supportPlatformId && player.grounded) {
+    player.footY = previousPlayerFootY;
+    player.velocityY = 0.2;
+    player.grounded = false;
+    player.locomotion = 'fall';
+  }
+  if (!player.grounded) {
+    resolveOneWayPlatformLanding(player, previousPlayerFootY, activeSurfaces, motionBody(player));
+  }
+  const blockEvent = resolveBlockHeadHit(player, previousHeadY, blocks, motionBody(player));
+  if (blockEvent?.type === 'block-broken') {
+    notice = blockEvent.blockType === 'hargold-only'
+      ? 'Hargold broke the reinforced explorer block.'
+      : 'Breakable block smashed.';
+    noticeSeconds = 1.5;
+  } else if (blockEvent?.type === 'block-rejected') {
+    notice = 'That reinforced block requires Hargold.';
+    noticeSeconds = 1.8;
+  }
+  if (!blockEvent) {
+    resolveSolidBlockSideCollision(player, previousPlayerBody, blocks, motionBody(player));
+  }
+  stepBlockFeedback(blocks, dt);
   collectItems();
   updateCombat(input, previousPlayerFootY, dt);
 
@@ -890,6 +952,7 @@ function frame(now) {
     cameraX,
     coins,
     compassCoins,
+    blocks,
     mobs,
     projectiles
   }, elapsed);

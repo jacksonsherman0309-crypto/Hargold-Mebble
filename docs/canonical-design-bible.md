@@ -178,6 +178,8 @@ Keep the standard roster limited to four types unless explicitly changed:
 
 Additional named materials may visually theme a Hargold-only block, but they do not create extra gameplay block categories.
 
+Visible course blocks and traversable platforms are gameplay geometry. A rendered block must respond to a valid underside hit, enforce its hero interaction rule, and persist its consumed or destroyed state. A rendered one-way platform must support landing from above while permitting travel from below.
+
 ### Coin blocks
 
 - Bright yellow/gold is allowed.
@@ -219,6 +221,7 @@ Additional named materials may visually theme a Hargold-only block, but they do 
 
 - All enemies must be original and production-intent 3D models.
 - Most common enemies are smaller than the heroes, generally knee-to-waist height relative to Hargold and below Mebble’s waist.
+- In the gameplay camera, Hargold should read at roughly two to three common-enemy heights. Mebble remains visibly taller and thinner. Character render and collision scale must be evaluated against enemies, blocks, platform thickness, and terrain—not in isolation.
 - Most common enemies die from one valid hit.
 - Eyes should be smaller and less uniform: roughly 20% smaller on non-animal enemies and 10% smaller on animal enemies compared with rejected concepts.
 - Smiles should be reduced and expressions should be more moderate.
