@@ -11,7 +11,7 @@ export const HERO_PROFILES = Object.freeze({
   Mebble: Object.freeze({
     status: 'proxy-collider-pending-production-mesh',
     width: 0.72,
-    height: 2.18,
+    height: 2.2932,
     jumpSpeedAddition: 1.16,
     airControlMultiplier: 1,
     groundSlamStrength: 'standard',

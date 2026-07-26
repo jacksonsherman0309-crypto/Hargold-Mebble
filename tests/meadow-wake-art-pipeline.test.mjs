@@ -107,8 +107,8 @@ for (const texture of Object.values(manifest.environmentTextures)) {
   assert.ok(statSync(texturePath).size > 1_000_000, `${texture} must be a production-resolution texture`);
 }
 
-assert.match(characterManifest.status, /production-topology-pass-active/);
-assert.match(characterManifest.activeRuntimeStatus, /production-topology-candidate/);
+assert.match(characterManifest.status, /mannequin-fitted-v4-active/);
+assert.match(characterManifest.activeRuntimeStatus, /mannequin-fitted-v4-candidate/);
 assert.equal(characterManifest.references.ApprovedPairTarget.status, 'present-approved-2026-07-25');
 assert.ok(statSync(approvedCharacterTarget).size > 2_000_000);
 assert.equal(characterManifest.dimensionalPresentation.classification, '2.75D');
@@ -121,7 +121,7 @@ assert.ok(characterManifest.sharedAnimationClipsRequired.includes('crawl'));
 assert.ok(characterManifest.sharedAnimationClipsRequired.includes('victory'));
 for (const hero of ['Hargold', 'Mebble']) {
   const spec = characterManifest.characters[hero];
-  assert.match(spec.status, /production-topology-candidate/);
+  assert.match(spec.status, /mannequin-fitted-v4-candidate/);
   assert.ok(
     statSync(new URL(`../assets/blender/${spec.blend}`, import.meta.url)).size > 500_000,
     `${hero} replacement source must contain the modeled, rigged, textured asset`
@@ -153,7 +153,7 @@ assert.match(motionValidator, /finalApprovalEligible/);
 
 const liveHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 assert.match(liveHtml, /data-action="sprint"/);
-assert.match(liveHtml, /meadow-rooms-6/);
-assert.match(renderer, /production-topology-1/);
+assert.match(liveHtml, /movement-foundation-1/);
+assert.match(renderer, /locked-fit-4/);
 
 console.log(`Meadow Wake art pipeline checks passed from ${root}`);

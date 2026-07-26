@@ -12,6 +12,9 @@ This document preserves the complete model-independent movement baseline establi
 - The same initial state, input sequence, and deterministic seed must produce the same final simulation state.
 - Gameplay simulation owns movement. Root motion is disabled by default.
 - Rendering, animation, cape motion, and final collider-to-mesh fitting are separate integration layers.
+- The active controller uses a hierarchical Grounded, Airborne, and Special
+  state graph. Every leaf owns lifecycle hooks, allowed transitions, collision
+  policy, animation intent, sound/effect hook IDs, and input permissions.
 
 ## 2. Universal hero movement
 
@@ -129,6 +132,15 @@ The production movement layer must support:
 - water volumes;
 - hazard volumes;
 - bottomless-pit kill planes.
+- three independent foot probes at heel, center, and toe;
+- left/right wall probes at lower, middle, and upper body height;
+- left/center/right head probes;
+- ledge, slope-normal, semisolid, and moving-platform anchor probes.
+
+The probe result is the shared contact snapshot for support, safe landing
+height, slope/material response, wall/head contact, semisolids, exposed ledges,
+and moving-platform velocity. A single capsule or center ray cannot be the only
+source of terrain understanding.
 
 ## 5. Surface materials
 
@@ -142,6 +154,29 @@ Required model-independent material families:
 - conveyor.
 
 Material response can modify acceleration, stopping distance, slope movement, and carried-object behavior without corrupting deterministic simulation.
+
+The current data-driven response registry also contains dirt, snow, wood,
+shallow-water, sinking-terrain, leaf, cloud, beach, and carpet profiles for
+authored course use. These extend presentation-aware terrain metadata without
+overriding the canonical required families above.
+
+## 5A. Level runtime foundation
+
+Playable level data is separated into terrain geometry, visual environment,
+gameplay areas, actor placements, entrances/exits, trigger ranges, rails,
+camera settings, and persistent state.
+
+- Gameplay areas own bounds, camera framing, zoom, vertical tracking,
+  background, music, direction, and activation rules.
+- Actor records own type, plane-locked position, area, visual layer,
+  parameters, event channels, persistent ID, and activation bounds.
+- Camera-aware activation prewarms actors ahead of the visible screen,
+  activates outside the visible edge, sleeps actors behind play, and despawns
+  non-persistent actors farther behind.
+- Node rails own position, arrival/exit speed, acceleration, wait, easing, loop
+  mode, facing rule, and trigger requirements.
+- Generic schemas store authored course data; they cannot generate or flatten
+  the campaign's world-specific content.
 
 ## 6. Water
 

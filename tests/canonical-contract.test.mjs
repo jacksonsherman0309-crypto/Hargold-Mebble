@@ -38,11 +38,11 @@ assert.equal(GAME_RULES.characterPresentation.construction, 'complete-3d-skinned
 assert.equal(GAME_RULES.characterPresentation.classification, '2.75D');
 assert.equal(
   GAME_RULES.characterPresentation.orientation.mode,
-  'controlled-three-quarter-side'
+  'true-side-primary-with-small-action-reveal'
 );
-assert.equal(GAME_RULES.characterPresentation.orientation.cameraBiasDegrees, 14);
-assert.equal(GAME_RULES.characterPresentation.orientation.revealDegreesByAction.sprint, 11);
-assert.equal(GAME_RULES.characterPresentation.orientation.revealDegreesByAction['turn-low'], 32);
+assert.equal(GAME_RULES.characterPresentation.orientation.cameraBiasDegrees, 6);
+assert.equal(GAME_RULES.characterPresentation.orientation.revealDegreesByAction.sprint, 3);
+assert.equal(GAME_RULES.characterPresentation.orientation.revealDegreesByAction['turn-low'], 12);
 assert.equal(GAME_RULES.characterPresentation.orientation.turnTowardCameraForReadability, true);
 assert.equal(
   GAME_RULES.characterPresentation.orientation.negativeScaleMirroringForbidden,
@@ -50,10 +50,18 @@ assert.equal(
 );
 assert.deepEqual(
   GAME_RULES.characterPresentation.gameplayScale.heroHeightMetres,
-  { Hargold: 1.82, Mebble: 2.18 }
+  { Hargold: 1.82, Mebble: 2.2932 }
 );
 assert.equal(GAME_RULES.characterPresentation.gameplayScale.gamePixelsPerMetre, 70);
 assert.equal(GAME_RULES.characterPresentation.gameplayScale.finalBlenderAssetsMustUseGameplayMetres, true);
+assert.equal(GAME_RULES.characterPresentation.animationFrames.authority, 'compact-tall-locked-animation-frames-v2');
+assert.equal(GAME_RULES.characterPresentation.animationFrames.panelContract.fixedCameraAcrossHeroesAndRows, true);
+assert.equal(GAME_RULES.characterPresentation.animationFrames.panelContract.fittedOverlayOpacity, 0.4);
+assert.equal(GAME_RULES.characterPresentation.animationFrames.panelContract.maximumJointErrorFractionOfHeight, 0.03);
+assert.equal(GAME_RULES.characterPresentation.animationFrames.panelContract.tallHeightRelativeToCompact, 1.26);
+assert.equal(GAME_RULES.characterPresentation.animationFrames.approvalRows.length, 20);
+assert.equal(GAME_RULES.characterPresentation.animationFrames.Hargold.frame, 'compact');
+assert.equal(GAME_RULES.characterPresentation.animationFrames.Mebble.frame, 'tall');
 assert.deepEqual(
   GAME_RULES.characterPresentation.animation.distinctJumpStages,
   ['anticipation', 'takeoff', 'ascent', 'apex', 'descent', 'contact', 'compression', 'recovery']
@@ -129,6 +137,27 @@ assert.deepEqual(
 );
 assert.equal(GAME_RULES.platform.gameplayReadabilityScale.terrainBlocksAreCollisionBearing, true);
 assert.equal(GAME_RULES.platform.gameplayReadabilityScale.visiblePlatformsAreCollisionBearing, true);
+assert.equal(GAME_RULES.movement.architecture.simulationAuthority, 'deterministic-fixed-step-velocity-controller');
+assert.deepEqual(
+  GAME_RULES.movement.architecture.collisionProbes.foot,
+  ['left-heel', 'center-foot', 'right-toe']
+);
+assert.equal(GAME_RULES.movement.architecture.collisionProbes.wall.length, 6);
+assert.ok(GAME_RULES.movement.architecture.hierarchy.airborne.includes('hargold-double-jump'));
+assert.ok(GAME_RULES.movement.architecture.hierarchy.airborne.includes('mebble-cape-glide'));
+assert.equal(GAME_RULES.levelConstruction.cameraAwareActorActivation, true);
+assert.equal(GAME_RULES.levelConstruction.nodeBasedPaths, true);
+assert.deepEqual(GAME_RULES.levelConstruction.runtimeDataLayers, [
+  'terrain-geometry',
+  'visual-environment',
+  'gameplay-areas',
+  'actors',
+  'entrances-and-exits',
+  'trigger-ranges',
+  'rails-and-paths',
+  'camera-settings',
+  'persistent-state'
+]);
 
 assert.equal(GAME_RULES.health.heartsAndLivesSeparate, true);
 assert.equal(GAME_RULES.health.maximumSurvivableHealthLayers, 3);

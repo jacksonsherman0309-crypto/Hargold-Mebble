@@ -1,4 +1,4 @@
-export const CANON_VERSION = '2026-07-25-unified-clean-room-movement-1';
+export const CANON_VERSION = '2026-07-26-hierarchical-movement-foundation-1';
 
 export const GAME_RULES = Object.freeze({
   platform: {
@@ -21,24 +21,24 @@ export const GAME_RULES = Object.freeze({
     gameplayPlane: 'strict-linear-side-scrolling',
     classification: '2.75D',
     orientation: Object.freeze({
-      mode: 'controlled-three-quarter-side',
-      cameraBiasDegrees: 14,
+      mode: 'true-side-primary-with-small-action-reveal',
+      cameraBiasDegrees: 6,
       revealDegreesByAction: Object.freeze({
-        default: 14,
-        idle: 18,
-        walk: 16,
-        run: 14,
-        sprint: 11,
-        start: 18,
-        stop: 24,
-        'turn-low': 32,
-        skid: 28,
-        airborne: 16,
-        'air-spin': 20,
-        'ground-slam': 14,
-        glide: 22,
-        hurt: 26,
-        victory: 24
+        default: 6,
+        idle: 8,
+        walk: 6,
+        run: 4,
+        sprint: 3,
+        start: 8,
+        stop: 10,
+        'turn-low': 12,
+        skid: 10,
+        airborne: 5,
+        'air-spin': 8,
+        'ground-slam': 4,
+        glide: 8,
+        hurt: 10,
+        victory: 10
       }),
       turnTowardCameraForReadability: true,
       physicalDirectionChange: true,
@@ -48,9 +48,9 @@ export const GAME_RULES = Object.freeze({
       gamePixelsPerMetre: 70,
       heroHeightMetres: Object.freeze({
         Hargold: 1.82,
-        Mebble: 2.18
+        Mebble: 2.2932
       }),
-      heroHeightRatioMebbleToHargold: 1.198,
+      heroHeightRatioMebbleToHargold: 1.26,
       commonMobHeightMetres: Object.freeze({
         minimum: 0.62,
         maximum: 0.76
@@ -58,6 +58,63 @@ export const GAME_RULES = Object.freeze({
       standardBlockHeightMetres: 0.74,
       visibleSilhouetteMayExceedColliderForAccessories: true,
       finalBlenderAssetsMustUseGameplayMetres: true
+    }),
+    animationFrames: Object.freeze({
+      authority: 'compact-tall-locked-animation-frames-v2',
+      workflow: 'locked-mannequin-skeleton-duplicate-fit-overlay-validate',
+      primaryReviewOrientation: 'true-side',
+      panelContract: Object.freeze({
+        floorLine: 0.08,
+        standingHeadLine: 0.92,
+        usablePoseX: Object.freeze({ minimum: 0.08, maximum: 0.92 }),
+        neutralRootX: 0.50,
+        orthographic: true,
+        fixedCameraAcrossHeroesAndRows: true,
+        fittedOverlayOpacity: 0.40,
+        maximumJointErrorFractionOfHeight: 0.03,
+        compactHeight: 1.00,
+        tallHeightRelativeToCompact: 1.26
+      }),
+      approvalRows: Object.freeze([
+        'neutral', 'walk-contact', 'run-extension', 'turnaround-skid',
+        'jump-anticipation', 'jump-apex', 'landing-compression',
+        'ground-slam-descent', 'hargold-double-jump-burst',
+        'mebble-glide', 'solid-silhouette', 'skeleton-alignment',
+        'run-contact', 'run-passing', 'jump-takeoff',
+        'fall-preparation', 'sprint-slide', 'damage-recoil',
+        'block-hit', 'victory'
+      ]),
+      Hargold: Object.freeze({
+        frame: 'compact',
+        maximumBodyWidth: 0.59,
+        headHeight: 0.34,
+        headWidth: 0.41,
+        torsoHeight: 0.32,
+        torsoWidth: 0.50,
+        visibleLegLength: 0.22,
+        armLengthShoulderToHand: 0.37,
+        handSize: 0.12,
+        footLength: 0.25,
+        footHeight: 0.115,
+        shoulderWidth: 0.46,
+        hipWidth: 0.39
+      }),
+      Mebble: Object.freeze({
+        frame: 'tall',
+        maximumBodyWidth: 0.36,
+        headHeight: 0.29,
+        headWidth: 0.31,
+        neckHeight: 0.17,
+        torsoHeight: 0.315,
+        torsoWidth: 0.32,
+        visibleLegLength: 0.33,
+        armLengthShoulderToHand: 0.42,
+        handSize: 0.11,
+        footLength: 0.24,
+        footHeight: 0.105,
+        shoulderWidth: 0.34,
+        hipWidth: 0.275
+      })
     }),
     animation: Object.freeze({
       gameplayDriven: true,
@@ -80,6 +137,37 @@ export const GAME_RULES = Object.freeze({
     validationRequiredInNeutralAndGameplayCamera: true
   },
   movement: {
+    architecture: Object.freeze({
+      simulationAuthority: 'deterministic-fixed-step-velocity-controller',
+      hierarchy: Object.freeze({
+        grounded: Object.freeze([
+          'idle', 'walk', 'run', 'turn', 'crouch', 'slide', 'landing', 'ground-action'
+        ]),
+        airborne: Object.freeze([
+          'jump-takeoff', 'jump-rise', 'jump-apex', 'fall', 'fast-fall',
+          'ground-pound', 'bounce', 'hargold-double-jump', 'mebble-cape-glide'
+        ]),
+        special: Object.freeze([
+          'ledge-grab', 'wall-contact', 'swim', 'moving-platform', 'damage',
+          'transition', 'scripted'
+        ])
+      }),
+      stateOwnedContracts: Object.freeze([
+        'enter', 'update', 'exit', 'transitions', 'collision', 'animation',
+        'sound-effects', 'input-permissions'
+      ]),
+      collisionProbes: Object.freeze({
+        foot: Object.freeze(['left-heel', 'center-foot', 'right-toe']),
+        wall: Object.freeze([
+          'left-lower', 'left-middle', 'left-upper',
+          'right-lower', 'right-middle', 'right-upper'
+        ]),
+        head: Object.freeze(['head-left', 'head-center', 'head-right']),
+        additional: Object.freeze([
+          'ledge', 'slope-normal', 'semisolid', 'moving-platform-anchor'
+        ])
+      })
+    }),
     variableJump: true,
     coyoteTimeAllowed: true,
     jumpBufferAllowed: true,
@@ -122,6 +210,19 @@ export const GAME_RULES = Object.freeze({
   },
   levelConstruction: {
     individuallyAuthoredCourses: true,
+    runtimeDataLayers: Object.freeze([
+      'terrain-geometry',
+      'visual-environment',
+      'gameplay-areas',
+      'actors',
+      'entrances-and-exits',
+      'trigger-ranges',
+      'rails-and-paths',
+      'camera-settings',
+      'persistent-state'
+    ]),
+    cameraAwareActorActivation: true,
+    nodeBasedPaths: true,
     supportedTerrainRatio: Object.freeze({ minimum: 0.8, maximum: 0.9 }),
     pitRatio: Object.freeze({ minimum: 0.1, maximum: 0.2 }),
     avoidLongFlatRuns: true,

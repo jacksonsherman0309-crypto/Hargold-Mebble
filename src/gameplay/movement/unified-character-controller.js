@@ -4,9 +4,19 @@ import { HERO_PROFILES, heroProfile } from './hero-profiles.js';
 import { updateMovementTelemetry } from './movement-debug.js';
 import { beginMovementStep, emitMovementEvent, movementEvents } from './movement-events.js';
 import {
+  executeMovementState,
+  initializeMovementStateLifecycle,
   MOVEMENT_STATES,
   transitionMovementState
 } from './movement-state-machine.js';
+import {
+  selectHorizontalResponse,
+  terrainResponseFor
+} from './movement-parameters.js';
+import {
+  buildMovementContactSnapshot,
+  deriveMovementContacts
+} from './movement-sensors.js';
 import { MOVEMENT_TUNING } from './movement-tuning.js';
 
 const HERO_NAMES = Object.freeze(['Hargold', 'Mebble']);
@@ -41,7 +51,7 @@ export function createUnifiedCharacterState({
 } = {}) {
   heroProfile(hero, profiles);
   const movementState = grounded ? MOVEMENT_STATES.IDLE : MOVEMENT_STATES.FALL;
-  return {
+  const state = {
     hero,
     footX,
     footY,
@@ -88,10 +98,24 @@ export function createUnifiedCharacterState({
     surfaceNormal: Object.freeze({ x: 0, y: -1 }),
     surfaceAngle: 0,
     surfaceMaterial: 'normal',
+    wallContactSide: null,
+    horizontalResponseCase: 'from-rest',
+    terrainResponseId: 'normal',
+    animationReferenceSpeed: tuning.walkSpeed,
+    animationSelection: movementState,
+    animationPlaybackRate: 1,
+    movementBranch: grounded ? 'grounded' : 'airborne',
+    inputPermissions: null,
+    collisionPolicy: null,
+    soundHooks: Object.freeze([]),
+    effectHooks: Object.freeze([]),
+    sensors: null,
+    contacts: null,
     blockBreakStrength: 0,
     events: [],
     telemetry: null
   };
+  return initializeMovementStateLifecycle(state);
 }
 
 export function movementBody(
@@ -108,11 +132,12 @@ export function movementBody(
 
 function startGroundJump(state, profile, tuning) {
   const runRatio = clamp(Math.abs(state.velocityX) / tuning.sprintSpeed, 0, 1);
+  const terrain = terrainResponseFor(state.surfaceMaterial);
   state.velocityY = -(
     tuning.baseJumpSpeed
     + profile.jumpSpeedAddition
     + tuning.runningJumpBonus * runRatio
-  );
+  ) * terrain.jumpMultiplier;
   state.velocityX += state.supportVelocityX * tuning.movingPlatformVelocityInheritance;
   state.velocityY += state.supportVelocityY * tuning.movingPlatformVelocityInheritance;
   state.grounded = false;
@@ -195,6 +220,8 @@ function beginGroundSlamImpact(state, tuning, surface = {}) {
 function enterGroundedLocomotion(state, input, dt, tuning, canStand) {
   const direction = (input.right ? 1 : 0) - (input.left ? 1 : 0);
   const speed = Math.abs(state.velocityX);
+  const terrain = terrainResponseFor(state.surfaceMaterial);
+  state.terrainResponseId = terrain.id;
 
   if (input.downHeld || state.stance !== 'standing') {
     if (!input.downHeld && canStand()) {
@@ -224,8 +251,24 @@ function enterGroundedLocomotion(state, input, dt, tuning, canStand) {
   const reversing = state.velocityX !== 0 &&
     direction !== 0 &&
     Math.sign(state.velocityX) !== direction;
+  const sprintReady = input.sprint &&
+    (speed >= tuning.sprintEntrySpeed || state.movementState === MOVEMENT_STATES.SPRINT);
+  const baseTargetSpeed = sprintReady
+    ? tuning.sprintSpeed
+    : input.run || input.sprint ? tuning.runSpeed : tuning.walkSpeed;
+  const targetSpeed = baseTargetSpeed * terrain.maximumSpeedMultiplier;
+  const response = selectHorizontalResponse({
+    velocityX: state.velocityX,
+    direction,
+    targetSpeed,
+    tuning,
+    terrain
+  });
+  state.horizontalResponseCase = response.case;
+  state.animationReferenceSpeed = Math.max(0.01, baseTargetSpeed);
+
   if (direction === 0) {
-    state.velocityX = approach(state.velocityX, 0, tuning.releaseDeceleration, dt);
+    state.velocityX = approach(state.velocityX, terrain.conveyorVelocity, response.acceleration, dt);
     if (Math.abs(state.velocityX) < 1e-6) state.velocityX = 0;
     if (state.velocityX === 0) transition(state, MOVEMENT_STATES.IDLE);
     else if (speed >= tuning.sprintEntrySpeed) transition(state, MOVEMENT_STATES.BRAKE);
@@ -234,7 +277,7 @@ function enterGroundedLocomotion(state, input, dt, tuning, canStand) {
   }
 
   if (reversing && speed >= tuning.skidThreshold) {
-    state.velocityX = approach(state.velocityX, 0, tuning.highSpeedSkidDeceleration, dt);
+    state.velocityX = approach(state.velocityX, 0, response.acceleration, dt);
     transition(state, MOVEMENT_STATES.SKID);
     if (Math.abs(state.velocityX) <= tuning.skidExitSpeed) {
       state.facing = direction;
@@ -244,26 +287,14 @@ function enterGroundedLocomotion(state, input, dt, tuning, canStand) {
   }
 
   state.facing = direction;
-  const sprintReady = input.sprint &&
-    (speed >= tuning.sprintEntrySpeed || state.movementState === MOVEMENT_STATES.SPRINT);
-  const targetSpeed = sprintReady
-    ? tuning.sprintSpeed
-    : input.run || input.sprint ? tuning.runSpeed : tuning.walkSpeed;
-  const acceleration = reversing
-    ? tuning.lowSpeedTurnAcceleration
-    : sprintReady
-      ? tuning.groundAccelerationSprint
-      : input.run || input.sprint
-        ? tuning.groundAccelerationRun
-        : tuning.groundAccelerationWalk;
   const signedSlopeTravel = Math.sin(state.surfaceAngle ?? 0) * direction;
   const slopeMultiplier = signedSlopeTravel >= 0
     ? 1 + signedSlopeTravel * tuning.downhillSpeedBoost
     : 1 + signedSlopeTravel * tuning.uphillSpeedPenalty;
   state.velocityX = approach(
     state.velocityX,
-    direction * targetSpeed * slopeMultiplier,
-    acceleration,
+    direction * targetSpeed * slopeMultiplier + terrain.conveyorVelocity,
+    response.acceleration,
     dt
   );
   transition(
@@ -276,7 +307,12 @@ function enterGroundedLocomotion(state, input, dt, tuning, canStand) {
 
 function updateAirSteering(state, input, dt, profile, tuning) {
   const direction = (input.right ? 1 : 0) - (input.left ? 1 : 0);
-  if (direction === 0) return;
+  if (direction === 0) {
+    if (state.airborneSeconds > 0.05) {
+      state.velocityX = approach(state.velocityX, 0, tuning.airBraking, dt);
+    }
+    return;
+  }
   const reversing = state.velocityX !== 0 && Math.sign(state.velocityX) !== direction;
   const maximum = input.sprint
     ? tuning.airMaximumSprintSpeed
@@ -465,6 +501,42 @@ function updateForcedState(state, input, dt, tuning, groundHeightAt, minimumX, m
   return false;
 }
 
+function refreshMovementContacts(state, {
+  tuning,
+  profiles,
+  groundHeightAt,
+  hasGroundAt,
+  surfaceAt,
+  wallAt,
+  headAt,
+  ledgeAt,
+  semisolidAt,
+  movingPlatformAt,
+  sampleSensors,
+  previousFootY
+}) {
+  const snapshot = sampleSensors
+    ? sampleSensors(state, { previousFootY })
+    : buildMovementContactSnapshot(state, {
+        tuning,
+        profiles,
+        groundHeightAt,
+        hasGroundAt,
+        surfaceAt,
+        wallAt,
+        headAt,
+        ledgeAt,
+        semisolidAt,
+        movingPlatformAt,
+        previousFootY
+      });
+  const sensors = snapshot.sensors ?? snapshot;
+  const contacts = snapshot.contacts ?? deriveMovementContacts(sensors);
+  state.sensors = sensors;
+  state.contacts = contacts;
+  return contacts;
+}
+
 export function stepUnifiedCharacterController(
   state,
   input,
@@ -475,6 +547,12 @@ export function stepUnifiedCharacterController(
     groundHeightAt = () => 0,
     hasGroundAt = () => true,
     surfaceAt = () => ({ angle: 0, normal: { x: 0, y: -1 }, material: 'normal' }),
+    wallAt = () => null,
+    headAt = () => null,
+    ledgeAt = () => null,
+    semisolidAt = () => null,
+    movingPlatformAt = () => null,
+    sampleSensors = null,
     canStand = () => true,
     minimumX = -Infinity,
     maximumX = Infinity,
@@ -492,6 +570,25 @@ export function stepUnifiedCharacterController(
   state.stateSeconds += deltaSeconds;
   state.doubleJumpUnlocked = Boolean(doubleJumpUnlocked);
   updateTimers(state, deltaSeconds);
+  let contacts = refreshMovementContacts(state, {
+    tuning,
+    profiles,
+    groundHeightAt,
+    hasGroundAt,
+    surfaceAt,
+    wallAt,
+    headAt,
+    ledgeAt,
+    semisolidAt,
+    movingPlatformAt,
+    sampleSensors,
+    previousFootY
+  });
+  if (state.grounded && contacts?.grounded) {
+    state.surfaceAngle = contacts.surfaceAngle;
+    state.surfaceNormal = contacts.surfaceNormal;
+    state.surfaceMaterial = contacts.terrainMaterial;
+  }
 
   const wantsDropThrough = state.grounded &&
     Boolean(state.supportPlatformId) &&
@@ -524,7 +621,7 @@ export function stepUnifiedCharacterController(
     state.airborneSeconds += deltaSeconds;
   }
 
-  if (state.grounded && !hasGroundAt(state.footX)) {
+  if (state.grounded && !contacts?.grounded) {
     state.grounded = false;
     state.supportPlatformId = null;
     state.supportVelocityX = 0;
@@ -544,7 +641,8 @@ export function stepUnifiedCharacterController(
   )) {
     state.accelerationX = (state.velocityX - previousVelocityX) / deltaSeconds;
     state.accelerationY = (state.velocityY - previousVelocityY) / deltaSeconds;
-    updateMovementTelemetry(state, input);
+    executeMovementState(state);
+    updateMovementTelemetry(state, input, contacts);
     return Object.freeze({ state, events: movementEvents(state), telemetry: state.telemetry });
   }
 
@@ -584,12 +682,25 @@ export function stepUnifiedCharacterController(
   if (state.grounded) {
     enterGroundedLocomotion(state, input, deltaSeconds, tuning, canStand);
     state.footX = clamp(state.footX + state.velocityX * deltaSeconds, minimumX, maximumX);
-    if (hasGroundAt(state.footX)) {
-      const surface = surfaceAt(state.footX) ?? {};
-      state.surfaceAngle = surface.angle ?? 0;
-      state.surfaceNormal = Object.freeze({ ...(surface.normal ?? { x: 0, y: -1 }) });
-      state.surfaceMaterial = surface.material ?? 'normal';
-      state.footY = groundHeightAt(state.footX);
+    contacts = refreshMovementContacts(state, {
+      tuning,
+      profiles,
+      groundHeightAt,
+      hasGroundAt,
+      surfaceAt,
+      wallAt,
+      headAt,
+      ledgeAt,
+      semisolidAt,
+      movingPlatformAt,
+      sampleSensors,
+      previousFootY
+    });
+    if (contacts?.grounded) {
+      state.surfaceAngle = contacts.surfaceAngle;
+      state.surfaceNormal = contacts.surfaceNormal;
+      state.surfaceMaterial = contacts.terrainMaterial;
+      state.footY = contacts.safeLandingY ?? groundHeightAt(state.footX);
       state.velocityY = 0;
     } else {
       state.grounded = false;
@@ -604,9 +715,23 @@ export function stepUnifiedCharacterController(
     updateAirborne(state, input, deltaSeconds, profile, tuning);
     state.footX = clamp(state.footX + state.velocityX * deltaSeconds, minimumX, maximumX);
     state.footY += state.velocityY * deltaSeconds;
-    const groundY = groundHeightAt(state.footX);
+    contacts = refreshMovementContacts(state, {
+      tuning,
+      profiles,
+      groundHeightAt,
+      hasGroundAt,
+      surfaceAt,
+      wallAt,
+      headAt,
+      ledgeAt,
+      semisolidAt,
+      movingPlatformAt,
+      sampleSensors,
+      previousFootY
+    });
+    const groundY = contacts?.safeLandingY ?? groundHeightAt(state.footX);
     if (
-      hasGroundAt(state.footX) &&
+      contacts?.canLand &&
       state.velocityY >= 0 &&
       state.footY >= groundY &&
       previousFootY <= groundY
@@ -622,7 +747,8 @@ export function stepUnifiedCharacterController(
 
   state.accelerationX = (state.velocityX - previousVelocityX) / deltaSeconds;
   state.accelerationY = (state.velocityY - previousVelocityY) / deltaSeconds;
-  updateMovementTelemetry(state, input);
+  executeMovementState(state);
+  updateMovementTelemetry(state, input, contacts);
   return Object.freeze({ state, events: movementEvents(state), telemetry: state.telemetry });
 }
 

@@ -52,6 +52,14 @@ Every production level must satisfy these rules unless an explicit newer instruc
 - Foreground art cannot hide required hazards or landing surfaces.
 - Enemy spawns must be offscreen or visibly telegraphed and never occur inside a safe landing area.
 - Mobile landscape camera and touch-control visibility must be validated.
+- Store terrain, visual environment, gameplay areas, actors, entrances/exits,
+  triggers, rails, camera settings, and persistent state as separate authored
+  layers.
+- Use camera-aware actor prewarm, activation, sleep, and despawn envelopes;
+  ordinary enemies cannot visibly pop into the camera view.
+- Reusable node rails may drive platforms, patrols, elevators, cinematic
+  cameras, and background motion, but the rail data cannot replace authored
+  course layout.
 
 ## 3. Recommended beat scaffold
 

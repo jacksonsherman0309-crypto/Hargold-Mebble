@@ -1,0 +1,40 @@
+{
+  "hero": "Mebble",
+  "source": "C:\\Users\\jacks\\OneDrive\\Desktop\\Hargold-Mebble\\assets\\blender\\mebble_character.blend",
+  "profile": "assets/blender/character-scale-orientation-profile.json",
+  "targetGameplayHeightMetres": 2.2932,
+  "motionRangeByFamily": {
+    "pelvis": 0.3456,
+    "torso": 1.0,
+    "head": 0.35,
+    "arms": 2.3,
+    "fingers": 0.5104,
+    "legs": 1.28,
+    "secondary": 0.92
+  },
+  "rootTranslationMaximum": 0.0,
+  "faceRanges": {
+    "smile": [
+      0.0,
+      0.86
+    ],
+    "mouth_open": [
+      0.0,
+      0.72
+    ],
+    "brow_raise_L": [
+      0.08,
+      0.48
+    ],
+    "brow_raise_R": [
+      0.08,
+      0.48
+    ]
+  },
+  "sampleCount": 45,
+  "errors": [],
+  "warnings": [
+    "The active mannequin-fitted candidate still requires final human art-direction approval."
+  ],
+  "finalApprovalEligible": false
+}

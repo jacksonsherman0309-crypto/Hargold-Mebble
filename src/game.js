@@ -1,9 +1,12 @@
 import { CharacterRenderer } from './character-renderer.js?v=meadow-rooms-6';
+import {
+  MEADOW_WAKE_ENEMY_ACTORS,
+  MEADOW_WAKE_LEVEL_DATA
+} from './content/meadow-wake-level-data.js?v=level-foundation-1';
 import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
 import {
   MEADOW_WAKE_PITS,
   MEADOW_WAKE_TERRAIN_POINTS,
-  MEADOW_WAKE_WORLD_END,
   createMeadowWakeBlocks,
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins,
@@ -30,9 +33,10 @@ import {
   transportRiderWithPlatform,
   supportHeightAt
 } from './gameplay/levels/platform-block-runtime.js?v=block-production-1';
-import { HERO_PROFILES } from './gameplay/movement/hero-profiles.js?v=unified-motion-1';
-import { createMovementInputBuffer } from './gameplay/movement/movement-input-buffer.js?v=unified-motion-1';
-import { MOVEMENT_STATES } from './gameplay/movement/movement-state-machine.js?v=unified-motion-1';
+import { createActorActivationRuntime } from './gameplay/levels/actor-activation-runtime.js?v=level-foundation-1';
+import { HERO_PROFILES } from './gameplay/movement/hero-profiles.js?v=unified-motion-2';
+import { createMovementInputBuffer } from './gameplay/movement/movement-input-buffer.js?v=unified-motion-2';
+import { MOVEMENT_STATES } from './gameplay/movement/movement-state-machine.js?v=unified-motion-2';
 import {
   applyMovementBounce,
   applyMovementDamage,
@@ -41,8 +45,8 @@ import {
   setMovementForcedState,
   stepUnifiedCharacterController,
   trySwapUnifiedHero
-} from './gameplay/movement/unified-character-controller.js?v=unified-motion-1';
-import { leaveExternalSupport } from './gameplay/movement/movement-collision-resolver.js?v=unified-motion-1';
+} from './gameplay/movement/unified-character-controller.js?v=unified-motion-2';
+import { leaveExternalSupport } from './gameplay/movement/movement-collision-resolver.js?v=unified-motion-2';
 import { clamp } from './runtime/math.js';
 import { FixedStepLoop } from './runtime/fixed-step.js';
 import { fatalHazardEvent } from './runtime/hazards/fatal-hazards.js';
@@ -60,7 +64,7 @@ const status = document.querySelector('#status');
 const W = canvas.width;
 const H = canvas.height;
 const SCALE = 70;
-const WORLD_END = MEADOW_WAKE_WORLD_END;
+const WORLD_END = MEADOW_WAKE_LEVEL_DATA.bounds.maxX;
 const keys = new Set();
 const touch = {
   left: false,
@@ -97,16 +101,9 @@ const compassCoins = createMeadowWakeCompassCoins();
 const checkpoint = { x: 70.5, reached: false };
 const platforms = createMeadowWakePlatforms();
 const blocks = createMeadowWakeBlocks(x => terrain.heightAt(x));
-const COURSE_ID = '1-1';
-const COURSE_NAME = 'Meadow Wake';
+const COURSE_ID = MEADOW_WAKE_LEVEL_DATA.id;
+const COURSE_NAME = MEADOW_WAKE_LEVEL_DATA.name;
 const COURSE_ROSTER = getCourseEnemyRoster(COURSE_ID);
-const MOB_PLACEMENTS = Object.freeze([
-  Object.freeze({ id: '1-1-critter-a', type: 'camp_critter', x: 6.4, patrolFrom: 5.1, patrolTo: 7.6 }),
-  Object.freeze({ id: '1-1-shellback-a', type: 'shellback', x: 8.7, patrolFrom: 8.05, patrolTo: 9.05 }),
-  Object.freeze({ id: '1-1-critter-b', type: 'camp_critter', x: 13.1, patrolFrom: 11.5, patrolTo: 14.8 }),
-  Object.freeze({ id: '1-1-shellback-b', type: 'shellback', x: 17.1, patrolFrom: 15.8, patrolTo: 19.4 }),
-  Object.freeze({ id: '1-1-critter-c', type: 'camp_critter', x: 25.6, patrolFrom: 24.1, patrolTo: 27.4 })
-]);
 
 let player = createUnifiedCharacterState({
   footX: initialCourseX,
@@ -116,7 +113,8 @@ let cameraX = 0;
 let cameraY = 0;
 let lastFrame = performance.now();
 let session = createSession(initialCourseX);
-let mobs = createCourseMobs();
+let mobs = [];
+let mobActivation = createCourseMobActivation();
 let projectiles = [];
 let notice = 'Meadow Wake: stomp Critters; stomp then kick Shellbacks.';
 let noticeSeconds = 5;
@@ -137,19 +135,53 @@ function createSession(spawnX = 1.8) {
   };
 }
 
-function createCourseMobs() {
-  return MOB_PLACEMENTS.map(placement => {
-    if (!COURSE_ROSTER.includes(placement.type)) {
-      throw new Error(`${placement.type} does not belong to ${COURSE_ID}`);
+function createMobFromActor(placement) {
+    const parameters = placement.parameters;
+    const type = parameters.enemyType;
+    if (!COURSE_ROSTER.includes(type)) {
+      throw new Error(`${type} does not belong to ${COURSE_ID}`);
     }
-    const mob = createMob(placement);
+    const mob = createMob({
+      id: placement.id,
+      type,
+      x: placement.position.x,
+      direction: -1
+    });
     mob.y = groundHeightAt(mob.x);
     mob.previousY = mob.y;
-    mob.spawnX = placement.x;
-    mob.patrolFrom = placement.patrolFrom;
-    mob.patrolTo = placement.patrolTo;
+    mob.spawnX = placement.position.x;
+    mob.patrolFrom = parameters.patrolFrom;
+    mob.patrolTo = parameters.patrolTo;
     mob.activated = false;
     return mob;
+}
+
+function createCourseMobActivation() {
+  return createActorActivationRuntime(MEADOW_WAKE_ENEMY_ACTORS, {
+    spawn(placement) {
+      const mob = createMobFromActor(placement);
+      mobs.push(mob);
+      return mob;
+    },
+    activate(mob) {
+      mob.activated = true;
+    },
+    sleep(mob) {
+      mob.activated = false;
+    },
+    despawn(mob) {
+      const index = mobs.indexOf(mob);
+      if (index >= 0) mobs.splice(index, 1);
+    }
+  });
+}
+
+function updateCourseMobActivation() {
+  const minX = Math.max(0, cameraX / SCALE);
+  const maxX = Math.min(WORLD_END, (cameraX + W) / SCALE);
+  mobActivation.update({
+    cameraBounds: { minX, maxX },
+    scrollDirection: Math.sign(player.velocityX) || player.facing
   });
 }
 
@@ -159,6 +191,15 @@ function inPit(x) {
 
 function groundHeightAt(x) {
   return inPit(x) ? 20 : terrain.heightAt(x);
+}
+
+function terrainMaterialAt(x) {
+  const regions = MEADOW_WAKE_LEVEL_DATA.terrainGeometry.materialRegions;
+  for (let index = regions.length - 1; index >= 0; index -= 1) {
+    const region = regions[index];
+    if (x >= region.from && x <= region.to) return region.material;
+  }
+  return 'normal';
 }
 
 function readGamepadSnapshot() {
@@ -235,25 +276,9 @@ function respawn() {
   session.attackSeconds = 0;
   inputBuffer.reset();
   projectiles = [];
-  for (const mob of mobs) {
-    if (mob.spawnX < session.spawnX && !mob.alive) continue;
-    const replacement = createMob({
-      id: mob.id,
-      type: mob.type,
-      x: mob.spawnX,
-      direction: -1
-    });
-    const patrolFrom = mob.patrolFrom;
-    const patrolTo = mob.patrolTo;
-    Object.assign(mob, replacement, {
-      spawnX: mob.spawnX,
-      patrolFrom,
-      patrolTo,
-      activated: false,
-      y: groundHeightAt(mob.spawnX),
-      previousY: groundHeightAt(mob.spawnX)
-    });
-  }
+  mobActivation.reset();
+  mobs = [];
+  mobActivation = createCourseMobActivation();
 }
 
 function loseLife(hazardType) {
@@ -312,7 +337,9 @@ function restartCourse() {
     footY: terrain.heightAt(session.spawnX),
     doubleJumpUnlocked: session.doubleJumpUnlocked
   });
-  mobs = createCourseMobs();
+  mobActivation.reset({ preservePersistentComplete: false });
+  mobs = [];
+  mobActivation = createCourseMobActivation();
   projectiles = [];
   inputBuffer.reset();
   notice = 'Course restarted with the Meadow Wake mob roster.';
@@ -360,6 +387,26 @@ function mobBody(mob) {
   };
 }
 
+function activeBlockAtPoint(point) {
+  return blocks.find(block => {
+    if (block.broken || (block.hidden && !block.revealed)) return false;
+    return point.x >= block.x - block.width / 2 &&
+      point.x <= block.x + block.width / 2 &&
+      point.y >= block.y - block.height / 2 &&
+      point.y <= block.y + block.height / 2;
+  }) ?? null;
+}
+
+function sensorSurfaceAtPoint(point, activeSurfaces, predicate = () => true) {
+  const tolerance = 0.12;
+  return activeSurfaces.find(surface =>
+    predicate(surface) &&
+    point.x >= surface.x - surface.width / 2 &&
+    point.x <= surface.x + surface.width / 2 &&
+    Math.abs(point.y - (surface.y - surface.height / 2)) <= tolerance
+  ) ?? null;
+}
+
 function defeatForPlayer(mob) {
   if (!mob.alive) return;
   defeatMob(mob);
@@ -378,7 +425,6 @@ function updateCombat(input, previousPlayerFootY, dt) {
   const playerBody = movementBody(player);
   const target = { x: player.footX, y: player.footY - playerBody.height * 0.55 };
   for (const mob of mobs) {
-    if (!mob.activated && mob.x - player.footX < 10.6 && mob.x >= player.footX - 2) mob.activated = true;
     if (!mob.activated) continue;
     const events = stepMob(mob, dt, {
       groundHeightAt,
@@ -493,6 +539,7 @@ function fixedUpdate(dt) {
   const previousHeadY = previousPlayerBody.y;
   const previousSupportPlatformId = player.supportPlatformId;
   const activeSurfaces = activeCourseSurfaces(platforms, blocks);
+  updateCourseMobActivation();
   stepUnifiedCharacterController(player, input, dt, {
     groundHeightAt: x => supportHeightAt(player, x, groundHeightAt, activeSurfaces),
     hasGroundAt: x => !inPit(x) || Boolean(
@@ -508,8 +555,36 @@ function fixedUpdate(dt) {
       return {
         angle,
         normal: { x: Math.sin(angle), y: -Math.cos(angle) },
-        material: 'normal'
+        material: terrainMaterialAt(x)
       };
+    },
+    wallAt: point => {
+      const block = activeBlockAtPoint(point);
+      if (block) return { id: block.id, material: block.type };
+      if (point.x <= 0.8 || point.x >= WORLD_END) return { id: 'course-boundary' };
+      return null;
+    },
+    headAt: point => {
+      const block = activeBlockAtPoint(point);
+      return block ? { id: block.id, material: block.type } : null;
+    },
+    semisolidAt: point => {
+      const surface = sensorSurfaceAtPoint(point, activeSurfaces, candidate => candidate.oneWay);
+      return surface ? { id: surface.id, top: surface.y - surface.height / 2 } : null;
+    },
+    movingPlatformAt: point => {
+      const surface = sensorSurfaceAtPoint(
+        point,
+        activeSurfaces,
+        candidate => Boolean(candidate.motion)
+      );
+      return surface
+        ? {
+            id: surface.id,
+            velocityX: surface.velocityX ?? 0,
+            velocityY: surface.velocityY ?? 0
+          }
+        : null;
     },
     minimumX: 0.8,
     maximumX: WORLD_END,

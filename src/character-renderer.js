@@ -19,11 +19,11 @@ const GAME_PIXELS_PER_METRE = PRESENTATION.gameplayScale.gamePixelsPerMetre;
 const ACTION_REVEAL_DEGREES = PRESENTATION.orientation.revealDegreesByAction;
 const MODEL_SPECS = Object.freeze({
   Hargold: Object.freeze({
-    url: new URL('../assets/exports/hargold_character.glb?v=production-topology-1', import.meta.url).href,
+    url: new URL('../assets/exports/hargold_character.glb?v=locked-fit-4', import.meta.url).href,
     assetHeightMetres: PRESENTATION.gameplayScale.heroHeightMetres.Hargold
   }),
   Mebble: Object.freeze({
-    url: new URL('../assets/exports/mebble_character.glb?v=production-topology-1', import.meta.url).href,
+    url: new URL('../assets/exports/mebble_character.glb?v=locked-fit-4', import.meta.url).href,
     assetHeightMetres: PRESENTATION.gameplayScale.heroHeightMetres.Mebble
   })
 });

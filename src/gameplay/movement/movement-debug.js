@@ -1,6 +1,7 @@
 export function updateMovementTelemetry(state, input, contacts = {}) {
   state.telemetry = Object.freeze({
     currentState: state.movementState,
+    currentBranch: state.movementBranch,
     previousState: state.previousMovementState,
     stateDurationSeconds: state.stateSeconds,
     position: Object.freeze({ x: state.footX, y: state.footY }),
@@ -10,6 +11,8 @@ export function updateMovementTelemetry(state, input, contacts = {}) {
     surfaceNormal: Object.freeze({ ...(state.surfaceNormal ?? { x: 0, y: -1 }) }),
     surfaceAngle: state.surfaceAngle ?? 0,
     surfaceMaterial: state.surfaceMaterial ?? 'normal',
+    terrainResponseId: state.terrainResponseId ?? 'normal',
+    horizontalResponseCase: state.horizontalResponseCase,
     supportPlatformId: state.supportPlatformId,
     jumpBufferSeconds: state.jumpBufferSeconds,
     coyoteSeconds: state.coyoteSeconds,
@@ -23,6 +26,14 @@ export function updateMovementTelemetry(state, input, contacts = {}) {
     glideExhausted: state.glideExhausted,
     groundSlamPhase: state.groundSlamPhase,
     contacts: Object.freeze({ ...contacts }),
+    sensorSummary: Object.freeze({
+      foot: state.sensors?.foot?.length ?? 0,
+      wall: state.sensors?.wall?.length ?? 0,
+      head: state.sensors?.head?.length ?? 0,
+      ledge: Boolean(state.sensors?.ledge),
+      semisolid: Boolean(state.sensors?.semisolid),
+      movingPlatform: Boolean(state.sensors?.movingPlatform)
+    }),
     input: Object.freeze({
       left: Boolean(input.left),
       right: Boolean(input.right),

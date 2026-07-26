@@ -1,17 +1,23 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "status": "locked-clean-room-production-profile",
   "coordinateSystem": {
     "units": "metres",
     "up": "Z",
     "characterForward": "-Y",
-    "origin": "between-feet-on-ground"
+    "origin": "between-feet-on-ground",
+    "reviewLogicalMapping": {
+      "movementX": "-native-Y",
+      "verticalY": "native-Z",
+      "depthZ": "native-X",
+      "cameraDirection": "-logical-Z"
+    }
   },
   "cleanRoomBoundary": {
     "permittedBenchmarkUse": [
       "observable silhouette readability",
       "relative character-enemy-environment scale principles",
-      "action-dependent three-quarter orientation principles",
+      "true-side-first orientation and small action-dependent reveal principles",
       "animation timing and deformation quality principles"
     ],
     "forbiddenSources": [
@@ -39,27 +45,29 @@
         "lockedSilhouette": "very-short-broad-round-low-centre-of-mass"
       },
       "Mebble": {
-        "targetVisibleHeightMetres": 2.18,
-        "targetCollisionHeightMetres": 2.18,
+        "targetVisibleHeightMetres": 2.2932,
+        "targetCollisionHeightMetres": 2.2932,
         "targetWidthMetres": 0.72,
-        "currentAssetHeightMetres": 2.18,
+        "currentAssetHeightMetres": 2.2932,
         "runtimeNormalizationScale": 1.0,
         "lockedSilhouette": "tall-thin-long-neck-visible-adams-apple"
       }
     },
     "ratios": {
-      "MebbleToHargoldHeight": 1.198,
+      "MebbleToHargoldHeight": 1.26,
       "HargoldToCommonMobHeight": {
         "minimum": 2.39,
         "maximum": 2.94
       },
       "HargoldToStandardBlockHeight": 2.459,
-      "MebbleToStandardBlockHeight": 2.946
+      "MebbleToStandardBlockHeight": 3.099
     },
     "finalAssetRule": "Blender sources and GLBs are authored at target gameplay metres with scale 1,1,1. Runtime conversion is only metres to game pixels."
   },
   "orientation": {
     "baseSideDegrees": 90,
+    "primaryReviewOrientation": "true-side",
+    "secondaryReviewOrientation": "small-three-quarter-reveal",
     "negativeScaleMirroringForbidden": true,
     "physicalDirectionChangeRequired": true,
     "turnPath": [
@@ -71,21 +79,21 @@
       "accelerate"
     ],
     "revealDegreesByAction": {
-      "default": 14,
-      "idle": 18,
-      "walk": 16,
-      "run": 14,
-      "sprint": 11,
-      "start": 18,
-      "stop": 24,
-      "turn-low": 32,
-      "skid": 28,
-      "airborne": 16,
-      "air-spin": 20,
-      "ground-slam": 14,
-      "glide": 22,
-      "hurt": 26,
-      "victory": 24
+      "default": 6,
+      "idle": 8,
+      "walk": 6,
+      "run": 4,
+      "sprint": 3,
+      "start": 8,
+      "stop": 10,
+      "turn-low": 12,
+      "skid": 10,
+      "airborne": 5,
+      "air-spin": 8,
+      "ground-slam": 4,
+      "glide": 8,
+      "hurt": 10,
+      "victory": 10
     },
     "characterReadability": {
       "Hargold": [

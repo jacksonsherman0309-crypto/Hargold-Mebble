@@ -4,3 +4,4 @@ await import('./actions.test.mjs');
 await import('./collision.test.mjs');
 await import('./determinism.test.mjs');
 await import('./calibration.test.mjs');
+await import('./hierarchy.test.mjs');

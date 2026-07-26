@@ -1,6 +1,6 @@
 # Character dimension, composition, and animation specification
 
-Status: approved production contract, July 25, 2026.
+Status: approved production contract, revised July 26, 2026.
 
 This contract uses the locked Hargold and Mebble sheets and
 `assets/references/Hargold and Mebble approved production target.png`.
@@ -27,16 +27,135 @@ proprietary tuning.
 
 ## Gameplay orientation
 
-- Use a controlled three-quarter side orientation: mostly facing travel, with
-  enough turn toward the camera to retain the face, chest, hands, footwear, and
-  personality.
-- Never leave the character permanently front-facing or at a perfectly flat
-  90-degree profile.
+- True side is the primary gameplay and approval orientation. Every action must
+  work at a flat profile before any reveal toward the camera is permitted.
+- The locked mannequin-fit sheets use one unchanging orthographic true-side
+  camera for every hero and row. No three-quarter reveal, per-character zoom,
+  airborne camera follow, camera rotation, or automatic panel filling is
+  permitted in those approval sheets.
+- Use the small action-dependent reveal profile in
+  `assets/blender/character-scale-orientation-profile.json`: 3 degrees for
+  sprint, 4 for run and ground slam, 5 for airborne, 6 for walk/default, 8 for
+  idle, start, air spin, and glide, 10 for stop, skid, hurt, and victory, and
+  12 for the planted turn.
+- A slight three-quarter view is a secondary personality and technical-review
+  view. It may not be used to hide overlapping limbs or a weak side silhouette.
 - Direction reversal must brake, compress, plant, twist, rotate, and accelerate
   into the new direction. Do not mirror a model with negative scale.
 - Test left-facing and right-facing movement from the real gameplay camera.
 
 ## Volume and proportions
+
+- Final Blender sources use metres at object scale `1,1,1`: Hargold is
+  1.82 m tall and Mebble is 2.2932 m tall. A standard block is 0.74 m and common
+  mobs occupy the 0.62–0.76 m band.
+- The Mebble-to-Hargold height ratio is 1.26. Hargold reads at 2.39–2.94
+  common-mob heights. These are original project targets derived from the
+  locked sheets and the repository's existing world/collision scale.
+- Visible hats, hair, feathers, and cape corners may exceed a collision proxy,
+  but feet, center of mass, and collision measurements remain on the canonical
+  metre scale.
+
+### Authoritative featureless animation frames
+
+Build and approve the rigged, featureless mannequins before fitting character
+surfaces. Do not begin a new face, costume, or accessory pass to compensate for
+an unapproved joint layout or action silhouette.
+
+| Normalized measurement | Hargold compact | Mebble tall |
+| --- | ---: | ---: |
+| Maximum body width | 0.59 | 0.36 |
+| Head height | 0.34 | 0.29 |
+| Head width | 0.41 | 0.31 |
+| Neck height | — | 0.17 |
+| Torso height | 0.32 | 0.315 |
+| Torso width | 0.50 | 0.32 |
+| Visible leg length | 0.22 | 0.33 |
+| Shoulder-to-hand arm length | 0.37 | 0.42 |
+| Hand size | 0.12 | 0.11 |
+| Foot length | 0.25 | 0.24 |
+| Foot height | 0.115 | 0.105 |
+| Shoulder width | 0.46 | 0.34 |
+| Hip width | 0.39 | 0.275 |
+
+The rig hierarchy contains Root, center of mass, pelvis, lower/mid/upper spine,
+chest, neck base/mid/upper, head, jaw, clavicles, limb chains, fingers, feet,
+toes, and character-specific accessory roots. Walk, run, and sprint validation
+uses contact, compression, passing, lift/airborne extension, and the mirrored
+opposite phases.
+
+### Locked-frame fitting and review contract
+
+The mannequin is the exact animation frame, not a neighboring pose example.
+For every approved row the pipeline creates and locks the mannequin pose,
+duplicates that exact skeleton, fits the hero mesh to the duplicate, and
+preserves all major joint centers. Head center, neck base, shoulder, elbow,
+wrist, pelvis, knee, ankle, and toe may differ by no more than three percent of
+total character height. Accessories may exceed the frame; the body may not
+drift away from it.
+
+Every mannequin and fitted panel uses the same:
+
+- orthographic true-side camera, looking along logical negative Z;
+- right-facing direction, logical movement X, vertical Y, and depth Z;
+- floor line at normalized panel Y `0.08`;
+- standing-head line at normalized panel Y `0.92`;
+- usable pose width from normalized X `0.08` to `0.92`;
+- neutral root at normalized X `0.50`;
+- camera position, orthographic scale, root convention, frame crop, and world
+  scale.
+
+Compact/Hargold standing height is normalized `1.00`; tall/Mebble is `1.26`.
+Neither hero may be enlarged independently to fill a panel. Internally blend
+the mannequin over every applicable fitted panel at 40 percent opacity and
+reject any joint-center error over the three-percent tolerance.
+
+The required four-column sheet contains twenty rows:
+
+1. neutral;
+2. walk contact;
+3. run extension;
+4. turnaround skid;
+5. jump anticipation;
+6. jump apex;
+7. landing compression;
+8. ground-slam descent;
+9. Hargold double-jump burst;
+10. Mebble glide;
+11. solid silhouette;
+12. complete skeleton alignment;
+13. run contact;
+14. run passing;
+15. jump takeoff;
+16. fall preparation;
+17. sprint slide;
+18. damage recoil;
+19. block-hit pose;
+20. victory pose.
+
+Hargold double jump is `N/A` in both Mebble/tall cells, and Mebble glide is
+`N/A` in both Hargold/compact cells. Neutral substitutes are forbidden. Split
+the review into three enlarged images covering neutral/silhouette/skeleton,
+locomotion, and jumping/abilities/attacks/landing.
+
+| Locked action frame | Required readable construction |
+| --- | --- |
+| Neutral | Pelvis over feet, 0–2° forward torso, 5–8° knees, 10–15° elbows, separated hands, flat feet. |
+| Walk contact | Front heel and rear toe contact, rear heel raised, opposing arm, 3–5° torso lean, neither foot airborne. |
+| Run extension | Both feet airborne, opposed wide leg and arm extension, 12–18° forward torso, pelvis above walk height. |
+| Turnaround skid | Previous travel is right; feet plant ahead to the right while torso braces left. Hargold leans 22–28° with 10–14% compression; Mebble leans 26–34° with 8–12% compression. |
+| Jump anticipation | Lowest prelaunch pose, feet flat, deep knees and hips, arms down/back. Hargold compresses 15–18%; Mebble 12–15%. |
+| Jump apex | Clearly airborne, bent knees, open balance arms, upright torso; never a reused neutral. |
+| Landing compression | Both feet planted with deep hip/knee absorption. Hargold compresses 18–22%; Mebble 14–18%; no higher than anticipation. |
+| Ground-slam descent | Airborne vertical centerline, feet beneath body, downward toes, forceful compact arms; Mebble's cape streams upward while his neck remains visible. |
+| Hargold double-jump | 10–20° torso twist, one raised knee, opposite driving leg and arms, separated feet, distinct from apex. |
+| Mebble glide | 8–12° forward torso, lifted chest, 55–70° spread arms, trailing rear leg, expanded cape, unobstructed neck and Adam's apple. |
+
+The silhouette row is pure black with no internal shading and reuses the exact
+Frame 01 pose and scale. The skeleton row draws connected bones and joint
+markers for root, pelvis, spine, neck, head, shoulders, elbows, wrists, hips,
+knees, ankles, and toes; Mebble also shows neck base/middle/upper and cape
+root. A centerline alone is not a skeleton overlay.
 
 - Heads require a curved skull, forehead depth, cheek and jaw volume, projecting
   nose, placed ears, modeled eyes, and volumetric hair/facial hair.
@@ -46,6 +165,21 @@ proprietary tuning.
   support open, fist, brace, grab, strike, landing, and balance poses.
 - Legs visibly drive locomotion. Feet support heel/toe placement, toe-off, foot
   roll, skids, landing compression, and speed-readable ground contact.
+- Silhouette approval is performed at 100–150 pixels tall. At that scale the
+  upper arm, forearm, hand, front foot, rear foot, torso, and rear accessory
+  must remain distinguishable in motion rather than collapsing into one blob.
+- Shoulders require authored deltoid volume and deformation loops connecting
+  the chest-to-arm transition. Arms cannot appear to emerge directly from the
+  side of the torso.
+- Hargold's forearms must extend clearly beyond his round torso, his hands are
+  enlarged by approximately 20–30 percent over the rejected July 26 candidate,
+  and his boots use a broader, longer ground-contact silhouette. His cheeks
+  remain round but transition into the face without separate spherical bulges.
+- Mebble's torso is modestly widened without weakening his tall-thin identity.
+  His arms hang clear of the vest and cape, his boots are enlarged, his neck
+  tapers through the middle, his Adam's apple projects clearly in profile, his
+  glasses sit off the face, and the cape begins as a curved shoulder yoke rather
+  than a flat back panel.
 - Hargold is the very short, broad, round, compact, low-center-of-gravity,
   grounded hero. His locked explorer identity remains unchanged.
 - Mebble is the taller, much thinner, long-limbed, long-necked,
@@ -140,3 +274,7 @@ animations, exports, and approved validation captures. This document, the
 approved target image, manifests, scripts, and placeholder GLBs are not
 substitutes for those assets. Do not modify mobs, enemies, bosses, levels, or
 unrelated assets during this character-production stage.
+
+Neutral-pose beauty renders cannot approve proportions. The approval sequence
+is bind deformation, then 100–150 pixel action silhouettes, then gameplay-camera
+motion, and only then close facial, cloth, accessory, and material finish.

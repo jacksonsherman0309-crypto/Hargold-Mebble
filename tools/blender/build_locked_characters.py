@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -150,6 +150,23 @@ def material(name: str, color, roughness=0.55, metallic=0.0):
         mat.node_tree.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
     mat["pbr_texture_resolution"] = 1024
     mat["texture_set"] = "base-color/roughness/normal/ao"
+    return mat
+
+
+def review_silhouette_material():
+    """Unlit-looking black review material with no specular highlights."""
+    mat = bpy.data.materials.get("MAT_REVIEW_SOLID_SILHOUETTE")
+    if mat is None:
+        mat = bpy.data.materials.new("MAT_REVIEW_SOLID_SILHOUETTE")
+    mat.diffuse_color = (0.0, 0.0, 0.0, 1.0)
+    mat.use_nodes = True
+    mat.node_tree.nodes.clear()
+    output = mat.node_tree.nodes.new("ShaderNodeOutputMaterial")
+    diffuse = mat.node_tree.nodes.new("ShaderNodeBsdfDiffuse")
+    diffuse.inputs["Color"].default_value = (0.0, 0.0, 0.0, 1.0)
+    diffuse.inputs["Roughness"].default_value = 1.0
+    mat.node_tree.links.new(diffuse.outputs["BSDF"], output.inputs["Surface"])
+    mat["review_only"] = True
     return mat
 
 
@@ -333,9 +350,73 @@ def parent_bone(obj, armature, bone):
     obj.parent = armature
     obj.parent_type = "BONE"
     obj.parent_bone = bone
-    parent_matrix = armature.matrix_world @ armature.data.bones[bone].matrix_local
+    # Blender's BONE object-parent space is anchored at the bone tail.  Using
+    # only matrix_local (the head frame) adds the full bone length again during
+    # dependency-graph evaluation, which visibly detached rigid accessories,
+    # boots, eyes, and hair from the skinned surface.  Include the tail offset
+    # in the inverse so the object preserves its authored world placement and
+    # then follows the evaluated bone without a one-bone-length jump.
+    rest_bone = armature.data.bones[bone]
+    parent_matrix = (
+        armature.matrix_world
+        @ rest_bone.matrix_local
+        @ Matrix.Translation((0.0, rest_bone.length, 0.0))
+    )
     obj.matrix_parent_inverse = parent_matrix.inverted()
+    # Force the newly assigned bone parent through the dependency graph before
+    # restoring the authored world matrix.  Without this update Blender applies
+    # the parent-space rotation/translation one evaluation later, so the
+    # immediately assigned matrix_world is silently displaced.
+    bpy.context.view_layer.update()
     obj.matrix_world = world
+    bpy.context.view_layer.update()
+    obj["authored_rest_world_matrix"] = [
+        world[row][column]
+        for row in range(4)
+        for column in range(4)
+    ]
+
+
+def restore_bone_parent_bindings(armature):
+    """Restore authored bone-parent bind matrices after export evaluation.
+
+    Blender's glTF exporter evaluates and bakes constrained animation.  In the
+    same process this can leave rigid bone-parented objects evaluated from a
+    transient pose when later review renders begin.  Rebinding from the stored
+    factory-scene matrices guarantees that full builds and `--skip-export`
+    review builds produce the same attachment placement.
+    """
+    scene = bpy.context.scene
+    saved_action = (
+        armature.animation_data.action
+        if armature.animation_data else None
+    )
+    saved_frame = scene.frame_current
+    if armature.animation_data:
+        armature.animation_data.action = None
+    armature.location = (0.0, 0.0, 0.0)
+    armature.rotation_euler = (0.0, 0.0, 0.0)
+    armature.scale = (1.0, 1.0, 1.0)
+    for pose_bone in armature.pose.bones:
+        pose_bone.matrix_basis = Matrix.Identity(4)
+    scene.frame_set(0)
+    bpy.context.view_layer.update()
+    for obj in bpy.data.objects:
+        values = obj.get("authored_rest_world_matrix")
+        if obj.parent != armature or not values or len(values) != 16:
+            continue
+        world = Matrix((
+            values[0:4],
+            values[4:8],
+            values[8:12],
+            values[12:16],
+        ))
+        obj.matrix_world = world
+        bpy.context.view_layer.update()
+    if armature.animation_data:
+        armature.animation_data.action = saved_action
+    scene.frame_set(saved_frame)
+    bpy.context.view_layer.update()
 
 
 def parent_object(obj, parent):
@@ -407,6 +488,8 @@ def create_armature(hero, dims, rig_collection):
     rig_collection.objects.link(arm)
     arm.show_in_front = True
     arm["rig_status"] = "production-intent-core-rig"
+    arm["target_height_metres"] = dims["height"]
+    arm["mannequin_frame"] = dims.get("frame", "")
     bpy.context.view_layer.objects.active = arm
     arm.select_set(True)
     bpy.ops.object.mode_set(mode="EDIT")
@@ -426,12 +509,31 @@ def create_armature(hero, dims, rig_collection):
     head_top = dims["head_top"]
     hip = dims["hip"]
     shoulder = dims["shoulder"]
+    elbow_z = dims.get("elbow_z", shoulder - 0.12)
+    wrist_z = dims.get("wrist_z", shoulder - 0.28)
     add("Root", (0, 0, 0), (0, 0, 0.22))
-    add("DEF_hips", (0, 0, hip - 0.18), (0, 0, hip + 0.18), "Root")
-    add("DEF_spine", (0, 0, hip), (0, 0, shoulder - 0.18), "DEF_hips")
-    add("DEF_chest", (0, 0, shoulder - 0.18), (0, 0, shoulder + 0.18), "DEF_spine")
-    add("DEF_neck", (0, 0, shoulder + 0.12), (0, 0, head_center - 0.27), "DEF_chest")
-    add("DEF_head", (0, 0, head_center - 0.29), (0, 0, head_center + 0.34), "DEF_neck")
+    add("DEF_center_of_mass", (0, 0, hip - 0.10), (0, 0, hip + 0.10), "Root")
+    add("DEF_hips", (0, 0, hip - 0.18), (0, 0, hip + 0.18), "DEF_center_of_mass")
+    spine_span = max(0.24, shoulder - hip)
+    spine_lower_top = hip + spine_span * 0.34
+    spine_mid_top = hip + spine_span * 0.67
+    spine_upper_top = shoulder - 0.04
+    add("DEF_spine_lower", (0, 0, hip), (0, 0, spine_lower_top), "DEF_hips")
+    add("DEF_spine_mid", (0, 0, spine_lower_top), (0, 0, spine_mid_top), "DEF_spine_lower")
+    add("DEF_spine_upper", (0, 0, spine_mid_top), (0, 0, spine_upper_top), "DEF_spine_mid")
+    add("DEF_chest", (0, 0, spine_upper_top), (0, 0, shoulder + 0.12), "DEF_spine_upper")
+    # Compatibility handles remain non-deforming; the fitted production
+    # surfaces use the explicit lower/mid/upper chains.
+    add("DEF_spine", (0, 0, hip), (0, 0, shoulder - 0.18), "DEF_hips", False)
+    neck_start = shoulder + 0.045
+    neck_end = max(neck_start + 0.09, head_center - 0.25)
+    neck_one = neck_start + (neck_end - neck_start) / 3
+    neck_two = neck_start + (neck_end - neck_start) * 2 / 3
+    add("DEF_neck_base", (0, 0, neck_start), (0, 0, neck_one), "DEF_chest")
+    add("DEF_neck_mid", (0, 0, neck_one), (0, 0, neck_two), "DEF_neck_base")
+    add("DEF_neck_upper", (0, 0, neck_two), (0, 0, neck_end), "DEF_neck_mid")
+    add("DEF_neck", (0, 0, neck_start), (0, 0, neck_end), "DEF_chest", False)
+    add("DEF_head", (0, 0, head_center - 0.29), (0, 0, head_center + 0.34), "DEF_neck_upper")
     add("DEF_jaw", (0, -0.06, head_center - 0.14), (0, -0.30, head_center - 0.20), "DEF_head")
     eye_x = 0.23 if hero == "Hargold" else 0.16
     eye_z = head_center + (0.05 if hero == "Hargold" else 0.04)
@@ -454,15 +556,24 @@ def create_armature(hero, dims, rig_collection):
         add("DEF_scarf_tail.L", (-0.10, -0.05, shoulder + 0.05), (-0.10, -0.12, shoulder - 0.42), "DEF_chest")
         add("DEF_scarf_tail.R", (0.10, -0.05, shoulder + 0.05), (0.10, -0.12, shoulder - 0.42), "DEF_chest")
         add("DEF_feather", (-0.42, 0, head_top + 0.06), (-0.72, 0, head_top + 0.47), "DEF_head")
+        add("DEF_backpack", (0, 0.12, shoulder), (0, 0.34, hip + 0.04), "DEF_chest")
+        add("DEF_backpack_gear", (0, 0.26, shoulder + 0.10), (0, 0.42, shoulder + 0.34), "DEF_backpack")
     else:
-        add("DEF_adams_apple", (0, -0.10, head_center - 0.47), (0, -0.18, head_center - 0.64), "DEF_neck")
+        add("DEF_adams_apple", (0, -0.10, head_center - 0.47), (0, -0.18, head_center - 0.64), "DEF_neck_mid")
     for side, sign in (("L", -1), ("R", 1)):
-        add(f"DEF_upper_arm.{side}", (sign * dims["chest_half"], 0, shoulder), (sign * dims["elbow"], 0, shoulder - 0.12), "DEF_chest")
-        add(f"DEF_forearm.{side}", (sign * dims["elbow"], 0, shoulder - 0.12), (sign * dims["wrist"], 0, shoulder - 0.28), f"DEF_upper_arm.{side}")
-        add(f"DEF_hand.{side}", (sign * dims["wrist"], 0, shoulder - 0.28), (sign * (dims["wrist"] + 0.18), 0, shoulder - 0.31), f"DEF_forearm.{side}")
+        clavicle_end = sign * max(dims["chest_half"] - 0.015, 0.08)
+        add(
+            f"DEF_clavicle.{side}",
+            (sign * 0.04, 0, shoulder + 0.035),
+            (clavicle_end, 0, shoulder),
+            "DEF_chest",
+        )
+        add(f"DEF_upper_arm.{side}", (sign * dims["chest_half"], 0, shoulder), (sign * dims["elbow"], 0, elbow_z), f"DEF_clavicle.{side}")
+        add(f"DEF_forearm.{side}", (sign * dims["elbow"], 0, elbow_z), (sign * dims["wrist"], 0, wrist_z), f"DEF_upper_arm.{side}")
+        add(f"DEF_hand.{side}", (sign * dims["wrist"], 0, wrist_z), (sign * (dims["wrist"] + 0.18), 0, wrist_z - 0.03), f"DEF_forearm.{side}")
         for finger_index, finger in enumerate(("thumb", "index", "middle", "ring", "pinky")):
             base_x = sign * (dims["wrist"] + 0.15)
-            base_z = shoulder - 0.34 + (2 - finger_index) * 0.018
+            base_z = wrist_z - 0.06 + (2 - finger_index) * 0.018
             add(f"DEF_{finger}.01.{side}", (base_x, -0.01, base_z),
                 (base_x + sign * 0.10, -0.02, base_z), f"DEF_hand.{side}")
             add(f"DEF_{finger}.02.{side}", (base_x + sign * 0.10, -0.02, base_z),
@@ -470,9 +581,11 @@ def create_armature(hero, dims, rig_collection):
         add(f"DEF_thigh.{side}", (sign * dims["leg_x"], 0, hip), (sign * dims["leg_x"], 0, dims["knee"]), "DEF_hips")
         add(f"DEF_shin.{side}", (sign * dims["leg_x"], 0, dims["knee"]), (sign * dims["leg_x"], 0, dims["ankle"]), f"DEF_thigh.{side}")
         add(f"DEF_foot.{side}", (sign * dims["leg_x"], 0, dims["ankle"]), (sign * dims["leg_x"], -0.34, dims["ankle"] - 0.03), f"DEF_shin.{side}")
+        add(f"DEF_toe.{side}", (sign * dims["leg_x"], -0.28, dims["ankle"] - 0.03),
+            (sign * dims["leg_x"], -0.48, dims["ankle"] - 0.03), f"DEF_foot.{side}")
     socket_specs = {
-        "SOCKET_hand_l": (-dims["wrist"], 0, shoulder - 0.28),
-        "SOCKET_hand_r": (dims["wrist"], 0, shoulder - 0.28),
+        "SOCKET_hand_l": (-dims["wrist"], 0, wrist_z),
+        "SOCKET_hand_r": (dims["wrist"], 0, wrist_z),
         "SOCKET_head": (0, 0, head_top),
         "SOCKET_hat": (0, 0, head_top + 0.02),
         "SOCKET_glasses": (0, -0.34, head_center + 0.05),
@@ -483,6 +596,7 @@ def create_armature(hero, dims, rig_collection):
     for name, head in socket_specs.items():
         add(name, head, (head[0], head[1], head[2] + 0.12), "Root")
     add("CTRL_root", (0, 0, 0), (0, 0.35, 0), None, False)
+    add("CTRL_center_of_mass", (0, -0.38, hip), (0, 0.38, hip), None, False)
     add("CTRL_hips", (0, -0.35, hip), (0, 0.35, hip), None, False)
     add("CTRL_chest", (0, -0.32, shoulder), (0, 0.32, shoulder), None, False)
     add("CTRL_head", (0, -0.28, head_center), (0, 0.28, head_center), None, False)
@@ -493,6 +607,8 @@ def create_armature(hero, dims, rig_collection):
     add("CTRL_mouth.L", (-mouth_x, -0.70, mouth_z), (-mouth_x, -0.87, mouth_z), None, False)
     add("CTRL_mouth.R", (mouth_x, -0.70, mouth_z), (mouth_x, -0.87, mouth_z), None, False)
     add("CTRL_hat_secondary", (0.55, 0, head_top), (0.55, 0, head_top + 0.32), None, False)
+    if hero == "Hargold":
+        add("CTRL_backpack_follow", (0.62, 0.16, shoulder), (0.62, 0.36, hip + 0.04), None, False)
     if hero == "Mebble":
         # Parallel rest orientation prevents control constraints from changing
         # the cape merely by being enabled.
@@ -500,10 +616,10 @@ def create_armature(hero, dims, rig_collection):
         add("CTRL_cape.02", (0.62, 0.32, shoulder - 0.38), (0.62, 0.38, shoulder - 0.88), None, False)
         add("CTRL_cape.03", (0.62, 0.38, shoulder - 0.88), (0.62, 0.34, shoulder - 1.38), None, False)
     for side, sign in (("L", -1), ("R", 1)):
-        add(f"CTRL_hand_ik.{side}", (sign * (dims["wrist"] + 0.2), -0.20, shoulder - 0.28),
-            (sign * (dims["wrist"] + 0.2), 0.05, shoulder - 0.28), None, False)
-        add(f"CTRL_elbow_pole.{side}", (sign * dims["elbow"], -0.65, shoulder - 0.12),
-            (sign * dims["elbow"], -0.45, shoulder - 0.12), None, False)
+        add(f"CTRL_hand_ik.{side}", (sign * (dims["wrist"] + 0.2), -0.20, wrist_z),
+            (sign * (dims["wrist"] + 0.2), 0.05, wrist_z), None, False)
+        add(f"CTRL_elbow_pole.{side}", (sign * dims["elbow"], -0.65, elbow_z),
+            (sign * dims["elbow"], -0.45, elbow_z), None, False)
         add(f"CTRL_foot_ik.{side}", (sign * dims["leg_x"], -0.35, dims["ankle"]),
             (sign * dims["leg_x"], 0.18, dims["ankle"]), None, False)
         add(f"CTRL_knee_pole.{side}", (sign * dims["leg_x"], -0.65, dims["knee"]),
@@ -561,6 +677,12 @@ def create_armature(hero, dims, rig_collection):
         variable.targets[0].id = arm
         variable.targets[0].data_path = f'pose.bones["CTRL_foot_ik.{side}"]["ik_fk"]'
         influence_driver.expression = "ik_fk"
+    if hero == "Hargold":
+        backpack_constraint = arm.pose.bones["DEF_backpack"].constraints.new("COPY_ROTATION")
+        backpack_constraint.target = arm
+        backpack_constraint.subtarget = "CTRL_backpack_follow"
+        backpack_constraint.target_space = "LOCAL"
+        backpack_constraint.owner_space = "LOCAL"
     hat_constraint = arm.pose.bones["DEF_hat_secondary"].constraints.new("COPY_ROTATION")
     hat_constraint.target = arm
     hat_constraint.subtarget = "CTRL_hat_secondary"
@@ -593,6 +715,20 @@ def create_armature(hero, dims, rig_collection):
         ui.update(min=0.0, max=1.0, description=description)
     arm.select_set(False)
     return arm
+
+
+def align_review_pose_to_floor(armature, airborne_height=0.0):
+    """Place a posed rig from the locked root/floor contract.
+
+    The exact same function is used for mannequin and fitted-character
+    rendering.  Production geometry is authored with its soles on Z=0 and the
+    rig root at the same origin, so deriving a new offset from rotated toe
+    joints would move the declared root and break fixed-panel alignment.
+    Airborne rows receive only their explicit authored height.
+    """
+    armature.location.z = airborne_height
+    bpy.context.view_layer.update()
+    return armature.location.z
 
 
 def add_core_actions(arm, hero):
@@ -668,6 +804,11 @@ def add_core_actions(arm, hero):
             control = arm.pose.bones["CTRL_cape.01"]
             control["cape_open"] = cape_open
             control.keyframe_insert(data_path='["cape_open"]', frame=1)
+    for side in ("L", "R"):
+        arm.pose.bones[f"CTRL_hand_ik.{side}"]["ik_fk"] = 0.0
+        arm.pose.bones[f"CTRL_foot_ik.{side}"]["ik_fk"] = 0.0
+    if hero == "Mebble":
+        arm.pose.bones["CTRL_cape.01"]["cape_open"] = 0.0
     arm.animation_data.action = actions["idle"]
     scene.frame_start, scene.frame_end = 1, 40
 
@@ -676,7 +817,7 @@ SHARED_REPLACEMENT_CLIPS = (
     "idle", "walk", "run", "sprint", "start", "stop", "turn-low", "skid",
     "takeoff", "rise", "apex", "fall", "land-soft", "land-hard",
     "landing-recovery", "jump-running", "jump-triple-1", "jump-triple-2",
-    "jump-triple-3", "wall-slide", "wall-jump", "wall-reaction",
+    "jump-triple-3", "wall-reaction",
     "ledge-stop", "crouch", "crawl", "stand", "duck", "duck-slide",
     "slope-slide", "rolling-momentum", "slide-jump", "spin-jump", "air-spin",
     "fast-fall", "ground-slam", "stomp-bounce", "swim", "dive",
@@ -693,53 +834,84 @@ def add_production_actions(arm, hero):
     scene = bpy.context.scene
     arm.animation_data_create()
     actions = {}
+    target_height = float(arm.get("target_height_metres", 1.82))
     secondary = (
-        ("DEF_feather", "DEF_scarf_tail.L", "DEF_scarf_tail.R")
+        (
+            "DEF_feather", "DEF_scarf_tail.L", "DEF_scarf_tail.R",
+            "DEF_backpack", "DEF_backpack_gear",
+        )
         if hero == "Hargold"
         else ("DEF_cape.01", "DEF_cape.02", "DEF_cape.03")
     )
     core_bones = (
-        "DEF_hips", "DEF_spine", "DEF_chest", "DEF_neck", "DEF_head",
+        "DEF_center_of_mass", "DEF_hips",
+        "DEF_spine_lower", "DEF_spine_mid", "DEF_spine_upper",
+        "DEF_spine", "DEF_chest",
+        "DEF_neck_base", "DEF_neck_mid", "DEF_neck_upper", "DEF_neck",
+        "DEF_head",
         "DEF_jaw", "DEF_upper_arm.L", "DEF_upper_arm.R",
+        "DEF_clavicle.L", "DEF_clavicle.R",
         "DEF_forearm.L", "DEF_forearm.R", "DEF_hand.L", "DEF_hand.R",
         "DEF_thigh.L", "DEF_thigh.R", "DEF_shin.L", "DEF_shin.R",
-        "DEF_foot.L", "DEF_foot.R", *secondary
+        "DEF_foot.L", "DEF_foot.R", "DEF_toe.L", "DEF_toe.R",
+        *(
+            f"DEF_{finger}.{segment}.{side}"
+            for side in ("L", "R")
+            for finger in ("thumb", "index", "middle", "ring", "pinky")
+            for segment in ("01", "02")
+        ),
+        *secondary
     )
 
     def pose(
-        hips=0.0, chest=0.0, head=0.0, arm_l=-1.12, arm_r=-1.12,
+        hips=0.0, chest=0.0, head=0.0, arm_l=-0.36, arm_r=-0.36,
         fore_l=0.0, fore_r=0.0, leg_l=0.0, leg_r=0.0,
         shin_l=0.0, shin_r=0.0, foot_l=0.0, foot_r=0.0,
+        toe_l=0.0, toe_r=0.0, hand_l=0.0, hand_r=0.0,
         twist=0.0, secondary_swing=0.0
     ):
         result = {
-            # Gameplay is read from the X/Z side-scrolling plane while the
-            # camera looks down -Y.  Blender pose rotations are bone-local:
-            # the vertical torso/leg chains bend visibly around local Z,
-            # while the horizontal arm chains bend around local X.  The old
-            # one-axis-for-every-chain mapping left the legs twisting in depth
-            # and made the motion read like a posed wooden doll.
-            "DEF_hips": (0, twist * 0.35, hips),
-            "DEF_spine": (0, -twist * 0.40, chest * 0.35),
-            "DEF_chest": (0, twist, chest),
-            "DEF_neck": (0, -twist * 0.25, -head * 0.25),
-            "DEF_head": (0, -twist * 0.35, head),
+            # The approval camera is a true profile view down local -X, so
+            # locomotion arcs must live in the local Y/Z plane.  The first
+            # Euler channel creates the visible profile bend; twist remains a
+            # separate secondary channel and never substitutes for a readable
+            # contact or extension silhouette.
+            "DEF_center_of_mass": (hips * 0.12, twist * 0.10, 0),
+            "DEF_hips": (hips * 0.72, twist * 0.30, 0),
+            "DEF_spine_lower": (chest * 0.16, -twist * 0.16, 0),
+            "DEF_spine_mid": (chest * 0.24, -twist * 0.18, 0),
+            "DEF_spine_upper": (chest * 0.30, twist * 0.28, 0),
+            "DEF_spine": (chest * 0.10, -twist * 0.10, 0),
+            "DEF_chest": (chest, twist, 0),
+            "DEF_neck_base": (-head * 0.10, -twist * 0.10, 0),
+            "DEF_neck_mid": (-head * 0.16, -twist * 0.12, 0),
+            "DEF_neck_upper": (-head * 0.22, -twist * 0.16, 0),
+            "DEF_neck": (0, 0, 0),
+            "DEF_head": (head, -twist * 0.35, 0),
+            "DEF_clavicle.L": (arm_l * 0.08, 0, -twist * 0.14),
+            "DEF_clavicle.R": (arm_r * 0.08, 0, twist * 0.14),
             "DEF_upper_arm.L": (arm_l, 0, -twist * 0.5),
             "DEF_upper_arm.R": (arm_r, 0, twist * 0.5),
             "DEF_forearm.L": (fore_l, 0, 0),
             "DEF_forearm.R": (fore_r, 0, 0),
-            "DEF_thigh.L": (0, 0, leg_l),
-            "DEF_thigh.R": (0, 0, leg_r),
-            "DEF_shin.L": (0, 0, shin_l),
-            "DEF_shin.R": (0, 0, shin_r),
+            "DEF_hand.L": (hand_l, 0, -twist * 0.18),
+            "DEF_hand.R": (hand_r, 0, twist * 0.18),
+            "DEF_thigh.L": (leg_l, 0, 0),
+            "DEF_thigh.R": (leg_r, 0, 0),
+            "DEF_shin.L": (shin_l, 0, 0),
+            "DEF_shin.R": (shin_r, 0, 0),
             "DEF_foot.L": (foot_l, 0, 0),
             "DEF_foot.R": (foot_r, 0, 0),
+            "DEF_toe.L": (toe_l, 0, 0),
+            "DEF_toe.R": (toe_r, 0, 0),
         }
         if hero == "Hargold":
             result.update({
                 "DEF_feather": (0, secondary_swing * 0.55, secondary_swing),
                 "DEF_scarf_tail.L": (-secondary_swing * 0.45, 0, secondary_swing * 0.25),
                 "DEF_scarf_tail.R": (-secondary_swing * 0.38, 0, -secondary_swing * 0.22),
+                "DEF_backpack": (-secondary_swing * 0.11, secondary_swing * 0.08, 0),
+                "DEF_backpack_gear": (-secondary_swing * 0.20, secondary_swing * 0.12, 0),
             })
         else:
             result.update({
@@ -758,8 +930,10 @@ def add_production_actions(arm, hero):
         act["source_geometry"] = "full-rebuild-2026-07-25"
         act["root_motion"] = False
         act["loop"] = loop
+        act["locked_frame_source"] = "compact-tall-locked-animation-frames-v2"
+        act["reference_height_metres"] = target_height
         act["contact_markers"] = json.dumps(list(contacts))
-        act["blend_in_seconds"] = 0.08 if name in {"skid", "wall-jump", "hurt"} else 0.12
+        act["blend_in_seconds"] = 0.08 if name in {"skid", "turn-low", "hurt"} else 0.12
         act["blend_out_seconds"] = 0.10
         arm.animation_data.action = act
         for bone_name in core_bones:
@@ -772,9 +946,36 @@ def add_production_actions(arm, hero):
         face = arm.pose.bones["CTRL_face"]
         face["smile"] = 0.0
         face["mouth_open"] = 0.0
+        action_grip = (
+            0.78 if name.startswith("carry-") or name in {"rope-grab", "rope-swing", "rope-climb"}
+            else 0.58 if name in {"ground-slam", "heavy-ground-slam", "stonefist-strike", "break-hargold-block", "hurt", "knockback"}
+            else 0.30 if name in {"run", "sprint", "takeoff", "rise", "double-jump", "air-spin"}
+            else 0.16
+        )
+        default_expression = (
+            {"smile": 0.0, "mouth_open": 0.72, "brow_raise_L": 0.12, "brow_raise_R": 0.12}
+            if name in {"hurt", "knockback", "defeat"}
+            else {"smile": 0.86, "mouth_open": 0.34, "brow_raise_L": 0.48, "brow_raise_R": 0.48}
+            if name == "victory"
+            else {"smile": 0.24, "mouth_open": 0.22, "brow_raise_L": 0.20, "brow_raise_R": 0.20}
+            if name in {"takeoff", "rise", "double-jump", "air-spin", "ground-slam"}
+            else {"smile": 0.16, "mouth_open": 0.0, "brow_raise_L": 0.08, "brow_raise_R": 0.08}
+        )
+        first_frame = keyframes[0][0]
+        last_frame = keyframes[-1][0]
         for frame, rotations, scales, locations, face_values in keyframes:
             scene.frame_set(frame)
-            for bone_name, rotation in rotations.items():
+            phase = 0.0 if last_frame == first_frame else (frame - first_frame) / (last_frame - first_frame)
+            grip = action_grip + math.sin(phase * math.pi) * (0.10 if name in {"walk", "run", "sprint"} else 0.04)
+            authored_rotations = dict(rotations)
+            for side, sign in (("L", -1), ("R", 1)):
+                authored_rotations[f"DEF_thumb.01.{side}"] = (0, sign * grip * 0.48, sign * 0.12)
+                authored_rotations[f"DEF_thumb.02.{side}"] = (0, sign * grip * 0.56, 0)
+                for finger_index, finger in enumerate(("index", "middle", "ring", "pinky")):
+                    finger_grip = grip * (0.88 + finger_index * 0.04)
+                    authored_rotations[f"DEF_{finger}.01.{side}"] = (0, sign * finger_grip * 0.72, 0)
+                    authored_rotations[f"DEF_{finger}.02.{side}"] = (0, sign * finger_grip * 0.88, 0)
+            for bone_name, rotation in authored_rotations.items():
                 bone = arm.pose.bones.get(bone_name)
                 if bone:
                     bone.rotation_euler = rotation
@@ -789,7 +990,9 @@ def add_production_actions(arm, hero):
                 if bone:
                     bone.location = location
                     bone.keyframe_insert("location", frame=frame)
-            for prop_name, value in face_values.items():
+            authored_face_values = dict(default_expression)
+            authored_face_values.update(face_values)
+            for prop_name, value in authored_face_values.items():
                 face[prop_name] = value
                 face.keyframe_insert(data_path=f'["{prop_name}"]', frame=frame)
         if hero == "Mebble" and cape_open is not None:
@@ -805,47 +1008,127 @@ def add_production_actions(arm, hero):
     # Locomotion cycles use keyed contacts, torso counter-rotation, head drag,
     # and secondary overlap. The first pose is repeated to avoid loop snapping.
     for name, amplitude, length, lift in (
-        ("walk", 0.32, 24, 0.025),
-        ("run", 0.50, 16, 0.050),
-        ("sprint", 0.68, 12, 0.075),
+        ("walk", 0.38, 24, 0.030),
+        ("run", 0.64, 16, 0.065),
+        ("sprint", 0.82, 12, 0.090),
     ):
-        first = pose(
-            hips=-0.05, chest=-0.06, head=0.05,
-            arm_l=-1.12 - amplitude * 0.45,
-            arm_r=-1.12 + amplitude * 0.42,
-            fore_l=-0.42, fore_r=-0.58,
+        forward_lean = amplitude * 0.22
+        contact_sink = -0.095 if hero == "Hargold" else -0.075
+        contact = pose(
+            hips=-forward_lean, chest=-forward_lean * 1.18, head=forward_lean * 0.62,
+            arm_l=-0.62 - amplitude * 0.78,
+            arm_r=0.18 + amplitude * 0.70,
+            fore_l=-0.48, fore_r=0.18,
             leg_l=amplitude, leg_r=-amplitude,
-            shin_l=-0.12, shin_r=-0.34, twist=0.08,
+            shin_l=-0.12, shin_r=-0.52,
+            foot_l=-0.10, foot_r=0.18, toe_l=0.12,
+            twist=0.08,
             secondary_swing=-amplitude * 0.26
+        )
+        compression = pose(
+            hips=0.16 + amplitude * 0.08,
+            chest=0.10 + amplitude * 0.08,
+            head=-0.07,
+            arm_l=-0.52 - amplitude * 0.52,
+            arm_r=0.08 + amplitude * 0.42,
+            fore_l=-0.52, fore_r=0.12,
+            leg_l=amplitude * 0.52, leg_r=-amplitude * 0.48,
+            shin_l=-0.58, shin_r=-0.70,
+            foot_l=0.10, foot_r=0.22,
+            twist=0.04,
+            secondary_swing=-amplitude * 0.08,
         )
         passing = pose(
             hips=0.03, chest=0.03, head=-0.02,
-            arm_l=-1.04, arm_r=-1.10, fore_l=-0.44, fore_r=-0.44,
-            leg_l=-0.05, leg_r=0.07, shin_l=-0.26, shin_r=-0.04,
+            arm_l=-0.30, arm_r=-0.18, fore_l=-0.44, fore_r=-0.32,
+            leg_l=-0.10, leg_r=0.14, shin_l=-0.30, shin_r=-0.10,
             twist=-0.03, secondary_swing=amplitude * 0.14
         )
-        opposite = pose(
-            hips=-0.05, chest=-0.06, head=0.05,
-            arm_l=-1.12 + amplitude * 0.42,
-            arm_r=-1.12 - amplitude * 0.45,
-            fore_l=-0.58, fore_r=-0.42,
+        extension = pose(
+            hips=-forward_lean * 0.82,
+            chest=-forward_lean,
+            head=forward_lean * 0.44,
+            arm_l=0.18 + amplitude * 0.70,
+            arm_r=-0.62 - amplitude * 0.78,
+            fore_l=0.18, fore_r=-0.48,
+            leg_l=-amplitude * 0.62, leg_r=amplitude * 0.78,
+            shin_l=-0.48, shin_r=-0.18,
+            foot_l=0.18, foot_r=-0.08, toe_r=0.10,
+            twist=-0.09,
+            secondary_swing=-amplitude * 0.34,
+        )
+        opposite_contact = pose(
+            hips=-forward_lean, chest=-forward_lean * 1.18, head=forward_lean * 0.62,
+            arm_l=0.18 + amplitude * 0.70,
+            arm_r=-0.62 - amplitude * 0.78,
+            fore_l=0.18, fore_r=-0.48,
             leg_l=-amplitude, leg_r=amplitude,
-            shin_l=-0.34, shin_r=-0.12, twist=-0.08,
+            shin_l=-0.52, shin_r=-0.12,
+            foot_l=0.18, foot_r=-0.10, toe_r=0.12,
+            twist=-0.08,
             secondary_swing=-amplitude * 0.30
         )
+        opposite_compression = pose(
+            hips=0.16 + amplitude * 0.08,
+            chest=0.10 + amplitude * 0.08,
+            head=-0.07,
+            arm_l=0.08 + amplitude * 0.42,
+            arm_r=-0.52 - amplitude * 0.52,
+            fore_l=0.12, fore_r=-0.52,
+            leg_l=-amplitude * 0.48, leg_r=amplitude * 0.52,
+            shin_l=-0.70, shin_r=-0.58,
+            foot_l=0.22, foot_r=0.10,
+            twist=-0.04,
+            secondary_swing=-amplitude * 0.08,
+        )
+        opposite_passing = pose(
+            hips=0.03, chest=0.03, head=-0.02,
+            arm_l=-0.18, arm_r=-0.30, fore_l=-0.32, fore_r=-0.44,
+            leg_l=0.14, leg_r=-0.10, shin_l=-0.10, shin_r=-0.30,
+            twist=0.03, secondary_swing=amplitude * 0.14,
+        )
+        opposite_extension = pose(
+            hips=-forward_lean * 0.82,
+            chest=-forward_lean,
+            head=forward_lean * 0.44,
+            arm_l=-0.62 - amplitude * 0.78,
+            arm_r=0.18 + amplitude * 0.70,
+            fore_l=-0.48, fore_r=0.18,
+            leg_l=amplitude * 0.78, leg_r=-amplitude * 0.62,
+            shin_l=-0.18, shin_r=-0.48,
+            foot_l=-0.08, foot_r=0.18, toe_l=0.10,
+            twist=0.09,
+            secondary_swing=-amplitude * 0.34,
+        )
+        compression_frame = max(2, round(length * 0.125))
+        passing_frame = max(compression_frame + 1, round(length * 0.25))
+        extension_frame = max(passing_frame + 1, round(length * 0.375))
+        opposite_frame = max(extension_frame + 1, round(length * 0.50))
+        opposite_compression_frame = max(opposite_frame + 1, round(length * 0.625))
+        opposite_passing_frame = max(opposite_compression_frame + 1, round(length * 0.75))
+        opposite_extension_frame = max(opposite_passing_frame + 1, round(length * 0.875))
         create_action(name, [
-            k(1, first, {"DEF_hips": (1.0, 1.0, 0.98)}, {"DEF_hips": (0, 0, 0)}),
-            k(length // 4, passing, locations={"DEF_hips": (0, 0, lift)}),
-            k(length // 2, opposite, {"DEF_hips": (1.0, 1.0, 0.98)}, {"DEF_hips": (0, 0, 0)}),
-            k(length * 3 // 4, passing, locations={"DEF_hips": (0, 0, lift)}),
-            k(length, first, {"DEF_hips": (1.0, 1.0, 0.98)}, {"DEF_hips": (0, 0, 0)}),
-        ], loop=True, contacts=((1, "left-foot"), (length // 2, "right-foot")))
+            k(1, contact, {"DEF_hips": (1.0, 1.0, 0.97)}, {"DEF_hips": (0, 0, contact_sink)}),
+            k(compression_frame, compression, {"DEF_hips": (1.04, 1.04, 0.92)}, {"DEF_hips": (0, 0, contact_sink - lift * 0.35)}),
+            k(passing_frame, passing, locations={"DEF_hips": (0, 0, lift)}),
+            k(extension_frame, extension, {"DEF_hips": (0.98, 0.98, 1.03)}, {"DEF_hips": (0, 0, lift * (1.55 if name != "walk" else 1.05))}),
+            k(opposite_frame, opposite_contact, {"DEF_hips": (1.0, 1.0, 0.97)}, {"DEF_hips": (0, 0, contact_sink)}),
+            k(opposite_compression_frame, opposite_compression, {"DEF_hips": (1.04, 1.04, 0.92)}, {"DEF_hips": (0, 0, contact_sink - lift * 0.35)}),
+            k(opposite_passing_frame, opposite_passing, locations={"DEF_hips": (0, 0, lift)}),
+            k(opposite_extension_frame, opposite_extension, {"DEF_hips": (0.98, 0.98, 1.03)}, {"DEF_hips": (0, 0, lift * (1.55 if name != "walk" else 1.05))}),
+            k(length, contact, {"DEF_hips": (1.0, 1.0, 0.97)}, {"DEF_hips": (0, 0, contact_sink)}),
+        ], loop=True, contacts=((1, "left-foot"), (opposite_frame, "right-foot")))
+        actions[name]["pose_phases"] = json.dumps([
+            "contact", "compression", "passing", "lift-airborne-extension",
+            "opposite-contact", "opposite-compression", "opposite-passing",
+            "opposite-lift-airborne-extension",
+        ])
 
     create_action("idle", [
-        k(1, pose(chest=-0.025, head=0.025, secondary_swing=-0.025), face={"smile": 0.18}),
+        k(1, pose(), face={"smile": 0.18}),
         k(24, pose(chest=0.035, head=-0.018, twist=0.025, secondary_swing=0.055),
           {"DEF_chest": (1.015, 1.015, 1.025)}, face={"smile": 0.28}),
-        k(48, pose(chest=-0.025, head=0.025, secondary_swing=-0.025), face={"smile": 0.18}),
+        k(48, pose(), face={"smile": 0.18}),
     ], loop=True)
 
     expressive = {
@@ -855,24 +1138,77 @@ def add_production_actions(arm, hero):
                  pose(chest=0.06, head=-0.03)],
         "turn-low": [pose(hips=0.12, chest=0.18, head=-0.12, twist=0.26),
                      pose(hips=-0.05, chest=-0.12, head=0.07, twist=-0.30, secondary_swing=0.30)],
-        "skid": [pose(hips=0.22, chest=0.24, head=-0.14, arm_l=0.15, arm_r=0.15, leg_l=-0.42, leg_r=0.55, twist=0.18, secondary_swing=0.55),
-                 pose(hips=0.08, chest=0.10, head=-0.04, arm_l=-0.25, arm_r=-0.40, leg_l=-0.10, leg_r=0.15)],
-        "takeoff": [pose(hips=0.28, chest=0.18, head=-0.12, arm_l=-0.92, arm_r=-0.92, leg_l=-0.34, leg_r=-0.34),
-                    pose(hips=-0.22, chest=-0.18, head=0.10, arm_l=0.18, arm_r=-0.40, leg_l=0.48, leg_r=-0.22, secondary_swing=-0.48)],
+        # Moving screen-right while reversing left: feet remain ahead of the
+        # pelvis, torso braces screen-left, and the arms trail with momentum.
+        "skid": [pose(
+                     hips=-0.34, chest=-0.46, head=0.22,
+                     arm_l=0.42, arm_r=0.18,
+                     fore_l=0.28, fore_r=0.12,
+                     leg_l=-0.62, leg_r=-0.28,
+                     shin_l=0.88, shin_r=0.64,
+                     foot_l=-0.18, foot_r=-0.08,
+                     twist=0.12, secondary_swing=0.68,
+                 ),
+                 pose(
+                     hips=-0.14, chest=-0.20, head=0.10,
+                     arm_l=-0.18, arm_r=-0.38,
+                     leg_l=-0.18, leg_r=0.08,
+                     shin_l=0.40, shin_r=0.28,
+                 )],
+        "takeoff": [pose(
+                        hips=0.42, chest=0.30, head=-0.18,
+                        arm_l=0.36, arm_r=0.36,
+                        fore_l=0.24, fore_r=0.24,
+                        leg_l=-0.58, leg_r=-0.58,
+                        shin_l=1.18, shin_r=1.18,
+                        foot_l=0.0, foot_r=0.0,
+                    ),
+                    pose(
+                        hips=-0.26, chest=-0.22, head=0.12,
+                        arm_l=-1.28, arm_r=-0.74,
+                        leg_l=0.38, leg_r=-0.28,
+                        shin_l=0.18, shin_r=0.34,
+                        secondary_swing=-0.54,
+                    )],
         "rise": [pose(hips=-0.12, chest=-0.16, head=0.08, arm_l=-1.10, arm_r=-0.38, leg_l=0.42, leg_r=-0.25, secondary_swing=-0.52),
                  pose(hips=-0.06, chest=-0.08, head=0.04, arm_l=-0.86, arm_r=-0.22, secondary_swing=-0.30)],
-        "apex": [pose(hips=0.0, chest=0.03, head=-0.02, arm_l=-0.60, arm_r=-0.40, leg_l=0.18, leg_r=-0.18, secondary_swing=0.0),
-                 pose(hips=0.03, chest=0.06, head=-0.04, arm_l=-0.48, arm_r=-0.48, secondary_swing=0.18)],
+        "apex": [pose(
+                     hips=0.02, chest=0.03, head=-0.02,
+                     arm_l=-1.08, arm_r=0.24,
+                     fore_l=-0.24, fore_r=0.22,
+                     leg_l=-0.28, leg_r=0.24,
+                     shin_l=0.62, shin_r=0.54,
+                     foot_l=0.10, foot_r=0.08,
+                     twist=0.05, secondary_swing=0.10,
+                 ),
+                 pose(
+                     hips=0.04, chest=0.05, head=-0.03,
+                     arm_l=-0.94, arm_r=0.14,
+                     leg_l=-0.22, leg_r=0.20,
+                     shin_l=0.58, shin_r=0.50,
+                     secondary_swing=0.20,
+                 )],
         "fall": [pose(hips=0.10, chest=0.14, head=-0.08, arm_l=-0.28, arm_r=-0.28, leg_l=-0.18, leg_r=0.18, secondary_swing=0.48),
                  pose(hips=0.14, chest=0.17, head=-0.10, arm_l=-0.16, arm_r=-0.16, secondary_swing=0.58)],
-        "land-soft": [pose(hips=0.28, chest=0.22, head=-0.13, arm_l=-0.18, arm_r=-0.18, leg_l=-0.28, leg_r=-0.28),
+        "land-soft": [pose(
+                          hips=0.14, chest=0.10, head=-0.06,
+                          arm_l=0.18, arm_r=0.18,
+                          leg_l=-0.43, leg_r=-0.43,
+                          shin_l=0.92, shin_r=0.92,
+                          foot_l=0.0, foot_r=0.0,
+                      ),
                       pose(hips=0.0, chest=0.0, head=0.0)],
-        "land-hard": [pose(hips=0.48, chest=0.36, head=-0.22, arm_l=0.20, arm_r=0.20, leg_l=-0.45, leg_r=-0.45, secondary_swing=0.72),
-                      pose(hips=0.18, chest=0.12, head=-0.08), pose()],
+        "land-hard": [pose(
+                          hips=0.48, chest=0.38, head=-0.22,
+                          arm_l=-1.08, arm_r=-0.42,
+                          fore_l=-0.18, fore_r=0.18,
+                          leg_l=-0.66, leg_r=-0.66,
+                          shin_l=1.28, shin_r=1.28,
+                          foot_l=0.0, foot_r=0.0,
+                          secondary_swing=0.72,
+                      ),
+                      pose(hips=0.22, chest=0.16, head=-0.10), pose()],
         "landing-recovery": [pose(hips=0.18, chest=0.16, head=-0.08), pose(chest=-0.04, head=0.03), pose()],
-        "wall-slide": [pose(hips=0.12, chest=-0.06, head=0.08, arm_l=-1.18, arm_r=-0.18, leg_l=-0.28, leg_r=0.35, twist=-0.12)],
-        "wall-jump": [pose(hips=0.20, chest=0.24, head=-0.16, arm_l=-0.18, arm_r=-1.08, leg_l=0.62, leg_r=-0.40, twist=0.32, secondary_swing=-0.55),
-                      pose(hips=-0.10, chest=-0.12, head=0.08, twist=-0.18)],
         "wall-reaction": [pose(hips=0.12, chest=0.20, head=-0.16, arm_l=-1.22, arm_r=-1.22), pose(hips=0.03, chest=0.05)],
         "ledge-stop": [pose(hips=0.16, chest=0.18, head=-0.22, arm_l=-0.18, arm_r=-0.80, leg_l=-0.25, leg_r=0.25), pose(head=-0.12)],
         "crouch": [pose(hips=0.32, chest=0.20, head=-0.12, arm_l=-0.35, arm_r=-0.35, leg_l=-0.45, leg_r=-0.45)],
@@ -898,12 +1234,34 @@ def add_production_actions(arm, hero):
         "jump-running": expressive["rise"], "jump-triple-1": expressive["rise"],
         "jump-triple-2": [pose(hips=-0.18, chest=-0.22, head=0.10, arm_l=-1.30, arm_r=-0.50, leg_l=0.55, leg_r=-0.35, twist=0.20)],
         "jump-triple-3": [pose(hips=-0.28, chest=-0.28, head=0.14, arm_l=-2.20, arm_r=-2.20, leg_l=0.68, leg_r=-0.48, secondary_swing=-0.72)],
-        "duck-slide": expressive["skid"], "slope-slide": expressive["skid"],
+        "duck-slide": [
+            pose(
+                hips=-0.18, chest=-0.40, head=0.20,
+                arm_l=0.38, arm_r=0.12,
+                leg_l=-0.82, leg_r=0.42,
+                shin_l=0.38, shin_r=1.02,
+                foot_l=-0.14, foot_r=0.08,
+                secondary_swing=0.74,
+            )
+        ],
+        "slope-slide": expressive["skid"],
         "rolling-momentum": [pose(hips=0.52, chest=0.72, head=-0.50, arm_l=-0.20, arm_r=-0.20, leg_l=-0.42, leg_r=-0.42, secondary_swing=0.62),
                              pose(hips=-0.52, chest=-0.72, head=0.50, arm_l=-0.20, arm_r=-0.20, leg_l=-0.42, leg_r=-0.42, secondary_swing=-0.62)],
         "slide-jump": expressive["takeoff"], "spin-jump": [pose(hips=-0.14, chest=-0.18, arm_l=-1.52, arm_r=-1.52, twist=-0.80), pose(hips=-0.08, chest=-0.10, arm_l=-1.52, arm_r=-1.52, twist=0.80)],
         "air-spin": [pose(arm_l=-1.45, arm_r=-1.45, twist=-1.0), pose(arm_l=-1.45, arm_r=-1.45, twist=1.0)],
-        "fast-fall": expressive["fall"], "ground-slam": [pose(hips=0.12, chest=0.18, head=-0.10, arm_l=-1.65, arm_r=-1.65, leg_l=-0.20, leg_r=-0.20, secondary_swing=0.85)],
+        "fast-fall": expressive["fall"],
+        "ground-slam": [
+            pose(
+                hips=0.0, chest=0.0, head=0.0,
+                arm_l=-0.54, arm_r=-0.54,
+                fore_l=-0.78, fore_r=-0.78,
+                leg_l=-0.03, leg_r=0.03,
+                shin_l=0.08, shin_r=0.08,
+                foot_l=0.28, foot_r=0.28,
+                toe_l=0.34, toe_r=0.34,
+                secondary_swing=0.92,
+            )
+        ],
         "stomp-bounce": expressive["takeoff"],
         "swim": [pose(chest=-0.12, arm_l=-1.80, arm_r=0.20, leg_l=0.32, leg_r=-0.32, twist=0.18), pose(chest=-0.12, arm_l=0.20, arm_r=-1.80, leg_l=-0.32, leg_r=0.32, twist=-0.18)],
         "dive": [pose(chest=-0.22, head=0.10, arm_l=-2.55, arm_r=-2.55, leg_l=0.12, leg_r=-0.12)],
@@ -911,11 +1269,11 @@ def add_production_actions(arm, hero):
         "climb-fence": [pose(arm_l=-1.50, arm_r=-0.35, leg_l=0.40, leg_r=-0.40), pose(arm_l=-0.35, arm_r=-1.50, leg_l=-0.40, leg_r=0.40)],
         "climb-vine": [pose(arm_l=-1.65, arm_r=-0.55, leg_l=0.35, leg_r=-0.35), pose(arm_l=-0.55, arm_r=-1.65, leg_l=-0.35, leg_r=0.35)],
         "climb-ladder": [pose(arm_l=-1.45, arm_r=-0.45, leg_l=0.38, leg_r=-0.38), pose(arm_l=-0.45, arm_r=-1.45, leg_l=-0.38, leg_r=0.38)],
-        "climb-detach": expressive["wall-jump"],
+        "climb-detach": expressive["takeoff"],
         "rope-grab": [pose(arm_l=-2.25, arm_r=-2.25, leg_l=-0.18, leg_r=0.28, chest=-0.12)],
         "rope-swing": [pose(arm_l=-2.20, arm_r=-2.20, hips=-0.18, chest=-0.20, leg_l=0.42, leg_r=0.28, secondary_swing=-0.62), pose(arm_l=-2.20, arm_r=-2.20, hips=0.18, chest=0.20, leg_l=-0.18, leg_r=-0.30, secondary_swing=0.62)],
         "rope-climb": [pose(arm_l=-2.15, arm_r=-1.10, leg_l=0.35, leg_r=-0.30), pose(arm_l=-1.10, arm_r=-2.15, leg_l=-0.30, leg_r=0.35)],
-        "rope-release": expressive["wall-jump"],
+        "rope-release": expressive["takeoff"],
         "carry-light-idle": [pose(arm_l=-1.15, arm_r=-1.15, fore_l=-0.65, fore_r=-0.65)],
         "carry-light-walk": [pose(arm_l=-1.15, arm_r=-1.15, fore_l=-0.65, fore_r=-0.65, leg_l=0.42, leg_r=-0.42), pose(arm_l=-1.15, arm_r=-1.15, fore_l=-0.65, fore_r=-0.65, leg_l=-0.42, leg_r=0.42)],
         "carry-heavy-idle": [pose(hips=0.18, chest=0.20, arm_l=-1.35, arm_r=-1.35, fore_l=-0.85, fore_r=-0.85)],
@@ -960,8 +1318,23 @@ def add_production_actions(arm, hero):
 
     if hero == "Hargold":
         hero_clips = {
-            "double-jump": [pose(hips=-0.20, chest=-0.24, head=0.12, arm_l=-2.0, arm_r=-0.8, leg_l=0.58, leg_r=-0.40, twist=0.55, secondary_swing=-0.70),
-                            pose(hips=-0.08, chest=-0.10, head=0.05, twist=-0.25)],
+            "double-jump": [
+                pose(
+                    hips=-0.18, chest=-0.24, head=0.12,
+                    arm_l=-1.92, arm_r=0.34,
+                    fore_l=-0.20, fore_r=0.24,
+                    leg_l=-0.62, leg_r=0.30,
+                    shin_l=0.72, shin_r=0.18,
+                    foot_l=0.14, foot_r=-0.10,
+                    twist=0.34, secondary_swing=-0.76,
+                ),
+                pose(
+                    hips=-0.06, chest=-0.10, head=0.05,
+                    arm_l=-1.16, arm_r=-0.28,
+                    leg_l=-0.26, leg_r=0.12,
+                    twist=-0.20,
+                ),
+            ],
             "break-hargold-block": [pose(hips=0.22, chest=0.30, arm_l=-1.55, arm_r=-0.25, twist=-0.32),
                                     pose(hips=-0.12, chest=-0.24, arm_l=0.42, arm_r=-0.55, twist=0.44)],
             "heavy-ground-slam": [pose(hips=0.18, chest=0.22, arm_l=-1.85, arm_r=-1.85, secondary_swing=0.90),
@@ -970,8 +1343,15 @@ def add_production_actions(arm, hero):
                                  pose(chest=-0.25, arm_l=0.55, arm_r=-0.60, twist=0.48)],
         }
     else:
-        glide = pose(hips=0.08, chest=-0.10, head=0.06, arm_l=-0.78, arm_r=-0.78,
-                     leg_l=0.12, leg_r=-0.12, secondary_swing=-0.42)
+        glide = pose(
+            hips=-0.03, chest=-0.18, head=0.10,
+            arm_l=-1.18, arm_r=0.34,
+            fore_l=-0.18, fore_r=0.12,
+            leg_l=-0.24, leg_r=0.34,
+            shin_l=0.48, shin_r=0.18,
+            foot_l=0.08, foot_r=-0.08,
+            twist=0.08, secondary_swing=-0.62,
+        )
         hero_clips = {
             "glide-open": [expressive["fall"][0], glide],
             "glide-sustain": [glide, pose(hips=0.05, chest=-0.06, head=0.03, arm_l=-0.72, arm_r=-0.82, secondary_swing=-0.30)],
@@ -991,6 +1371,485 @@ def add_production_actions(arm, hero):
                 else [(1, 1.0), (length, 1.0)]
             )
         create_action(name, keys, loop=name == "glide-sustain", cape_open=cape_open)
+
+    # Locked mannequin review frames use IK targets so foot contacts, planted
+    # compression, and pose envelopes are explicit rather than approximate FK
+    # samples. These single-frame actions are generated once and shared by the
+    # featureless mannequin and the fitted production surface.
+    height = target_height
+    ankle_z = arm.data.bones["DEF_foot.L"].head_local.z
+    leg_depth = abs(arm.data.bones["DEF_thigh.L"].head_local.x)
+    hand_depth = {
+        side: abs(arm.data.bones[f"CTRL_hand_ik.{side}"].tail_local.x)
+        for side in ("L", "R")
+    }
+
+    def review_definition(
+        *,
+        chest=0.0,
+        head=0.0,
+        hips=0.0,
+        twist=0.0,
+        pelvis_drop=0.0,
+        feet=((-0.08, 0.0), (0.08, 0.0)),
+        hands=((-0.04, 0.39), (0.13, 0.39)),
+        foot_rotations=(0.0, 0.0),
+        secondary_swing=0.0,
+        face=None,
+    ):
+        return {
+            "body": pose(
+                hips=hips,
+                chest=chest,
+                head=head,
+                twist=twist,
+                secondary_swing=secondary_swing,
+            ),
+            "pelvis_drop": pelvis_drop,
+            "feet": {"L": feet[0], "R": feet[1]},
+            "hands": {"L": hands[0], "R": hands[1]},
+            "foot_rotations": {"L": foot_rotations[0], "R": foot_rotations[1]},
+            "face": face or {},
+        }
+
+    anticipation_drop = 0.165 if hero == "Hargold" else 0.135
+    landing_drop = 0.205 if hero == "Hargold" else 0.165
+    skid_lean = -0.44 if hero == "Hargold" else -0.52
+    neutral_hands = (
+        ((-0.06, 0.38), (0.15, 0.38))
+        if hero == "Hargold"
+        else ((-0.04, 0.40), (0.13, 0.40))
+    )
+    review_poses = {
+        "review-neutral": review_definition(
+            chest=0.02,
+            feet=((-0.08, 0.0), (0.08, 0.0)),
+            hands=neutral_hands,
+        ),
+        "review-walk-contact": review_definition(
+            chest=0.07,
+            pelvis_drop=0.025,
+            feet=((-0.16, 0.018), (0.22, 0.0)),
+            hands=((0.19, 0.54), (-0.13, 0.46)),
+            foot_rotations=(0.34, -0.05),
+            secondary_swing=-0.18,
+        ),
+        "review-run-extension": review_definition(
+            chest=0.26,
+            hips=0.08,
+            feet=((-0.28, 0.15), (0.31, 0.12)),
+            hands=((0.28, 0.58), (-0.23, 0.50)),
+            foot_rotations=(0.12, -0.12),
+            secondary_swing=-0.48,
+        ),
+        "review-turnaround-skid": review_definition(
+            chest=skid_lean,
+            head=-skid_lean * 0.42,
+            hips=skid_lean * 0.48,
+            pelvis_drop=0.12 if hero == "Hargold" else 0.10,
+            feet=((0.05, 0.0), (0.29, 0.0)),
+            hands=((0.30, 0.48), (0.22, 0.42)),
+            foot_rotations=(-0.08, -0.16),
+            secondary_swing=0.70,
+        ),
+        "review-jump-anticipation": review_definition(
+            chest=0.28,
+            head=-0.16,
+            hips=0.34,
+            pelvis_drop=anticipation_drop,
+            feet=((-0.08, 0.0), (0.08, 0.0)),
+            hands=((-0.19, 0.25), (-0.13, 0.28)),
+            secondary_swing=0.20,
+        ),
+        "review-jump-apex": review_definition(
+            chest=0.02,
+            feet=((-0.12, 0.13), (0.15, 0.11)),
+            hands=((-0.24, 0.66), (0.30, 0.63)),
+            foot_rotations=(0.08, 0.06),
+            secondary_swing=0.12,
+        ),
+        "review-landing-compression": review_definition(
+            chest=0.34,
+            head=-0.18,
+            hips=0.40,
+            pelvis_drop=landing_drop,
+            feet=((-0.09, 0.0), (0.09, 0.0)),
+            hands=((0.24, 0.43), (-0.20, 0.47)),
+            secondary_swing=0.74,
+        ),
+        "review-ground-slam": review_definition(
+            chest=0.0,
+            feet=((-0.025, 0.04), (0.025, 0.04)),
+            hands=((-0.10, 0.50), (0.12, 0.50)),
+            foot_rotations=(0.34, 0.34),
+            secondary_swing=0.95,
+            face={"mouth_open": 0.22, "brow_raise_L": 0.18, "brow_raise_R": 0.18},
+        ),
+        "review-run-contact": review_definition(
+            chest=0.22,
+            pelvis_drop=0.035,
+            feet=((-0.20, 0.018), (0.25, 0.0)),
+            hands=((0.24, 0.57), (-0.20, 0.48)),
+            foot_rotations=(0.30, -0.06),
+            secondary_swing=-0.30,
+        ),
+        "review-run-passing": review_definition(
+            chest=0.18,
+            feet=((-0.03, 0.13), (0.12, 0.025)),
+            hands=((0.08, 0.51), (-0.03, 0.48)),
+            foot_rotations=(0.20, -0.02),
+            secondary_swing=0.14,
+        ),
+        "review-jump-takeoff": review_definition(
+            chest=-0.20,
+            head=0.10,
+            hips=-0.18,
+            feet=((-0.08, 0.07), (0.10, 0.09)),
+            hands=((0.02, 0.78), (0.22, 0.72)),
+            secondary_swing=-0.58,
+        ),
+        "review-fall-preparation": review_definition(
+            chest=0.14,
+            head=-0.08,
+            feet=((-0.10, 0.08), (0.12, 0.07)),
+            hands=((-0.19, 0.58), (0.23, 0.58)),
+            foot_rotations=(0.12, 0.12),
+            secondary_swing=0.56,
+        ),
+        "review-sprint-slide": review_definition(
+            chest=0.58,
+            head=-0.22,
+            hips=0.38,
+            pelvis_drop=0.18 if hero == "Hargold" else 0.15,
+            feet=((-0.18, 0.015), (0.31, 0.0)),
+            hands=((-0.22, 0.31), (-0.12, 0.35)),
+            foot_rotations=(0.12, -0.08),
+            secondary_swing=0.82,
+        ),
+        "review-damage-recoil": review_definition(
+            chest=-0.40,
+            head=0.30,
+            hips=-0.22,
+            twist=0.18,
+            feet=((-0.10, 0.10), (0.16, 0.04)),
+            hands=((-0.30, 0.63), (0.32, 0.58)),
+            secondary_swing=0.86,
+            face={"mouth_open": 0.72},
+        ),
+        "review-block-hit": review_definition(
+            chest=-0.28,
+            head=0.10,
+            hips=-0.12,
+            twist=0.18,
+            feet=((-0.10, 0.0), (0.12, 0.0)),
+            hands=((0.31, 0.70), (0.14, 0.55)),
+            secondary_swing=0.42,
+        ),
+        "review-victory": review_definition(
+            chest=-0.14,
+            head=0.08,
+            feet=((-0.08, 0.0), (0.10, 0.03)),
+            hands=((-0.10, 0.94), (0.24, 0.91)),
+            secondary_swing=-0.44,
+            face={"smile": 0.86, "mouth_open": 0.34},
+        ),
+    }
+    if hero == "Hargold":
+        review_poses["review-hargold-double-jump"] = review_definition(
+            chest=-0.18,
+            head=0.10,
+            hips=-0.12,
+            twist=0.28,
+            feet=((-0.20, 0.09), (0.18, 0.18)),
+            hands=((-0.22, 0.90), (0.25, 0.38)),
+            foot_rotations=(0.12, -0.14),
+            secondary_swing=-0.78,
+        )
+    else:
+        review_poses["review-mebble-glide"] = review_definition(
+            chest=0.17,
+            head=-0.08,
+            feet=((-0.12, 0.09), (0.22, 0.13)),
+            hands=((-0.34, 0.68), (0.36, 0.70)),
+            foot_rotations=(0.08, -0.08),
+            secondary_swing=-0.74,
+        )
+
+    def set_control_tail(control_name, target):
+        control = arm.pose.bones[control_name]
+        control.rotation_mode = "XYZ"
+        rest = control.bone.matrix_local.copy()
+        delta = Vector(target) - control.bone.tail_local
+        control.matrix = Matrix.Translation(delta) @ rest
+        control.keyframe_insert("location", frame=1)
+        control.keyframe_insert("rotation_euler", frame=1)
+        control.keyframe_insert("scale", frame=1)
+
+    for name, definition in review_poses.items():
+        action = bpy.data.actions.new(name)
+        action.use_fake_user = True
+        action["clip_status"] = "locked-mannequin-review-frame"
+        action["source_geometry"] = "full-rebuild-2026-07-25"
+        action["root_motion"] = False
+        action["loop"] = False
+        action["contact_markers"] = json.dumps([])
+        action["blend_in_seconds"] = 0.08
+        action["blend_out_seconds"] = 0.08
+        action["locked_frame_source"] = "compact-tall-locked-animation-frames-v2"
+        action["reference_height_metres"] = height
+        action["joint_alignment_tolerance_fraction"] = 0.03
+        arm.animation_data.action = action
+        scene.frame_set(1)
+        for bone in arm.pose.bones:
+            bone.rotation_mode = "XYZ"
+            bone.rotation_euler = (0, 0, 0)
+            bone.location = (0, 0, 0)
+            bone.scale = (1, 1, 1)
+        for side in ("L", "R"):
+            for control_name in (
+                f"CTRL_hand_ik.{side}", f"CTRL_foot_ik.{side}",
+            ):
+                control = arm.pose.bones[control_name]
+                control["ik_fk"] = 1.0
+                control.keyframe_insert(data_path='["ik_fk"]', frame=1)
+        for bone_name, rotation in definition["body"].items():
+            bone = arm.pose.bones.get(bone_name)
+            if bone:
+                bone.rotation_euler = rotation
+                bone.keyframe_insert("rotation_euler", frame=1)
+        center = arm.pose.bones["DEF_center_of_mass"]
+        center.location.z = -definition["pelvis_drop"] * height
+        center.keyframe_insert("location", frame=1)
+        for side, sign in (("L", -1), ("R", 1)):
+            logical_foot_x, foot_raise = definition["feet"][side]
+            set_control_tail(
+                f"CTRL_foot_ik.{side}",
+                (
+                    sign * leg_depth,
+                    -logical_foot_x * height,
+                    ankle_z + foot_raise * height,
+                ),
+            )
+            set_control_tail(
+                f"CTRL_knee_pole.{side}",
+                (
+                    sign * leg_depth,
+                    -(logical_foot_x * 0.52 + 0.12) * height,
+                    max(ankle_z + height * 0.16, height * 0.21),
+                ),
+            )
+            logical_hand_x, hand_height = definition["hands"][side]
+            set_control_tail(
+                f"CTRL_hand_ik.{side}",
+                (
+                    sign * hand_depth[side],
+                    -logical_hand_x * height,
+                    hand_height * height,
+                ),
+            )
+            set_control_tail(
+                f"CTRL_elbow_pole.{side}",
+                (
+                    sign * abs(arm.data.bones[f"CTRL_elbow_pole.{side}"].tail_local.x),
+                    -(logical_hand_x * 0.50 - 0.10) * height,
+                    max(hand_height * height, height * 0.48),
+                ),
+            )
+            foot = arm.pose.bones[f"DEF_foot.{side}"]
+            foot.rotation_euler.x = definition["foot_rotations"][side]
+            foot.keyframe_insert("rotation_euler", frame=1)
+        face = arm.pose.bones["CTRL_face"]
+        face_values = {
+            "smile": 0.14,
+            "mouth_open": 0.0,
+            "brow_raise_L": 0.08,
+            "brow_raise_R": 0.08,
+            **definition["face"],
+        }
+        for property_name, value in face_values.items():
+            face[property_name] = value
+            face.keyframe_insert(data_path=f'["{property_name}"]', frame=1)
+        if hero == "Mebble":
+            cape_control = arm.pose.bones["CTRL_cape.01"]
+            cape_control["cape_open"] = 1.0 if name == "review-mebble-glide" else 0.0
+            cape_control.keyframe_insert(data_path='["cape_open"]', frame=1)
+        actions[name] = action
+
+    # Replace the first-pass target-position review actions with locked FK
+    # actions.  The production surface contains several rigid, bone-parented
+    # accessories as well as skinned geometry; driving review poses through
+    # absolute IK targets made those two attachment classes diverge visually.
+    # A single authored FK action is now the literal source for both the
+    # mannequin and fitted render, so every deform bone and accessory inherits
+    # the same evaluated transform.
+    for review_name in tuple(review_poses):
+        old_action = actions.pop(review_name)
+        if arm.animation_data.action == old_action:
+            arm.animation_data.action = None
+        bpy.data.actions.remove(old_action)
+
+    for side in ("L", "R"):
+        arm.pose.bones[f"CTRL_hand_ik.{side}"]["ik_fk"] = 0.0
+        arm.pose.bones[f"CTRL_foot_ik.{side}"]["ik_fk"] = 0.0
+
+    review_fk = {
+        "review-neutral": {
+            "pose": dict(chest=0.02, arm_l=(1.05 if hero == "Hargold" else 0.28),
+                         arm_r=-0.65, fore_l=-0.24, fore_r=0.12,
+                         leg_l=0.06, leg_r=-0.05, shin_l=-0.08, shin_r=-0.06),
+        },
+        "review-walk-contact": {
+            "pose": dict(chest=0.08, arm_l=0.82, arm_r=-0.86, fore_l=-0.12, fore_r=-0.18,
+                         leg_l=-0.50, leg_r=0.58, shin_l=-0.22, shin_r=-0.12,
+                         foot_l=0.12, foot_r=-0.08, secondary_swing=-0.18),
+        },
+        "review-run-extension": {
+            "pose": dict(hips=0.08, chest=0.24, arm_l=1.38, arm_r=-1.28,
+                         fore_l=-0.20, fore_r=-0.30, leg_l=-1.02, leg_r=1.12,
+                         shin_l=-0.34, shin_r=-0.18, foot_l=0.20, foot_r=-0.12,
+                         secondary_swing=-0.48),
+        },
+        "review-turnaround-skid": {
+            "pose": dict(hips=-0.30, chest=-0.52, head=0.24, arm_l=-1.12, arm_r=-0.72,
+                         fore_l=-0.42, fore_r=-0.24, leg_l=0.76, leg_r=1.02,
+                         shin_l=-1.08, shin_r=-0.82, foot_l=-0.18, foot_r=-0.22,
+                         secondary_swing=0.70),
+            "drop": 0.06,
+        },
+        "review-jump-anticipation": {
+            "pose": dict(hips=0.46, chest=0.42, head=-0.20, arm_l=0.98, arm_r=0.52,
+                         fore_l=-0.58, fore_r=-0.42, leg_l=1.06, leg_r=1.02,
+                         shin_l=-1.78, shin_r=-1.72, foot_l=0.52, foot_r=0.48,
+                         secondary_swing=0.22),
+            "drop": 0.12 if hero == "Hargold" else 0.09,
+        },
+        "review-jump-apex": {
+            "pose": dict(chest=-0.06, head=0.08, arm_l=-1.72, arm_r=0.42,
+                         fore_l=-0.32, fore_r=-0.56, leg_l=0.48, leg_r=-0.34,
+                         shin_l=-1.22, shin_r=-1.05, foot_l=0.20, foot_r=-0.12,
+                         secondary_swing=0.12),
+        },
+        "review-landing-compression": {
+            "pose": dict(hips=0.52, chest=0.48, head=-0.24, arm_l=0.86, arm_r=-0.72,
+                         fore_l=-0.54, fore_r=-0.38, leg_l=1.14, leg_r=1.08,
+                         shin_l=-1.92, shin_r=-1.84, foot_l=0.54, foot_r=0.50,
+                         secondary_swing=0.76),
+            "drop": 0.15 if hero == "Hargold" else 0.12,
+        },
+        "review-ground-slam": {
+            "pose": dict(chest=0.04, head=-0.05, arm_l=-1.10, arm_r=-1.22,
+                         fore_l=-0.42, fore_r=-0.34, leg_l=0.18, leg_r=-0.16,
+                         shin_l=-0.12, shin_r=-0.10, foot_l=0.28, foot_r=0.28,
+                         secondary_swing=0.94),
+            "face": {"mouth_open": 0.22, "brow_raise_L": 0.18, "brow_raise_R": 0.18},
+        },
+        "review-run-contact": {
+            "pose": dict(hips=0.06, chest=0.22, arm_l=0.88, arm_r=-1.02,
+                         fore_l=-0.18, fore_r=-0.28, leg_l=-0.74, leg_r=0.88,
+                         shin_l=-0.46, shin_r=-0.20, foot_l=0.26, foot_r=-0.10,
+                         secondary_swing=-0.30),
+        },
+        "review-run-passing": {
+            "pose": dict(hips=0.04, chest=0.18, arm_l=0.20, arm_r=-0.42,
+                         fore_l=-0.16, fore_r=-0.22, leg_l=0.24, leg_r=-0.12,
+                         shin_l=-1.26, shin_r=-0.54, foot_l=0.20, foot_r=-0.04,
+                         secondary_swing=0.14),
+        },
+        "review-jump-takeoff": {
+            "pose": dict(hips=-0.18, chest=-0.24, head=0.12,
+                         arm_l=(-2.18 if hero == "Hargold" else -1.68),
+                         arm_r=(-1.72 if hero == "Hargold" else -1.38),
+                         fore_l=-0.14, fore_r=-0.20, leg_l=-0.22, leg_r=0.18,
+                         shin_l=-0.24, shin_r=-0.12, foot_l=0.12, foot_r=0.08,
+                         secondary_swing=-0.58),
+        },
+        "review-fall-preparation": {
+            "pose": dict(hips=0.08, chest=0.16, head=-0.08, arm_l=0.62, arm_r=-0.82,
+                         fore_l=-0.34, fore_r=-0.30, leg_l=0.30, leg_r=-0.26,
+                         shin_l=-0.72, shin_r=-0.68, foot_l=0.16, foot_r=0.16,
+                         secondary_swing=0.56),
+        },
+        "review-sprint-slide": {
+            "pose": dict(hips=0.48, chest=0.64, head=-0.24, arm_l=0.96, arm_r=0.66,
+                         fore_l=-0.56, fore_r=-0.44, leg_l=1.06, leg_r=0.54,
+                         shin_l=-1.62, shin_r=-1.02, foot_l=0.34, foot_r=-0.12,
+                         secondary_swing=0.82),
+            "drop": 0.12 if hero == "Hargold" else 0.10,
+        },
+        "review-damage-recoil": {
+            "pose": dict(hips=-0.24, chest=-0.46, head=0.34, arm_l=-1.32, arm_r=0.96,
+                         fore_l=-0.36, fore_r=-0.44, leg_l=-0.28, leg_r=0.46,
+                         shin_l=-0.62, shin_r=-0.44, foot_l=0.10, foot_r=-0.14,
+                         twist=0.18, secondary_swing=0.86),
+            "face": {"mouth_open": 0.72},
+        },
+        "review-block-hit": {
+            "pose": dict(hips=-0.12, chest=-0.30, head=0.12,
+                         arm_l=(-2.18 if hero == "Hargold" else -1.85),
+                         arm_r=-1.52,
+                         fore_l=-0.16, fore_r=-0.58, leg_l=0.08, leg_r=-0.08,
+                         shin_l=-0.32, shin_r=-0.28, twist=0.18, secondary_swing=0.42),
+        },
+        "review-victory": {
+            "pose": dict(chest=-0.16, head=0.10,
+                         arm_l=(-2.34 if hero == "Hargold" else -1.95),
+                         arm_r=0.38,
+                         fore_l=-0.10, fore_r=-0.52, leg_l=-0.10, leg_r=0.28,
+                         shin_l=-0.22, shin_r=-0.64, foot_r=-0.12,
+                         secondary_swing=-0.44),
+            "face": {"smile": 0.86, "mouth_open": 0.34},
+        },
+    }
+    if hero == "Hargold":
+        review_fk["review-hargold-double-jump"] = {
+            "pose": dict(hips=-0.12, chest=-0.20, head=0.12, arm_l=-2.24, arm_r=0.46,
+                         fore_l=-0.18, fore_r=-0.48, leg_l=0.58, leg_r=-0.42,
+                         shin_l=-1.18, shin_r=-0.92, foot_l=0.16, foot_r=-0.14,
+                         twist=0.28, secondary_swing=-0.78),
+        }
+    else:
+        review_fk["review-mebble-glide"] = {
+            "pose": dict(chest=0.16, head=-0.08, arm_l=-1.48, arm_r=-1.32,
+                         fore_l=-0.14, fore_r=-0.18, leg_l=-0.26, leg_r=0.38,
+                         shin_l=-0.46, shin_r=-0.72, foot_l=0.08, foot_r=-0.08,
+                         secondary_swing=-0.74),
+            "cape_open": 1.0,
+        }
+
+    for name, definition in review_fk.items():
+        locations = {
+            "DEF_center_of_mass": (
+                0.0,
+                0.0,
+                -definition.get("drop", 0.0) * height,
+            )
+        }
+        create_action(
+            name,
+            [k(
+                1,
+                pose(**definition["pose"]),
+                locations=locations,
+                face=definition.get("face", {}),
+            )],
+            cape_open=(
+                [(1, definition["cape_open"])]
+                if "cape_open" in definition else None
+            ),
+        )
+        action = actions[name]
+        action["clip_status"] = "locked-mannequin-review-frame"
+        action["joint_alignment_tolerance_fraction"] = 0.03
+        arm.animation_data.action = action
+        scene.frame_set(1)
+        for side in ("L", "R"):
+            for control_name in (
+                f"CTRL_hand_ik.{side}",
+                f"CTRL_foot_ik.{side}",
+            ):
+                control = arm.pose.bones[control_name]
+                control["ik_fk"] = 0.0
+                control.keyframe_insert(data_path='["ik_fk"]', frame=1)
 
     arm.animation_data.action = actions["idle"]
     scene.frame_start, scene.frame_end = 1, 48

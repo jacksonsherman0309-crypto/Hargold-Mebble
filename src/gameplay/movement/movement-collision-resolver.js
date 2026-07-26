@@ -75,6 +75,12 @@ export function resolveExternalWallHit(state, {
 } = {}) {
   state.footX = footX;
   state.velocityX = 0;
+  state.wallContactSide = side;
+  transitionMovementState(
+    state,
+    MOVEMENT_STATES.WALL_CONTACT,
+    (type, detail) => emitMovementEvent(state, type, detail)
+  );
   emitMovementEvent(state, 'wall-contact', { side, obstacleId });
   return state;
 }

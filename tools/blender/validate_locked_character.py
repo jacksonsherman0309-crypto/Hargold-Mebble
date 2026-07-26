@@ -16,7 +16,7 @@ SHARED_REPLACEMENT_CLIPS = {
     "idle", "walk", "run", "sprint", "start", "stop", "turn-low", "skid",
     "takeoff", "rise", "apex", "fall", "land-soft", "land-hard",
     "landing-recovery", "jump-running", "jump-triple-1", "jump-triple-2",
-    "jump-triple-3", "wall-slide", "wall-jump", "wall-reaction",
+    "jump-triple-3", "wall-reaction",
     "ledge-stop", "crouch", "crawl", "stand", "duck", "duck-slide",
     "slope-slide", "rolling-momentum", "slide-jump", "spin-jump", "air-spin",
     "fast-fall", "ground-slam", "stomp-bounce", "swim", "dive",
@@ -60,6 +60,7 @@ def validate() -> dict:
         "DEF_mouth_corner.R", "DEF_hat_secondary", "CTRL_root", "CTRL_face",
         "CTRL_eyes", "CTRL_brow.L", "CTRL_brow.R", "CTRL_mouth.L",
         "CTRL_mouth.R", "CTRL_hat_secondary",
+        "DEF_toe.L", "DEF_toe.R",
         "SOCKET_hand_l", "SOCKET_hand_r", "SOCKET_head", "SOCKET_hat",
         "SOCKET_glasses", "SOCKET_back", "SOCKET_vfx_feet", "SOCKET_vfx_center",
     }
@@ -102,6 +103,9 @@ def validate() -> dict:
             fail(f"missing arm IK/FK switch {side}", errors)
         if not foot_control or "ik_fk" not in foot_control:
             fail(f"missing leg IK/FK switch {side}", errors)
+        boot = bpy.data.objects.get(f"GEO_{hero}_boot_{side}")
+        if not boot or f"DEF_toe.{side}" not in boot.vertex_groups:
+            fail(f"boot {side} is not weighted to DEF_toe.{side}", errors)
         arm_ik = arm.pose.bones[f"DEF_forearm.{side}"].constraints.get("IK")
         leg_ik = arm.pose.bones[f"DEF_shin.{side}"].constraints.get("IK")
         driver_paths = {
@@ -222,6 +226,10 @@ def validate() -> dict:
         action = bpy.data.actions[action_name]
         if action.get("clip_status") != "new-replacement-authored":
             fail(f"action is not a replacement-authored clip: {action_name}", errors)
+        if action.get("clean_room_animation") is not True:
+            fail(f"action is not marked as clean-room authored: {action_name}", errors)
+        if action.get("negative_scale_mirroring") is not False:
+            fail(f"action does not forbid negative-scale mirroring: {action_name}", errors)
 
     scene = bpy.context.scene
     if scene.get("geometryGeneration") != "continuous-skinned-rebuild-2026-07-25":
@@ -230,6 +238,8 @@ def validate() -> dict:
         fail("scene does not explicitly reject prior geometry reuse", errors)
     if scene.get("sourceScene") != "factory-empty":
         fail("scene was not marked as factory-empty", errors)
+    if scene.get("presentationProfile") != "assets/blender/character-scale-orientation-profile.json":
+        fail("scene is missing the locked scale/orientation profile", errors)
 
     glb_path = ROOT / "assets" / "exports" / f"{hero.lower()}_character.glb"
     glb_summary = {}

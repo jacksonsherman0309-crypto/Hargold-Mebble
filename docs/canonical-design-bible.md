@@ -72,6 +72,20 @@ The latest approved Hargold and Mebble model is locked. Do not change proportion
 - Production meshes require smooth rounded topology, clean deformation edge flow, sculpted faces, expressive brows, detailed hands and boots, layered garments, authored cloth folds, clean UVs, optimized game topology, and planned LODs.
 - Hero bodies and soft garments must deform as continuous skinned surfaces. Bone-parented upper-arm, forearm, elbow, hand, thigh, or shin pieces that read as an articulated wooden doll are not acceptable production geometry.
 - Character construction is action-first. Proportions must be approved in run, jump, landing, skid, slam, carry, wall-contact, and character-specific action poses before close facial or material polish.
+- The July 26 compact/tall featureless animation mannequins are the authoritative construction frames for joint placement, motion proportions, deformation, and side-view pose readability. Hargold is fitted around the compact frame and Mebble around the tall frame only after those featureless rigs pass action tests.
+- The July 26 locked-frame correction makes each approved mannequin pose an
+  exact tracing frame rather than a neighboring example. Production fitting
+  duplicates the mannequin skeleton and preserves head, neck, shoulder, elbow,
+  wrist, pelvis, knee, ankle, and toe centers within three percent of total
+  hero height. Mannequin and fit use the same root, action sample,
+  orthographic camera, world scale, floor line, crop, and true-side direction.
+- The review panel uses one shared world scale: compact/Hargold height `1.00`
+  and tall/Mebble height `1.26`. Exclusive Hargold double-jump and Mebble glide
+  cells display `N/A` for the other hero instead of substituting a neutral
+  pose. Approval covers twenty locked frames and three enlarged review sheets:
+  neutral alignment, locomotion, and air/actions.
+- The mannequins are clean-room original project guides built from the approved normalized ranges. They are not copied game meshes, rigs, animation clips, or extracted proprietary measurements, and they do not override the locked Hargold and Mebble identity sheets.
+- Primary approval uses a true side gameplay profile. Small action-dependent camera reveal is secondary and may clarify the face or skeleton, but it cannot conceal a weak profile silhouette.
 - Every hero silhouette must remain identifiable at 100–150 pixels tall. Arms and hands must separate from the torso, feet must create a stable readable ground-contact shape, shoulders must have deformable volume, and backpacks/capes must retain a distinct overlap instead of merging into one body mass.
 - Hargold requires longer readable forearms, hands enlarged by roughly 20–30 percent over the rejected candidate, larger boots, defined shoulders, and less spherical cheek transitions while preserving his locked short round identity.
 - Mebble requires a slightly wider torso, longer separated arms, larger boots, a more tapered visible neck, a stronger Adam's apple profile, glasses offset clearly from the face, and a cape yoke that wraps naturally over the shoulders while preserving his locked tall thin identity.
@@ -243,7 +257,7 @@ Block interaction follows the locked original Meadow Wake feedback hierarchy:
 - All enemies must be original and production-intent 3D models.
 - Most common enemies are smaller than the heroes, generally knee-to-waist height relative to Hargold and below Mebble’s waist.
 - In the gameplay camera, Hargold should read at roughly two to three common-enemy heights. Mebble remains visibly taller and thinner. Character render and collision scale must be evaluated against enemies, blocks, platform thickness, and terrain—not in isolation.
-- Canonical gameplay height is 1.82 m for Hargold and 2.18 m for Mebble.
+- Canonical gameplay height is 1.82 m for Hargold and 2.2932 m for Mebble.
   Common mobs occupy the 0.62–0.76 m band and the standard block height is
   0.74 m. Final Blender sources must use these gameplay metres at object scale
   `1,1,1`; temporary runtime normalization is permitted only for explicitly

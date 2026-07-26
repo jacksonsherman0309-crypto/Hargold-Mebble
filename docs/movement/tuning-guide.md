@@ -2,6 +2,11 @@
 
 All shared values live in `src/gameplay/movement/movement-tuning.js`; hero-only differences live in `hero-profiles.js`. Do not duplicate these numbers in the browser integration, animation system, or level scripts.
 
+`movement-parameters.js` defines the machine-readable parameter schema,
+horizontal response cases, and terrain-response profiles. Visible material
+names do not determine physics directly; authored terrain supplies a gameplay
+material ID.
+
 Run:
 
 ```bash
@@ -16,6 +21,7 @@ Important parameter groups:
 | --- | --- | --- |
 | Ground targets | `walkSpeed`, `runSpeed`, `sprintSpeed` | Raises the corresponding stable horizontal speed |
 | Ground response | `groundAcceleration*`, `releaseDeceleration`, `highSpeedSkidDeceleration` | Reaches targets, stops, or reverses sooner |
+| Context response | `accelerationFromRest`, `accelerationWhileMoving`, `noInputDeceleration`, `oppositeInputBraking`, `activeTurnAcceleration`, slow/medium/fast cases | Changes one acceleration context without flattening starts, coasting, and reversals into one value |
 | Jump | `baseJumpSpeed`, `runningJumpBonus`, `heldJumpGravity`, `releasedJumpGravity` | Changes initial height/momentum or hold sensitivity |
 | Forgiveness | `jumpBufferSeconds`, `coyoteSeconds` | Widens the valid early/late input window |
 | Twirl | `airTwirlSeconds`, `airTwirlGravityMultiplier`, `airTwirlMaximumFallSpeed` | Extends or strengthens the bounded hang |
