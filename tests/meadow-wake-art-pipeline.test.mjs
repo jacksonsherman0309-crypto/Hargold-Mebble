@@ -16,6 +16,7 @@ const approvedCharacterTarget = new URL(
   import.meta.url
 );
 const {
+  MEADOW_WAKE_GAMEPLAY_LANDMARKS,
   MEADOW_WAKE_SCENERY_BEATS,
   MEADOW_WAKE_SCENERY_PROPS,
   MEADOW_WAKE_MIDGROUND_LANDMARKS,
@@ -76,11 +77,13 @@ assert.match(foregroundRenderer, /animated-creek-cascade/);
 assert.match(foregroundRenderer, /reinforced-gate/);
 assert.match(foregroundRenderer, /terrainFaceGeometry/);
 assert.match(foregroundRenderer, /MeadowWake_AuthoredModularTerrainSystem/);
+assert.match(foregroundRenderer, /MeadowWake_HandcraftedLandformFeatures/);
 assert.match(foregroundRenderer, /irregular-layered-earth-face/);
 assert.match(foregroundRenderer, /modeled-grass-overhang-cap/);
 assert.match(foregroundRenderer, /authored-clay-and-loam-strata/);
 assert.match(foregroundRenderer, /fractured-readable-cliff-edge/);
 assert.equal(MEADOW_WAKE_SCENERY_BEATS.length, 7);
+assert.equal(MEADOW_WAKE_GAMEPLAY_LANDMARKS.length, 12);
 assert.equal(meadowWakeSceneryCoverage().length, 7);
 assert.ok(MEADOW_WAKE_SCENERY_PROPS.length >= 40);
 assert.ok(MEADOW_WAKE_MIDGROUND_LANDMARKS.length >= 7);
@@ -150,7 +153,7 @@ assert.match(motionValidator, /finalApprovalEligible/);
 
 const liveHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 assert.match(liveHtml, /data-action="sprint"/);
-assert.match(liveHtml, /meadow-ground-first-5/);
+assert.match(liveHtml, /meadow-rooms-6/);
 assert.match(renderer, /production-topology-1/);
 
 console.log(`Meadow Wake art pipeline checks passed from ${root}`);

@@ -140,7 +140,11 @@ export const GAME_RULES = Object.freeze({
       integrateBlocksCoinsAndMechanismsIntoTerrain: true,
       prioritizeGameplayReadability: true,
       wholeCourseConsistencyRequired: true,
-      proceduralReplacementForbidden: true
+      proceduralReplacementForbidden: true,
+      outdoorGameplayRoomsRequired: true,
+      heroLandmarkPerRoomRequired: true,
+      landmarksMustConnectToCollisionBearingTraversal: true,
+      blocksMustBelongToNamedGameplayPhrases: true
     }),
     mechanismTypes: Object.freeze([
       'moving-platform',
@@ -239,12 +243,35 @@ const WORLD_ONE_LEVELS = [
     foregroundDirective: Object.freeze({
       targetSupportedTerrainRatio: 0.85,
       connectedGroundProgressionRatio: Object.freeze({ minimum: 0.65, maximum: 0.75 }),
+      authoredRouteComposition: Object.freeze({
+        connectedGround: 0.7,
+        optionalElevated: 0.2,
+        dedicatedPlatformSequences: 0.1
+      }),
       authoredCourseLength: 124,
       preserveExistingValleyArtDirection: true,
       obstacleEmphasis: 'terrain, blocks, coins, routes, and platform mechanisms',
       environmentQualityFloor: 'approved-Meadow-Wake-reference-image',
       authoredVisualBeatCount: 7,
       authoredTraversalPhaseCount: 9,
+      authoredOutdoorRoomCount: 12,
+      heroLandmarkCadenceSeconds: Object.freeze({ minimum: 8, maximum: 10 }),
+      landmarkDrivenTraversal: true,
+      blocksUseNamedGameplayPhrases: true,
+      outdoorRooms: Object.freeze([
+        'Trailhead Camp',
+        'Elder Root Walk',
+        'Mason Shelf',
+        'Shellback Quarry',
+        'Timberyard Clearing',
+        'Stump Creek Hollow',
+        'Lantern Bridge',
+        'Mill Meadow',
+        'Root Terrace',
+        'Lookout Ruins',
+        'Flowering Run',
+        'Three-Gap Vista'
+      ]),
       finishAllSectionsToSharedQualityFloor: true,
       trueGapClusters: Object.freeze([
         'concealed-creek-pocket-with-recovery-shelf',

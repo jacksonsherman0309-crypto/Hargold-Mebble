@@ -14,8 +14,11 @@ import {
 } from '../src/gameplay/levels/platform-block-runtime.js';
 import {
   MEADOW_WAKE_BLOCK_DEFINITIONS,
+  MEADOW_WAKE_BLOCK_PHRASES,
   MEADOW_WAKE_COIN_DEFINITIONS,
   MEADOW_WAKE_COMPASS_COIN_DEFINITIONS,
+  MEADOW_WAKE_GAMEPLAY_ROOMS,
+  MEADOW_WAKE_LANDFORM_FEATURES,
   MEADOW_WAKE_PITS,
   MEADOW_WAKE_PLATFORMS,
   MEADOW_WAKE_ROUTE_PHASES,
@@ -23,9 +26,15 @@ import {
   MEADOW_WAKE_TERRAIN_MODULES,
   createMeadowWakeBlocks,
   createMeadowWakePlatforms,
+  meadowWakeBlockPhraseCoverage,
   meadowWakePitRatio,
+  meadowWakeRoomCoverage,
   meadowWakeTerrainModuleCoverage
 } from '../src/content/meadow-wake-course.js';
+import {
+  MEADOW_WAKE_GAMEPLAY_LANDMARKS,
+  MEADOW_WAKE_SCENERY_PROPS
+} from '../src/content/meadow-wake-scenery.js';
 
 const platform = MEADOW_WAKE_PLATFORMS[0];
 const landingState = {
@@ -239,11 +248,50 @@ assert.equal(MEADOW_WAKE_COMPASS_COIN_DEFINITIONS.length, 3);
 assert.ok(MEADOW_WAKE_COIN_DEFINITIONS.length >= 145);
 assert.ok(MEADOW_WAKE_PLATFORMS.length >= 18 && MEADOW_WAKE_PLATFORMS.length <= 28);
 assert.ok(MEADOW_WAKE_PLATFORMS.every(platform => platform.purpose));
+assert.ok(MEADOW_WAKE_PLATFORMS.every(platform => platform.roomId));
+const groundedPlatforms = MEADOW_WAKE_PLATFORMS.filter(platformDefinition => platformDefinition.supportStyle);
+assert.ok(groundedPlatforms.length >= 10, 'static upper paths should read as part of the landform or built structure');
+assert.ok(groundedPlatforms.every(platformDefinition => !platformDefinition.motion));
+assert.ok(groundedPlatforms.every(platformDefinition => (
+  ['boulder', 'root', 'ruin', 'timber'].includes(platformDefinition.supportStyle)
+  && platformDefinition.supportDrop > 0
+)));
 assert.ok(MEADOW_WAKE_BLOCK_DEFINITIONS.length >= 28 && MEADOW_WAKE_BLOCK_DEFINITIONS.length <= 36);
 assert.ok(MEADOW_WAKE_BLOCK_DEFINITIONS.every(block => block.formation));
+assert.ok(MEADOW_WAKE_BLOCK_DEFINITIONS.every(block => Number.isInteger(block.phraseStep)));
 assert.equal(MEADOW_WAKE_PITS.length, 5);
 assert.ok(meadowWakePitRatio() >= 0.08 && meadowWakePitRatio() <= 0.1);
 assert.ok(Math.abs(meadowWakePitRatio() + meadowWakeTerrainModuleCoverage() - 1) < 1e-9);
+assert.equal(MEADOW_WAKE_GAMEPLAY_ROOMS.length, 12);
+assert.equal(meadowWakeRoomCoverage(), 1);
+assert.ok(MEADOW_WAKE_GAMEPLAY_ROOMS.every((room, index, rooms) => (
+  index === 0 || room.range[0] === rooms[index - 1].range[1]
+)));
+assert.ok(MEADOW_WAKE_GAMEPLAY_ROOMS.every(room => (
+  room.range[1] - room.range[0] >= 7 && room.range[1] - room.range[0] <= 13
+)));
+assert.equal(MEADOW_WAKE_LANDFORM_FEATURES.length, MEADOW_WAKE_GAMEPLAY_ROOMS.length);
+assert.deepEqual(
+  [...new Set(MEADOW_WAKE_LANDFORM_FEATURES.map(feature => feature.roomId))].sort(),
+  [...MEADOW_WAKE_GAMEPLAY_ROOMS.map(room => room.id)].sort()
+);
+assert.equal(MEADOW_WAKE_GAMEPLAY_LANDMARKS.length, MEADOW_WAKE_GAMEPLAY_ROOMS.length);
+const platformIds = new Set(MEADOW_WAKE_PLATFORMS.map(platformDefinition => platformDefinition.id));
+const sceneryPropIds = new Set(MEADOW_WAKE_SCENERY_PROPS.map(propDefinition => propDefinition.id));
+for (const landmark of MEADOW_WAKE_GAMEPLAY_LANDMARKS) {
+  assert.ok(sceneryPropIds.has(landmark.propId), `${landmark.propId} must be an authored visible prop`);
+  assert.ok(landmark.linkedPlatformIds.length >= 1);
+  assert.ok(landmark.linkedPlatformIds.every(platformId => platformIds.has(platformId)));
+}
+for (const feature of MEADOW_WAKE_LANDFORM_FEATURES) {
+  assert.ok(feature.linkedPlatforms.every(platformId => platformIds.has(platformId)));
+}
+assert.equal(meadowWakeBlockPhraseCoverage(), 1);
+const phraseIds = new Set(MEADOW_WAKE_BLOCK_PHRASES.map(phrase => phrase.id));
+assert.equal(phraseIds.size, MEADOW_WAKE_BLOCK_PHRASES.length);
+assert.ok(MEADOW_WAKE_BLOCK_PHRASES.every(phrase =>
+  MEADOW_WAKE_BLOCK_DEFINITIONS.some(blockDefinition => blockDefinition.formation === phrase.id)
+));
 assert.ok(MEADOW_WAKE_TERRAIN_MODULES.length >= 20);
 assert.ok(new Set(MEADOW_WAKE_TERRAIN_MODULES.map(module => module.variant)).size >= 6);
 assert.ok(MEADOW_WAKE_TERRAIN_MODULES.every(module => module.to > module.from));

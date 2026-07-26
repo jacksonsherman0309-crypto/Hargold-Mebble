@@ -1,5 +1,5 @@
 import * as THREE from '../../vendor/three/three.module.js';
-import { MEADOW_WAKE_MIDGROUND_LANDMARKS } from '../content/meadow-wake-scenery.js';
+import { MEADOW_WAKE_MIDGROUND_LANDMARKS } from '../content/meadow-wake-scenery.js?v=meadow-rooms-6';
 
 const TEXTURE_URLS = Object.freeze({
   farValley: new URL(

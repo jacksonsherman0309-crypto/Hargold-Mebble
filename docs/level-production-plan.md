@@ -137,6 +137,9 @@ Construction direction:
 - Keep approximately 65–75% of ordinary forward progression on connected
   ground. Elevated platforms supplement that route and each must have a named
   teaching, reward, shortcut, secret, or timing purpose.
+- Tune the finished World 1-1 route toward 70% connected-ground play, 20%
+  optional elevated play, and 10% dedicated platform sequences while
+  preserving the individually authored room and beat flow.
 - Group true gaps into authored events rather than distributing them evenly:
   the concealed creek pocket with its recovery shelf, the framed rope-bridge
   ravine, and the three-gap final panorama.
@@ -144,6 +147,22 @@ Construction direction:
   grass overhangs, clay/loam strata, embedded stone, exposed roots, eroded
   edges, and clean collision profiles. Long stretched terrain slabs are not an
   acceptable visible implementation.
+- Nest twelve continuous outdoor gameplay rooms inside the seven archived beats:
+  Trailhead Camp, Elder Root Walk, Mason Shelf, Shellback Quarry, Timberyard
+  Clearing, Stump Creek Hollow, Lantern Bridge, Mill Meadow, Root Terrace,
+  Lookout Ruins, Flowering Run, and Three-Gap Vista.
+- Hold a dominant original hero landmark in each room for roughly eight to ten
+  seconds of play. Each landmark must carry or frame collision-bearing
+  traversal such as an awning, root toe, boulder shelf, ruin ledge, timber
+  stack, rope bridge, waterwheel paddle, root shelf, lookout stones, stump, or
+  goal overlook.
+- Use one continuous base-loam material across adjoining terrain modules and
+  express room identity with modeled landforms and authored transitions.
+  Straight material seams that expose the underlying module boundaries are not
+  an acceptable finish.
+- Store blocks as named gameplay phrases that teach, test, gate, recover, hide,
+  or reward. Every visible or hidden Meadow Wake block must belong to one of
+  those phrases.
 
 ### 1-2 — Acorn Run
 

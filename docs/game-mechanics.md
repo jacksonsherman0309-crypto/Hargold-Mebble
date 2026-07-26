@@ -274,10 +274,22 @@ The 100-coin reward must correctly award extra lives and obey the 99-life cap.
   65–75% of ordinary forward play stays on connected ground, while its few
   true-gap events are grouped and clearly framed rather than repeated across
   every screen.
+- The authored target mix is 70% connected-ground play, 20% optional elevated
+  play, and 10% dedicated platform sequences. The percentages describe course
+  pacing and do not authorize generated or evenly repeated layouts.
 - Foreground flow alternates hills, layered ledges, bridges, vertical climbs, ruins, camps, clearings, and elevated or concealed routes.
 - Moving, falling, rotating, lift, and seesaw platforms are collision-bearing mechanisms, not decorative motion.
 - Dense coin trails, arcs, stacks, optional paths, and interrupted secret clues teach movement and reward exploration.
 - Environmental structures such as camp decks, fallen logs, stumps, fences, and ruins may carry traversal and block formations when their collision remains readable.
+- Meadow Wake is divided into twelve named outdoor gameplay rooms nested inside
+  its existing seven beats. Each room has a dominant landmark connected to at
+  least one collision-bearing traversal element and an authored landform
+  language distinct from the rooms around it.
+- Meadow Wake's landmark cadence targets roughly eight to ten seconds of play
+  per room. Landmarks orient the route and cannot be treated as scenery-only
+  backdrop dressing.
+- All Meadow Wake blocks are members of named gameplay phrases with a teaching,
+  route, recovery, gating, secret, or reward purpose.
 - Teach a mechanic safely, test it, then combine it with prior mechanics.
 - Required paths remain possible for Hargold.
 - Optional routes may reward Mebble’s jump/glide, Hargold’s block breaking, switches, power-ups, or learned skills.

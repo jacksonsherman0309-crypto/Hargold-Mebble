@@ -358,9 +358,16 @@ Block interaction follows the locked original Meadow Wake feedback hierarchy:
   and true gaps are grouped into a concealed creek pocket, one framed rope
   ravine, and the graduated exit panorama. This opening course must not scatter
   pits or floating platforms uniformly across its length.
+- Its authored World 1 route-composition target is 70% connected-ground play,
+  20% optional elevated play, and 10% dedicated platform sequences. These are
+  pacing targets for the complete route, not a procedural per-screen formula.
 - Terrain and mechanisms should provide substantial obstacle variety: narrow ledges, moving/falling/rotating platforms, lifts, seesaws, bridges, breakable formations, and optional routes.
 - Use dense coin lines, arcs, vertical stacks, interrupted clues, and concealed rewards to teach jumps, guide momentum, and signpost route choices.
 - Camps, fallen logs, stumps, fences, cliffs, and ruins should serve environmental storytelling and readable platforming roles rather than appearing as disconnected decoration.
+- Divide long outdoor courses into authored gameplay rooms even when scenery remains visually continuous. Meadow Wake uses twelve named outdoor rooms nested inside its seven archived beats and nine traversal phases.
+- Give each Meadow Wake room one dominant original hero landmark readable for roughly eight to ten seconds of play. The landmark must orient progression and connect to at least one collision-bearing route element rather than functioning only as distant decoration.
+- Terrain-room transitions must change landform language through embankments, boulder shelves, root networks, eroded creek banks, timber retaining walls, ruin foundations, and fractured overlooks. Texture swaps over the same strip silhouette are not sufficient.
+- Every Meadow Wake block belongs to a named teaching, route, recovery, gating, secret, or reward phrase. Scattered blocks with no communicated action or payoff are not approved course composition.
 - Teach a mechanic safely, test it, then combine it with previous mechanics.
 - Use approximately seven encounter/camera beats as a planning scaffold where appropriate, but do not force identical pacing on every level.
 - Spawn enemies offscreen or with a readable telegraph.

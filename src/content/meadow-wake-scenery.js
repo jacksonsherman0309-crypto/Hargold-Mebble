@@ -20,7 +20,7 @@ export const MEADOW_WAKE_SCENERY_BEATS = Object.freeze([
     range: Object.freeze([0, 15.9]),
     palette: 'warm-camp-clearing',
     props: Object.freeze([
-      prop('opening-lodge', 'camp-lodge', -0.15, 1.12, { depth: -32 }),
+      prop('opening-lodge', 'camp-lodge', -0.15, 1.28, { depth: -8, heroLandmark: true }),
       prop('opening-wayfinder', 'trail-sign', 0.35, 0.68, { facing: 1, depth: 34 }),
       prop('opening-lantern', 'lantern-post', 3.8, 0.78, { depth: 28 }),
       prop('opening-crates', 'crate-stack', 5.15, 0.62, { depth: 18 }),
@@ -35,6 +35,7 @@ export const MEADOW_WAKE_SCENERY_BEATS = Object.freeze([
     range: Object.freeze([15.9, 24]),
     palette: 'root-hollow',
     props: Object.freeze([
+      prop('elder-root-arch', 'root-arch-tree', 15.15, 1.24, { depth: 18, heroLandmark: true }),
       prop('log-hollow-root-fan', 'root-fan', 16.08, 1.1, { depth: -4 }),
       prop('log-hollow-ferns', 'fern-bank', 18.65, 1.08, { depth: 42 }),
       prop('log-hollow-fence', 'trail-fence', 20.05, 0.72, { depth: -28 }),
@@ -47,8 +48,9 @@ export const MEADOW_WAKE_SCENERY_BEATS = Object.freeze([
     range: Object.freeze([24, 40]),
     palette: 'mossy-fieldstone',
     props: Object.freeze([
+      prop('mason-shelf-pine', 'cliff-pine', 26.2, 1.18, { depth: -28, heroLandmark: true }),
       prop('shellback-low-wall', 'ruin-wall', 25.0, 0.92, { depth: -18 }),
-      prop('shellback-ruin-tower', 'ruin-tower', 30.7, 1.05, { depth: -24 }),
+      prop('shellback-ruin-tower', 'ruin-tower', 34.2, 1.42, { depth: -12, heroLandmark: true }),
       prop('shellback-lantern-hook', 'lantern-post', 33.0, 0.82, { depth: 30 }),
       prop('shellback-broken-arch', 'broken-arch', 36.8, 0.96, { depth: -20 }),
       prop('shellback-ruin-fence', 'trail-fence', 38.25, 0.8, { depth: -26 }),
@@ -61,12 +63,13 @@ export const MEADOW_WAKE_SCENERY_BEATS = Object.freeze([
     palette: 'working-camp',
     props: Object.freeze([
       prop('clearing-supply-tent', 'camp-tent', 41.55, 0.94, { depth: -72 }),
-      prop('clearing-timber-frame', 'camp-scaffold', 44.55, 1.08, { depth: -12 }),
+      prop('clearing-timber-frame', 'camp-scaffold', 48.2, 1.32, { depth: 6, heroLandmark: true }),
       prop('clearing-hoist', 'timber-hoist', 48.55, 1.0, { depth: -18 }),
       prop('clearing-barrels', 'barrel-stack', 50.35, 0.82, { depth: 22 }),
       prop('clearing-mushroom-stump', 'mushroom-stump', 52.1, 0.95, { depth: 30 }),
       prop('clearing-trail-fence', 'trail-fence', 54.95, 0.92, { depth: -24 }),
       prop('clearing-ruin-arch', 'broken-arch', 57.35, 1.0, { depth: -34 }),
+      prop('creek-giant-stump', 'giant-root-stump', 56.2, 1.28, { depth: 14, heroLandmark: true }),
       prop('clearing-bramble-clue', 'bramble-gate', 59.65, 0.92, { depth: 24 }),
       prop('hidden-creek-reeds', 'creek-reeds', 62.05, 1.08, { depth: 44, lowRoute: true }),
       prop('clearing-oak', 'canopy-tree', 64.2, 1.12, { depth: -118 })
@@ -78,6 +81,7 @@ export const MEADOW_WAKE_SCENERY_BEATS = Object.freeze([
     palette: 'ravine-overlook',
     props: Object.freeze([
       prop('bridge-west-anchor', 'bridge-anchor', 64.9, 1.0, { depth: 12 }),
+      prop('bridge-signal-frame', 'bridge-signal-frame', 67, 1.16, { depth: -16, heroLandmark: true }),
       prop('bridge-east-anchor', 'bridge-anchor', 69.15, 1.0, { depth: 12, facing: -1 }),
       prop('checkpoint-shelter', 'checkpoint-shelter', 70.15, 1.0, { depth: -42 }),
       prop('checkpoint-lantern', 'lantern-post', 71.65, 0.9, { depth: 30 })
@@ -91,12 +95,13 @@ export const MEADOW_WAKE_SCENERY_BEATS = Object.freeze([
       prop('creek-cascade-a', 'creek-cascade', 73.15, 0.92, { depth: -76 }),
       prop('creek-route-ferns', 'fern-bank', 75.3, 1.05, { depth: 42 }),
       prop('creek-trail-fence', 'trail-fence', 76.35, 0.8, { depth: -24 }),
-      prop('creek-waterwheel', 'waterwheel', 79.45, 0.9, { depth: -36 }),
+      prop('creek-watermill', 'watermill', 79.45, 1.22, { depth: -4, heroLandmark: true }),
       prop('creek-reeds-a', 'creek-reeds', 82.45, 1.0, { depth: 40, lowRoute: true }),
+      prop('root-terrace-oak', 'canopy-tree', 88.2, 1.32, { depth: -48, heroLandmark: true, facing: -1 }),
       prop('upper-ruin-tower', 'ruin-tower', 87.75, 1.12, { depth: -30 }),
       prop('upper-ruin-wall', 'ruin-wall', 90.4, 1.0, { depth: -20 }),
       prop('hargold-gate-frame', 'reinforced-gate', 94.7, 1.0, { depth: -24 }),
-      prop('watch-deck-tower', 'camp-watchtower', 97.45, 1.02, { depth: -38 }),
+      prop('watch-deck-tower', 'camp-watchtower', 97.45, 1.34, { depth: -12, heroLandmark: true }),
       prop('watch-deck-crates', 'crate-stack', 99.15, 0.86, { depth: 22 }),
       prop('ruin-descent-cascade', 'creek-cascade', 101.9, 0.86, { depth: -78 })
     ])
@@ -108,12 +113,12 @@ export const MEADOW_WAKE_SCENERY_BEATS = Object.freeze([
     props: Object.freeze([
       prop('panorama-flower-bank-a', 'flower-bank', 104.4, 1.08, { depth: 40 }),
       prop('panorama-stump', 'mushroom-stump', 106.85, 1.05, { depth: 22 }),
-      prop('panorama-vista-oak', 'canopy-tree', 109.0, 1.02, { depth: -112 }),
+      prop('panorama-vista-oak', 'canopy-tree', 108.6, 1.34, { depth: -54, heroLandmark: true }),
       prop('panorama-ferns', 'fern-bank', 113.2, 0.96, { depth: 42 }),
       prop('panorama-lantern', 'lantern-post', 117.25, 0.9, { depth: 28 }),
       prop('panorama-trail-fence', 'trail-fence', 118.1, 0.84, { depth: -24 }),
       prop('goal-wayfinder', 'trail-sign', 121.05, 0.95, { facing: -1, depth: 28 }),
-      prop('goal-stone-gate', 'goal-gate', 122.55, 1.08, { depth: -30 })
+      prop('goal-stone-gate', 'goal-gate', 122.55, 1.28, { depth: -8, heroLandmark: true })
     ])
   })
 ]);
@@ -121,6 +126,21 @@ export const MEADOW_WAKE_SCENERY_BEATS = Object.freeze([
 export const MEADOW_WAKE_SCENERY_PROPS = Object.freeze(
   MEADOW_WAKE_SCENERY_BEATS.flatMap(beat => beat.props)
 );
+
+export const MEADOW_WAKE_GAMEPLAY_LANDMARKS = Object.freeze([
+  Object.freeze({ roomId: 'trailhead-camp', propId: 'opening-lodge', silhouette: 'raised canvas lodge', traversal: 'camp awning is an optional overlook', linkedPlatformIds: Object.freeze(['camp-awning-deck']) }),
+  Object.freeze({ roomId: 'elder-root-walk', propId: 'elder-root-arch', silhouette: 'walk-under elder root arch', traversal: 'root toe and fallen log form the jump lesson', linkedPlatformIds: Object.freeze(['opening-stump-step', 'fallen-log-launch']) }),
+  Object.freeze({ roomId: 'mason-shelf', propId: 'mason-shelf-pine', silhouette: 'pine rooted into a boulder shelf', traversal: 'rock overlook sits above the grounded first encounter', linkedPlatformIds: Object.freeze(['mason-shelf-overlook']) }),
+  Object.freeze({ roomId: 'shellback-quarry', propId: 'shellback-ruin-tower', silhouette: 'broken fieldstone watch ruin', traversal: 'ruin ledges and block column define the shell route', linkedPlatformIds: Object.freeze(['shellback-low-ledge', 'shellback-upper-route-a', 'shellback-upper-route-b']) }),
+  Object.freeze({ roomId: 'timberyard-clearing', propId: 'clearing-timber-frame', silhouette: 'tall timber hoist and scaffold', traversal: 'stack, deck, and lift are parts of the working camp', linkedPlatformIds: Object.freeze(['timber-stack-climb', 'camp-scaffold-deck', 'camp-clearing-lift']) }),
+  Object.freeze({ roomId: 'stump-creek-hollow', propId: 'creek-giant-stump', silhouette: 'giant hollow stump over an eroded bank', traversal: 'root toe points toward the concealed creek shelf', linkedPlatformIds: Object.freeze(['bramble-clue-step', 'concealed-creek-shelf']) }),
+  Object.freeze({ roomId: 'lantern-bridge', propId: 'bridge-signal-frame', silhouette: 'lantern signal frame over the ravine', traversal: 'rope bridge hangs from visible stone-and-timber anchors', linkedPlatformIds: Object.freeze(['rope-bridge-main', 'checkpoint-rest-deck']) }),
+  Object.freeze({ roomId: 'mill-meadow', propId: 'creek-watermill', silhouette: 'working creek watermill', traversal: 'one moving paddle carries an optional reward route', linkedPlatformIds: Object.freeze(['waterwheel-paddle-lift', 'mill-race-log']) }),
+  Object.freeze({ roomId: 'root-terrace', propId: 'root-terrace-oak', silhouette: 'terraced oak with exposed supporting roots', traversal: 'lift and root shelf form one contained upper route', linkedPlatformIds: Object.freeze(['root-terrace-lift', 'root-terrace-ruin-shelf']) }),
+  Object.freeze({ roomId: 'lookout-ruins', propId: 'watch-deck-tower', silhouette: 'canvas-roof lookout tower', traversal: 'rotating and falling stones climb through the foundation', linkedPlatformIds: Object.freeze(['rotating-ruin-step', 'compact-falling-step', 'gate-low-step']) }),
+  Object.freeze({ roomId: 'flowering-run', propId: 'panorama-vista-oak', silhouette: 'giant flowering hill oak', traversal: 'stump and low-high-low block phrase prepare the final run', linkedPlatformIds: Object.freeze(['final-hill-stump']) }),
+  Object.freeze({ roomId: 'three-gap-vista', propId: 'goal-stone-gate', silhouette: 'mossed stone goal gate', traversal: 'the final log resolves onto its stable overlook', linkedPlatformIds: Object.freeze(['final-gap-three-log']) })
+]);
 
 export const MEADOW_WAKE_MIDGROUND_LANDMARKS = Object.freeze([
   Object.freeze({ id: 'camp-smoke-column', type: 'smoke', x: 2.4, parallax: 0.38, scale: 1.05 }),

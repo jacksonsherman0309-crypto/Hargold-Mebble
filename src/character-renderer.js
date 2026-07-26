@@ -9,9 +9,9 @@ import {
   MEADOW_WAKE_WORLD_END,
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins
-} from './content/meadow-wake-course.js?v=meadow-ground-first-5';
-import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=meadow-ground-first-5';
-import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=meadow-ground-first-5';
+} from './content/meadow-wake-course.js?v=meadow-rooms-6';
+import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=meadow-rooms-6';
+import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=meadow-rooms-6';
 import { GAME_RULES } from './canonical-data.js';
 
 const PRESENTATION = GAME_RULES.characterPresentation;
