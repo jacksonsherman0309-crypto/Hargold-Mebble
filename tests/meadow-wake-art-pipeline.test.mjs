@@ -11,6 +11,10 @@ const characterManifest = JSON.parse(readFileSync(
   new URL('../assets/blender/character-production-manifest.json', import.meta.url),
   'utf8'
 ));
+const approvedCharacterTarget = new URL(
+  '../assets/references/Hargold and Mebble approved production target.png',
+  import.meta.url
+);
 
 assert.equal(manifest.courseId, '1-1');
 assert.match(manifest.status, /vertical-slice-wip/);
@@ -47,6 +51,10 @@ assert.match(environmentRenderer, /backgroundMid\.position\.x = -cameraX \* 0\.1
 assert.match(environmentRenderer, /applyLedgeMaterials/);
 assert.match(environmentRenderer, /configureColorTexture\(soil, \{ repeat: true \}\)/);
 assert.match(renderer, /name === 'sprint'/);
+assert.match(renderer, /cameraBias: THREE\.MathUtils\.degToRad\(14\)/);
+assert.match(renderer, /model\.root\.scale\.setScalar\(model\.baseScale\)/);
+assert.match(renderer, /model\.currentYaw \+= yawDelta/);
+assert.doesNotMatch(renderer, /model\.baseScale \* direction/);
 
 for (const texture of Object.values(manifest.environmentTextures)) {
   if (!texture.endsWith?.('.png')) continue;
@@ -54,15 +62,21 @@ for (const texture of Object.values(manifest.environmentTextures)) {
   assert.ok(statSync(texturePath).size > 1_000_000, `${texture} must be a production-resolution texture`);
 }
 
-assert.match(characterManifest.status, /full-replacement/);
-assert.match(characterManifest.status, /continuous-skin/);
+assert.match(characterManifest.status, /original-character-rebuild-required/);
+assert.match(characterManifest.activeRuntimeStatus, /provisional-procedural/);
+assert.equal(characterManifest.references.ApprovedPairTarget.status, 'present-approved-2026-07-25');
+assert.ok(statSync(approvedCharacterTarget).size > 2_000_000);
+assert.equal(characterManifest.dimensionalPresentation.classification, '2.75D');
+assert.equal(characterManifest.dimensionalPresentation.negativeScaleMirroringForbidden, true);
+assert.ok(characterManifest.requiredValidationViews.includes('gameplay-three-quarter-side'));
+assert.ok(characterManifest.requiredValidationActions.includes('physical-direction-reversal'));
+assert.ok(characterManifest.requiredValidationActions.includes('Mebble-glide'));
 assert.ok(characterManifest.sharedAnimationClipsRequired.includes('sprint'));
 assert.ok(characterManifest.sharedAnimationClipsRequired.includes('crawl'));
 assert.ok(characterManifest.sharedAnimationClipsRequired.includes('victory'));
 for (const hero of ['Hargold', 'Mebble']) {
   const spec = characterManifest.characters[hero];
-  assert.match(spec.status, /no-prior-geometry-reused/);
-  assert.match(spec.status, /continuous-skin/);
+  assert.match(spec.status, /rejected-procedural-placeholder/);
   assert.ok(
     statSync(new URL(`../assets/blender/${spec.blend}`, import.meta.url)).size > 1_000_000,
     `${hero} replacement source must contain the modeled, rigged, textured asset`
@@ -83,6 +97,7 @@ const characterValidator = readFileSync(
 );
 assert.match(deformableBuilder, /union-remeshed-continuous-surface/);
 assert.match(deformableBuilder, /normalized-four-influence-skin/);
+assert.match(deformableBuilder, /deprecated for production/);
 assert.match(characterValidator, /segmented rigid limb geometry is forbidden/);
 
 const liveHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');

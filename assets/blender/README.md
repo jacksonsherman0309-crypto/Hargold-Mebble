@@ -1,12 +1,19 @@
 # Blender character asset pipeline
 
-This directory contains editable full-replacement Hargold and Mebble Blender
-sources in addition to the production contracts and generic template. Each
-source is regenerated from a factory-empty scene and records
-`reusesPriorGeometry = false`; no mesh from the rejected blockouts is linked or
-imported. The active generator creates continuous union-remeshed skin and
-garment surfaces, binds them with normalized deformation weights, and rejects
-the former bone-parented limb-piece construction.
+The active browser build still contains the July 25 procedural Hargold and
+Mebble prototypes so the game remains runnable. They are not approved
+production characters and must not be described or promoted as such.
+
+The approved production route is newly modeled, entirely original character
+geometry built in empty Blender scenes against the locked Hargold and Mebble
+sheets. Do not reuse the rejected geometry or substitute generic humanoid base
+models.
+
+`docs/character-dimension-animation-spec.md` is the binding construction and
+motion contract. Production characters are complete 3D skinned models presented
+through the strict 2.75D camera at a controlled three-quarter side angle.
+Negative-scale sprite-style mirroring is forbidden; direction changes require a
+physical animated rotation.
 
 Structural completeness is not final AAA art approval. A senior character
 artist still needs to approve or refine the sculpt/retopology, skin weights,
@@ -47,14 +54,16 @@ not evidence that the depicted production files already exist.
 - Reference images are packed or linked in `REF`, disabled in renders and exports.
 - All materials use a mobile-compatible Principled BSDF path.
 
-Rebuild the current generated sources with:
+The following legacy command is retained only for reproducing the current
+provisional browser placeholders and now requires an explicit opt-in:
 
 ```powershell
-& 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background --factory-startup --python-exit-code 1 --python tools\blender\build_deformable_characters.py
+& 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background --factory-startup --python-exit-code 1 --python tools\blender\build_deformable_characters.py -- --allow-legacy-provisional-rebuild
 ```
 
-`build_locked_characters.py` remains as the rig/action library and historical
-segmented-builder record. It is not the active geometry build entry point.
+It is not the production geometry entry point. It still produces the rejected
+doll-like result. `build_locked_characters.py` likewise remains historical
+rig/action-library code.
 
 Run the implemented structural/runtime-export checks with:
 
@@ -63,8 +72,9 @@ Run the implemented structural/runtime-export checks with:
 & 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background assets\blender\mebble_character.blend --python-exit-code 1 --python tools\blender\validate_locked_character.py
 ```
 
-`validate_character_asset.py` is the manifest-level animation-completeness
-gate. Both replacement sources are expected to pass it.
+These validators report the structural state of the provisional generated
+files only. Passing them is not production approval and does not satisfy the
+modeling, deformation, action-pose, or gameplay-camera preview gates.
 
 ## Approval gates
 

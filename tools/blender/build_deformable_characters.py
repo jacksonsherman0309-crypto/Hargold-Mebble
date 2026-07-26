@@ -677,5 +677,12 @@ def build(hero):
 
 
 if __name__ == "__main__":
+    if "--allow-legacy-provisional-rebuild" not in sys.argv:
+        raise RuntimeError(
+            "This factory-empty procedural builder is deprecated for production. "
+            "It reproduces the rejected doll-like placeholders. Pass "
+            "--allow-legacy-provisional-rebuild only to reproduce the current "
+            "non-production browser placeholders."
+        )
     for character in ("Hargold", "Mebble"):
         build(character)

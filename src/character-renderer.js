@@ -16,12 +16,14 @@ const MODEL_SPECS = Object.freeze({
   Hargold: Object.freeze({
     url: new URL('../assets/exports/hargold_character.glb?v=continuous-skin-3', import.meta.url).href,
     pixelsPerMetre: 43,
-    yaw: Math.PI / 2
+    sideYaw: Math.PI / 2,
+    cameraBias: THREE.MathUtils.degToRad(14)
   }),
   Mebble: Object.freeze({
     url: new URL('../assets/exports/mebble_character.glb?v=continuous-skin-3', import.meta.url).href,
     pixelsPerMetre: 40,
-    yaw: Math.PI / 2
+    sideYaw: Math.PI / 2,
+    cameraBias: THREE.MathUtils.degToRad(14)
   })
 });
 
@@ -1025,7 +1027,8 @@ export class CharacterRenderer {
       const gltf = await this.loader.loadAsync(spec.url);
       const root = gltf.scene;
       root.name = `${hero}_runtime`;
-      root.rotation.y = spec.yaw;
+      const rightFacingYaw = spec.sideYaw - spec.cameraBias;
+      root.rotation.y = rightFacingYaw;
       root.scale.setScalar(spec.pixelsPerMetre);
       root.visible = false;
       root.traverse(object => {
@@ -1047,7 +1050,10 @@ export class CharacterRenderer {
         clips,
         action: null,
         actionName: '',
-        baseScale: spec.pixelsPerMetre
+        baseScale: spec.pixelsPerMetre,
+        currentYaw: rightFacingYaw,
+        rightFacingYaw,
+        leftFacingYaw: -spec.sideYaw + spec.cameraBias
       });
       this.onProgress(this.statusText());
     } catch (error) {
@@ -1253,11 +1259,15 @@ export class CharacterRenderer {
       model.root.visible = active;
       if (!active) continue;
       const direction = facing < 0 ? -1 : 1;
-      model.root.scale.set(
-        model.baseScale * direction,
-        model.baseScale,
-        model.baseScale
+      model.root.scale.setScalar(model.baseScale);
+      const targetYaw = direction < 0 ? model.leftFacingYaw : model.rightFacingYaw;
+      const yawDelta = Math.atan2(
+        Math.sin(targetYaw - model.currentYaw),
+        Math.cos(targetYaw - model.currentYaw)
       );
+      const turnResponsiveness = ['skid', 'turn-low'].includes(locomotion) ? 15 : 10;
+      model.currentYaw += yawDelta * (1 - Math.exp(-turnResponsiveness * deltaSeconds));
+      model.root.rotation.y = model.currentYaw;
       model.root.position.set(
         screenX - this.width / 2,
         this.height / 2 - screenY,

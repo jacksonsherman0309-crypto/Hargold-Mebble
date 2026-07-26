@@ -30,7 +30,7 @@ Every production level must satisfy these rules unless an explicit newer instruc
 - Fully rendered 3D “2.75D” presentation target.
 - Average completion target near two minutes at a moderately quick pace, excluding unusually large finales.
 - Required route remains completable by Hargold.
-- Universal wall jumping for both heroes.
+- Wall-contact reactions are required, but unrestricted wall jumping is not currently enabled.
 - One or two Mebble-required obstacles, grouped into one contained section whenever practical.
 - Several Hargold-only blocks or Hargold-specific interactions.
 - Avoid repeated back-and-forth swapping on the required main path.
@@ -96,7 +96,7 @@ Later worlds may classify selected well-hidden coins as expert-hidden. A hidden 
 
 ### Shared movement
 
-- Both heroes wall jump.
+- Both heroes receive readable wall-collision reactions; neither has an unrestricted wall jump.
 - Mebble jumps slightly higher and has glide.
 - Required jumps remain reachable by Hargold through geometry, switches, moving objects, or approved power-ups.
 
@@ -112,7 +112,7 @@ Boss: Verdant Wyrm, five earned damage events.
 
 Purpose:
 
-- Teach movement, variable jump, wall jump, and hero swapping.
+- Teach movement, variable jump, wall-collision reactions, and hero swapping.
 - Introduce standard breakable blocks and coin blocks.
 - Introduce Camp Critter and Shellback.
 
@@ -176,7 +176,7 @@ Purpose:
 
 - Vertical platforming.
 - Hargold-only block introduction and reinforcement.
-- Shared wall-jump practice.
+- Shared wall-contact and ledge-control practice.
 
 Construction direction:
 

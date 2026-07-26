@@ -30,292 +30,29 @@ import {
   transportRiderWithPlatform,
   supportHeightAt
 } from './gameplay/levels/platform-block-runtime.js?v=block-production-1';
+import { HERO_PROFILES } from './gameplay/movement/hero-profiles.js?v=unified-motion-1';
+import { createMovementInputBuffer } from './gameplay/movement/movement-input-buffer.js?v=unified-motion-1';
+import { MOVEMENT_STATES } from './gameplay/movement/movement-state-machine.js?v=unified-motion-1';
+import {
+  applyMovementBounce,
+  applyMovementDamage,
+  createUnifiedCharacterState,
+  movementBody,
+  setMovementForcedState,
+  stepUnifiedCharacterController,
+  trySwapUnifiedHero
+} from './gameplay/movement/unified-character-controller.js?v=unified-motion-1';
+import { leaveExternalSupport } from './gameplay/movement/movement-collision-resolver.js?v=unified-motion-1';
+import { clamp } from './runtime/math.js';
+import { FixedStepLoop } from './runtime/fixed-step.js';
+import { fatalHazardEvent } from './runtime/hazards/fatal-hazards.js';
+import { createLinearGround } from './runtime/terrain/linear-ground.js';
 
 /*
- * Browser-compatible test entry.
- *
- * Keep this file dependency-free so index.html also works when opened directly
- * from disk. The production-quality reusable implementations remain under
- * src/runtime and are covered by the automated tests.
+ * Browser game integration. Physics is owned by the unified controller under
+ * src/gameplay/movement; this file supplies course, combat, camera, and input
+ * adapters only.
  */
-function clamp(value, minimum, maximum) {
-  return Math.max(minimum, Math.min(maximum, value));
-}
-
-function lerp(from, to, amount) {
-  return from + (to - from) * amount;
-}
-
-function approach(value, target, rate, deltaSeconds) {
-  if (value < target) return Math.min(target, value + rate * deltaSeconds);
-  return Math.max(target, value - rate * deltaSeconds);
-}
-
-class FixedStepLoop {
-  constructor({ hz = 120, maximumFrameSeconds = 0.25, maximumStepsPerFrame = 30 } = {}) {
-    this.stepSeconds = 1 / hz;
-    this.maximumFrameSeconds = maximumFrameSeconds;
-    this.maximumStepsPerFrame = maximumStepsPerFrame;
-    this.accumulator = 0;
-    this.totalSteps = 0;
-  }
-
-  advance(elapsedSeconds, step) {
-    const boundedElapsed = Math.min(elapsedSeconds, this.maximumFrameSeconds);
-    this.accumulator += boundedElapsed;
-    let executed = 0;
-    while (this.accumulator + Number.EPSILON >= this.stepSeconds && executed < this.maximumStepsPerFrame) {
-      step(this.stepSeconds, this.totalSteps);
-      this.accumulator -= this.stepSeconds;
-      this.totalSteps += 1;
-      executed += 1;
-    }
-    if (this.accumulator >= this.stepSeconds) this.accumulator %= this.stepSeconds;
-  }
-}
-
-function createLinearGround(points) {
-  function heightAt(positionX) {
-    const x = clamp(positionX, points[0][0], points.at(-1)[0]);
-    for (let index = 0; index < points.length - 1; index += 1) {
-      const from = points[index];
-      const to = points[index + 1];
-      if (x >= from[0] && x <= to[0]) {
-        return lerp(from[1], to[1], (x - from[0]) / (to[0] - from[0]));
-      }
-    }
-    return points.at(-1)[1];
-  }
-  return { heightAt };
-}
-
-const PROVISIONAL_MOTION_TUNING = Object.freeze({
-  status: 'provisional-engineering-tuning',
-  walkSpeed: 3.2,
-  runSpeed: 5.7,
-  sprintSpeed: 7.15,
-  groundAccelerationWalk: 18,
-  groundAccelerationRun: 22,
-  groundAccelerationSprint: 25,
-  releaseDeceleration: 16,
-  lowSpeedTurnAcceleration: 25,
-  highSpeedSkidDeceleration: 30,
-  skidThreshold: 3,
-  skidExitSpeed: 1.1,
-  airAcceleration: 11,
-  airReverseAcceleration: 14,
-  airMaximumWalkSpeed: 3.6,
-  airMaximumRunSpeed: 5.9,
-  airMaximumSprintSpeed: 7.2,
-  baseJumpSpeed: 10.4,
-  runningJumpBonus: 1.55,
-  heldJumpGravity: 22.6,
-  releasedJumpGravity: 39.2,
-  fallGravity: 36.8,
-  apexGravity: 16,
-  apexVelocityWindow: 0.84,
-  maximumFallSpeed: 15.8,
-  jumpBufferSeconds: 5 / 60,
-  coyoteSeconds: 4 / 60,
-  hardLandingSpeed: 13.2,
-  minimumJumpCutVelocity: -4.7,
-  glideGravity: 5.6,
-  glideMaximumFallSpeed: 2.9
-});
-const DEVELOPER_HARGOLD_DOUBLE_JUMP_UNLOCKED = true;
-
-const PROVISIONAL_HERO_PROFILES = Object.freeze({
-  Hargold: Object.freeze({ width: 1.02, height: 1.82, jumpSpeedAddition: 0, airControlMultiplier: 1 }),
-  Mebble: Object.freeze({ width: 0.72, height: 2.18, jumpSpeedAddition: 1.16, airControlMultiplier: 1 })
-});
-
-function createMotionState({
-  hero = 'Hargold',
-  footX = 0,
-  footY = 0,
-  grounded = true
-} = {}) {
-  return {
-    hero, footX, footY,
-    velocityX: 0, velocityY: 0, grounded, facing: 1,
-    locomotion: grounded ? 'idle' : 'fall', stateSeconds: 0,
-    coyoteSeconds: grounded ? PROVISIONAL_MOTION_TUNING.coyoteSeconds : 0,
-    jumpBufferSeconds: 0, glide: 'closed', landingSpeed: 0,
-    doubleJumpUsed: false, doubleJumpAnimationSeconds: 0,
-    groundSlamming: false,
-    supportPlatformId: null
-  };
-}
-
-function motionBody(state) {
-  const profile = PROVISIONAL_HERO_PROFILES[state.hero];
-  return {
-    x: state.footX - profile.width / 2,
-    y: state.footY - profile.height,
-    width: profile.width,
-    height: profile.height
-  };
-}
-
-function trySwapHero(state, { canOccupy = () => true } = {}) {
-  const nextHero = state.hero === 'Hargold' ? 'Mebble' : 'Hargold';
-  const profile = PROVISIONAL_HERO_PROFILES[nextHero];
-  const candidate = {
-    x: state.footX - profile.width / 2,
-    y: state.footY - profile.height,
-    width: profile.width,
-    height: profile.height
-  };
-  if (!canOccupy(candidate, nextHero)) return { accepted: false, hero: state.hero };
-  state.hero = nextHero;
-  return { accepted: true, hero: nextHero };
-}
-
-function stepMotion(state, input, deltaSeconds, {
-  groundHeightAt = () => 0,
-  minimumX = -Infinity,
-  maximumX = Infinity
-} = {}) {
-  const tuning = PROVISIONAL_MOTION_TUNING;
-  const profile = PROVISIONAL_HERO_PROFILES[state.hero];
-  const previousFootY = state.footY;
-  state.stateSeconds += deltaSeconds;
-  state.doubleJumpAnimationSeconds = Math.max(0, state.doubleJumpAnimationSeconds - deltaSeconds);
-  state.jumpBufferSeconds = input.jumpPressed
-    ? tuning.jumpBufferSeconds
-    : Math.max(0, state.jumpBufferSeconds - deltaSeconds);
-  state.coyoteSeconds = state.grounded
-    ? tuning.coyoteSeconds
-    : Math.max(0, state.coyoteSeconds - deltaSeconds);
-
-  if (
-    input.jumpPressed
-    && !state.grounded
-    && state.coyoteSeconds <= 0
-    && state.hero === 'Hargold'
-    && DEVELOPER_HARGOLD_DOUBLE_JUMP_UNLOCKED
-    && !state.doubleJumpUsed
-  ) {
-    state.doubleJumpUsed = true;
-    state.doubleJumpAnimationSeconds = 0.22;
-    state.velocityY = -tuning.baseJumpSpeed;
-    state.glide = 'closed';
-    state.locomotion = 'double-jump';
-  } else if (state.jumpBufferSeconds > 0 && (state.grounded || state.coyoteSeconds > 0)) {
-    const runRatio = clamp(Math.abs(state.velocityX) / tuning.sprintSpeed, 0, 1);
-    state.velocityY = -(tuning.baseJumpSpeed + profile.jumpSpeedAddition + tuning.runningJumpBonus * runRatio);
-    state.grounded = false;
-    state.coyoteSeconds = 0;
-    state.jumpBufferSeconds = 0;
-    state.glide = 'closed';
-  }
-
-  const direction = (input.right ? 1 : 0) - (input.left ? 1 : 0);
-  if (state.grounded) {
-    const speed = Math.abs(state.velocityX);
-    const maximum = input.sprint
-      ? tuning.sprintSpeed
-      : input.run ? tuning.runSpeed : tuning.walkSpeed;
-    const reversing = state.velocityX !== 0 && direction !== 0 && Math.sign(state.velocityX) !== direction;
-    if (input.downHeld) {
-      state.velocityX = approach(state.velocityX, 0, 20, deltaSeconds);
-      state.locomotion = speed >= tuning.skidThreshold
-        ? 'duck-slide'
-        : direction !== 0 ? 'crawl' : 'crouch';
-    } else if (direction === 0) {
-      state.velocityX = approach(state.velocityX, 0, tuning.releaseDeceleration, deltaSeconds);
-      state.locomotion = Math.abs(state.velocityX) < 1e-6
-        ? 'idle'
-        : speed > tuning.runSpeed * 1.02 ? 'sprint' : speed > tuning.walkSpeed * 0.92 ? 'run' : 'walk';
-    } else if (reversing && speed >= tuning.skidThreshold) {
-      state.velocityX = approach(state.velocityX, 0, tuning.highSpeedSkidDeceleration, deltaSeconds);
-      state.locomotion = 'skid';
-    } else {
-      state.facing = direction;
-      state.velocityX = approach(
-        state.velocityX,
-        direction * maximum,
-        reversing
-          ? tuning.lowSpeedTurnAcceleration
-          : input.sprint
-            ? tuning.groundAccelerationSprint
-            : input.run ? tuning.groundAccelerationRun : tuning.groundAccelerationWalk,
-        deltaSeconds
-      );
-      state.locomotion = Math.abs(state.velocityX) > tuning.runSpeed * 1.02
-        ? 'sprint'
-        : Math.abs(state.velocityX) > tuning.walkSpeed * 0.94 ? 'run' : 'walk';
-    }
-    state.footX = clamp(state.footX + state.velocityX * deltaSeconds, minimumX, maximumX);
-    state.footY = groundHeightAt(state.footX);
-    state.velocityY = 0;
-  } else {
-    if (direction !== 0) {
-      const reversing = state.velocityX !== 0 && Math.sign(state.velocityX) !== direction;
-      const maximum = input.sprint
-        ? tuning.airMaximumSprintSpeed
-        : input.run ? tuning.airMaximumRunSpeed : tuning.airMaximumWalkSpeed;
-      state.velocityX = approach(
-        state.velocityX,
-        direction * maximum,
-        (reversing ? tuning.airReverseAcceleration : tuning.airAcceleration) * profile.airControlMultiplier,
-        deltaSeconds
-      );
-      state.facing = direction;
-    }
-    const absoluteVerticalSpeed = Math.abs(state.velocityY);
-    let gravity = absoluteVerticalSpeed <= tuning.apexVelocityWindow
-      ? tuning.apexGravity
-      : state.velocityY < 0
-        ? input.jumpHeld ? tuning.heldJumpGravity : tuning.releasedJumpGravity
-        : tuning.fallGravity;
-    const shouldGlide = state.hero === 'Mebble' && input.glideHeld && state.velocityY > tuning.apexVelocityWindow;
-    if (shouldGlide) {
-      gravity = tuning.glideGravity;
-      state.velocityY = Math.min(state.velocityY, tuning.glideMaximumFallSpeed);
-      state.glide = state.glide === 'closed' ? 'opening' : 'sustained';
-    } else {
-      state.glide = state.glide === 'opening' || state.glide === 'sustained' ? 'closing' : 'closed';
-    }
-    state.velocityY = Math.min(tuning.maximumFallSpeed, state.velocityY + gravity * deltaSeconds);
-    if (input.fastFallHeld && state.velocityY > tuning.apexVelocityWindow) {
-      state.groundSlamming = true;
-      state.velocityY = Math.max(state.velocityY, 18);
-    }
-    if (!input.jumpHeld && state.velocityY < tuning.minimumJumpCutVelocity) {
-      state.velocityY = tuning.minimumJumpCutVelocity;
-    }
-    state.footX = clamp(state.footX + state.velocityX * deltaSeconds, minimumX, maximumX);
-    state.footY += state.velocityY * deltaSeconds;
-    const groundY = groundHeightAt(state.footX);
-    if (state.velocityY >= 0 && state.footY >= groundY && previousFootY <= groundY) {
-      state.landingSpeed = state.velocityY;
-      state.footY = groundY;
-      state.velocityY = 0;
-      state.grounded = true;
-      state.glide = 'closed';
-      state.doubleJumpUsed = false;
-      state.locomotion = state.groundSlamming || state.landingSpeed >= tuning.hardLandingSpeed
-        ? 'land-hard'
-        : 'land-soft';
-      state.groundSlamming = false;
-    } else {
-      state.locomotion = state.velocityY < -tuning.apexVelocityWindow
-        ? 'rise'
-        : state.velocityY <= tuning.apexVelocityWindow ? 'apex' : 'fall';
-      if (state.doubleJumpAnimationSeconds > 0) state.locomotion = 'double-jump';
-      else if (state.groundSlamming) state.locomotion = 'ground-slam';
-    }
-  }
-}
-
-function fatalHazardEvent(type) {
-  return {
-    type: 'fatal-hazard',
-    hazardType: type,
-    bypasses: ['hearts', 'invulnerability', 'activePowerUp']
-  };
-}
 
 const canvas = document.querySelector('#game');
 const ctx = canvas.getContext('2d');
@@ -325,8 +62,19 @@ const H = canvas.height;
 const SCALE = 70;
 const WORLD_END = MEADOW_WAKE_WORLD_END;
 const keys = new Set();
-const touch = { left: false, right: false, run: false, sprint: false, jump: false, action: false };
+const touch = {
+  left: false,
+  right: false,
+  run: false,
+  sprint: false,
+  jump: false,
+  slam: false,
+  action: false,
+  swap: false
+};
 const loop = new FixedStepLoop({ hz: 120 });
+const inputBuffer = createMovementInputBuffer();
+const movementDebugEnabled = new URLSearchParams(location.search).has('debugMovement');
 let characterLoadStatus = 'Loading 3D characters...';
 const characterRenderer = new CharacterRenderer({
   mount: canvas.parentElement,
@@ -355,8 +103,7 @@ const MOB_PLACEMENTS = Object.freeze([
   Object.freeze({ id: '1-1-critter-c', type: 'camp_critter', x: 25.6, patrolFrom: 24.1, patrolTo: 27.4 })
 ]);
 
-let player = createMotionState({ footX: 1.8, footY: terrain.heightAt(1.8) });
-let previousInput = { jump: false, swap: false, action: false };
+let player = createUnifiedCharacterState({ footX: 1.8, footY: terrain.heightAt(1.8) });
 let cameraX = 0;
 let lastFrame = performance.now();
 let session = createSession();
@@ -376,7 +123,8 @@ function createSession() {
     spawnX: 1.8,
     invulnerabilitySeconds: 0,
     attackSeconds: 0,
-    enemiesDefeated: 0
+    enemiesDefeated: 0,
+    doubleJumpUnlocked: false
   };
 }
 
@@ -404,32 +152,46 @@ function groundHeightAt(x) {
   return inPit(x) ? 20 : terrain.heightAt(x);
 }
 
-function inputSnapshot() {
-  const jump = keys.has('Space') || keys.has('ArrowUp') || keys.has('KeyW') || touch.jump;
-  const swap = keys.has('KeyQ');
-  const action = keys.has('KeyE') || touch.action;
-  const down = keys.has('ArrowDown') || keys.has('KeyS');
-  const snapshot = {
-    left: keys.has('ArrowLeft') || keys.has('KeyA') || touch.left,
-    right: keys.has('ArrowRight') || keys.has('KeyD') || touch.right,
-    run: keys.has('KeyX') || keys.has('ShiftLeft') || keys.has('ShiftRight') || touch.run || touch.sprint,
-    sprint: keys.has('ShiftLeft') || keys.has('ShiftRight') || touch.sprint,
-    jumpPressed: jump && !previousInput.jump,
-    jumpHeld: jump,
-    actionPressed: action && !previousInput.action,
-    glideHeld: action,
-    fastFallHeld: down,
-    downHeld: down
+function readGamepadSnapshot() {
+  const gamepad = Array.from(navigator.getGamepads?.() ?? []).find(Boolean);
+  if (!gamepad) return {};
+  const horizontal = gamepad.axes[0] ?? 0;
+  const vertical = gamepad.axes[1] ?? 0;
+  const pressed = index => Boolean(gamepad.buttons[index]?.pressed);
+  return {
+    left: horizontal < -0.35 || pressed(14),
+    right: horizontal > 0.35 || pressed(15),
+    run: pressed(2) || pressed(3),
+    sprint: pressed(5),
+    jump: pressed(0),
+    down: vertical > 0.5 || pressed(13),
+    action: pressed(1),
+    swap: pressed(4),
+    pause: pressed(9)
   };
-  if (swap && !previousInput.swap) swapPlayer();
-  previousInput = { jump, swap, action };
-  return snapshot;
+}
+
+function rawInputSnapshot() {
+  const gamepad = readGamepadSnapshot();
+  return {
+    left: keys.has('ArrowLeft') || keys.has('KeyA') || touch.left || gamepad.left,
+    right: keys.has('ArrowRight') || keys.has('KeyD') || touch.right || gamepad.right,
+    run: keys.has('KeyX') || keys.has('ShiftLeft') || keys.has('ShiftRight') ||
+      touch.run || touch.sprint || gamepad.run || gamepad.sprint,
+    sprint: keys.has('ShiftLeft') || keys.has('ShiftRight') || touch.sprint || gamepad.sprint,
+    jump: keys.has('Space') || keys.has('ArrowUp') || keys.has('KeyW') ||
+      touch.jump || gamepad.jump,
+    down: keys.has('ArrowDown') || keys.has('KeyS') || touch.slam || gamepad.down,
+    action: keys.has('KeyE') || touch.action || gamepad.action,
+    swap: keys.has('KeyQ') || touch.swap || gamepad.swap,
+    pause: keys.has('Escape') || gamepad.pause
+  };
 }
 
 function canOccupy(candidate) {
   if (candidate.x < 0 || candidate.x + candidate.width > WORLD_END) return false;
   const lowOverhang = candidate.x < 14.6 && candidate.x + candidate.width > 13.2;
-  if (lowOverhang && candidate.height > PROVISIONAL_HERO_PROFILES.Hargold.height) return false;
+  if (lowOverhang && candidate.height > HERO_PROFILES.Hargold.height) return false;
   return !blocks.some(block => {
     if (block.broken || (block.hidden && !block.revealed)) return false;
     const blockBody = {
@@ -444,7 +206,7 @@ function canOccupy(candidate) {
 
 function swapPlayer() {
   if (session.state !== 'playing') return;
-  const result = trySwapHero(player, { canOccupy });
+  const result = trySwapUnifiedHero(player, { canOccupy });
   notice = result.accepted
     ? `${result.hero} active — feet and momentum preserved.`
     : 'Swap blocked: Mebble cannot safely fit here.';
@@ -453,15 +215,16 @@ function swapPlayer() {
 
 function respawn() {
   resetCoursePlatforms(platforms);
-  player = createMotionState({
+  player = createUnifiedCharacterState({
     hero: player.hero,
     footX: session.spawnX,
-    footY: terrain.heightAt(session.spawnX)
+    footY: terrain.heightAt(session.spawnX),
+    doubleJumpUnlocked: session.doubleJumpUnlocked
   });
   session.healthLayers = session.maximumHealthLayers;
   session.invulnerabilitySeconds = 1;
   session.attackSeconds = 0;
-  previousInput = { jump: false, swap: false, action: false };
+  inputBuffer.reset();
   projectiles = [];
   for (const mob of mobs) {
     if (mob.spawnX < session.spawnX && !mob.alive) continue;
@@ -492,8 +255,7 @@ function loseLife(hazardType) {
   noticeSeconds = 3;
   if (session.lives === 0) {
     session.state = 'game-over';
-    player.velocityX = 0;
-    player.velocityY = 0;
+    setMovementForcedState(player, MOVEMENT_STATES.DEAD);
     return;
   }
   respawn();
@@ -502,21 +264,18 @@ function loseLife(hazardType) {
 function damagePlayer(source, direction = 1) {
   if (session.state !== 'playing' || session.invulnerabilitySeconds > 0) return false;
   session.healthLayers = Math.max(0, session.healthLayers - 1);
-  player.velocityX = direction * 4.2;
-  player.velocityY = -5.4;
-  player.grounded = false;
   if (session.healthLayers === 0) {
     session.lives = Math.max(0, session.lives - 1);
     notice = `${source}: health depleted; one life lost.`;
     noticeSeconds = 2.5;
     if (session.lives === 0) {
       session.state = 'game-over';
-      player.velocityX = 0;
-      player.velocityY = 0;
+      setMovementForcedState(player, MOVEMENT_STATES.DEAD);
     } else {
       respawn();
     }
   } else {
+    applyMovementDamage(player, direction);
     session.invulnerabilitySeconds = 0.8;
     notice = `${source}: one health layer lost.`;
     noticeSeconds = 1.8;
@@ -539,10 +298,14 @@ function restartCourse() {
     block.impactKind = 'idle';
   }
   resetCoursePlatforms(platforms);
-  player = createMotionState({ footX: session.spawnX, footY: terrain.heightAt(session.spawnX) });
+  player = createUnifiedCharacterState({
+    footX: session.spawnX,
+    footY: terrain.heightAt(session.spawnX),
+    doubleJumpUnlocked: session.doubleJumpUnlocked
+  });
   mobs = createCourseMobs();
   projectiles = [];
-  previousInput = { jump: false, swap: false, action: false };
+  inputBuffer.reset();
   notice = 'Course restarted with the Meadow Wake mob roster.';
   noticeSeconds = 2;
 }
@@ -603,7 +366,7 @@ function updateCombat(input, previousPlayerFootY, dt) {
     session.attackSeconds = player.hero === 'Hargold' ? 0.28 : 0.22;
   }
 
-  const playerBody = motionBody(player);
+  const playerBody = movementBody(player);
   const target = { x: player.footX, y: player.footY - playerBody.height * 0.55 };
   for (const mob of mobs) {
     if (!mob.activated && mob.x - player.footX < 10.6 && mob.x >= player.footX - 2) mob.activated = true;
@@ -649,9 +412,13 @@ function updateCombat(input, previousPlayerFootY, dt) {
       if (result.outcome === 'damage-player') {
         damagePlayer('Unsafe spiked stomp', player.footX < mob.x ? -1 : 1);
       } else {
+        const wasGroundSlamming = player.groundSlamming;
         player.footY = mobTop;
-        player.velocityY = -7.2;
-        player.grounded = false;
+        applyMovementBounce(player, {
+          kind: 'enemy',
+          jumpHeld: input.jumpHeld,
+          strong: wasGroundSlamming
+        });
         if (result.outcome === 'defeat') {
           session.enemiesDefeated += 1;
           notice = `${mob.type.replaceAll('_', ' ')} stomped.`;
@@ -705,33 +472,49 @@ function updateCombat(input, previousPlayerFootY, dt) {
 
 function fixedUpdate(dt) {
   if (session.state !== 'playing') return;
-  const input = inputSnapshot();
+  const input = inputBuffer.consumeStep();
+  if (input.swapPressed) swapPlayer();
   stepCoursePlatforms(platforms, dt, {
     supportPlatformId: player.supportPlatformId,
     riderX: player.footX
   });
-  transportRiderWithPlatform(player, platforms);
+  transportRiderWithPlatform(player, platforms, dt);
   const previousPlayerFootY = player.footY;
-  const previousPlayerBody = motionBody(player);
+  const previousPlayerBody = movementBody(player);
   const previousHeadY = previousPlayerBody.y;
   const previousSupportPlatformId = player.supportPlatformId;
   const activeSurfaces = activeCourseSurfaces(platforms, blocks);
-  stepMotion(player, input, dt, {
+  stepUnifiedCharacterController(player, input, dt, {
     groundHeightAt: x => supportHeightAt(player, x, groundHeightAt, activeSurfaces),
+    hasGroundAt: x => !inPit(x) || Boolean(
+      player.supportPlatformId &&
+      activeSurfaces.some(surface =>
+        surface.id === player.supportPlatformId &&
+        x >= surface.x - surface.width / 2 &&
+        x <= surface.x + surface.width / 2
+      )
+    ),
+    surfaceAt: x => {
+      const angle = terrain.angleAt(x);
+      return {
+        angle,
+        normal: { x: Math.sin(angle), y: -Math.cos(angle) },
+        material: 'normal'
+      };
+    },
     minimumX: 0.8,
-    maximumX: WORLD_END
+    maximumX: WORLD_END,
+    doubleJumpUnlocked: session.doubleJumpUnlocked
   });
   if (previousSupportPlatformId && !player.supportPlatformId && player.grounded) {
     player.footY = previousPlayerFootY;
-    player.velocityY = 0.2;
-    player.grounded = false;
-    player.locomotion = 'fall';
+    leaveExternalSupport(player, { downwardSpeed: 0.2 });
   }
   if (!player.grounded) {
-    resolveOneWayPlatformLanding(player, previousPlayerFootY, activeSurfaces, motionBody(player));
+    resolveOneWayPlatformLanding(player, previousPlayerFootY, activeSurfaces, movementBody(player));
   }
   player.blockBreakStrength = player.hero === 'Hargold' || session.healthLayers > 1 ? 1 : 0;
-  const blockEvent = resolveBlockHeadHit(player, previousHeadY, blocks, motionBody(player));
+  const blockEvent = resolveBlockHeadHit(player, previousHeadY, blocks, movementBody(player));
   if (blockEvent?.type === 'block-broken') {
     notice = blockEvent.blockType === 'hargold-only'
       ? 'Hargold broke the reinforced explorer block.'
@@ -754,7 +537,7 @@ function fixedUpdate(dt) {
     noticeSeconds = 1.8;
   }
   if (!blockEvent) {
-    resolveSolidBlockSideCollision(player, previousPlayerBody, blocks, motionBody(player));
+    resolveSolidBlockSideCollision(player, previousPlayerBody, blocks, movementBody(player));
   }
   stepBlockFeedback(blocks, dt);
   collectItems();
@@ -769,7 +552,7 @@ function fixedUpdate(dt) {
   if (player.footY > 11.5) loseLife('pit');
   if (player.footX >= WORLD_END - 0.75) {
     session.state = 'complete';
-    player.locomotion = 'victory';
+    setMovementForcedState(player, MOVEMENT_STATES.VICTORY);
     notice = 'Meadow Wake complete.';
     noticeSeconds = Infinity;
   }
@@ -885,7 +668,7 @@ function drawMarkers() {
 
 function drawPlayer() {
   if (characterRenderer.isReady(player.hero)) return;
-  const body = motionBody(player);
+  const body = movementBody(player);
   const x = worldToScreenX(body.x);
   const y = worldToScreenY(body.y);
   const width = body.width * SCALE;
@@ -957,6 +740,21 @@ function drawOverlay() {
     ctx.fillText('Press R or tap RESTART to begin again', W / 2, H / 2 + 30);
     ctx.textAlign = 'left';
   }
+  if (movementDebugEnabled && player.telemetry) {
+    const debug = player.telemetry;
+    const lines = [
+      `${debug.previousState} → ${debug.currentState}  ${debug.stateDurationSeconds.toFixed(3)}s`,
+      `pos ${debug.position.x.toFixed(3)}, ${debug.position.y.toFixed(3)}  vel ${debug.velocity.x.toFixed(3)}, ${debug.velocity.y.toFixed(3)}`,
+      `grounded ${debug.grounded}  support ${debug.supportPlatformId ?? 'terrain/none'}  normal ${debug.surfaceNormal.x.toFixed(2)}, ${debug.surfaceNormal.y.toFixed(2)}`,
+      `buffer ${debug.jumpBufferSeconds.toFixed(3)}  coyote ${debug.coyoteSeconds.toFixed(3)}  twirl ${debug.twirlAvailable}  double ${debug.doubleJumpAvailable}`,
+      `glide ${debug.glideState} ${debug.glideSeconds.toFixed(2)}s  slam ${debug.groundSlamPhase}`
+    ];
+    ctx.fillStyle = 'rgba(5, 10, 8, .9)';
+    ctx.fillRect(18, H - 158, 720, 138);
+    ctx.fillStyle = '#d9f6cf';
+    ctx.font = '600 14px ui-monospace, monospace';
+    lines.forEach((line, index) => ctx.fillText(line, 30, H - 132 + index * 23));
+  }
 }
 
 function draw() {
@@ -968,6 +766,7 @@ function draw() {
 function frame(now) {
   const elapsed = Math.max(0, Math.min(0.1, (now - lastFrame) / 1000));
   lastFrame = now;
+  inputBuffer.sample(rawInputSnapshot(), elapsed);
   loop.advance(elapsed, fixedUpdate);
   noticeSeconds = Math.max(0, noticeSeconds - elapsed);
   const sprintLookAhead = player.locomotion === 'sprint'
@@ -1005,14 +804,14 @@ addEventListener('keyup', event => keys.delete(event.code));
 addEventListener('blur', () => {
   keys.clear();
   for (const action of Object.keys(touch)) touch[action] = false;
+  inputBuffer.reset();
 });
 
 for (const button of document.querySelectorAll('[data-action]')) {
   const action = button.dataset.action;
   const set = value => {
     button.classList.toggle('active', value);
-    if (action === 'swap' && value) swapPlayer();
-    else if (action === 'restart' && value) restartCourse();
+    if (action === 'restart' && value) restartCourse();
     else if (action in touch) touch[action] = value;
   };
   button.addEventListener('pointerdown', event => {

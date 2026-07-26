@@ -12,13 +12,45 @@ assert.equal(
 );
 
 assert.deepEqual(GAME_RULES.campaign.difficultyModes, ['Easy', 'Normal', 'Hard', 'Nightmare']);
-assert.deepEqual(GAME_RULES.movement.wallJump, { Hargold: true, Mebble: true });
+assert.deepEqual(GAME_RULES.movement.wallJump, {
+  Hargold: false,
+  Mebble: false,
+  status: 'not-enabled-without-a-future-explicit-rule'
+});
 assert.equal(GAME_RULES.movement.allRequiredJumpsReachableByHargold, true);
 assert.equal(GAME_RULES.movement.sharedHorizontalBaseTuning, true);
 assert.deepEqual(GAME_RULES.movement.locomotionTargets, ['walk', 'run', 'sprint']);
 assert.ok(GAME_RULES.movement.requiredCharacterStates.includes('crawl'));
 assert.ok(GAME_RULES.movement.requiredCharacterStates.includes('victory'));
+assert.deepEqual(GAME_RULES.movement.airTwirl, {
+  universalBeforeHargoldDoubleJumpUnlock: true,
+  input: 'fresh airborne jump press',
+  oncePerAirborneSequence: true,
+  boundedHangTime: true,
+  grantsAdditionalJump: false
+});
+assert.deepEqual(
+  GAME_RULES.movement.groundSlam.phases,
+  ['startup', 'descent', 'impact', 'recovery']
+);
 assert.equal(GAME_RULES.heroGating.avoidRepeatedMainRouteBacktrackingSwaps, true);
+assert.equal(GAME_RULES.characterPresentation.construction, 'complete-3d-skinned-models');
+assert.equal(GAME_RULES.characterPresentation.classification, '2.75D');
+assert.equal(
+  GAME_RULES.characterPresentation.orientation.mode,
+  'controlled-three-quarter-side'
+);
+assert.equal(GAME_RULES.characterPresentation.orientation.cameraBiasDegrees, 14);
+assert.equal(
+  GAME_RULES.characterPresentation.orientation.negativeScaleMirroringForbidden,
+  true
+);
+assert.deepEqual(
+  GAME_RULES.characterPresentation.animation.distinctJumpStages,
+  ['anticipation', 'takeoff', 'ascent', 'apex', 'descent', 'contact', 'compression', 'recovery']
+);
+assert.equal(GAME_RULES.movement.hargoldDoubleJump.learnedSkill, true);
+assert.equal('mebbleDoubleJump' in GAME_RULES.movement, false);
 assert.deepEqual(GAME_RULES.levelConstruction.supportedTerrainRatio, { minimum: 0.8, maximum: 0.9 });
 assert.deepEqual(GAME_RULES.levelConstruction.pitRatio, { minimum: 0.1, maximum: 0.2 });
 assert.equal(GAME_RULES.levelConstruction.individuallyAuthoredCourses, true);
@@ -69,12 +101,21 @@ assert.match(LOCKED_HERO_DESIGN.Mebble.definingFeatures.join(' '), /Adam/);
 assert.match(LOCKED_HERO_DESIGN.Hargold.build, /very short/);
 assert.equal(LOCKED_HERO_DESIGN.Hargold.reference, 'assets/references/Hargold locked production character sheet.png');
 assert.equal(LOCKED_HERO_DESIGN.Mebble.reference, 'assets/references/Mebble locked production character sheet.png');
+assert.equal(
+  LOCKED_HERO_DESIGN.Hargold.approvedProductionTarget,
+  'assets/references/Hargold and Mebble approved production target.png'
+);
+assert.equal(
+  LOCKED_HERO_DESIGN.Hargold.approvedProductionTargetSha256,
+  LOCKED_HERO_DESIGN.Mebble.approvedProductionTargetSha256
+);
 assert.match(LOCKED_HERO_DESIGN.Hargold.clothing.join(' '), /backpack/);
 assert.match(LOCKED_HERO_DESIGN.Mebble.clothing.join(' '), /double belts/);
-assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /new geometry/);
+assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /new original artist-authored geometry/);
 assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /continuous skinned/);
 assert.match(LOCKED_HERO_DESIGN.Mebble.productionModel.join(' '), /no rigid segmented limbs/);
-assert.match(LOCKED_HERO_DESIGN.Mebble.productionAnimation.join(' '), /new gameplay clips/);
+assert.match(LOCKED_HERO_DESIGN.Mebble.productionModel.join(' '), /empty Blender scene/);
+assert.match(LOCKED_HERO_DESIGN.Mebble.productionAnimation.join(' '), /new original gameplay clips/);
 assert.match(LOCKED_HERO_DESIGN.Hargold.gameplay.join(' '), /exclusive learned double jump/);
 
 for (const world of CAMPAIGN) {
@@ -87,7 +128,7 @@ for (const world of CAMPAIGN) {
   for (const level of world.levels) {
     if (world.number !== 1) {
       assert.equal(level.strictSideScrollingPlane, true);
-      assert.equal(level.wallJumpAvailableToBothHeroes, true);
+      assert.equal(level.wallJumpAvailableToBothHeroes, false);
       assert.equal(level.hargoldRequiredJumpReachability, true);
       assert.equal(level.avoidRepeatedMainRouteSwapping, true);
     }

@@ -2,14 +2,30 @@
 
 Last verified: July 25, 2026
 
-The locked PNG sheets are references, not pre-existing 3D assets. This
-repository contains generated Blender sources and GLB exports created from a
-factory-empty scene. The July 25 continuous-skin rebuild replaces the rejected
-rounded-part construction: body, sleeve, torso, trouser, hand, and boot volumes
-are now union-remeshed surfaces with normalized armature weights instead of
-separate rigid limb pieces.
+The locked PNG sheets are references, not pre-existing 3D assets. The licensed
+base-model instruction was withdrawn as a clerical error. The approved
+production direction is newly modeled, entirely original Hargold and Mebble
+geometry created from empty Blender scenes against those locked sheets.
 
-## Verified replacement assets
+The existing Blender sources and GLB exports were generated procedurally from
+factory-empty scenes, but their doll-like forms remain rejected. They are
+runnable placeholders only and are not approved production replacements. They
+will stay active until the new original models pass the required preview and
+deformation gates.
+
+## Approved visual target
+
+`assets/references/Hargold and Mebble approved production target.png` was
+approved on July 25, 2026. It locks the desired organic character appeal,
+expressive action posing, layered clothing, soft anatomy, material finish, and
+animated-platformer presentation. It is concept reference art, not an editable
+mesh, rig, material set, or animation asset.
+
+The individual locked Hargold and Mebble sheets remain authoritative for exact
+costume pieces, proportions, facial identifiers, orthographic silhouettes, and
+rear/side details not fully visible in the combined action preview.
+
+## Provisional active assets
 
 ### Hargold
 
@@ -54,25 +70,31 @@ fast-fall/ground-slam/stomp bounce, water, climbing, ropes, carrying,
 drop/throw, hurt/knockback/defeat, swapping, and victory. Actions contain
 transition, looping, root-motion, and contact-marker metadata.
 
-## What still requires production approval
+## Blocking production inputs and approvals
 
-The automated Blender and GLB gates pass, and action-pose renders now verify
-that facial volume stays attached during locomotion. This is still not a claim
-of final AAA-quality approval. The remaining work is:
+The existing procedural files pass their historical structural checks. That
+does not authorize them for production. The required work is:
 
-1. Senior character-artist sculpt and retopology review against every locked
+1. Create new original high-resolution sculpts from empty Blender scenes,
+   matching the locked Hargold and Mebble sheets.
+2. Retopologize for smooth deformation, clean facial edge flow, detailed hands
+   and boots, layered clothing, and optimized gameplay LODs.
+3. Build the production body, facial, finger, IK/FK, socket, and
+   secondary-motion rigs.
+4. Senior character-artist sculpt and retopology review against every locked
    orthographic view.
-2. Senior skin-weight and corrective-shape polish at shoulders, hips, fingers,
+5. Senior skin-weight and corrective-shape polish at shoulders, hips, fingers,
    Hargold's round torso, and Mebble's long neck.
-3. Hand-painted texture detail beyond the packed pipeline maps.
-4. Mebble cape collision/dynamic-secondary-motion tuning and Hargold
+6. Hand-painted texture detail beyond the packed pipeline maps.
+7. Mebble cape collision/dynamic-secondary-motion tuning and Hargold
    hat/feather/scarf dynamic tuning in the target engine.
-5. Mobile LODs, draw-call/material consolidation, texture atlasing, and measured
+8. Mobile LODs, draw-call/material consolidation, texture atlasing, and measured
    device budgets.
-6. Every-clip deformation, foot-contact, transition, and readability review in
+9. Author the complete original gameplay animation set.
+10. Every-clip deformation, foot-contact, transition, and readability review in
    the live 2.75D camera.
-7. Final art-director approval that both characters match the locked sheets.
+11. Turnaround, action-pose, gameplay-camera, and final
+   art-director approval before active-file replacement.
 
-Until those reviews are signed off, these are animated, continuous-skin
-production prototypes and playable runtime exports, not final shipped
-character art.
+Until those inputs and reviews are complete, the active files are provisional
+animated placeholders, not final shipped character art.

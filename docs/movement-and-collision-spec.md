@@ -33,9 +33,9 @@ Both Hargold and Mebble share this complete baseline:
 - jump-combo timing and triple-jump multiplier;
 - wall contact probing;
 - wall slide;
-- wall jump;
+- wall-contact reaction without an unrestricted wall jump;
 - wall-coyote timing;
-- brief post-wall-jump steering lock;
+- brief collision-reaction steering damping where required;
 - same-wall regrab suppression;
 - crouch;
 - crawl;
@@ -48,11 +48,11 @@ Both Hargold and Mebble share this complete baseline:
 - slope-driven slide acceleration;
 - momentum-preserving jump from a slide;
 - spin jump from the ground;
-- one air spin per airtime with controlled fall braking;
+- one air twirl per airborne sequence, triggered by a fresh airborne jump press, with preserved horizontal momentum and bounded hang time but no additional launch;
 - normal fall;
 - fast fall;
 - terminal velocity;
-- ground slam;
+- ground slam triggered by a fresh airborne Down/S/SLAM press from ascent, apex, or descent, with prepare, committed descent, impact, and recovery phases;
 - hard-landing event;
 - stomp bounce;
 - strong stomp bounce;
@@ -247,7 +247,7 @@ The movement layer should expose animation intent without hard-coding a particul
 - Jump-combo/triple-jump timing.
 - Hargold double jump locked/unlocked behavior.
 - Mebble glide descent cap and no infinite flight.
-- Wall slide and wall jump for both heroes.
+- Wall contact and wall-slide presentation for both heroes; unrestricted wall jump is not enabled.
 - Wall-coyote timing.
 - Same-wall regrab suppression.
 - Crouch and blocked stand-up.
@@ -278,6 +278,6 @@ These items cannot be finalized until real production models and animation exist
 - per-animation foot-contact markers;
 - stride synchronization to movement speed;
 - root-motion reconciliation if any clip contains translation;
-- final landing, wall-jump, slide, spin, attack, and hurt transition blending;
+- final landing, wall-contact, slide, spin, attack, and hurt transition blending;
 - Mebble cape and clothing secondary motion;
 - collider-to-visible-body alignment in all hero states.

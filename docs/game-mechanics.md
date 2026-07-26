@@ -22,6 +22,8 @@ This is the authoritative gameplay specification for Codex and all collaborators
 - Use the active hero ability or active power-up action.
 - Pause and restart.
 - Mobile and keyboard controls must produce the same core behavior.
+- Space/W/Up starts a jump when grounded or within coyote time. One later fresh press triggers Mebble's twirl, Hargold's twirl before unlock, or Hargold's learned double jump after unlock.
+- Down/S or the mobile SLAM control starts the universal ground slam from ascent, apex, or descent.
 
 ## 3. General movement
 
@@ -30,6 +32,9 @@ This is the authoritative gameplay specification for Codex and all collaborators
 - Hargold and Mebble share identical horizontal base-controller tuning for walk, run, sprint, turning, braking, and air control.
 - Walk, run, and sprint are distinct speed targets and animation states.
 - Jump height should respond to how long the jump control is held.
+- Air twirl is limited to once per airborne sequence, preserves horizontal momentum, and applies a short bounded hang-time window without adding jump height as a second launch.
+- Ground slam uses explicit startup, descent, impact, and recovery phases. A held airborne Down input becomes an ordinary fast fall when the ground-slam clearance and airborne-time requirements are not satisfied.
+- Unrestricted wall jumping is disabled for both heroes unless a later explicit rule adds it.
 - Coyote time and jump buffering may be used to improve responsiveness without making jumps automatic.
 - All mandatory progression jumps must be possible with Hargold in the intended state.
 - Mebble jumps slightly higher than Hargold.
@@ -63,7 +68,7 @@ This is the authoritative gameplay specification for Codex and all collaborators
 - Uses the shared horizontal base controller.
 - Jumps slightly higher than Hargold.
 - Has an innate cape parachute/glide.
-- Holding glide while descending slows the fall and permits limited horizontal correction or a short glide.
+- Holding Space while descending opens the cape, slows the fall, and permits limited horizontal correction or a short glide.
 - Glide must not create infinite flight or height gain.
 - Can reach and activate selected switches that Hargold cannot reach.
 - His taller collision body must be respected in tunnels and during swaps.

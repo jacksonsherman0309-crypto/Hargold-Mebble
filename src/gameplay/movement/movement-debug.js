@@ -1,0 +1,38 @@
+export function updateMovementTelemetry(state, input, contacts = {}) {
+  state.telemetry = Object.freeze({
+    currentState: state.movementState,
+    previousState: state.previousMovementState,
+    stateDurationSeconds: state.stateSeconds,
+    position: Object.freeze({ x: state.footX, y: state.footY }),
+    velocity: Object.freeze({ x: state.velocityX, y: state.velocityY }),
+    acceleration: Object.freeze({ x: state.accelerationX, y: state.accelerationY }),
+    grounded: state.grounded,
+    surfaceNormal: Object.freeze({ ...(state.surfaceNormal ?? { x: 0, y: -1 }) }),
+    surfaceAngle: state.surfaceAngle ?? 0,
+    surfaceMaterial: state.surfaceMaterial ?? 'normal',
+    supportPlatformId: state.supportPlatformId,
+    jumpBufferSeconds: state.jumpBufferSeconds,
+    coyoteSeconds: state.coyoteSeconds,
+    airborneSeconds: state.airborneSeconds,
+    twirlAvailable: !state.airTwirlUsed,
+    doubleJumpAvailable: state.hero === 'Hargold' &&
+      state.doubleJumpUnlocked &&
+      !state.doubleJumpUsed,
+    glideState: state.glide,
+    glideSeconds: state.glideSeconds,
+    glideExhausted: state.glideExhausted,
+    groundSlamPhase: state.groundSlamPhase,
+    contacts: Object.freeze({ ...contacts }),
+    input: Object.freeze({
+      left: Boolean(input.left),
+      right: Boolean(input.right),
+      run: Boolean(input.run),
+      sprint: Boolean(input.sprint),
+      jumpPressed: Boolean(input.jumpPressed),
+      jumpHeld: Boolean(input.jumpHeld),
+      downPressed: Boolean(input.downPressed ?? input.groundSlamPressed),
+      downHeld: Boolean(input.downHeld)
+    })
+  });
+  return state.telemetry;
+}

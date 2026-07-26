@@ -1,86 +1,12 @@
 /*
- * Engineering tuning extracted from Build 009's algorithms and converted to
- * meter-scale proxy units. Exact numerical tuning is still open in canon.
- * These values are deliberately not stored in canonical-data.js and must not
- * be treated as approved final movement values.
+ * Compatibility exports for model-independent systems that predate the
+ * unified gameplay/movement module.
  */
-export const PROVISIONAL_MOTION_TUNING = Object.freeze({
-  status: 'provisional-engineering-tuning',
-  source: 'algorithmic extraction from archived Build 009; values retuned to proxy meter units',
-  walkSpeed: 3.2,
-  runSpeed: 5.7,
-  sprintSpeed: 7.15,
-  groundAccelerationWalk: 18,
-  groundAccelerationRun: 22,
-  groundAccelerationSprint: 25,
-  releaseDeceleration: 16,
-  lowSpeedTurnAcceleration: 25,
-  highSpeedSkidDeceleration: 30,
-  skidThreshold: 3,
-  skidExitSpeed: 1.1,
-  airAcceleration: 11,
-  airReverseAcceleration: 14,
-  airMaximumWalkSpeed: 3.6,
-  airMaximumRunSpeed: 5.9,
-  airMaximumSprintSpeed: 7.2,
-  baseJumpSpeed: 10.4,
-  runningJumpBonus: 1.55,
-  heldJumpGravity: 22.6,
-  releasedJumpGravity: 39.2,
-  fallGravity: 36.8,
-  apexGravity: 16,
-  apexVelocityWindow: 0.84,
-  maximumFallSpeed: 15.8,
-  jumpBufferSeconds: 5 / 60,
-  coyoteSeconds: 4 / 60,
-  hardLandingSpeed: 13.2,
-  minimumJumpCutVelocity: -4.7,
-  glideGravity: 5.6,
-  glideMaximumFallSpeed: 2.9,
-  fastFallAcceleration: 28,
-  fastFallMinimumSpeed: 7,
-  groundSlamSpeed: 18,
-  stompBounceSpeed: 8,
-  strongStompBounceSpeed: 11,
-  wallSlideMaximumSpeed: 3.4,
-  wallJumpHorizontalSpeed: 6.2,
-  wallJumpVerticalSpeed: 10,
-  wallCoyoteSeconds: 5 / 60,
-  wallSteeringLockSeconds: 8 / 60,
-  sameWallRegrabSeconds: 10 / 60,
-  crouchHeightMultiplier: 0.58,
-  slideMinimumSpeed: 3,
-  slideFriction: 5,
-  airSpinFallBrake: 10,
-  swimAcceleration: 8,
-  swimMaximumSpeed: 4,
-  swimDrag: 3.5,
-  buoyancyAcceleration: 8,
-  climbSpeed: 2.8,
-  ropePumpAcceleration: 3.5,
-  carryLightSpeedMultiplier: 0.86,
-  carryHeavySpeedMultiplier: 0.62,
-  carryLightJumpMultiplier: 0.9,
-  carryHeavyJumpMultiplier: 0.68,
-  throwSpeed: 8,
-  throwHeroVelocityInheritance: 0.5,
-  hurtLockSeconds: 0.28,
-  invulnerabilitySeconds: 1.05
-});
+export {
+  MOVEMENT_PARAMETER_DOCUMENTATION,
+  MOVEMENT_TUNING as PROVISIONAL_MOTION_TUNING
+} from '../../gameplay/movement/movement-tuning.js';
 
-export const PROVISIONAL_HERO_PROFILES = Object.freeze({
-  Hargold: Object.freeze({
-    status: 'proxy-collider-pending-production-mesh',
-    width: 1.02,
-    height: 1.82,
-    jumpSpeedAddition: 0,
-    airControlMultiplier: 1
-  }),
-  Mebble: Object.freeze({
-    status: 'proxy-collider-pending-production-mesh',
-    width: 0.72,
-    height: 2.18,
-    jumpSpeedAddition: 1.16,
-    airControlMultiplier: 1
-  })
-});
+export {
+  HERO_PROFILES as PROVISIONAL_HERO_PROFILES
+} from '../../gameplay/movement/hero-profiles.js';

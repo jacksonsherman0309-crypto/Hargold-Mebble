@@ -5,18 +5,19 @@ Codex must load the current canon, the world-specific archive policy, the exact 
 ## Required reading order
 
 1. `docs/canonical-design-bible.md` — highest-level current design source of truth.
-2. `docs/world-specific-archive-policy.md` — mandatory rule against flattening authored worlds and levels into a universal template.
-3. `docs/level-production-plan.md` — current campaign and level-construction requirements.
-4. `docs/game-mechanics.md` — detailed gameplay mechanics.
-5. `docs/movement-and-collision-spec.md` — complete universal movement, collision, terrain, water, climbing, carrying, and deterministic-simulation contract.
-6. `src/canonical-data.js` — machine-readable rules, campaign accounting, World 1 plans, and locked hero data.
-7. `archive/physics/build-017-movement-spec.md` and `archive/physics/physics_completion_matrix.json` — archived full Build 017 physics contract.
-8. `archive/full-motion/hargold_mebble_full_motion_build_009_qa.json` — archived QA evidence for the earlier playable motion build.
-9. `docs/historical-build-handoff.md` — Build 025–030 handoff and production boundaries.
-10. `docs/archived-source-inventory.md` — earlier standalone artifacts and their transfer status.
-11. If `IMPORT_STATUS.txt` exists, read it, then inspect the complete package under the listed `archive/imported-packages/...` root.
-12. Read every exact world plan, course plan, encounter manifest, enemy definition, runtime file, and boss contract relevant to the requested task.
-13. Inspect the current implementation files relevant to the task.
+2. `docs/character-dimension-animation-spec.md` — approved fully 3D construction, three-quarter presentation, rig, animation, camera-readability, and validation contract.
+3. `docs/world-specific-archive-policy.md` — mandatory rule against flattening authored worlds and levels into a universal template.
+4. `docs/level-production-plan.md` — current campaign and level-construction requirements.
+5. `docs/game-mechanics.md` — detailed gameplay mechanics.
+6. `docs/movement-and-collision-spec.md` — complete universal movement, collision, terrain, water, climbing, carrying, and deterministic-simulation contract.
+7. `src/canonical-data.js` — machine-readable rules, campaign accounting, World 1 plans, and locked hero data.
+8. `archive/physics/build-017-movement-spec.md` and `archive/physics/physics_completion_matrix.json` — archived full Build 017 physics contract.
+9. `archive/full-motion/hargold_mebble_full_motion_build_009_qa.json` — archived QA evidence for the earlier playable motion build.
+10. `docs/historical-build-handoff.md` — Build 025–030 handoff and production boundaries.
+11. `docs/archived-source-inventory.md` — earlier standalone artifacts and their transfer status.
+12. If `IMPORT_STATUS.txt` exists, read it, then inspect the complete package under the listed `archive/imported-packages/...` root.
+13. Read every exact world plan, course plan, encounter manifest, enemy definition, runtime file, and boss contract relevant to the requested task.
+14. Inspect the current implementation files relevant to the task.
 
 ## Authority and conflict rules
 

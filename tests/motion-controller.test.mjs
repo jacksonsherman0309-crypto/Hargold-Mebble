@@ -21,7 +21,8 @@ const noInput = Object.freeze({
   sprint: false,
   jumpPressed: false,
   jumpHeld: false,
-  glideHeld: false
+  glideHeld: false,
+  groundSlamPressed: false
 });
 
 function simulate(state, seconds, inputForStep) {
@@ -143,6 +144,63 @@ simulate(glideState, 0.5, () => ({ glideHeld: true, jumpHeld: true }));
 assert.ok(glideState.velocityY <= TUNING.glideMaximumFallSpeed + fixedStep * TUNING.glideGravity);
 assert.equal(glideState.glide, 'sustained');
 
+const twirlState = createMotionState({
+  grounded: false,
+  footY: -5
+});
+twirlState.velocityY = 4;
+stepMotion(
+  twirlState,
+  { ...noInput, jumpPressed: true, jumpHeld: true },
+  fixedStep,
+  { groundHeightAt: flatGround }
+);
+assert.equal(twirlState.airTwirlUsed, true);
+assert.equal(twirlState.locomotion, 'air-spin');
+assert.ok(twirlState.velocityY <= TUNING.airTwirlMaximumFallSpeed);
+const firstTwirlRemaining = twirlState.airTwirlSeconds;
+stepMotion(
+  twirlState,
+  { ...noInput, jumpPressed: true, jumpHeld: true },
+  fixedStep,
+  { groundHeightAt: flatGround }
+);
+assert.ok(
+  twirlState.airTwirlSeconds < firstTwirlRemaining,
+  'a second airborne press must not restart the one-use twirl'
+);
+
+const slamState = createMotionState({
+  grounded: false,
+  footY: -2
+});
+slamState.velocityY = -5;
+simulate(slamState, TUNING.minimumGroundSlamAirSeconds, () => ({}));
+stepMotion(
+  slamState,
+  { ...noInput, groundSlamPressed: true },
+  fixedStep,
+  { groundHeightAt: flatGround }
+);
+assert.equal(slamState.groundSlamming, true);
+assert.equal(slamState.groundSlamPhase, 'startup');
+assert.equal(slamState.velocityY, 0, 'ground slam begins with an anticipation pause');
+simulate(slamState, 0.15, () => ({}));
+assert.equal(slamState.groundSlamPhase, 'descent');
+assert.ok(slamState.velocityY > 0);
+for (let index = 0; index < 120 && !slamState.grounded; index += 1) {
+  stepMotion(
+    slamState,
+    noInput,
+    fixedStep,
+    { groundHeightAt: flatGround }
+  );
+}
+assert.equal(slamState.grounded, true);
+assert.equal(slamState.locomotion, 'land-hard');
+assert.equal(slamState.groundSlamming, false);
+assert.equal(slamState.airTwirlUsed, false);
+
 const swapState = createMotionState({ footX: 4, footY: 7 });
 const oldBody = motionBody(swapState);
 const acceptedSwap = trySwapHero(swapState);
@@ -196,6 +254,6 @@ assert.equal(
   PROVISIONAL_HERO_PROFILES.Mebble.airControlMultiplier,
   'both heroes use identical shared horizontal air-control tuning'
 );
-assert.equal(TUNING.status, 'provisional-engineering-tuning');
+assert.equal(TUNING.status, 'provisional-clean-room-project-tuning');
 
 console.log('Modular motion extraction checks passed.');

@@ -1,23 +1,35 @@
 {
   "schemaVersion": 1,
-  "status": "full-replacement-continuous-skin-generated-structural-validation-passed-visual-approval-required",
+  "status": "original-character-rebuild-required-current-procedural-assets-rejected",
+  "activeRuntimeStatus": "provisional-procedural-character-assets-retained-for-runnable-build-only",
   "coordinateSystem": {"units": "metres", "up": "Z", "characterForward": "-Y", "origin": "between-feet-on-ground"},
+  "dimensionalPresentation": {
+    "construction": "complete-3d-skinned-models-with-modeled-front-back-and-sides",
+    "gameplay": "strict-linear-side-scrolling-plane",
+    "classification": "2.75D",
+    "orientation": "controlled-three-quarter-side",
+    "cameraBiasDegrees": 14,
+    "directionChange": "brake-compress-plant-twist-rotate-accelerate",
+    "negativeScaleMirroringForbidden": true,
+    "validationContexts": ["neutral-model-scene", "actual-gameplay-camera-and-level-lighting"]
+  },
   "references": {
+    "ApprovedPairTarget": {"path": "../references/Hargold and Mebble approved production target.png", "status": "present-approved-2026-07-25", "sha256": "A236AB062EE5FA8390CDDA7BA5EC21A7B4989CCB82F375CF34435E7A5B5FC05D", "purpose": "action-pose, surface-quality, material, expression and animation-readiness target; not a 3D asset"},
     "Mebble": {"path": "../references/Mebble locked production character sheet.png", "status": "present-locked-newest-authority", "historicalPath": "../references/Character design evolution of Mebble.png"},
     "Hargold": {"path": "../references/Hargold locked production character sheet.png", "status": "present-locked-newest-authority"}
   },
   "characters": {
     "Hargold": {
       "blend": "hargold_character.blend",
-      "status": "full-replacement-continuous-skin-generated-no-prior-geometry-reused-visual-approval-required",
+      "status": "rejected-procedural-placeholder-active-pending-original-production-rebuild",
       "implemented": {
-        "model": ["fresh factory-empty replacement geometry", "continuous union-remeshed skin body", "continuous skinned jacket/sleeves and trousers", "soft locked-sheet silhouette", "modeled face/eyes/mouth/hair/beard", "layered explorer clothing", "hat/feather/scarf", "backpack", "integrated hand/finger volumes", "skinned organic boots/laces/soles"],
+        "model": ["provisional factory-empty procedural geometry; not an approved production replacement", "continuous union-remeshed skin body", "continuous skinned jacket/sleeves and trousers", "soft locked-sheet silhouette", "modeled face/eyes/mouth/hair/beard", "layered explorer clothing", "hat/feather/scarf", "backpack", "integrated hand/finger volumes", "skinned organic boots/laces/soles"],
         "rig": ["82-bone armature", "19 controls", "driven IK/FK switches", "jaw, eye, lid, eyebrow and mouth-corner bones", "six facial properties", "finger chains", "hat/scarf/feather secondary bones", "gameplay sockets"],
         "materials": ["packed 1K base-color/roughness/normal/AO texture channels", "Principled skin", "eyes/mouth", "hair", "cloth", "leather", "metal", "feather"],
         "animations": ["65 newly authored gameplay clips", "walk/run/sprint cycles", "jump and landing family", "crawl/slide/roll/wall/ledge states", "combat/hurt/victory", "Hargold-specific double-jump and block/strike clips"],
         "validation": ["front/three-quarter/side/back renders", "run deformation render", "segmented-limb rejection gate", "continuous-skin and adjacent-bone weight checks", "Blender structural validator", "GLB skin/mesh/morph/animation inspection"]
       },
-      "remainingProductionWork": ["senior character-artist sculpt/retopology and skin-weight review", "hand-painted texture detail beyond packed pipeline maps", "shoulder/hip/finger corrective shapes", "LOD and mobile material-budget pass", "engine deformation/scale review across every clip", "final locked-sheet art-director approval"],
+      "remainingProductionWork": ["new original high-resolution sculpt from an empty Blender scene", "clean production retopology, UVs and skin weights", "complete original facial/body/secondary rig and animation library", "senior character-artist sculpt/retopology and skin-weight review", "hand-painted texture detail beyond packed pipeline maps", "shoulder/hip/finger corrective shapes", "LOD and mobile material-budget pass", "engine deformation/scale review across every clip", "turnaround, action-pose, gameplay-camera and final locked-sheet approval"],
       "modelsRequired": ["body/head", "eyes/teeth/tongue", "hair/moustache/rounded chin beard", "olive explorer jacket and tan shirt", "wide-brim olive hat with brown band and orange feather", "deep red-brown wrapped scarf/cape collar", "belt and explorer pouches", "brown field backpack with leaf badge", "boots", "hands"],
       "rigsRequired": ["gameplay deformation/control rig", "facial/eye rig", "cape/scarf secondary-motion rig", "hat-feather secondary rig"],
       "materialsRequired": ["skin", "eyes", "mouth", "hair/goatee", "green cloth", "red-brown cape/scarf", "brown leather", "metal hardware", "hat feather"],
@@ -25,15 +37,15 @@
     },
     "Mebble": {
       "blend": "mebble_character.blend",
-      "status": "full-replacement-continuous-skin-generated-no-prior-geometry-reused-visual-approval-required",
+      "status": "rejected-procedural-placeholder-active-pending-original-production-rebuild",
       "implemented": {
-        "model": ["fresh factory-empty replacement geometry", "continuous union-remeshed skin body including long neck and visible Adam's apple", "continuous skinned shirt/sleeves, trousers, vest and hood", "soft locked-sheet tall/thin silhouette", "face/eyes/mouth/hair/bushy brows", "crooked glasses", "small tilted top hat/leaf", "double belts/pouches", "integrated hand/finger volumes", "skinned organic tall lace-up boots", "weighted morphing cape"],
+        "model": ["provisional factory-empty procedural geometry; not an approved production replacement", "continuous union-remeshed skin body including long neck and visible Adam's apple", "continuous skinned shirt/sleeves, trousers, vest and hood", "soft locked-sheet tall/thin silhouette", "face/eyes/mouth/hair/bushy brows", "crooked glasses", "small tilted top hat/leaf", "double belts/pouches", "integrated hand/finger volumes", "skinned organic tall lace-up boots", "weighted morphing cape"],
         "rig": ["83-bone armature", "22 controls", "driven IK/FK switches", "jaw, eye, lid, eyebrow and mouth-corner bones", "six facial properties", "finger chains", "Adam's-apple bone", "three-bone weighted cape chain", "cape-open controller and GlideOpen morph", "gameplay sockets"],
         "materials": ["packed 1K base-color/roughness/normal/AO texture channels", "Principled skin", "eyes/mouth", "hair", "glasses", "cloth/cape", "leather", "metal"],
         "animations": ["66 newly authored gameplay clips", "walk/run/sprint cycles", "jump and landing family", "crawl/slide/roll/wall/ledge states", "combat/hurt/victory", "five Mebble glide clips"],
         "validation": ["front/three-quarter/side/back renders", "glide-open deformation render", "segmented-limb rejection gate", "continuous-skin and adjacent-bone weight checks", "Blender structural validator", "GLB skin/mesh/animation/morph inspection"]
       },
-      "remainingProductionWork": ["senior character-artist sculpt/retopology and skin-weight review", "hand-painted texture detail beyond packed pipeline maps", "shoulder/hip/neck/finger corrective shapes", "cape collision and dynamic-secondary-motion tuning", "LOD and mobile material-budget pass", "engine deformation/scale review across every clip", "final locked-sheet art-director approval"],
+      "remainingProductionWork": ["new original high-resolution sculpt from an empty Blender scene", "clean production retopology, UVs and skin weights", "complete original facial/body/cape rig and animation library", "senior character-artist sculpt/retopology and skin-weight review", "hand-painted texture detail beyond packed pipeline maps", "shoulder/hip/neck/finger corrective shapes", "cape collision and dynamic-secondary-motion tuning", "LOD and mobile material-budget pass", "engine deformation/scale review across every clip", "turnaround, action-pose, gameplay-camera and final locked-sheet approval"],
       "modelsRequired": ["body/head and long skinny neck", "protruding Adam's apple", "eyes/teeth/tongue", "hair/bushy eyebrows", "crooked less-round glasses", "small brown top hat with green band and leaf", "cream shirt/brown vest/dark trousers", "double belts/pouches", "tall lace-up boots", "hands", "green emblem cape/glider"],
       "rigsRequired": ["gameplay deformation/control rig", "facial/eye/brow rig", "Adam's-apple/neck corrective rig", "glasses and hat sockets", "cape fold/open/glide rig with secondary motion"],
       "materialsRequired": ["skin", "eyes", "mouth", "hair/eyebrows", "glasses", "hat", "shirt", "vest/trousers", "leather", "metal hardware", "green cape"],
@@ -52,7 +64,9 @@
     "Hargold": ["double-jump", "break-hargold-block", "heavy-ground-slam", "stonefist-strike"],
     "Mebble": ["glide-open", "glide-sustain", "glide-steer-left", "glide-steer-right", "glide-close"]
   },
+  "requiredValidationViews": ["front", "rear", "true-side", "gameplay-three-quarter-side", "left-facing", "right-facing"],
+  "requiredValidationActions": ["idle", "walk", "run", "sprint", "acceleration", "skid", "physical-direction-reversal", "standard-jump", "running-jump", "Hargold-double-jump", "ascent", "apex", "fall", "landing", "hard-landing", "crouch", "sprint-slide", "stomp", "bounce", "ground-slam", "damage", "Hargold-block-break", "Mebble-slow-fall", "Mebble-glide", "level-completion"],
   "requiredSockets": ["SOCKET_hand_l", "SOCKET_hand_r", "SOCKET_head", "SOCKET_back", "SOCKET_vfx_feet", "SOCKET_vfx_center"],
   "requiredMetadata": ["assetVersion", "canonVersion", "referenceHash", "author", "blenderVersion", "reviewStatus"],
-  "exports": {"Hargold": "../exports/hargold_character.glb", "Mebble": "../exports/mebble_character.glb", "status": "replacement-exports-structurally-validated-runtime-browser-review-required"}
+  "exports": {"Hargold": "../exports/hargold_character.glb", "Mebble": "../exports/mebble_character.glb", "status": "provisional-procedural-runtime-exports-retained-until-original-replacements-are-approved"}
 }

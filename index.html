@@ -26,14 +26,15 @@
         <div class="right-controls">
           <button class="utility" data-action="restart" aria-label="Restart course">RESTART</button>
           <button data-action="swap" aria-label="Swap hero">SWAP</button>
-          <button class="action" data-action="action" aria-label="Attack or glide as airborne Mebble">ACTION</button>
-          <button class="jump" data-action="jump" aria-label="Jump">JUMP</button>
+          <button class="slam" data-action="slam" aria-label="Ground slam while airborne">SLAM</button>
+          <button class="action" data-action="action" aria-label="Attack or interact">ACTION</button>
+          <button class="jump" data-action="jump" aria-label="Jump, air twirl, double jump, or Mebble glide">JUMP</button>
         </div>
       </div>
     </section>
 
     <footer>
-      Move: A/D or arrows · Run: X · Sprint: Shift · Jump: Space/W/↑ · Attack / Mebble glide: E · Fast fall / slam: S/↓ · Swap: Q · Restart: R
+      Move: A/D or arrows · Run: X · Sprint: Shift · Jump / twirl / glide: Space/W/↑ · Ground slam or fast fall: S/↓ · Attack: E · Swap: Q · Restart: R
     </footer>
   </main>
   <script>
@@ -49,6 +50,6 @@
       if (status) status.textContent = `ASSET ERROR · ${detail}`;
     });
   </script>
-  <script type="module" src="src/game.js?v=block-production-1" onerror="document.querySelector('#status').textContent='STARTUP ERROR · game module failed to load'"></script>
+  <script type="module" src="src/game.js?v=unified-motion-1" onerror="document.querySelector('#status').textContent='STARTUP ERROR · game module failed to load'"></script>
 </body>
 </html>

@@ -1,3 +1,12 @@
+import {
+  applyMovementLanding
+} from '../movement/unified-character-controller.js';
+import {
+  resolveExternalHeadHit,
+  resolveExternalWallHit,
+  transportWithSupport
+} from '../movement/movement-collision-resolver.js';
+
 const CONTACT_EPSILON = 0.035;
 const BLOCK_BUMP_SECONDS = 0.18;
 const BLOCK_FLASH_SECONDS = 0.16;
@@ -54,6 +63,10 @@ export function resolveOneWayPlatformLanding(state, previousFootY, platforms, bo
   const currentFootY = state.footY;
   let landing = null;
   for (const platform of platforms) {
+    if (
+      state.dropThroughSeconds > 0 &&
+      state.dropThroughPlatformId === platform.id
+    ) continue;
     if (!platform.oneWay || !bodyOverlapsHorizontal(body, platform)) continue;
     const landingX = Math.max(
       platform.x - platform.width / 2,
@@ -66,15 +79,15 @@ export function resolveOneWayPlatformLanding(state, previousFootY, platforms, bo
   }
   if (!landing) return null;
 
-  state.footY = platformTop(landing, state.footX);
-  state.velocityY = 0;
-  state.grounded = true;
-  state.supportPlatformId = landing.id;
-  state.doubleJumpUsed = false;
-  state.groundSlamming = false;
-  state.glide = 'closed';
-  state.locomotion = 'land-soft';
-  state.stateSeconds = 0;
+  applyMovementLanding(state, {
+    footY: platformTop(landing, state.footX),
+    platformId: landing.id,
+    landingSpeed: state.velocityY,
+    surface: {
+      angle: landing.angle ?? 0,
+      material: landing.surfaceMaterial ?? 'normal'
+    }
+  });
   return { type: 'platform-landed', platformId: landing.id };
 }
 
@@ -122,11 +135,11 @@ export function resolveBlockHeadHit(state, previousHeadY, blocks, body) {
             : 'heavy-hit',
       { bumpSeconds: canBreak ? 0.2 : 0.16 }
     );
-    state.footY = underside + body.height;
-    state.velocityY = Math.max(0.8, Math.abs(state.velocityY) * 0.08);
-    state.grounded = false;
-    state.supportPlatformId = null;
-    state.locomotion = 'fall';
+    resolveExternalHeadHit(state, {
+      footY: underside + body.height,
+      reboundSpeed: 0.8,
+      blockId: block.id
+    });
     return {
       type: eventType,
       blockId: block.id,
@@ -154,13 +167,19 @@ export function resolveSolidBlockSideCollision(state, previousBody, blocks, body
     if (!verticalOverlap) continue;
 
     if (previousBody.x + previousBody.width <= left + CONTACT_EPSILON && body.x + body.width > left) {
-      state.footX = left - body.width / 2;
-      state.velocityX = 0;
+      resolveExternalWallHit(state, {
+        side: 'left',
+        footX: left - body.width / 2,
+        obstacleId: block.id
+      });
       return { type: 'block-side-contact', blockId: block.id, side: 'left' };
     }
     if (previousBody.x >= right - CONTACT_EPSILON && body.x < right) {
-      state.footX = right + body.width / 2;
-      state.velocityX = 0;
+      resolveExternalWallHit(state, {
+        side: 'right',
+        footX: right + body.width / 2,
+        obstacleId: block.id
+      });
       return { type: 'block-side-contact', blockId: block.id, side: 'right' };
     }
   }
@@ -271,13 +290,21 @@ export function stepCoursePlatforms(
   }
 }
 
-export function transportRiderWithPlatform(state, platforms) {
+export function transportRiderWithPlatform(state, platforms, deltaSeconds = 1 / 120) {
   if (!state.supportPlatformId || !state.grounded) return false;
   const platform = platforms.find(item => item.id === state.supportPlatformId);
   if (!platform) return false;
 
   const deltaX = platform.x - platform.previousX;
-  state.footX += deltaX;
-  state.footY = platformTop(platform, state.footX);
+  transportWithSupport(
+    state,
+    deltaX,
+    platformTop(platform, state.footX + deltaX),
+    platform.id,
+    {
+      velocityX: deltaX / deltaSeconds,
+      velocityY: (platform.y - platform.previousY) / deltaSeconds
+    }
+  );
   return deltaX !== 0 || platform.y !== platform.previousY || platform.angle !== 0;
 }

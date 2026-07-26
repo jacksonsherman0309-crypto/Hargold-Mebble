@@ -61,11 +61,13 @@ The latest approved Hargold and Mebble model is locked. Do not change proportion
 - The two locked production character sheets above override older character renderings where they differ.
 - Their orthographic views, detail callouts, silhouettes, colors, clothing, and visible rig-layout intent are modeling requirements.
 - Text printed on a PNG such as “fully rigged,” topology counts, software names, or material claims is descriptive reference content, not proof that editable meshes, armatures, weights, materials, or animation files exist in the repository.
+- `assets/references/Hargold and Mebble approved production target.png` is the approved July 25, 2026 action-pose, surface-quality, material, expression, and animation-readiness target. The individual locked sheets remain authoritative for exact character details wherever the combined target omits or simplifies them.
 - The separate gameplay-quality image supplied on July 25, 2026 is a lighting, rendering, environment-density, camera, UI-polish, and overall finish target only. It does not override the locked hero sheets or canonical gameplay rules.
 
 ### Production character quality
 
-- The rejected blockout geometry and its animation clips are superseded. Replacement hero sources must be built from empty Blender scenes and must not reuse prior character geometry.
+- `docs/character-dimension-animation-spec.md` is the binding dimensional construction, three-quarter gameplay orientation, rig, animation, shading, camera-readability, and validation contract.
+- The rejected blockout and doll-like procedural geometry remain superseded. Production replacements must be newly modeled original Hargold and Mebble geometry built from empty Blender scenes. Do not reuse the rejected character geometry or substitute another generic humanoid base.
 - The replacement must preserve the locked identities, silhouettes, proportions, clothing, colors, accessories, and defining facial features above.
 - Production meshes require smooth rounded topology, clean deformation edge flow, sculpted faces, expressive brows, detailed hands and boots, layered garments, authored cloth folds, clean UVs, optimized game topology, and planned LODs.
 - Hero bodies and soft garments must deform as continuous skinned surfaces. Bone-parented upper-arm, forearm, elbow, hand, thigh, or shin pieces that read as an articulated wooden doll are not acceptable production geometry.
@@ -73,6 +75,7 @@ The latest approved Hargold and Mebble model is locked. Do not change proportion
 - Final materials require authored PBR texture sets, including base color, roughness, normal detail, and ambient-occlusion support where appropriate. Procedural flat-color materials are not a final substitute.
 - Production rigs require IK/FK limbs, finger articulation, eye, brow, jaw and mouth controls, gameplay sockets, and secondary controls for Hargold's hat, feather and scarf and Mebble's hat, cape and clothing.
 - Every gameplay clip must be newly authored with readable anticipation, controlled squash and stretch, follow-through, overlapping secondary motion, lively idle posing, reliable foot contacts, and seamless state blending.
+- Do not replace the active runtime character files until front, three-quarter, side, and back turnarounds; jump, run, skid, landing, hurt, and character-specific action poses; live 2.75D gameplay-camera captures; and deformation checks have all passed review.
 - Nintendo games may be used only as a broad craftsmanship, readability, responsiveness, and finish benchmark. Do not copy proprietary tuning values, poses, animation data, code, meshes, materials, textures, or protected designs.
 
 ## 4. Core movement
@@ -83,7 +86,9 @@ The latest approved Hargold and Mebble model is locked. Do not change proportion
 - Precise, readable jump arcs.
 - Variable jump height based on input hold duration.
 - Coyote time and jump buffering are allowed for responsiveness.
-- Wall jumps are universal for both Hargold and Mebble.
+- A fresh airborne press of the jump control triggers one air twirl per airborne sequence for Mebble and for Hargold before his double-jump skill is unlocked. Once that skill is unlocked, Hargold's fresh airborne press performs the double jump with a twirling animation instead.
+- A fresh Down/S or mobile SLAM press while airborne enters a short preparation pose, then a committed ground-slam descent and hard-landing recovery.
+- Unrestricted wall jumping is not currently enabled for either hero. Wall contact still produces collision and presentation reactions; a wall-jump mechanic requires a future explicit rule.
 - All required main-route jumps must be possible for Hargold in the intended state.
 - Mebble jumps slightly higher than Hargold.
 - The required character state set includes crouch, crawl, slide, rolling momentum, wall reaction, ledge stop, look up, duck, landing recovery, hurt, and victory in addition to the existing universal movement baseline.
