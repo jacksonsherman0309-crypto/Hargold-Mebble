@@ -35,7 +35,12 @@ export function createMotionState({
     coyoteSeconds: grounded ? tuning.coyoteSeconds : 0,
     jumpBufferSeconds: 0,
     glide: 'closed',
-    landingSpeed: 0
+    landingSpeed: 0,
+    spinUsed: false,
+    spinSeconds: 0,
+    spinDirection: 1,
+    groundSlamming: false,
+    groundSlamImpact: false
   };
 }
 
@@ -73,11 +78,7 @@ export function trySwapHero(
 }
 
 function startJump(state, profile, tuning) {
-  const runRatio = clamp(
-    Math.abs(state.velocityX) / tuning.sprintSpeed,
-    0,
-    1
-  );
+  const runRatio = clamp(Math.abs(state.velocityX) / tuning.sprintSpeed, 0, 1);
   state.velocityY = -(
     tuning.baseJumpSpeed
     + profile.jumpSpeedAddition
@@ -89,6 +90,41 @@ function startJump(state, profile, tuning) {
   state.locomotion = 'takeoff';
   state.stateSeconds = 0;
   state.glide = 'closed';
+  state.spinUsed = false;
+  state.spinSeconds = 0;
+  state.groundSlamming = false;
+  state.groundSlamImpact = false;
+}
+
+function startAirSpin(state, tuning) {
+  state.spinUsed = true;
+  state.spinSeconds = tuning.airSpinDurationSeconds;
+  state.spinDirection = state.facing || 1;
+  state.glide = 'closed';
+  state.groundSlamming = false;
+  state.groundSlamImpact = false;
+
+  // The twirl is not a second full jump. It briefly arrests a fall or softens
+  // downward speed so the input has the readable, responsive mid-air effect.
+  if (state.velocityY > tuning.airSpinMaximumDownwardSpeed) {
+    state.velocityY = tuning.airSpinMaximumDownwardSpeed;
+  } else if (state.velocityY > 0) {
+    state.velocityY = Math.max(0, state.velocityY - tuning.airSpinUpwardBrake);
+  }
+
+  state.locomotion = 'air-spin';
+  state.stateSeconds = 0;
+}
+
+function startGroundSlam(state, tuning) {
+  state.groundSlamming = true;
+  state.groundSlamImpact = false;
+  state.spinSeconds = 0;
+  state.glide = 'closed';
+  state.velocityX *= tuning.groundSlamHorizontalRetention;
+  state.velocityY = Math.max(state.velocityY, tuning.groundSlamSpeed);
+  state.locomotion = 'ground-slam';
+  state.stateSeconds = 0;
 }
 
 function updateGroundedHorizontal(state, input, deltaSeconds, tuning) {
@@ -97,11 +133,17 @@ function updateGroundedHorizontal(state, input, deltaSeconds, tuning) {
   const maximum = input.sprint
     ? tuning.sprintSpeed
     : input.run ? tuning.runSpeed : tuning.walkSpeed;
-  const reversing = (
-    state.velocityX !== 0
+  const reversing = state.velocityX !== 0
     && direction !== 0
-    && Math.sign(state.velocityX) !== direction
-  );
+    && Math.sign(state.velocityX) !== direction;
+
+  if (input.downHeld) {
+    state.velocityX = approach(state.velocityX, 0, tuning.slideFriction, deltaSeconds);
+    state.locomotion = speed >= tuning.slideMinimumSpeed
+      ? 'duck-slide'
+      : direction !== 0 ? 'crawl' : 'crouch';
+    return;
+  }
 
   if (direction === 0) {
     state.velocityX = approach(
@@ -154,11 +196,10 @@ function updateGroundedHorizontal(state, input, deltaSeconds, tuning) {
 
 function updateAirborne(state, input, deltaSeconds, profile, tuning) {
   const direction = (input.right ? 1 : 0) - (input.left ? 1 : 0);
-  if (direction !== 0) {
-    const reversing = (
-      state.velocityX !== 0
-      && Math.sign(state.velocityX) !== direction
-    );
+
+  if (!state.groundSlamming && direction !== 0) {
+    const reversing = state.velocityX !== 0
+      && Math.sign(state.velocityX) !== direction;
     const maximum = input.sprint
       ? tuning.airMaximumSprintSpeed
       : input.run ? tuning.airMaximumRunSpeed : tuning.airMaximumWalkSpeed;
@@ -174,6 +215,15 @@ function updateAirborne(state, input, deltaSeconds, profile, tuning) {
     state.facing = direction;
   }
 
+  if (state.groundSlamming) {
+    state.velocityY = Math.min(
+      tuning.maximumGroundSlamSpeed,
+      state.velocityY + tuning.groundSlamAcceleration * deltaSeconds
+    );
+    state.locomotion = 'ground-slam';
+    return;
+  }
+
   const absoluteVerticalSpeed = Math.abs(state.velocityY);
   let gravity = absoluteVerticalSpeed <= tuning.apexVelocityWindow
     ? tuning.apexGravity
@@ -181,17 +231,13 @@ function updateAirborne(state, input, deltaSeconds, profile, tuning) {
       ? input.jumpHeld ? tuning.heldJumpGravity : tuning.releasedJumpGravity
       : tuning.fallGravity;
 
-  const shouldGlide = (
-    state.hero === 'Mebble'
+  const shouldGlide = state.hero === 'Mebble'
     && input.glideHeld
     && state.velocityY > tuning.apexVelocityWindow
-  );
+    && state.spinSeconds <= 0;
   if (shouldGlide) {
     gravity = tuning.glideGravity;
-    state.velocityY = Math.min(
-      state.velocityY,
-      tuning.glideMaximumFallSpeed
-    );
+    state.velocityY = Math.min(state.velocityY, tuning.glideMaximumFallSpeed);
     state.glide = state.glide === 'closed' ? 'opening' : 'sustained';
   } else {
     state.glide = state.glide === 'sustained' || state.glide === 'opening'
@@ -204,8 +250,29 @@ function updateAirborne(state, input, deltaSeconds, profile, tuning) {
     state.velocityY + gravity * deltaSeconds
   );
 
+  if (input.fastFallHeld && state.velocityY > tuning.apexVelocityWindow) {
+    state.velocityY = Math.max(
+      tuning.fastFallMinimumSpeed,
+      state.velocityY + tuning.fastFallAcceleration * deltaSeconds
+    );
+  }
+
   if (!input.jumpHeld && state.velocityY < tuning.minimumJumpCutVelocity) {
     state.velocityY = tuning.minimumJumpCutVelocity;
+  }
+
+  if (state.spinSeconds > 0) {
+    state.spinSeconds = Math.max(0, state.spinSeconds - deltaSeconds);
+    if (state.velocityY > 0) {
+      state.velocityY = approach(
+        state.velocityY,
+        0,
+        tuning.airSpinFallBrake,
+        deltaSeconds
+      );
+    }
+    state.locomotion = 'air-spin';
+    return;
   }
 
   state.locomotion = state.velocityY < -tuning.apexVelocityWindow
@@ -232,8 +299,10 @@ export function stepMotion(
   const profile = profileFor(state.hero, profiles);
   const previousFootY = state.footY;
   state.stateSeconds += deltaSeconds;
+  state.groundSlamImpact = false;
 
-  state.jumpBufferSeconds = input.jumpPressed
+  const airborneJumpPress = Boolean(input.jumpPressed && !state.grounded && state.coyoteSeconds <= 0);
+  state.jumpBufferSeconds = input.jumpPressed && !airborneJumpPress
     ? tuning.jumpBufferSeconds
     : Math.max(0, state.jumpBufferSeconds - deltaSeconds);
   state.coyoteSeconds = state.grounded
@@ -245,6 +314,21 @@ export function stepMotion(
     && (state.grounded || state.coyoteSeconds > 0)
   ) {
     startJump(state, profile, tuning);
+  } else if (
+    airborneJumpPress
+    && !state.spinUsed
+    && !state.groundSlamming
+  ) {
+    startAirSpin(state, tuning);
+  }
+
+  const slamPressed = Boolean(input.groundSlamPressed || input.downPressed);
+  if (
+    !state.grounded
+    && !state.groundSlamming
+    && (slamPressed || (input.fastFallHeld && state.velocityY >= tuning.groundSlamActivationVelocity))
+  ) {
+    startGroundSlam(state, tuning);
   }
 
   if (state.grounded) {
@@ -276,9 +360,13 @@ export function stepMotion(
       state.velocityY = 0;
       state.grounded = true;
       state.glide = 'closed';
-      state.locomotion = state.landingSpeed >= tuning.hardLandingSpeed
+      state.spinUsed = false;
+      state.spinSeconds = 0;
+      state.groundSlamImpact = state.groundSlamming;
+      state.locomotion = state.groundSlamming || state.landingSpeed >= tuning.hardLandingSpeed
         ? 'land-hard'
         : 'land-soft';
+      state.groundSlamming = false;
       state.stateSeconds = 0;
     }
   }
