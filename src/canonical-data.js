@@ -238,12 +238,20 @@ const WORLD_ONE_LEVELS = [
     enemies: ['Camp Critter', 'Shellback'],
     foregroundDirective: Object.freeze({
       targetSupportedTerrainRatio: 0.85,
+      connectedGroundProgressionRatio: Object.freeze({ minimum: 0.65, maximum: 0.75 }),
       authoredCourseLength: 124,
       preserveExistingValleyArtDirection: true,
       obstacleEmphasis: 'terrain, blocks, coins, routes, and platform mechanisms',
       environmentQualityFloor: 'approved-Meadow-Wake-reference-image',
       authoredVisualBeatCount: 7,
-      finishAllSectionsToSharedQualityFloor: true
+      authoredTraversalPhaseCount: 9,
+      finishAllSectionsToSharedQualityFloor: true,
+      trueGapClusters: Object.freeze([
+        'concealed-creek-pocket-with-recovery-shelf',
+        'framed-rope-bridge-ravine',
+        'graduated-exit-panorama'
+      ]),
+      visibleTerrainConstruction: 'explicit-irregular-modular-3d-chunks-with-clean-collision'
     })
   },
   {
@@ -362,7 +370,7 @@ export const LOCKED_HERO_DESIGN = Object.freeze({
     clothing: ['layered olive-green explorer jacket', 'tan shirt', 'wide-brim olive-green hat with brown band and orange feather', 'deep red-brown wrapped scarf/cape collar', 'brown field backpack with leaf badge', 'brown belt and explorer pouches', 'brown boots', 'brass-colored hardware'],
     face: ['dark moustache and rounded chin beard/goatee treatment from locked sheet', 'round friendly features', 'moderate—not exaggerated—smile'],
     gameplay: ['shared horizontal base-controller tuning', 'Hargold-only block breaking', 'heavy-rock ground-slam defeats', 'exclusive learned double jump'],
-    productionModel: ['new original artist-authored geometry built from an empty Blender scene', 'do not reuse the rejected doll-like procedural geometry or substitute a generic humanoid base', 'continuous skinned body and soft-garment surfaces with no rigid segmented limbs', 'smooth rounded deformation topology', 'sculpted face and expressive eyebrows', 'detailed hands and boots', 'layered clothing with authored folds', 'clean UVs and optimized LOD-ready topology', 'action-pose and gameplay-camera deformation approval'],
+    productionModel: ['new original artist-authored geometry built from an empty Blender scene', 'do not reuse the rejected doll-like procedural geometry or substitute a generic humanoid base', 'continuous skinned body and soft-garment surfaces with no rigid segmented limbs', 'smooth rounded deformation topology', 'sculpted face and expressive eyebrows', 'detailed hands and boots', 'layered clothing with authored folds', 'clean UVs and optimized LOD-ready topology', 'action-pose and gameplay-camera deformation approval', '100–150 pixel silhouette approval', 'deformable shoulder volume with separated arms', 'longer readable forearms and hands enlarged roughly 20–30 percent over the rejected candidate', 'larger stable boot silhouette', 'soft integrated cheek transitions'],
     productionRig: ['IK/FK limbs', 'finger articulation', 'eye, eyebrow, jaw and mouth controls', 'gameplay sockets', 'hat, feather and scarf secondary controls'],
     productionAnimation: ['new original gameplay clips', 'anticipation and controlled squash/stretch', 'follow-through and overlapping secondary motion', 'reliable foot contacts', 'seamless state blending']
   },
@@ -374,7 +382,7 @@ export const LOCKED_HERO_DESIGN = Object.freeze({
     definingFeatures: ['very long skinny neck', 'clearly visible protruding Adam’s apple', 'small brown top hat with green band and leaf detail', 'slightly crooked less-round glasses', 'very bushy eyebrows'],
     clothing: ['cream rolled-sleeve shirt', 'brown vest', 'dark trousers', 'double belts and explorer pouches', 'tall brown lace-up boots', 'green emblem cape that opens as parachute/glider'],
     gameplay: ['shared horizontal base-controller tuning', 'slightly higher jump', 'innate slow-fall and short glide'],
-    productionModel: ['new original artist-authored geometry built from an empty Blender scene', 'do not reuse the rejected doll-like procedural geometry or substitute a generic humanoid base', 'continuous skinned body and soft-garment surfaces with no rigid segmented limbs', 'smooth rounded deformation topology', 'sculpted face and expressive eyebrows', 'detailed hands and boots', 'layered clothing with authored folds', 'clean UVs and optimized LOD-ready topology', 'action-pose and gameplay-camera deformation approval'],
+    productionModel: ['new original artist-authored geometry built from an empty Blender scene', 'do not reuse the rejected doll-like procedural geometry or substitute a generic humanoid base', 'continuous skinned body and soft-garment surfaces with no rigid segmented limbs', 'smooth rounded deformation topology', 'sculpted face and expressive eyebrows', 'detailed hands and boots', 'layered clothing with authored folds', 'clean UVs and optimized LOD-ready topology', 'action-pose and gameplay-camera deformation approval', '100–150 pixel silhouette approval', 'deformable shoulder volume with arms separated from vest and cape', 'modestly wider torso with larger hands and boots', 'tapered visible neck and stronger Adam’s apple profile', 'glasses offset from the face and curved cape shoulder yoke'],
     productionRig: ['IK/FK limbs', 'finger articulation', 'eye, eyebrow, jaw and mouth controls', 'gameplay sockets', 'neck corrective and cape secondary controls'],
     productionAnimation: ['new original gameplay clips', 'anticipation and controlled squash/stretch', 'follow-through and overlapping secondary motion', 'reliable foot contacts', 'seamless state blending'],
     visibilityRule: 'neck and Adam’s apple may not be hidden by collar, cape, pose or lighting'

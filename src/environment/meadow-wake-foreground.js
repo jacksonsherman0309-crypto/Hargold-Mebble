@@ -85,6 +85,61 @@ function taperedPanelGeometry(bottomWidth, topWidth, height, depth) {
   return geometry;
 }
 
+function terrainFaceGeometry({
+  from,
+  to,
+  heightAt,
+  sceneHeight,
+  faceDepth,
+  depth = 192,
+  seed = 0,
+  cap = false
+}) {
+  const front = depth / 2;
+  const back = -depth / 2;
+  const samples = [];
+  for (let x = from; x < to; x += 0.24) samples.push(x);
+  samples.push(to);
+  const vertices = [];
+  const uvs = [];
+
+  for (const x of samples) {
+    const ratio = (x - from) / Math.max(0.001, to - from);
+    const edgeFade = Math.sin(ratio * Math.PI);
+    const surfaceVariation =
+      (Math.sin(x * 2.41 + seed) * 0.9 + Math.sin(x * 5.17 + seed * 0.3) * 0.36)
+      * edgeFade;
+    const top = sceneHeight / 2 - heightAt(x) * SCALE + surfaceVariation;
+    const bottom = cap
+      ? top - 20 - (Math.sin(x * 4.3 + seed) + 1) * 2.2
+      : Math.min(-526, top - faceDepth - Math.sin(x * 1.63 + seed) * 16);
+    vertices.push(x * SCALE, top + (cap ? 10 : 0), front, x * SCALE, bottom, front);
+    vertices.push(x * SCALE, top + (cap ? 10 : 0), back, x * SCALE, bottom, back);
+    const u = (x - from) / 1.55;
+    const vSpan = cap ? 1 : Math.max(1.2, (top - bottom) / 176);
+    uvs.push(u, vSpan, u, 0, u, vSpan, u, 0);
+  }
+
+  const indices = [];
+  for (let index = 0; index < samples.length - 1; index += 1) {
+    const a = index * 4;
+    const b = a + 4;
+    indices.push(
+      a, a + 1, b, b, a + 1, b + 1,
+      a + 2, b + 2, a + 3, b + 2, b + 3, a + 3,
+      a, b, a + 2, b, b + 2, a + 2,
+      a + 1, a + 3, b + 1, b + 1, a + 3, b + 3
+    );
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 export class MeadowWakeForegroundArt {
   constructor({ world, height, width, materials, materialFactory }) {
     this.world = world;
@@ -142,6 +197,32 @@ export class MeadowWakeForegroundArt {
       color: 0x8a5630,
       roughness: 0.96,
       metalness: 0
+    });
+    this.soilClay = new THREE.MeshStandardMaterial({
+      color: 0xa67854,
+      roughness: 0.98,
+      metalness: 0
+    });
+    this.soilDark = new THREE.MeshStandardMaterial({
+      color: 0x4a382b,
+      roughness: 1,
+      metalness: 0
+    });
+    this.soilOchre = new THREE.MeshStandardMaterial({
+      color: 0xc29a68,
+      roughness: 0.96,
+      metalness: 0
+    });
+    this.mossEdge = new THREE.MeshStandardMaterial({
+      color: 0x4e8138,
+      roughness: 0.96,
+      metalness: 0
+    });
+    this.strataLine = new THREE.MeshBasicMaterial({
+      color: 0xcda47e,
+      transparent: true,
+      opacity: 0.18,
+      depthWrite: false
     });
     this.leafDark = new THREE.MeshStandardMaterial({
       color: 0x2f6a33,
@@ -213,6 +294,22 @@ export class MeadowWakeForegroundArt {
     this.materials.stone.bumpScale = 0.6;
     this.materials.stone.color.setHex(0xb8b8ad);
     this.materials.stone.needsUpdate = true;
+    for (const [material, tint, bumpScale] of [
+      [this.soilClay, 0xb39883, 0.5],
+      [this.soilDark, 0x927969, 0.52],
+      [this.soilOchre, 0xc1a38a, 0.44]
+    ]) {
+      material.map = this.materials.soil.map;
+      material.bumpMap = this.materials.soil.bumpMap;
+      material.bumpScale = bumpScale;
+      material.color.setHex(tint);
+      material.needsUpdate = true;
+    }
+    this.mossEdge.map = this.materials.turf.map;
+    this.mossEdge.bumpMap = this.materials.turf.bumpMap;
+    this.mossEdge.bumpScale = 0.36;
+    this.mossEdge.color.setHex(0x89a97c);
+    this.mossEdge.needsUpdate = true;
   }
 
   addBox(root, name, width, height, depth, material, position = [0, 0, 0], radius = 2.5) {
@@ -360,6 +457,157 @@ export class MeadowWakeForegroundArt {
       amplitude: 0.012
     });
     return cluster;
+  }
+
+  terrainMaterialFor(variant) {
+    if (variant === 'compacted-clay') return this.soilClay;
+    if (variant === 'ruin-foundation' || variant === 'stone-seam') return this.soilDark;
+    if (variant === 'eroded-bank') return this.soilOchre;
+    return this.materials.soil;
+  }
+
+  addTerrainStrata(root, definition, heightAt) {
+    const span = definition.to - definition.from;
+    const bandCount = span > 5.5 ? 2 : 1;
+    for (let band = 0; band < bandCount; band += 1) {
+      const points = [];
+      const samples = Math.max(5, Math.ceil(span * 1.4));
+      for (let index = 0; index <= samples; index += 1) {
+        const ratio = index / samples;
+        const x = definition.from + span * ratio;
+        const surfaceY = this.height / 2 - heightAt(x) * SCALE;
+        const depth = 88 + band * 126 + Math.sin(ratio * Math.PI * 2 + definition.seed) * 8;
+        points.push(new THREE.Vector3(x * SCALE, surfaceY - depth, 98 + band * 0.6));
+      }
+      const layer = this.addMesh(
+        root,
+        'authored-clay-and-loam-strata',
+        new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), samples * 2, 1.7 + band * 0.55, 6, false),
+        this.strataLine
+      );
+      layer.castShadow = false;
+      layer.receiveShadow = false;
+    }
+  }
+
+  addCliffEdge(root, definition, side, heightAt) {
+    const x = side === 'left' ? definition.from : definition.to;
+    const surfaceY = this.height / 2 - heightAt(x) * SCALE;
+    const direction = side === 'left' ? 1 : -1;
+    for (let index = 0; index < 7; index += 1) {
+      const rock = this.addMesh(
+        root,
+        'fractured-readable-cliff-edge',
+        new THREE.DodecahedronGeometry(13 + variation(definition.seed + index) * 9, 0),
+        index % 3 ? this.materials.stone : this.soilDark,
+        [
+          x * SCALE + direction * (7 + index % 2 * 6),
+          surfaceY - 18 - index * 28,
+          100 + index % 3 * 2
+        ]
+      );
+      rock.scale.set(1.08 + index % 2 * 0.18, 0.82, 0.66);
+      rock.rotation.z = direction * (0.08 + index * 0.025);
+    }
+    for (let index = 0; index < 3; index += 1) {
+      const exposedRoot = this.addMesh(
+        root,
+        'cliff-edge-exposed-root',
+        new THREE.CylinderGeometry(2.1, 4.2, 62 - index * 9, 8),
+        this.bark,
+        [
+          x * SCALE + direction * (14 + index * 8),
+          surfaceY - 44 - index * 48,
+          106
+        ]
+      );
+      exposedRoot.rotation.z = direction * (0.25 + index * 0.12);
+    }
+  }
+
+  buildTerrainModules({ definitions, heightAt }) {
+    const terrainRoot = new THREE.Group();
+    terrainRoot.name = 'MeadowWake_AuthoredModularTerrainSystem';
+    this.world.add(terrainRoot);
+
+    for (const definition of definitions) {
+      const moduleRoot = new THREE.Group();
+      moduleRoot.name = `${definition.id}_${definition.variant}_authored-terrain-module`;
+      moduleRoot.userData = {
+        course: '1-1',
+        authoredRange: [definition.from, definition.to],
+        collisionSource: 'MEADOW_WAKE_TERRAIN_POINTS'
+      };
+      terrainRoot.add(moduleRoot);
+
+      const face = this.addMesh(
+        moduleRoot,
+        'irregular-layered-earth-face',
+        terrainFaceGeometry({
+          ...definition,
+          heightAt,
+          sceneHeight: this.height,
+          depth: 192
+        }),
+        this.terrainMaterialFor(definition.variant)
+      );
+      face.receiveShadow = true;
+
+      const cap = this.addMesh(
+        moduleRoot,
+        'modeled-grass-overhang-cap',
+        terrainFaceGeometry({
+          ...definition,
+          heightAt,
+          sceneHeight: this.height,
+          faceDepth: 24,
+          depth: 204,
+          cap: true
+        }),
+        definition.variant === 'flowered-bank' ? this.mossEdge : this.materials.turf
+      );
+      cap.castShadow = true;
+      cap.receiveShadow = true;
+
+      this.addTerrainStrata(moduleRoot, definition, heightAt);
+      const span = definition.to - definition.from;
+      const stoneCount = Math.max(4, Math.round(span * 1.15));
+      for (let index = 0; index < stoneCount; index += 1) {
+        const ratio = (index + 0.55) / stoneCount;
+        const x = definition.from + span * ratio;
+        const surfaceY = this.height / 2 - heightAt(x) * SCALE;
+        const depth = 46 + variation(definition.seed * 3 + index) * 230;
+        const rock = this.addMesh(
+          moduleRoot,
+          'embedded-rounded-fieldstone',
+          new THREE.DodecahedronGeometry(8 + variation(definition.seed + index * 5) * 10, 0),
+          this.materials.stone,
+          [x * SCALE, surfaceY - depth, 101 + index % 3]
+        );
+        rock.scale.set(1.35, 0.7 + index % 2 * 0.12, 0.52);
+        rock.rotation.z = (variation(definition.seed + index * 11) - 0.5) * 0.58;
+      }
+
+      const rootCount = definition.variant.includes('root') ? 4 : 2;
+      for (let index = 0; index < rootCount; index += 1) {
+        const ratio = (index + 1) / (rootCount + 1);
+        const x = definition.from + span * ratio;
+        const surfaceY = this.height / 2 - heightAt(x) * SCALE;
+        const rootDrop = this.addMesh(
+          moduleRoot,
+          'embedded-branching-earth-root',
+          new THREE.CylinderGeometry(1.8, 4.2, 42 + index * 11, 8),
+          index % 2 ? this.darkWood : this.bark,
+          [x * SCALE, surfaceY - 58 - index * 26, 105]
+        );
+        rootDrop.rotation.z = (index % 2 ? 1 : -1) * (0.22 + variation(definition.seed + index) * 0.28);
+      }
+
+      if (definition.cliffLeft) this.addCliffEdge(moduleRoot, definition, 'left', heightAt);
+      if (definition.cliffRight) this.addCliffEdge(moduleRoot, definition, 'right', heightAt);
+    }
+
+    return terrainRoot;
   }
 
   buildPlatform(definition) {

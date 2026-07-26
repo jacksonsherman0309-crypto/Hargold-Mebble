@@ -130,6 +130,20 @@ Construction direction:
 - Preserve the approved bright layered valley background, lighting, atmosphere, depth, and color palette while bringing the collision-bearing foreground to the same visual finish.
 - Treat all seven Meadow Wake beats as one continuous environment finish pass: authored near-field props, modeled terrain relief, section-specific midground landmarks, stable warm daylight, atmospheric separation, and unobstructed landing/hazard silhouettes must continue through the goal.
 - Construct the seven authored beats as a continuously evolving approximately two-minute course with roughly 85% supported ground, meaningful ravines, dense coin guidance, camp decks, a fallen-log launch, breakable ruins, lifts, falling ledges, a rope bridge, creek routes, rotating stonework, and three graduated final gaps.
+- Re-author the visible layout around nine readable traversal phases inside
+  those seven beats: camp departure, first natural obstacle, first encounter,
+  gentle elevation, one controlled gap sequence, an open running meadow, one
+  compact platform challenge, a combination challenge, and the exit approach.
+- Keep approximately 65–75% of ordinary forward progression on connected
+  ground. Elevated platforms supplement that route and each must have a named
+  teaching, reward, shortcut, secret, or timing purpose.
+- Group true gaps into authored events rather than distributing them evenly:
+  the concealed creek pocket with its recovery shelf, the framed rope-bridge
+  ravine, and the three-gap final panorama.
+- Use explicit modular terrain chunks with irregular modeled silhouettes,
+  grass overhangs, clay/loam strata, embedded stone, exposed roots, eroded
+  edges, and clean collision profiles. Long stretched terrain slabs are not an
+  acceptable visible implementation.
 
 ### 1-2 — Acorn Run
 

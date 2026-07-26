@@ -18,10 +18,13 @@ import {
   MEADOW_WAKE_COMPASS_COIN_DEFINITIONS,
   MEADOW_WAKE_PITS,
   MEADOW_WAKE_PLATFORMS,
+  MEADOW_WAKE_ROUTE_PHASES,
   MEADOW_WAKE_SECTIONS,
+  MEADOW_WAKE_TERRAIN_MODULES,
   createMeadowWakeBlocks,
   createMeadowWakePlatforms,
-  meadowWakePitRatio
+  meadowWakePitRatio,
+  meadowWakeTerrainModuleCoverage
 } from '../src/content/meadow-wake-course.js';
 
 const platform = MEADOW_WAKE_PLATFORMS[0];
@@ -198,7 +201,7 @@ assert.equal(spentReward?.type, 'block-used');
 assert.equal(hiddenCoinBlock.broken, false, 'spent reward blocks remain solid');
 
 const movingPlatforms = createMeadowWakePlatforms();
-const movingStep = movingPlatforms.find(item => item.id === 'first-moving-step');
+const movingStep = movingPlatforms.find(item => item.id === 'rotating-ruin-step');
 const movingStartX = movingStep.x;
 stepCoursePlatforms(movingPlatforms, 0.5);
 assert.notEqual(movingStep.x, movingStartX);
@@ -231,14 +234,22 @@ assert.equal(falling.y, falling.baseY);
 assert.equal(falling.fallState, 'idle');
 
 assert.equal(MEADOW_WAKE_SECTIONS.length, 7);
+assert.equal(MEADOW_WAKE_ROUTE_PHASES.length, 9);
 assert.equal(MEADOW_WAKE_COMPASS_COIN_DEFINITIONS.length, 3);
-assert.ok(MEADOW_WAKE_COIN_DEFINITIONS.length >= 120);
-assert.ok(MEADOW_WAKE_PLATFORMS.length >= 35);
-assert.ok(MEADOW_WAKE_BLOCK_DEFINITIONS.length >= 48);
-assert.ok(meadowWakePitRatio() >= 0.1 && meadowWakePitRatio() <= 0.2);
-assert.ok(Math.abs(
-  MEADOW_WAKE_PITS.reduce((total, pit) => total + pit.to - pit.from, 0) - 19
-) < 1e-9);
+assert.ok(MEADOW_WAKE_COIN_DEFINITIONS.length >= 145);
+assert.ok(MEADOW_WAKE_PLATFORMS.length >= 18 && MEADOW_WAKE_PLATFORMS.length <= 28);
+assert.ok(MEADOW_WAKE_PLATFORMS.every(platform => platform.purpose));
+assert.ok(MEADOW_WAKE_BLOCK_DEFINITIONS.length >= 28 && MEADOW_WAKE_BLOCK_DEFINITIONS.length <= 36);
+assert.ok(MEADOW_WAKE_BLOCK_DEFINITIONS.every(block => block.formation));
+assert.equal(MEADOW_WAKE_PITS.length, 5);
+assert.ok(meadowWakePitRatio() >= 0.08 && meadowWakePitRatio() <= 0.1);
+assert.ok(Math.abs(meadowWakePitRatio() + meadowWakeTerrainModuleCoverage() - 1) < 1e-9);
+assert.ok(MEADOW_WAKE_TERRAIN_MODULES.length >= 20);
+assert.ok(new Set(MEADOW_WAKE_TERRAIN_MODULES.map(module => module.variant)).size >= 6);
+assert.ok(MEADOW_WAKE_TERRAIN_MODULES.every(module => module.to > module.from));
+assert.ok(MEADOW_WAKE_ROUTE_PHASES.every((phase, index, phases) => (
+  index === 0 || phase.range[0] === phases[index - 1].range[1]
+)));
 assert.deepEqual(
   [...new Set(MEADOW_WAKE_BLOCK_DEFINITIONS.map(block => block.type))].sort(),
   ['coin', 'hargold-only', 'power-up', 'standard-breakable']

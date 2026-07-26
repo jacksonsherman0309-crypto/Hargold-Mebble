@@ -71,6 +71,10 @@ The latest approved Hargold and Mebble model is locked. Do not change proportion
 - The replacement must preserve the locked identities, silhouettes, proportions, clothing, colors, accessories, and defining facial features above.
 - Production meshes require smooth rounded topology, clean deformation edge flow, sculpted faces, expressive brows, detailed hands and boots, layered garments, authored cloth folds, clean UVs, optimized game topology, and planned LODs.
 - Hero bodies and soft garments must deform as continuous skinned surfaces. Bone-parented upper-arm, forearm, elbow, hand, thigh, or shin pieces that read as an articulated wooden doll are not acceptable production geometry.
+- Character construction is action-first. Proportions must be approved in run, jump, landing, skid, slam, carry, wall-contact, and character-specific action poses before close facial or material polish.
+- Every hero silhouette must remain identifiable at 100–150 pixels tall. Arms and hands must separate from the torso, feet must create a stable readable ground-contact shape, shoulders must have deformable volume, and backpacks/capes must retain a distinct overlap instead of merging into one body mass.
+- Hargold requires longer readable forearms, hands enlarged by roughly 20–30 percent over the rejected candidate, larger boots, defined shoulders, and less spherical cheek transitions while preserving his locked short round identity.
+- Mebble requires a slightly wider torso, longer separated arms, larger boots, a more tapered visible neck, a stronger Adam's apple profile, glasses offset clearly from the face, and a cape yoke that wraps naturally over the shoulders while preserving his locked tall thin identity.
 - Character approval requires action-pose and gameplay-camera deformation review; a neutral T-pose or still turntable is not sufficient evidence of an animated production character.
 - Final materials require authored PBR texture sets, including base color, roughness, normal detail, and ambient-occlusion support where appropriate. Procedural flat-color materials are not a final substitute.
 - Production rigs require IK/FK limbs, finger articulation, eye, brow, jaw and mouth controls, gameplay sockets, and secondary controls for Hargold's hat, feather and scarf and Mebble's hat, cape and clothing.
@@ -348,6 +352,12 @@ Block interaction follows the locked original Meadow Wake feedback hierarchy:
 - Collision-bearing foreground, platforms, bridges, ruins, blocks, coins, and mechanisms must read as modeled 3D objects integrated into the terrain. Flat cards may support distant atmospheric scenery only and cannot substitute for playable geometry.
 - Handcraft the playable foreground around movement decisions. Alternate rolling hills, ledges, bridges, vertical climbs, ruins, camps, clearings, elevated routes, and secrets rather than relying on broad uninterrupted ground.
 - Standard courses should target approximately 80–90% supported terrain and 10–20% memorable pit spans. This is a course-level pacing ratio, not a command to distribute pits evenly.
+- Meadow Wake's current approved re-authoring is more conservative than that
+  general pit range: approximately 65–75% of ordinary forward play follows
+  connected ground, optional and contained sequences use authored structures,
+  and true gaps are grouped into a concealed creek pocket, one framed rope
+  ravine, and the graduated exit panorama. This opening course must not scatter
+  pits or floating platforms uniformly across its length.
 - Terrain and mechanisms should provide substantial obstacle variety: narrow ledges, moving/falling/rotating platforms, lifts, seesaws, bridges, breakable formations, and optional routes.
 - Use dense coin lines, arcs, vertical stacks, interrupted clues, and concealed rewards to teach jumps, guide momentum, and signpost route choices.
 - Camps, fallen logs, stumps, fences, cliffs, and ruins should serve environmental storytelling and readable platforming roles rather than appearing as disconnected decoration.

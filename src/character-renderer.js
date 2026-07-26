@@ -4,13 +4,14 @@ import {
   MEADOW_WAKE_BLOCK_DEFINITIONS,
   MEADOW_WAKE_PITS,
   MEADOW_WAKE_PLATFORMS,
+  MEADOW_WAKE_TERRAIN_MODULES,
   MEADOW_WAKE_TERRAIN_POINTS,
   MEADOW_WAKE_WORLD_END,
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins
-} from './content/meadow-wake-course.js?v=meadow-finish-4';
-import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=meadow-finish-4';
-import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=meadow-finish-4';
+} from './content/meadow-wake-course.js?v=meadow-ground-first-5';
+import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=meadow-ground-first-5';
+import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=meadow-ground-first-5';
 import { GAME_RULES } from './canonical-data.js';
 
 const PRESENTATION = GAME_RULES.characterPresentation;
@@ -878,19 +879,10 @@ export class CharacterRenderer {
       }
       return points.at(-1)[1];
     };
-    const grass = this.environmentArt.turfMaterial;
-    const soil = this.environmentArt.soilMaterial;
-    const terrainRuns = [];
-    let terrainCursor = 0;
-    for (const pit of MEADOW_WAKE_PITS) {
-      terrainRuns.push([terrainCursor, pit.from]);
-      terrainCursor = pit.to;
-    }
-    terrainRuns.push([terrainCursor, MEADOW_WAKE_WORLD_END]);
-    for (const [start, end] of terrainRuns) {
-      this.terrainStrip('authored-continuous-terrain', start, end, heightAt, soil);
-      this.terrainRibbon('continuous-living-grass-rim', start, end, heightAt, grass);
-    }
+    this.foregroundArt.buildTerrainModules({
+      definitions: MEADOW_WAKE_TERRAIN_MODULES,
+      heightAt
+    });
     this.foregroundArt.decorateTerrain({ heightAt, inPit });
     this.foregroundArt.buildAuthoredScenery(heightAt);
     for (const definition of MEADOW_WAKE_PLATFORMS) this.buildPlatformVisual(definition);

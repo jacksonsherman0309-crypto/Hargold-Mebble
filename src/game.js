@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js?v=meadow-finish-4';
+import { CharacterRenderer } from './character-renderer.js?v=meadow-ground-first-5';
 import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
 import {
   MEADOW_WAKE_PITS,
@@ -8,7 +8,7 @@ import {
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins,
   createMeadowWakePlatforms
-} from './content/meadow-wake-course.js?v=meadow-finish-4';
+} from './content/meadow-wake-course.js?v=meadow-ground-first-5';
 import {
   attackMob,
   createMob,

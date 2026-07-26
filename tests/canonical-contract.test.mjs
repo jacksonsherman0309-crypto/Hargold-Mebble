@@ -78,6 +78,12 @@ assert.equal(
 );
 assert.equal(getLevel('1-1').foregroundDirective.targetSupportedTerrainRatio, 0.85);
 assert.equal(getLevel('1-1').foregroundDirective.authoredVisualBeatCount, 7);
+assert.deepEqual(
+  getLevel('1-1').foregroundDirective.connectedGroundProgressionRatio,
+  { minimum: 0.65, maximum: 0.75 }
+);
+assert.equal(getLevel('1-1').foregroundDirective.authoredTraversalPhaseCount, 9);
+assert.equal(getLevel('1-1').foregroundDirective.trueGapClusters.length, 3);
 assert.equal(getLevel('1-1').foregroundDirective.finishAllSectionsToSharedQualityFloor, true);
 assert.deepEqual(
   GAME_RULES.platform.gameplayReadabilityScale.hargoldApproximateCommonEnemyHeights,
@@ -138,6 +144,10 @@ assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /new original
 assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /continuous skinned/);
 assert.match(LOCKED_HERO_DESIGN.Mebble.productionModel.join(' '), /no rigid segmented limbs/);
 assert.match(LOCKED_HERO_DESIGN.Mebble.productionModel.join(' '), /empty Blender scene/);
+assert.ok(LOCKED_HERO_DESIGN.Hargold.productionModel.includes('100–150 pixel silhouette approval'));
+assert.ok(LOCKED_HERO_DESIGN.Hargold.productionModel.includes('deformable shoulder volume with separated arms'));
+assert.ok(LOCKED_HERO_DESIGN.Mebble.productionModel.includes('100–150 pixel silhouette approval'));
+assert.ok(LOCKED_HERO_DESIGN.Mebble.productionModel.includes('glasses offset from the face and curved cape shoulder yoke'));
 assert.match(LOCKED_HERO_DESIGN.Mebble.productionAnimation.join(' '), /new original gameplay clips/);
 assert.match(LOCKED_HERO_DESIGN.Hargold.gameplay.join(' '), /exclusive learned double jump/);
 
