@@ -2,28 +2,28 @@ import * as THREE from '../vendor/three/three.module.js';
 import { GLTFLoader } from '../vendor/three/loaders/GLTFLoader.js';
 import {
   MEADOW_WAKE_BLOCK_DEFINITIONS,
-  MEADOW_WAKE_FOREGROUND_PROPS,
   MEADOW_WAKE_PITS,
   MEADOW_WAKE_PLATFORMS,
   MEADOW_WAKE_TERRAIN_POINTS,
   MEADOW_WAKE_WORLD_END,
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins
-} from './content/meadow-wake-course.js?v=block-production-1';
-import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=block-production-1';
+} from './content/meadow-wake-course.js?v=meadow-finish-4';
+import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=meadow-finish-4';
+import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=meadow-finish-4';
+import { GAME_RULES } from './canonical-data.js';
 
+const PRESENTATION = GAME_RULES.characterPresentation;
+const GAME_PIXELS_PER_METRE = PRESENTATION.gameplayScale.gamePixelsPerMetre;
+const ACTION_REVEAL_DEGREES = PRESENTATION.orientation.revealDegreesByAction;
 const MODEL_SPECS = Object.freeze({
   Hargold: Object.freeze({
-    url: new URL('../assets/exports/hargold_character.glb?v=continuous-skin-3', import.meta.url).href,
-    pixelsPerMetre: 43,
-    sideYaw: Math.PI / 2,
-    cameraBias: THREE.MathUtils.degToRad(14)
+    url: new URL('../assets/exports/hargold_character.glb?v=production-topology-1', import.meta.url).href,
+    assetHeightMetres: PRESENTATION.gameplayScale.heroHeightMetres.Hargold
   }),
   Mebble: Object.freeze({
-    url: new URL('../assets/exports/mebble_character.glb?v=continuous-skin-3', import.meta.url).href,
-    pixelsPerMetre: 40,
-    sideYaw: Math.PI / 2,
-    cameraBias: THREE.MathUtils.degToRad(14)
+    url: new URL('../assets/exports/mebble_character.glb?v=production-topology-1', import.meta.url).href,
+    assetHeightMetres: PRESENTATION.gameplayScale.heroHeightMetres.Mebble
   })
 });
 
@@ -45,6 +45,8 @@ export class CharacterRenderer {
     );
     this.camera.position.set(0, 0, 900);
     this.camera.lookAt(0, 0, 0);
+    this.camera.zoom = 0.9;
+    this.camera.updateProjectionMatrix();
 
     this.renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -73,10 +75,15 @@ export class CharacterRenderer {
     key.shadow.camera.right = 900;
     key.shadow.camera.top = 700;
     key.shadow.camera.bottom = -700;
+    key.shadow.bias = -0.00016;
+    key.shadow.normalBias = 0.025;
     this.scene.add(key);
     const rim = new THREE.DirectionalLight(0x91c7ff, 2.4);
     rim.position.set(320, 220, -180);
     this.scene.add(rim);
+    const meadowFill = new THREE.DirectionalLight(0xb9dfac, 1.15);
+    meadowFill.position.set(-180, -90, 260);
+    this.scene.add(meadowFill);
     this.world = new THREE.Group();
     this.scene.add(this.world);
     this.backgroundFar = new THREE.Group();
@@ -100,6 +107,18 @@ export class CharacterRenderer {
       renderer: this.renderer,
       width,
       height
+    });
+    this.foregroundArt = new MeadowWakeForegroundArt({
+      world: this.world,
+      width,
+      height,
+      materials: {
+        turf: this.environmentArt.turfMaterial,
+        soil: this.environmentArt.soilMaterial,
+        stone: this.environmentArt.stoneMaterial,
+        wood: this.environmentArt.woodMaterial
+      },
+      materialFactory: color => this.material(color)
     });
     this.buildMeadowWake();
 
@@ -194,7 +213,57 @@ export class CharacterRenderer {
     return mesh;
   }
 
+  terrainRibbon(name, start, end, heightAt, material, scale = 70, depth = 188) {
+    const front = depth / 2;
+    const back = -depth / 2;
+    const samples = [];
+    for (let x = start; x < end; x += 0.18) samples.push(x);
+    samples.push(end);
+    const vertices = [];
+    const uvs = [];
+    for (const x of samples) {
+      const top =
+        this.height / 2 - heightAt(x) * scale + 14 +
+        Math.sin(x * 2.17) * 1.2;
+      const bottom = top - 19 - (Math.sin(x * 3.73) + 1) * 2.4;
+      vertices.push(x * scale, top, front, x * scale, bottom, front);
+      vertices.push(x * scale, top, back, x * scale, bottom, back);
+      const u = (x - start) / 1.35;
+      uvs.push(u, 1, u, 0, u, 1, u, 0);
+    }
+    const indices = [];
+    for (let index = 0; index < samples.length - 1; index += 1) {
+      const a = index * 4;
+      const b = a + 4;
+      indices.push(
+        a, a + 1, b, b, a + 1, b + 1,
+        a + 2, b + 2, a + 3, b + 2, b + 3, a + 3,
+        a, b, a + 2, b, b + 2, a + 2,
+        a + 1, a + 3, b + 1, b + 1, a + 3, b + 3
+      );
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute(vertices, 3)
+    );
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.name = name;
+    mesh.receiveShadow = true;
+    mesh.castShadow = true;
+    this.world.add(mesh);
+    return mesh;
+  }
+
   buildPlatformVisual(definition) {
+    if (this.foregroundArt) {
+      const authoredSlot = this.foregroundArt.buildPlatform(definition);
+      this.platformSlots.push(authoredSlot);
+      return authoredSlot;
+    }
     const scale = 70;
     const root = new THREE.Group();
     root.name = `${definition.id}_${definition.visual}`;
@@ -636,6 +705,61 @@ export class CharacterRenderer {
     });
   }
 
+  spawnCoinCollectionEffect(collectible, major = false) {
+    const position = collectible.position;
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(major ? 24 : 14, major ? 2.4 : 1.8, 8, 30),
+      new THREE.MeshBasicMaterial({
+        color: major ? 0xfff0a1 : 0xffd65c,
+        transparent: true,
+        opacity: 0.82,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      })
+    );
+    ring.name = major
+      ? 'compass-coin-collection-ring'
+      : 'trail-coin-collection-ring';
+    ring.position.copy(position);
+    ring.position.z += 8;
+    this.spawnBlockEffect(ring, {
+      life: major ? 0.52 : 0.38,
+      gravity: 0,
+      kind: 'collect'
+    });
+
+    const particleMaterial = new THREE.MeshBasicMaterial({
+      color: major ? 0xfff2a8 : 0xffcb46,
+      transparent: true,
+      opacity: 0.9,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+    const particleCount = major ? 10 : 6;
+    for (let index = 0; index < particleCount; index += 1) {
+      const angle = index / particleCount * Math.PI * 2;
+      const spark = new THREE.Mesh(
+        new THREE.OctahedronGeometry(major ? 3.2 : 2.2, 0),
+        particleMaterial.clone()
+      );
+      spark.name = 'coin-collection-spark';
+      spark.position.copy(position);
+      spark.position.z += 10 + index % 3;
+      const speed = (major ? 74 : 52) + index % 3 * 8;
+      this.spawnBlockEffect(spark, {
+        life: major ? 0.66 : 0.46,
+        velocity: new THREE.Vector3(
+          Math.cos(angle) * speed,
+          Math.sin(angle) * speed + 26,
+          (index % 2 ? 1 : -1) * 8
+        ),
+        angularVelocity: new THREE.Vector3(0, 3 + index, 5),
+        gravity: 110,
+        kind: 'collect-spark'
+      });
+    }
+  }
+
   spawnBlockImpact(slot, state) {
     const x = slot.root.position.x;
     const y = slot.root.position.y;
@@ -729,6 +853,8 @@ export class CharacterRenderer {
       if (effect.kind === 'reward') {
         const pulse = 1 + Math.sin((1 - remaining) * Math.PI) * 0.28;
         effect.mesh.scale.setScalar(pulse);
+      } else if (effect.kind === 'collect') {
+        effect.mesh.scale.setScalar(1 + (1 - remaining) * 1.15);
       }
     }
     for (const effect of this.blockEffects.filter(effect => effect.life <= 0)) {
@@ -754,9 +880,6 @@ export class CharacterRenderer {
     };
     const grass = this.environmentArt.turfMaterial;
     const soil = this.environmentArt.soilMaterial;
-    const stone = this.environmentArt.stoneMaterial;
-    const wood = this.environmentArt.woodMaterial;
-    const gold = new THREE.MeshStandardMaterial({ color: 0xf5bd32, roughness: 0.28, metalness: 0.55 });
     const terrainRuns = [];
     let terrainCursor = 0;
     for (const pit of MEADOW_WAKE_PITS) {
@@ -766,37 +889,10 @@ export class CharacterRenderer {
     terrainRuns.push([terrainCursor, MEADOW_WAKE_WORLD_END]);
     for (const [start, end] of terrainRuns) {
       this.terrainStrip('authored-continuous-terrain', start, end, heightAt, soil);
+      this.terrainRibbon('continuous-living-grass-rim', start, end, heightAt, grass);
     }
-    for (let x = 0; x < MEADOW_WAKE_WORLD_END; x += 0.5) {
-      const x1 = Math.min(MEADOW_WAKE_WORLD_END, x + 0.5);
-      if (inPit(x + 0.25)) continue;
-      const top0 = this.height / 2 - heightAt(x) * scale;
-      const top1 = this.height / 2 - heightAt(x1) * scale;
-      this.terrainSegment('living-grass-rim', x * scale, x1 * scale, top0 + 9, top1 + 9, grass, 178, Math.min(top0, top1) - 4);
-      if (x < 10 || Math.round(x * 2) % 4 === 0) {
-        for (let detail = 0; detail < 2; detail += 1) {
-          const detailX = (x + 0.13 + detail * 0.23) * scale;
-          const detailTop = this.height / 2 - heightAt(x + 0.13 + detail * 0.23) * scale;
-          const rock = new THREE.Mesh(
-            new THREE.DodecahedronGeometry(9 + ((x * 7 + detail * 3) % 5), 0),
-            stone
-          );
-          rock.name = 'terrain-rock-cladding';
-          rock.scale.set(1.25, 0.76, 0.45);
-          rock.position.set(detailX, detailTop - 17 - detail * 16, 88);
-          rock.rotation.z = (x + detail) * 0.41;
-          rock.castShadow = true;
-          this.world.add(rock);
-        }
-      }
-    }
-    this.environmentArt.decorateCourse({
-      heightAt,
-      inPit,
-      scale,
-      courseEnd: MEADOW_WAKE_WORLD_END,
-      props: MEADOW_WAKE_FOREGROUND_PROPS
-    });
+    this.foregroundArt.decorateTerrain({ heightAt, inPit });
+    this.foregroundArt.buildAuthoredScenery(heightAt);
     for (const definition of MEADOW_WAKE_PLATFORMS) this.buildPlatformVisual(definition);
 
     for (const definition of MEADOW_WAKE_BLOCK_DEFINITIONS) {
@@ -805,40 +901,22 @@ export class CharacterRenderer {
     }
     const visualCoins = createMeadowWakeCoins(heightAt);
     visualCoins.forEach(({ x, y }, index) => {
-      const coin = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 4, 24), gold);
-      coin.rotation.x = Math.PI / 2;
-      coin.position.set(x * scale, this.height / 2 - y * scale, 35);
-      coin.userData = { kind: 'coin', index };
-      this.collectibleMeshes.push(coin);
-      this.world.add(coin);
+      this.collectibleMeshes.push(this.foregroundArt.buildCoin({ x, y, index }));
     });
     createMeadowWakeCompassCoins().forEach(({ x, y }, index) => {
-      const compass = new THREE.Mesh(new THREE.TorusGeometry(18, 5, 10, 32), gold);
-      compass.position.set(x * scale, this.height / 2 - y * scale, 35);
-      compass.userData = { kind: 'compass', index };
-      this.collectibleMeshes.push(compass);
-      this.world.add(compass);
+      this.collectibleMeshes.push(this.foregroundArt.buildCoin({ x, y, index, major: true }));
     });
     this.addMobProxy('1-1-critter-a', 'camp_critter');
     this.addMobProxy('1-1-shellback-a', 'shellback');
     this.addMobProxy('1-1-critter-b', 'camp_critter');
     this.addMobProxy('1-1-shellback-b', 'shellback');
     this.addMobProxy('1-1-critter-c', 'camp_critter');
-    for (const [name, x, color] of [
-      ['checkpoint', 70.5, 0xf0b93d],
-      ['goal', 123.25, 0x3d8750]
-    ]) {
-      const groundY = this.height / 2 - heightAt(x) * scale;
-      const pole = new THREE.Mesh(new THREE.CylinderGeometry(5, 6, 150, 10), wood);
-      pole.name = `${name}-pole`;
-      pole.position.set(x * scale, groundY + 75, 8);
-      this.world.add(pole);
-      const banner = this.box(`${name}-banner`, x * scale + 39, groundY + 15, 72, 58, 10, this.material(color));
-      banner.position.z = 16;
-      const finial = new THREE.Mesh(new THREE.SphereGeometry(10, 14, 10), gold);
-      finial.position.set(x * scale, groundY + 155, 8);
-      this.world.add(finial);
-    }
+    const checkpointX = 70.5;
+    this.foregroundArt.buildCourseMarker({
+      name: 'checkpoint',
+      x: checkpointX,
+      groundY: this.height / 2 - heightAt(checkpointX) * scale
+    });
   }
 
   addMobProxy(id, type) {
@@ -941,7 +1019,12 @@ export class CharacterRenderer {
       const environment = this.prepareImportedAsset(environmentGltf.scene);
       environment.name = 'MeadowWake_AuthoredOpeningEnvironment';
       environment.traverse(node => {
-        if (/^(TreeCrown|TreeTrunk|MeadowBush)/i.test(node.name)) node.visible = false;
+        if (
+          /^(TreeCrown|TreeTrunk|MeadowBush|CampPost|CampRidge|RoofBrace|CampCanopy|CampFooting|CampBanner|SignPost|CampSign)/i
+            .test(node.name)
+        ) {
+          node.visible = false;
+        }
       });
       environment.scale.setScalar(70);
       environment.position.set(0, this.height / 2 - 7.9 * 70, -12);
@@ -988,6 +1071,7 @@ export class CharacterRenderer {
       }
       const ledgeTemplate = this.prepareImportedAsset(ledgeGltf.scene);
       for (const slot of this.platformSlots) {
+        if (slot.authoredForeground) continue;
         if (slot.visual !== 'turf-ledge') continue;
         const ledge = ledgeTemplate.clone(true);
         ledge.name = 'AuthoredMeadowLedgeVisual';
@@ -1012,6 +1096,7 @@ export class CharacterRenderer {
     this.onProgress('Loading Meadow Wake valley and terrain textures...');
     try {
       await this.environmentArt.loadTextures();
+      this.foregroundArt.applySurfaceTextures(this.environmentArt.detailTextures);
       this.environmentArtReady = true;
       this.onProgress(this.statusText());
     } catch (error) {
@@ -1027,9 +1112,11 @@ export class CharacterRenderer {
       const gltf = await this.loader.loadAsync(spec.url);
       const root = gltf.scene;
       root.name = `${hero}_runtime`;
-      const rightFacingYaw = spec.sideYaw - spec.cameraBias;
+      const runtimeScale = GAME_PIXELS_PER_METRE;
+      const defaultReveal = THREE.MathUtils.degToRad(ACTION_REVEAL_DEGREES.default);
+      const rightFacingYaw = Math.PI / 2 - defaultReveal;
       root.rotation.y = rightFacingYaw;
-      root.scale.setScalar(spec.pixelsPerMetre);
+      root.scale.setScalar(runtimeScale);
       root.visible = false;
       root.traverse(object => {
         object.frustumCulled = false;
@@ -1050,10 +1137,9 @@ export class CharacterRenderer {
         clips,
         action: null,
         actionName: '',
-        baseScale: spec.pixelsPerMetre,
+        baseScale: runtimeScale,
         currentYaw: rightFacingYaw,
-        rightFacingYaw,
-        leftFacingYaw: -spec.sideYaw + spec.cameraBias
+        currentFacing: 1
       });
       this.onProgress(this.statusText());
     } catch (error) {
@@ -1096,7 +1182,7 @@ export class CharacterRenderer {
       next.enabled = true;
       next.setEffectiveWeight(1);
       next.play();
-      const blendSeconds = ['skid', 'wall-jump', 'hurt'].includes(name) ? 0.08 : 0.12;
+      const blendSeconds = ['skid', 'turn-low', 'hurt'].includes(name) ? 0.08 : 0.12;
       if (model.action) model.action.crossFadeTo(next, blendSeconds, true);
       model.action = next;
       model.actionName = name;
@@ -1231,6 +1317,7 @@ export class CharacterRenderer {
     glide,
     horizontalSpeed = 0,
     cameraX = 0,
+    cameraY = 0,
     coins = [],
     compassCoins = [],
     blocks = [],
@@ -1243,12 +1330,23 @@ export class CharacterRenderer {
     const shakeX = Math.sin(this.blockEffectClock * 91) * this.blockShakeAmplitude * shakeRatio;
     const shakeY = Math.cos(this.blockEffectClock * 77) * this.blockShakeAmplitude * 0.55 * shakeRatio;
     this.world.position.x = -cameraX - this.width / 2 + shakeX;
-    this.world.position.y = shakeY;
-    this.environmentArt.update(cameraX, deltaSeconds);
+    this.world.position.y = cameraY + shakeY;
+    this.environmentArt.update(cameraX, cameraY, deltaSeconds);
+    this.foregroundArt.update(cameraX, deltaSeconds);
     for (const mesh of this.collectibleMeshes) {
       const source = mesh.userData.kind === 'coin' ? coins[mesh.userData.index] : compassCoins[mesh.userData.index];
+      if (source?.taken && !mesh.userData.wasTaken) {
+        this.spawnCoinCollectionEffect(
+          mesh,
+          mesh.userData.kind === 'compass'
+        );
+      }
+      mesh.userData.wasTaken = Boolean(source?.taken);
       mesh.visible = !source?.taken;
-      mesh.rotation.y += deltaSeconds * 2.7;
+      mesh.rotation.y += deltaSeconds * (mesh.userData.kind === 'compass' ? 1.65 : 2.55);
+      mesh.position.y = mesh.userData.baseY +
+        Math.sin(this.blockEffectClock * 2.4 + mesh.userData.phase) *
+        (mesh.userData.kind === 'compass' ? 4.5 : 2.2);
     }
     this.updateBlocks(blocks, deltaSeconds);
     this.updatePlatforms(platforms);
@@ -1260,17 +1358,27 @@ export class CharacterRenderer {
       if (!active) continue;
       const direction = facing < 0 ? -1 : 1;
       model.root.scale.setScalar(model.baseScale);
-      const targetYaw = direction < 0 ? model.leftFacingYaw : model.rightFacingYaw;
+      const orientationKey = glide !== 'closed'
+        ? 'glide'
+        : ['rise', 'apex', 'fall', 'takeoff', 'land-soft', 'land-hard', 'double-jump'].includes(locomotion)
+          ? 'airborne'
+          : locomotion;
+      const revealDegrees = ACTION_REVEAL_DEGREES[orientationKey] ?? ACTION_REVEAL_DEGREES.default;
+      const reveal = THREE.MathUtils.degToRad(revealDegrees);
+      const targetYaw = direction < 0
+        ? -Math.PI / 2 + reveal
+        : Math.PI / 2 - reveal;
       const yawDelta = Math.atan2(
         Math.sin(targetYaw - model.currentYaw),
         Math.cos(targetYaw - model.currentYaw)
       );
       const turnResponsiveness = ['skid', 'turn-low'].includes(locomotion) ? 15 : 10;
       model.currentYaw += yawDelta * (1 - Math.exp(-turnResponsiveness * deltaSeconds));
+      model.currentFacing = direction;
       model.root.rotation.y = model.currentYaw;
       model.root.position.set(
         screenX - this.width / 2,
-        this.height / 2 - screenY,
+        this.height / 2 - screenY + cameraY,
         110
       );
       this.play(model, this.selectClip(hero, locomotion, glide), horizontalSpeed);

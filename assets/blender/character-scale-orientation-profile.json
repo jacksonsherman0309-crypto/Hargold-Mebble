@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "status": "locked-clean-room-production-profile",
+  "coordinateSystem": {
+    "units": "metres",
+    "up": "Z",
+    "characterForward": "-Y",
+    "origin": "between-feet-on-ground"
+  },
+  "cleanRoomBoundary": {
+    "permittedBenchmarkUse": [
+      "observable silhouette readability",
+      "relative character-enemy-environment scale principles",
+      "action-dependent three-quarter orientation principles",
+      "animation timing and deformation quality principles"
+    ],
+    "forbiddenSources": [
+      "Nintendo meshes",
+      "Nintendo rigs",
+      "Nintendo animation data",
+      "decompiled or leaked source code",
+      "copied proprietary character proportions"
+    ]
+  },
+  "gameplayScale": {
+    "gamePixelsPerMetre": 70,
+    "standardBlockHeightMetres": 0.74,
+    "commonMobHeightMetres": {
+      "minimum": 0.62,
+      "maximum": 0.76
+    },
+    "characters": {
+      "Hargold": {
+        "targetVisibleHeightMetres": 1.82,
+        "targetCollisionHeightMetres": 1.82,
+        "targetWidthMetres": 1.02,
+        "currentAssetHeightMetres": 1.82,
+        "runtimeNormalizationScale": 1.0,
+        "lockedSilhouette": "very-short-broad-round-low-centre-of-mass"
+      },
+      "Mebble": {
+        "targetVisibleHeightMetres": 2.18,
+        "targetCollisionHeightMetres": 2.18,
+        "targetWidthMetres": 0.72,
+        "currentAssetHeightMetres": 2.18,
+        "runtimeNormalizationScale": 1.0,
+        "lockedSilhouette": "tall-thin-long-neck-visible-adams-apple"
+      }
+    },
+    "ratios": {
+      "MebbleToHargoldHeight": 1.198,
+      "HargoldToCommonMobHeight": {
+        "minimum": 2.39,
+        "maximum": 2.94
+      },
+      "HargoldToStandardBlockHeight": 2.459,
+      "MebbleToStandardBlockHeight": 2.946
+    },
+    "finalAssetRule": "Blender sources and GLBs are authored at target gameplay metres with scale 1,1,1. Runtime conversion is only metres to game pixels."
+  },
+  "orientation": {
+    "baseSideDegrees": 90,
+    "negativeScaleMirroringForbidden": true,
+    "physicalDirectionChangeRequired": true,
+    "turnPath": [
+      "brake",
+      "compress",
+      "plant",
+      "twist-toward-camera",
+      "rotate",
+      "accelerate"
+    ],
+    "revealDegreesByAction": {
+      "default": 14,
+      "idle": 18,
+      "walk": 16,
+      "run": 14,
+      "sprint": 11,
+      "start": 18,
+      "stop": 24,
+      "turn-low": 32,
+      "skid": 28,
+      "airborne": 16,
+      "air-spin": 20,
+      "ground-slam": 14,
+      "glide": 22,
+      "hurt": 26,
+      "victory": 24
+    },
+    "characterReadability": {
+      "Hargold": [
+        "keep both eye shapes readable in three-quarter gameplay poses",
+        "preserve belly, backpack, hat brim, scarf and feather overlap",
+        "avoid shoulder and forearm merging into the round torso silhouette"
+      ],
+      "Mebble": [
+        "keep the long neck and Adam's apple visible",
+        "preserve crooked glasses, hat, cape edge and boot separation",
+        "avoid cape hiding the rear arm and torso line in glide poses"
+      ]
+    }
+  },
+  "functionalArticulation": {
+    "requiredBodyFamilies": [
+      "root-and-pelvis",
+      "spine-and-chest",
+      "neck-and-head",
+      "eyes-lids-brows-jaw-mouth-cheeks",
+      "shoulders-upper-arms-forearms-hands",
+      "all-five-finger-chains",
+      "thighs-shins-ankles-feet-toes",
+      "hat-and-character-specific-secondary-parts"
+    ],
+    "HargoldSecondary": [
+      "hat",
+      "feather",
+      "scarf-tails",
+      "backpack-overlap"
+    ],
+    "MebbleSecondary": [
+      "hat",
+      "glasses",
+      "Adam's apple",
+      "three-zone-cape"
+    ],
+    "deformationValidationActions": [
+      "idle",
+      "walk",
+      "run",
+      "sprint",
+      "skid",
+      "takeoff",
+      "apex",
+      "land-hard",
+      "air-spin",
+      "ground-slam",
+      "hurt",
+      "victory"
+    ],
+    "heroValidationActions": {
+      "Hargold": [
+        "double-jump",
+        "break-hargold-block"
+      ],
+      "Mebble": [
+        "glide-open",
+        "glide-sustain",
+        "glide-close"
+      ]
+    }
+  }
+}

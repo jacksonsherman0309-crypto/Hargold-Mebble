@@ -11,6 +11,14 @@ Meadow Wake course; they do not generate or replace course geometry.
 - `meadow-soil-stone-albedo-v2.png` — authored terrain-face albedo with
   gameplay-scale fieldstones and roots.
 - `meadow-turf-albedo-v1.png` — terrain-top and ledge turf albedo.
+- `meadow-camp-timber-albedo-v1.png` — hand-finished camp timber and plank
+  albedo for modeled decks, bridges, hoists, crates, and structural props.
+- `meadow-ruin-stone-albedo-v1.png` — moss-jointed fieldstone albedo for
+  modeled ruins, ledges, bridge anchors, and goal masonry.
+- `meadow-canvas-albedo-v1.png` — stitched explorer-green canvas albedo for
+  camp shelters, banners, and awnings.
+- `meadow-bark-albedo-v1.png` — stylized bark albedo for trunks, stumps,
+  fallen logs, roots, and structural timber variation.
 
 The bitmap sources were generated with OpenAI's built-in image generation and
 then integrated with real Three.js terrain meshes, lighting, fog, and 3D
@@ -57,3 +65,35 @@ Midground ridge:
 > scattered firs, shrubs, ferns, mossy rocks and tiny wildflowers; the upper
 > field is empty chroma. Sunlit polished game art, no characters, no interface,
 > no text, no copied franchise assets.
+
+Camp timber:
+
+> Original seamless square albedo texture for premium stylized 3D-cartoon
+> explorer-camp timber in a side-scrolling platformer: broad hand-hewn warm
+> brown planks, readable grain, knots, beveled wear and subtle tonal variation,
+> soft even PBR base-color lighting, tileable on all edges, no text, no symbols,
+> no characters, no interface, and no copied franchise assets.
+
+Ruin stone:
+
+> Original seamless square albedo texture for premium stylized meadow ruins:
+> large rounded hand-set grey and warm slate fieldstones, deep readable joints,
+> restrained moss and lichen, clean gameplay-distance shapes, soft even PBR
+> base-color lighting, tileable on all edges, no text, no characters, no
+> interface, and no copied franchise assets.
+
+Camp canvas:
+
+> Original seamless square albedo texture for weathered explorer-green camp
+> canvas: tightly woven cloth, subtle stitched horizontal seams, gentle sun
+> fading and restrained wear, clean premium stylized 3D-cartoon game finish,
+> soft even PBR base-color lighting, tileable on all edges, no emblems, no text,
+> no characters, no interface, and no copied franchise assets.
+
+Bark:
+
+> Original seamless square albedo texture for premium stylized 3D-cartoon
+> meadow tree bark: chunky vertical ridges, warm dark-brown grooves, softened
+> hand-sculpted forms, restrained moss traces, strong gameplay-distance
+> readability, soft even PBR base-color lighting, tileable on all edges, no
+> text, no characters, no interface, and no copied franchise assets.

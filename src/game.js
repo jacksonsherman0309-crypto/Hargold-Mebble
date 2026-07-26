@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js?v=block-production-1';
+import { CharacterRenderer } from './character-renderer.js?v=meadow-finish-4';
 import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
 import {
   MEADOW_WAKE_PITS,
@@ -8,7 +8,7 @@ import {
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins,
   createMeadowWakePlatforms
-} from './content/meadow-wake-course.js?v=block-production-1';
+} from './content/meadow-wake-course.js?v=meadow-finish-4';
 import {
   attackMob,
   createMob,
@@ -74,7 +74,12 @@ const touch = {
 };
 const loop = new FixedStepLoop({ hz: 120 });
 const inputBuffer = createMovementInputBuffer();
-const movementDebugEnabled = new URLSearchParams(location.search).has('debugMovement');
+const runtimeParameters = new URLSearchParams(location.search);
+const movementDebugEnabled = runtimeParameters.has('debugMovement');
+const requestedArtPreviewX = Number(runtimeParameters.get('artPreview'));
+const initialCourseX = Number.isFinite(requestedArtPreviewX)
+  ? clamp(requestedArtPreviewX, 1.8, WORLD_END - 1)
+  : 1.8;
 let characterLoadStatus = 'Loading 3D characters...';
 const characterRenderer = new CharacterRenderer({
   mount: canvas.parentElement,
@@ -103,16 +108,20 @@ const MOB_PLACEMENTS = Object.freeze([
   Object.freeze({ id: '1-1-critter-c', type: 'camp_critter', x: 25.6, patrolFrom: 24.1, patrolTo: 27.4 })
 ]);
 
-let player = createUnifiedCharacterState({ footX: 1.8, footY: terrain.heightAt(1.8) });
+let player = createUnifiedCharacterState({
+  footX: initialCourseX,
+  footY: terrain.heightAt(initialCourseX)
+});
 let cameraX = 0;
+let cameraY = 0;
 let lastFrame = performance.now();
-let session = createSession();
+let session = createSession(initialCourseX);
 let mobs = createCourseMobs();
 let projectiles = [];
 let notice = 'Meadow Wake: stomp Critters; stomp then kick Shellbacks.';
 let noticeSeconds = 5;
 
-function createSession() {
+function createSession(spawnX = 1.8) {
   return {
     healthLayers: 1,
     maximumHealthLayers: 1,
@@ -120,7 +129,7 @@ function createSession() {
     standardCoins: 0,
     compass: 0,
     state: 'playing',
-    spawnX: 1.8,
+    spawnX,
     invulnerabilitySeconds: 0,
     attackSeconds: 0,
     enemiesDefeated: 0,
@@ -772,8 +781,20 @@ function frame(now) {
   const sprintLookAhead = player.locomotion === 'sprint'
     ? clamp(player.velocityX * 24, -150, 150)
     : 0;
-  const targetCamera = Math.max(0, player.footX * SCALE - W * 0.34 + sprintLookAhead);
+  const targetCamera = Math.max(
+    -W * 0.22,
+    player.footX * SCALE - W * 0.34 + sprintLookAhead
+  );
   cameraX += (targetCamera - cameraX) * Math.min(1, elapsed * 5);
+  const cameraSurfaceY = terrain.heightAt(clamp(player.footX, 0, WORLD_END));
+  const terrainFraming = cameraSurfaceY * SCALE - H * 0.77;
+  const airborneFollow = clamp(
+    (player.footY - cameraSurfaceY) * SCALE * 0.15,
+    -30,
+    16
+  );
+  const targetCameraY = clamp(terrainFraming + airborneFollow, -78, 28);
+  cameraY += (targetCameraY - cameraY) * Math.min(1, elapsed * 3.6);
   status.textContent = `${session.state === 'playing' ? 'PLAYING' : session.state.toUpperCase()} · 120 Hz · ${characterLoadStatus}`;
   draw();
   characterRenderer.render({
@@ -785,6 +806,7 @@ function frame(now) {
     glide: player.glide,
     horizontalSpeed: player.velocityX,
     cameraX,
+    cameraY,
     coins,
     compassCoins,
     blocks,

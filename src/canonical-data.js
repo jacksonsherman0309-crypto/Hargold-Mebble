@@ -23,8 +23,41 @@ export const GAME_RULES = Object.freeze({
     orientation: Object.freeze({
       mode: 'controlled-three-quarter-side',
       cameraBiasDegrees: 14,
+      revealDegreesByAction: Object.freeze({
+        default: 14,
+        idle: 18,
+        walk: 16,
+        run: 14,
+        sprint: 11,
+        start: 18,
+        stop: 24,
+        'turn-low': 32,
+        skid: 28,
+        airborne: 16,
+        'air-spin': 20,
+        'ground-slam': 14,
+        glide: 22,
+        hurt: 26,
+        victory: 24
+      }),
+      turnTowardCameraForReadability: true,
       physicalDirectionChange: true,
       negativeScaleMirroringForbidden: true
+    }),
+    gameplayScale: Object.freeze({
+      gamePixelsPerMetre: 70,
+      heroHeightMetres: Object.freeze({
+        Hargold: 1.82,
+        Mebble: 2.18
+      }),
+      heroHeightRatioMebbleToHargold: 1.198,
+      commonMobHeightMetres: Object.freeze({
+        minimum: 0.62,
+        maximum: 0.76
+      }),
+      standardBlockHeightMetres: 0.74,
+      visibleSilhouetteMayExceedColliderForAccessories: true,
+      finalBlenderAssetsMustUseGameplayMetres: true
     }),
     animation: Object.freeze({
       gameplayDriven: true,
@@ -95,6 +128,20 @@ export const GAME_RULES = Object.freeze({
     terrainDrivenChallenge: true,
     denseCoinGuidance: true,
     preserveApprovedWorldOneBackgroundDirection: true,
+    environmentPresentation: Object.freeze({
+      minimumVisualBenchmark: 'approved-Meadow-Wake-reference-image',
+      preserveLightingAtmosphereDepthAndPalette: true,
+      collisionBearingForegroundMustBeFullyModeled: true,
+      layeredParallaxBands: Object.freeze([
+        'playable-foreground',
+        'authored-midground',
+        'far-background'
+      ]),
+      integrateBlocksCoinsAndMechanismsIntoTerrain: true,
+      prioritizeGameplayReadability: true,
+      wholeCourseConsistencyRequired: true,
+      proceduralReplacementForbidden: true
+    }),
     mechanismTypes: Object.freeze([
       'moving-platform',
       'falling-platform',
@@ -193,7 +240,10 @@ const WORLD_ONE_LEVELS = [
       targetSupportedTerrainRatio: 0.85,
       authoredCourseLength: 124,
       preserveExistingValleyArtDirection: true,
-      obstacleEmphasis: 'terrain, blocks, coins, routes, and platform mechanisms'
+      obstacleEmphasis: 'terrain, blocks, coins, routes, and platform mechanisms',
+      environmentQualityFloor: 'approved-Meadow-Wake-reference-image',
+      authoredVisualBeatCount: 7,
+      finishAllSectionsToSharedQualityFloor: true
     })
   },
   {

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "courseId": "1-1",
   "courseName": "Meadow Wake",
-  "status": "production-intent-opening-vertical-slice-wip",
+  "status": "authored-whole-course-environment-finish-wip",
   "canonSource": [
     "docs/canonical-design-bible.md",
     "docs/level-production-plan.md",
@@ -21,14 +21,20 @@
       "original far-valley art plate",
       "transparent midground forest-ridge parallax layer",
       "texture-mapped 3D soil and turf terrain",
-      "course-specific 3D foreground foliage dressing"
+      "course-specific 3D foreground foliage dressing",
+      "seven authored environment beats with explicit prop placement",
+      "continuous modeled terrain face and living turf ribbon",
+      "course-specific camp, ruin, bridge, creek, and goal prop families",
+      "volumetric differentiated platform families",
+      "original modeled coin and Compass Coin presentation",
+      "authored distant landmarks, smoke, mist, and waterfall ribbons",
+      "terrain-aware side-view camera framing"
     ],
     "remaining": [
       "final sculpt and topology review",
       "UV review for all imported prop assets",
       "enemy armatures and complete animation clips",
       "destruction fragments and VFX",
-      "remaining course-section environment set dressing",
       "LOD and compressed-texture mobile optimization",
       "final lighting and target-device art approval"
     ]
@@ -64,7 +70,13 @@
     "forestRidge": "../../textures/world-1/meadow-wake/meadow-midground-ridge-v1.png",
     "soilAlbedo": "../../textures/world-1/meadow-wake/meadow-soil-stone-albedo-v2.png",
     "turfAlbedo": "../../textures/world-1/meadow-wake/meadow-turf-albedo-v1.png",
+    "timberAlbedo": "../../textures/world-1/meadow-wake/meadow-camp-timber-albedo-v1.png",
+    "ruinStoneAlbedo": "../../textures/world-1/meadow-wake/meadow-ruin-stone-albedo-v1.png",
+    "canvasAlbedo": "../../textures/world-1/meadow-wake/meadow-canvas-albedo-v1.png",
+    "barkAlbedo": "../../textures/world-1/meadow-wake/meadow-bark-albedo-v1.png",
     "runtimeModule": "../../../src/environment/meadow-wake-environment.js",
+    "foregroundRuntimeModule": "../../../src/environment/meadow-wake-foreground.js",
+    "authoredSceneryData": "../../../src/content/meadow-wake-scenery.js",
     "provenance": "Original built-in image generation, chroma-key matte processing, and authored Three.js 3D integration."
   },
   "originality": "Original Hargold & Mebble assets. Nintendo materials were not copied."

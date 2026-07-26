@@ -32,7 +32,7 @@ jobs:
           cp index.html styles.css _site/
           cp -R src vendor _site/
           mkdir -p _site/assets
-          cp -R assets/exports _site/assets/
+          cp -R assets/exports assets/textures _site/assets/
           touch _site/.nojekyll
 
       - name: Upload playable site

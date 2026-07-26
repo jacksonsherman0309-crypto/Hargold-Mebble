@@ -239,6 +239,11 @@ Block interaction follows the locked original Meadow Wake feedback hierarchy:
 - All enemies must be original and production-intent 3D models.
 - Most common enemies are smaller than the heroes, generally knee-to-waist height relative to Hargold and below Mebble’s waist.
 - In the gameplay camera, Hargold should read at roughly two to three common-enemy heights. Mebble remains visibly taller and thinner. Character render and collision scale must be evaluated against enemies, blocks, platform thickness, and terrain—not in isolation.
+- Canonical gameplay height is 1.82 m for Hargold and 2.18 m for Mebble.
+  Common mobs occupy the 0.62–0.76 m band and the standard block height is
+  0.74 m. Final Blender sources must use these gameplay metres at object scale
+  `1,1,1`; temporary runtime normalization is permitted only for explicitly
+  rejected provisional assets.
 - Most common enemies die from one valid hit.
 - Eyes should be smaller and less uniform: roughly 20% smaller on non-animal enemies and 10% smaller on animal enemies compared with rejected concepts.
 - Smiles should be reduced and expressions should be more moderate.
@@ -338,6 +343,9 @@ Block interaction follows the locked original Meadow Wake feedback hierarchy:
 - Levels need actual platforming density: terrain changes, pits, blocks, enemies, coin routes, hazards, optional rooms, and secrets.
 - Avoid long empty walking sections.
 - Preserve the approved World 1 environmental art direction: layered valley depth, warm daylight, atmospheric haze, saturated natural color, and detailed 3D scenery. Foreground construction must rise to that bar without restarting or flattening the art direction.
+- The approved Meadow Wake gameplay reference image is the minimum environment-quality benchmark for terrain modeling, scene density, dimensional lighting, parallax depth, material finish, and composed side-view readability. It is a quality target only; all shipped geometry, textures, props, blocks, collectibles, and layouts remain original.
+- A finished course cannot contain a polished showcase opening followed by generic, procedural-looking, or visibly weaker sections. Its full authored runtime must maintain the same material language, terrain thickness, environmental density, lighting continuity, and gameplay readability from start through goal.
+- Collision-bearing foreground, platforms, bridges, ruins, blocks, coins, and mechanisms must read as modeled 3D objects integrated into the terrain. Flat cards may support distant atmospheric scenery only and cannot substitute for playable geometry.
 - Handcraft the playable foreground around movement decisions. Alternate rolling hills, ledges, bridges, vertical climbs, ruins, camps, clearings, elevated routes, and secrets rather than relying on broad uninterrupted ground.
 - Standard courses should target approximately 80–90% supported terrain and 10–20% memorable pit spans. This is a course-level pacing ratio, not a command to distribute pits evenly.
 - Terrain and mechanisms should provide substantial obstacle variety: narrow ledges, moving/falling/rotating platforms, lifts, seesaws, bridges, breakable formations, and optional routes.

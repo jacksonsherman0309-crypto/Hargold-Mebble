@@ -41,10 +41,19 @@ assert.equal(
   'controlled-three-quarter-side'
 );
 assert.equal(GAME_RULES.characterPresentation.orientation.cameraBiasDegrees, 14);
+assert.equal(GAME_RULES.characterPresentation.orientation.revealDegreesByAction.sprint, 11);
+assert.equal(GAME_RULES.characterPresentation.orientation.revealDegreesByAction['turn-low'], 32);
+assert.equal(GAME_RULES.characterPresentation.orientation.turnTowardCameraForReadability, true);
 assert.equal(
   GAME_RULES.characterPresentation.orientation.negativeScaleMirroringForbidden,
   true
 );
+assert.deepEqual(
+  GAME_RULES.characterPresentation.gameplayScale.heroHeightMetres,
+  { Hargold: 1.82, Mebble: 2.18 }
+);
+assert.equal(GAME_RULES.characterPresentation.gameplayScale.gamePixelsPerMetre, 70);
+assert.equal(GAME_RULES.characterPresentation.gameplayScale.finalBlenderAssetsMustUseGameplayMetres, true);
 assert.deepEqual(
   GAME_RULES.characterPresentation.animation.distinctJumpStages,
   ['anticipation', 'takeoff', 'ascent', 'apex', 'descent', 'contact', 'compression', 'recovery']
@@ -55,7 +64,21 @@ assert.deepEqual(GAME_RULES.levelConstruction.supportedTerrainRatio, { minimum: 
 assert.deepEqual(GAME_RULES.levelConstruction.pitRatio, { minimum: 0.1, maximum: 0.2 });
 assert.equal(GAME_RULES.levelConstruction.individuallyAuthoredCourses, true);
 assert.ok(GAME_RULES.levelConstruction.mechanismTypes.includes('seesaw'));
+assert.equal(
+  GAME_RULES.levelConstruction.environmentPresentation.minimumVisualBenchmark,
+  'approved-Meadow-Wake-reference-image'
+);
+assert.equal(
+  GAME_RULES.levelConstruction.environmentPresentation.wholeCourseConsistencyRequired,
+  true
+);
+assert.equal(
+  GAME_RULES.levelConstruction.environmentPresentation.proceduralReplacementForbidden,
+  true
+);
 assert.equal(getLevel('1-1').foregroundDirective.targetSupportedTerrainRatio, 0.85);
+assert.equal(getLevel('1-1').foregroundDirective.authoredVisualBeatCount, 7);
+assert.equal(getLevel('1-1').foregroundDirective.finishAllSectionsToSharedQualityFloor, true);
 assert.deepEqual(
   GAME_RULES.platform.gameplayReadabilityScale.hargoldApproximateCommonEnemyHeights,
   { minimum: 2, maximum: 3 }

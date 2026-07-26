@@ -1,4 +1,5 @@
 import * as THREE from '../../vendor/three/three.module.js';
+import { MEADOW_WAKE_MIDGROUND_LANDMARKS } from '../content/meadow-wake-scenery.js';
 
 const TEXTURE_URLS = Object.freeze({
   farValley: new URL(
@@ -15,6 +16,22 @@ const TEXTURE_URLS = Object.freeze({
   ).href,
   turf: new URL(
     '../../assets/textures/world-1/meadow-wake/meadow-turf-albedo-v1.png',
+    import.meta.url
+  ).href,
+  timber: new URL(
+    '../../assets/textures/world-1/meadow-wake/meadow-camp-timber-albedo-v1.png',
+    import.meta.url
+  ).href,
+  ruinStone: new URL(
+    '../../assets/textures/world-1/meadow-wake/meadow-ruin-stone-albedo-v1.png',
+    import.meta.url
+  ).href,
+  canvas: new URL(
+    '../../assets/textures/world-1/meadow-wake/meadow-canvas-albedo-v1.png',
+    import.meta.url
+  ).href,
+  bark: new URL(
+    '../../assets/textures/world-1/meadow-wake/meadow-bark-albedo-v1.png',
     import.meta.url
   ).href
 });
@@ -46,6 +63,8 @@ export class MeadowWakeEnvironmentArt {
     this.height = height;
     this.loader = new THREE.TextureLoader();
     this.foliage = [];
+    this.midgroundLandmarks = [];
+    this.atmosphere = [];
     this.elapsed = 0;
 
     this.soilMaterial = new THREE.MeshStandardMaterial({
@@ -61,13 +80,13 @@ export class MeadowWakeEnvironmentArt {
       emissiveIntensity: 0.16
     });
     this.stoneMaterial = new THREE.MeshStandardMaterial({
-      color: 0x455044,
-      roughness: 0.98,
+      color: 0x59655a,
+      roughness: 0.92,
       metalness: 0
     });
     this.woodMaterial = new THREE.MeshStandardMaterial({
-      color: 0x714221,
-      roughness: 0.88,
+      color: 0x754522,
+      roughness: 0.9,
       metalness: 0
     });
 
@@ -85,6 +104,7 @@ export class MeadowWakeEnvironmentArt {
     });
 
     this.buildBackdrop();
+    this.buildMidgroundLandmarks();
   }
 
   buildBackdrop() {
@@ -126,6 +146,172 @@ export class MeadowWakeEnvironmentArt {
       hazeContinuation.position.x += offset;
       this.backgroundMid.add(hazeContinuation);
     }
+
+    const sunWashMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffefc7,
+      transparent: true,
+      opacity: 0.018,
+      depthWrite: false,
+      fog: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide
+    });
+    for (const [index, x] of [-490, -120, 320, 680].entries()) {
+      const shaft = new THREE.Mesh(new THREE.PlaneGeometry(180, 820), sunWashMaterial.clone());
+      shaft.name = 'MeadowWake_SoftSunShaft';
+      shaft.position.set(x, 70, -610);
+      shaft.rotation.z = -0.24 + index * 0.025;
+      shaft.material.opacity *= 0.82 + index * 0.06;
+      shaft.renderOrder = -880;
+      this.backgroundMid.add(shaft);
+      this.atmosphere.push({ object: shaft, phase: index * 1.7, sunShaft: true });
+    }
+  }
+
+  buildMidgroundLandmarks() {
+    const hazyLeaf = new THREE.MeshStandardMaterial({
+      color: 0x497e55,
+      roughness: 1,
+      metalness: 0,
+      transparent: true,
+      opacity: 0.76,
+      depthWrite: false
+    });
+    const hazyLeafLight = hazyLeaf.clone();
+    hazyLeafLight.color.setHex(0x689769);
+    const hazyStone = new THREE.MeshStandardMaterial({
+      color: 0x72877a,
+      roughness: 1,
+      metalness: 0,
+      transparent: true,
+      opacity: 0.72,
+      depthWrite: false
+    });
+    const hazyWood = new THREE.MeshStandardMaterial({
+      color: 0x6b5540,
+      roughness: 1,
+      metalness: 0,
+      transparent: true,
+      opacity: 0.72,
+      depthWrite: false
+    });
+    const distantWater = new THREE.MeshBasicMaterial({
+      color: 0xb8eff2,
+      transparent: true,
+      opacity: 0.2,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+    const smokeMaterial = new THREE.MeshBasicMaterial({
+      color: 0xe4eee0,
+      transparent: true,
+      opacity: 0.14,
+      depthWrite: false
+    });
+
+    for (const landmark of MEADOW_WAKE_MIDGROUND_LANDMARKS) {
+      const group = new THREE.Group();
+      group.name = `${landmark.id}_${landmark.type}_midground-landmark`;
+      group.position.set(
+        landmark.x * 70 * landmark.parallax - this.width / 2,
+        -228,
+        -520
+      );
+      group.scale.setScalar(landmark.scale ?? 1);
+      group.userData = {
+        baseX: group.position.x,
+        parallax: landmark.parallax,
+        phase: landmark.x * 0.17
+      };
+      this.scene.add(group);
+
+      if (landmark.type === 'tree-line') {
+        for (let index = 0; index < 9; index += 1) {
+          const trunk = new THREE.Mesh(new THREE.CylinderGeometry(6, 10, 112, 8), hazyWood);
+          trunk.position.set((index - 4) * 31, 52, -index % 3 * 5);
+          group.add(trunk);
+          for (let crown = 0; crown < 3; crown += 1) {
+            const foliage = new THREE.Mesh(
+              new THREE.DodecahedronGeometry(30 + (index + crown) % 3 * 5, 1),
+              crown % 2 ? hazyLeaf : hazyLeafLight
+            );
+            foliage.position.set(
+              (index - 4) * 31 + (crown - 1) * 14,
+              111 + crown % 2 * 22,
+              -8 + crown * 4
+            );
+            foliage.scale.set(1.15, 0.82, 0.7);
+            group.add(foliage);
+          }
+        }
+      } else if (landmark.type === 'ruin-silhouette') {
+        for (const [column, height] of [[-56, 112], [0, 168], [58, 126]]) {
+          const ruin = new THREE.Mesh(
+            chamferedLandmarkGeometry(48, height, 34),
+            hazyStone
+          );
+          ruin.position.set(column, height / 2, 0);
+          ruin.rotation.z = column === 0 ? 0.02 : column < 0 ? -0.04 : 0.05;
+          group.add(ruin);
+        }
+        const lintel = new THREE.Mesh(chamferedLandmarkGeometry(154, 24, 36), hazyStone);
+        lintel.position.set(0, 126, 0);
+        group.add(lintel);
+      } else if (landmark.type === 'camp-line') {
+        for (const offset of [-78, 42]) {
+          const tent = new THREE.Mesh(new THREE.ConeGeometry(74, 96, 4), hazyLeaf);
+          tent.rotation.y = Math.PI / 4;
+          tent.scale.z = 0.62;
+          tent.position.set(offset, 47, 0);
+          group.add(tent);
+          const mast = new THREE.Mesh(new THREE.CylinderGeometry(4, 5, 118, 8), hazyWood);
+          mast.position.set(offset, 58, 0);
+          group.add(mast);
+        }
+      } else if (landmark.type === 'waterfall') {
+        for (const offset of [-32, 0, 34]) {
+          const fall = new THREE.Mesh(
+            waterfallRibbonGeometry(
+              22 + Math.abs(offset) * 0.06,
+              184 - Math.abs(offset)
+            ),
+            distantWater
+          );
+          fall.position.set(offset, 92, 0);
+          group.add(fall);
+          this.atmosphere.push({ object: fall, phase: offset * 0.1 + landmark.x, waterfall: true });
+        }
+        for (let index = 0; index < 5; index += 1) {
+          const mist = new THREE.Mesh(new THREE.SphereGeometry(18 + index * 3, 12, 8), smokeMaterial);
+          mist.position.set((index - 2) * 16, 8 + index % 2 * 5, 4);
+          mist.scale.set(1.4, 0.5, 0.6);
+          group.add(mist);
+        }
+      } else if (landmark.type === 'smoke') {
+        for (let index = 0; index < 7; index += 1) {
+          const puff = new THREE.Mesh(
+            new THREE.SphereGeometry(18 + index * 2.5, 12, 8),
+            smokeMaterial.clone()
+          );
+          puff.position.set(
+            Math.sin(index * 1.4) * 15,
+            40 + index * 31,
+            -index * 3
+          );
+          puff.scale.set(1.1, 0.78, 0.68);
+          group.add(puff);
+          this.atmosphere.push({
+            object: puff,
+            phase: index * 0.83 + landmark.x,
+            smoke: true,
+            baseX: puff.position.x,
+            baseY: puff.position.y
+          });
+        }
+      }
+
+      this.midgroundLandmarks.push(group);
+    }
   }
 
   configureColorTexture(texture, { repeat = false } = {}) {
@@ -140,11 +326,15 @@ export class MeadowWakeEnvironmentArt {
   }
 
   async loadTextures() {
-    const [farValley, forestRidge, soil, turf] = await Promise.all([
+    const [farValley, forestRidge, soil, turf, timber, ruinStone, canvas, bark] = await Promise.all([
       this.loader.loadAsync(TEXTURE_URLS.farValley),
       this.loader.loadAsync(TEXTURE_URLS.forestRidge),
       this.loader.loadAsync(TEXTURE_URLS.soil),
-      this.loader.loadAsync(TEXTURE_URLS.turf)
+      this.loader.loadAsync(TEXTURE_URLS.turf),
+      this.loader.loadAsync(TEXTURE_URLS.timber),
+      this.loader.loadAsync(TEXTURE_URLS.ruinStone),
+      this.loader.loadAsync(TEXTURE_URLS.canvas),
+      this.loader.loadAsync(TEXTURE_URLS.bark)
     ]);
 
     this.farMaterial.map = this.configureColorTexture(farValley);
@@ -152,9 +342,29 @@ export class MeadowWakeEnvironmentArt {
     this.midMaterial.map = this.configureColorTexture(forestRidge);
     this.midMaterial.needsUpdate = true;
     this.soilMaterial.map = this.configureColorTexture(soil, { repeat: true });
+    this.soilMaterial.bumpMap = soil;
+    this.soilMaterial.bumpScale = 0.72;
     this.soilMaterial.needsUpdate = true;
     this.turfMaterial.map = this.configureColorTexture(turf, { repeat: true });
+    this.turfMaterial.bumpMap = turf;
+    this.turfMaterial.bumpScale = 0.42;
     this.turfMaterial.needsUpdate = true;
+    this.woodMaterial.map = this.configureColorTexture(timber, { repeat: true });
+    this.woodMaterial.bumpMap = timber;
+    this.woodMaterial.bumpScale = 0.48;
+    this.woodMaterial.color.setHex(0xffffff);
+    this.woodMaterial.needsUpdate = true;
+    this.stoneMaterial.map = this.configureColorTexture(ruinStone, { repeat: true });
+    this.stoneMaterial.bumpMap = ruinStone;
+    this.stoneMaterial.bumpScale = 0.6;
+    this.stoneMaterial.color.setHex(0xffffff);
+    this.stoneMaterial.needsUpdate = true;
+    this.detailTextures = Object.freeze({
+      timber,
+      ruinStone,
+      canvas: this.configureColorTexture(canvas, { repeat: true }),
+      bark: this.configureColorTexture(bark, { repeat: true })
+    });
   }
 
   addForegroundProp(definition, heightAt, scale) {
@@ -327,13 +537,68 @@ export class MeadowWakeEnvironmentArt {
     });
   }
 
-  update(cameraX, deltaSeconds) {
+  update(cameraX, cameraY, deltaSeconds) {
     this.elapsed += Math.min(deltaSeconds, 0.05);
     this.backgroundFar.position.x = -cameraX * 0.018;
+    this.backgroundFar.position.y = -cameraY * 0.025;
     this.backgroundMid.position.x = -cameraX * 0.11;
-    this.backgroundMid.position.y = Math.sin(this.elapsed * 0.14) * 1.5;
+    this.backgroundMid.position.y = -cameraY * 0.075 + Math.sin(this.elapsed * 0.14) * 1.5;
+    for (const group of this.midgroundLandmarks) {
+      group.position.x = group.userData.baseX - cameraX * group.userData.parallax;
+      group.position.y = -228 - cameraY * 0.11;
+    }
+    for (const entry of this.atmosphere) {
+      if (entry.smoke) {
+        const smokeTravel =
+          ((this.elapsed * 1.8 + entry.phase * 0.2) % 198 + 198) % 198;
+        entry.object.position.x =
+          entry.baseX + Math.sin(this.elapsed * 0.35 + entry.phase) * 3;
+        entry.object.position.y = entry.baseY + smokeTravel;
+      } else if (entry.waterfall) {
+        entry.object.material.opacity =
+          0.16 + Math.sin(this.elapsed * 1.6 + entry.phase) * 0.025;
+      } else if (entry.sunShaft) {
+        entry.object.material.opacity = 0.012 + Math.sin(this.elapsed * 0.18 + entry.phase) * 0.004;
+      } else {
+        entry.object.material.opacity = 0.05 + Math.sin(this.elapsed * 0.18 + entry.phase) * 0.012;
+      }
+    }
     for (const { cluster, phase } of this.foliage) {
       cluster.rotation.z = Math.sin(this.elapsed * 1.25 + phase) * 0.018;
     }
   }
+}
+
+function chamferedLandmarkGeometry(width, height, depth) {
+  const geometry = new THREE.BoxGeometry(width, height, depth, 2, 2, 1);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function waterfallRibbonGeometry(width, height, segments = 9) {
+  const positions = [];
+  const uvs = [];
+  const indices = [];
+  for (let index = 0; index <= segments; index += 1) {
+    const ratio = index / segments;
+    const y = height / 2 - ratio * height;
+    const taper = 0.86 + ratio * 0.24;
+    const drift = Math.sin(ratio * Math.PI * 3.2) * width * 0.12;
+    const halfWidth = width * taper * 0.5;
+    positions.push(drift - halfWidth, y, 0, drift + halfWidth, y, 0);
+    uvs.push(0, ratio, 1, ratio);
+    if (index < segments) {
+      const left = index * 2;
+      indices.push(left, left + 2, left + 1, left + 1, left + 2, left + 3);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute(positions, 3)
+  );
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
 }

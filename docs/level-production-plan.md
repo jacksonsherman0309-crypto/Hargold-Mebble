@@ -28,6 +28,8 @@ Every production level must satisfy these rules unless an explicit newer instruc
 
 - Strict linear side-scrolling gameplay plane.
 - Fully rendered 3D “2.75D” presentation target.
+- Use the approved Meadow Wake gameplay reference as the minimum quality floor for environment density, terrain volume, materials, lighting, parallax, and side-view composition while keeping all production assets and layouts original.
+- Apply the quality floor across the complete authored course. No section may fall back to generic boxes, repetitive procedural dressing, flat playable cards, or visibly unfinished background/foreground treatment.
 - Average completion target near two minutes at a moderately quick pace, excluding unusually large finales.
 - Required route remains completable by Hargold.
 - Wall-contact reactions are required, but unrestricted wall jumping is not currently enabled.
@@ -126,6 +128,7 @@ Construction direction:
 - After the checkpoint, alternate visible upper ledges and a lower creek route so route choice feels intentional.
 - Include one grouped Mebble section and one Hargold-only block group.
 - Preserve the approved bright layered valley background, lighting, atmosphere, depth, and color palette while bringing the collision-bearing foreground to the same visual finish.
+- Treat all seven Meadow Wake beats as one continuous environment finish pass: authored near-field props, modeled terrain relief, section-specific midground landmarks, stable warm daylight, atmospheric separation, and unobstructed landing/hazard silhouettes must continue through the goal.
 - Construct the seven authored beats as a continuously evolving approximately two-minute course with roughly 85% supported ground, meaningful ravines, dense coin guidance, camp decks, a fallen-log launch, breakable ruins, lifts, falling ledges, a rope bridge, creek routes, rotating stonework, and three graduated final gaps.
 
 ### 1-2 — Acorn Run
