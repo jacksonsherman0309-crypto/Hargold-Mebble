@@ -9,8 +9,8 @@ import {
   MEADOW_WAKE_WORLD_END,
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins
-} from './content/meadow-wake-course.js?v=authored-foreground-1';
-import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=authored-foreground-1';
+} from './content/meadow-wake-course.js?v=block-production-1';
+import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=block-production-1';
 
 const MODEL_SPECS = Object.freeze({
   Hargold: Object.freeze({
@@ -82,6 +82,10 @@ export class CharacterRenderer {
     this.scene.add(this.backgroundFar, this.backgroundMid);
     this.collectibleMeshes = [];
     this.blockSlots = [];
+    this.blockEffects = [];
+    this.blockEffectClock = 0;
+    this.blockShakeSeconds = 0;
+    this.blockShakeAmplitude = 0;
     this.platformSlots = [];
     this.mobMeshes = new Map();
     this.projectileMeshes = new Map();
@@ -321,6 +325,420 @@ export class CharacterRenderer {
     return slot;
   }
 
+  chamferedBlockGeometry(width, height, depth, radius = 5) {
+    const halfWidth = width / 2;
+    const halfHeight = height / 2;
+    const corner = Math.min(radius, halfWidth * 0.28, halfHeight * 0.28);
+    const shape = new THREE.Shape();
+    shape.moveTo(-halfWidth + corner, -halfHeight);
+    shape.lineTo(halfWidth - corner, -halfHeight);
+    shape.quadraticCurveTo(halfWidth, -halfHeight, halfWidth, -halfHeight + corner);
+    shape.lineTo(halfWidth, halfHeight - corner);
+    shape.quadraticCurveTo(halfWidth, halfHeight, halfWidth - corner, halfHeight);
+    shape.lineTo(-halfWidth + corner, halfHeight);
+    shape.quadraticCurveTo(-halfWidth, halfHeight, -halfWidth, halfHeight - corner);
+    shape.lineTo(-halfWidth, -halfHeight + corner);
+    shape.quadraticCurveTo(-halfWidth, -halfHeight, -halfWidth + corner, -halfHeight);
+    const geometry = new THREE.ExtrudeGeometry(shape, {
+      depth,
+      bevelEnabled: true,
+      bevelSegments: 2,
+      bevelSize: Math.min(2.4, corner * 0.45),
+      bevelThickness: 2,
+      curveSegments: 3,
+      steps: 1
+    });
+    geometry.center();
+    return geometry;
+  }
+
+  buildMeadowBlockVisual(definition, centreY) {
+    const scale = 70;
+    const width = definition.width * scale;
+    const height = definition.height * scale;
+    const depth = definition.type === 'hargold-only' ? 86 : 82;
+    const root = new THREE.Group();
+    root.name = `${definition.id}_${definition.type}_production-block`;
+    root.position.set(definition.x * scale, centreY, 0);
+    this.world.add(root);
+
+    const active = new THREE.Group();
+    active.name = `${definition.type}_active-state`;
+    const used = new THREE.Group();
+    used.name = `${definition.type}_used-solid-state`;
+    used.visible = false;
+    root.add(active, used);
+
+    const addMesh = (parent, name, geometry, material, position = [0, 0, 0]) => {
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.name = name;
+      mesh.position.set(...position);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      parent.add(mesh);
+      return mesh;
+    };
+    const standard = (color, roughness = 0.78, metalness = 0.02) =>
+      new THREE.MeshStandardMaterial({ color, roughness, metalness });
+    const stonePalette = [0x70543e, 0x806149, 0x624b3a, 0x8b6a4e, 0x594536];
+    const timber = standard(0x8a552d, 0.76);
+    const darkTimber = standard(0x4c3020, 0.86);
+    const moss = standard(0x537a35, 0.94);
+    const brass = standard(0xd49a35, 0.32, 0.5);
+    const warmGold = standard(0xf4bd35, 0.28, 0.58);
+    const frontZ = depth / 2 + 3;
+
+    const addStoneFace = parent => {
+      addMesh(
+        parent,
+        'fieldstone-block-core',
+        this.chamferedBlockGeometry(width, height, depth, 6),
+        standard(0x392d27, 0.92)
+      );
+      const cells = [
+        [-0.29, 0.27, 0.35, 0.37, -0.06],
+        [0.08, 0.3, 0.34, 0.3, 0.08],
+        [0.35, 0.22, 0.25, 0.42, -0.08],
+        [-0.34, -0.1, 0.28, 0.31, 0.09],
+        [-0.04, -0.04, 0.34, 0.39, -0.04],
+        [0.31, -0.13, 0.3, 0.28, 0.07],
+        [-0.27, -0.37, 0.38, 0.25, -0.05],
+        [0.15, -0.37, 0.43, 0.24, 0.04]
+      ];
+      cells.forEach(([x, y, w, h, angle], index) => {
+        const slab = addMesh(
+          parent,
+          'hand-set-breakable-stone',
+          this.chamferedBlockGeometry(width * w, height * h, 9 + index % 3, 3.5),
+          standard(stonePalette[index % stonePalette.length], 0.9),
+          [x * width, y * height, frontZ]
+        );
+        slab.rotation.z = angle;
+      });
+      for (const [x, y, angle, length] of [
+        [-0.13, 0.13, 0.75, 14],
+        [0.16, 0.01, -0.62, 12],
+        [-0.02, -0.23, 0.34, 13]
+      ]) {
+        const crack = addMesh(
+          parent,
+          'carved-break-line',
+          new THREE.BoxGeometry(length, 2.2, 2.5),
+          standard(0x271f1b, 1),
+          [x * width, y * height, frontZ + 8]
+        );
+        crack.rotation.z = angle;
+      }
+      for (const x of [-0.31, -0.08, 0.21, 0.36]) {
+        const tuft = addMesh(
+          parent,
+          'block-moss-tuft',
+          new THREE.DodecahedronGeometry(4.2, 0),
+          moss,
+          [x * width, height * 0.47, frontZ + 7]
+        );
+        tuft.scale.set(1.4, 0.55, 0.55);
+      }
+    };
+
+    const addFrame = (parent, bodyColor, panelColor, usedState = false) => {
+      addMesh(
+        parent,
+        usedState ? 'spent-block-body' : 'reward-block-body',
+        this.chamferedBlockGeometry(width, height, depth, 7),
+        standard(bodyColor, 0.82)
+      );
+      addMesh(
+        parent,
+        'recessed-carved-panel',
+        this.chamferedBlockGeometry(width * 0.67, height * 0.65, 10, 4),
+        standard(panelColor, usedState ? 0.92 : 0.66),
+        [0, 0, frontZ]
+      );
+      for (const [x, y, w, h] of [
+        [0, height * 0.4, width * 0.78, 6],
+        [0, -height * 0.4, width * 0.78, 6],
+        [-width * 0.4, 0, 6, height * 0.78],
+        [width * 0.4, 0, 6, height * 0.78]
+      ]) {
+        addMesh(parent, 'timber-reward-frame', new THREE.BoxGeometry(w, h, 11), darkTimber, [x, y, frontZ + 3]);
+      }
+      for (const [x, y] of [
+        [-width * 0.37, -height * 0.37],
+        [width * 0.37, -height * 0.37],
+        [-width * 0.37, height * 0.37],
+        [width * 0.37, height * 0.37]
+      ]) {
+        addMesh(
+          parent,
+          'forged-corner-rivet',
+          new THREE.SphereGeometry(3.6, 10, 7),
+          usedState ? standard(0x59564c, 0.7, 0.12) : brass,
+          [x, y, frontZ + 9]
+        );
+      }
+    };
+
+    if (definition.type === 'standard-breakable') {
+      addStoneFace(active);
+    } else if (definition.type === 'hargold-only') {
+      addMesh(
+        active,
+        'reinforced-explorer-stone',
+        this.chamferedBlockGeometry(width, height, depth, 7),
+        standard(0x55483b, 0.92)
+      );
+      for (const angle of [-0.72, 0.72]) {
+        const brace = addMesh(
+          active,
+          'reinforced-timber-crossbrace',
+          new THREE.BoxGeometry(width * 0.88, 9, 14),
+          timber,
+          [0, 0, frontZ + 1]
+        );
+        brace.rotation.z = angle;
+      }
+      const medallion = addMesh(
+        active,
+        'hargold-strength-medallion',
+        new THREE.CylinderGeometry(14, 14, 6, 20),
+        brass,
+        [0, 0, frontZ + 10]
+      );
+      medallion.rotation.x = Math.PI / 2;
+      const leaf = addMesh(
+        active,
+        'original-explorer-leaf-mark',
+        new THREE.SphereGeometry(7, 14, 8),
+        moss,
+        [0, 0, frontZ + 15]
+      );
+      leaf.scale.set(0.62, 1.15, 0.24);
+      leaf.rotation.z = -0.58;
+      for (const [x, y] of [
+        [-width * 0.38, -height * 0.38],
+        [width * 0.38, -height * 0.38],
+        [-width * 0.38, height * 0.38],
+        [width * 0.38, height * 0.38]
+      ]) {
+        addMesh(active, 'hargold-block-rivet', new THREE.SphereGeometry(4, 10, 7), brass, [x, y, frontZ + 8]);
+      }
+    } else {
+      const isCoin = definition.type === 'coin';
+      addFrame(active, isCoin ? 0x9a6028 : 0x315e3b, isCoin ? 0xd99728 : 0x477c49);
+      addFrame(used, 0x514b40, 0x6b675c, true);
+      const medallion = addMesh(
+        active,
+        isCoin ? 'trail-coin-compass-emblem' : 'explorer-power-emblem',
+        new THREE.CylinderGeometry(isCoin ? 13 : 12, isCoin ? 13 : 12, 5, 24),
+        isCoin ? warmGold : standard(0xd9cf7a, 0.5, 0.08),
+        [0, 0, frontZ + 11]
+      );
+      medallion.rotation.x = Math.PI / 2;
+      if (isCoin) {
+        addMesh(
+          active,
+          'coin-compass-ring',
+          new THREE.TorusGeometry(9, 1.5, 6, 24),
+          standard(0x8b571b, 0.5, 0.22),
+          [0, 0, frontZ + 15]
+        );
+        for (const angle of [0, Math.PI / 2, Math.PI / 4, -Math.PI / 4]) {
+          const needle = addMesh(
+            active,
+            'coin-compass-needle',
+            new THREE.BoxGeometry(2.1, angle % (Math.PI / 2) === 0 ? 15 : 12, 2),
+            standard(0x8b571b, 0.5, 0.22),
+            [0, 0, frontZ + 16]
+          );
+          needle.rotation.z = angle;
+        }
+      } else {
+        for (const [x, rotation] of [[-4.2, -0.58], [4.2, 0.58]]) {
+          const powerLeaf = addMesh(
+            active,
+            'paired-power-leaf',
+            new THREE.SphereGeometry(6.5, 14, 8),
+            standard(0x4f7d39, 0.74),
+            [x, 0, frontZ + 15]
+          );
+          powerLeaf.scale.set(0.55, 1.15, 0.24);
+          powerLeaf.rotation.z = rotation;
+        }
+      }
+      addMesh(
+        used,
+        'spent-block-ring',
+        new THREE.TorusGeometry(10, 1.8, 6, 24),
+        standard(0x45443e, 0.94),
+        [0, 0, frontZ + 14]
+      );
+    }
+
+    const flashMaterial = new THREE.MeshBasicMaterial({
+      color: 0xfff1b5,
+      transparent: true,
+      opacity: 0.56,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+    const flash = addMesh(
+      root,
+      'block-impact-flash',
+      this.chamferedBlockGeometry(width + 5, height + 5, 3, 7),
+      flashMaterial,
+      [0, 0, depth / 2 + 11]
+    );
+    flash.visible = false;
+
+    const artType = definition.type === 'hargold-only'
+      ? 'hargold'
+      : definition.type === 'standard-breakable'
+        ? 'breakable'
+        : definition.type;
+    const slot = {
+      id: definition.id,
+      type: artType,
+      gameplayType: definition.type,
+      root,
+      active,
+      used,
+      flash,
+      placeholder: root,
+      baseY: centreY,
+      lastImpactSerial: 0,
+      wasRevealed: !definition.hidden,
+      revealProgress: definition.hidden ? 0 : 1,
+      productionVisual: true
+    };
+    this.blockSlots.push(slot);
+    return slot;
+  }
+
+  spawnBlockEffect(mesh, {
+    life = 0.72,
+    velocity = new THREE.Vector3(),
+    angularVelocity = new THREE.Vector3(),
+    gravity = 520,
+    kind = 'debris'
+  } = {}) {
+    this.world.add(mesh);
+    this.blockEffects.push({
+      mesh,
+      life,
+      duration: life,
+      velocity,
+      angularVelocity,
+      gravity,
+      kind
+    });
+  }
+
+  spawnBlockImpact(slot, state) {
+    const x = slot.root.position.x;
+    const y = slot.root.position.y;
+    const z = 98;
+    const isBreak = state.impactKind === 'break' || state.impactKind === 'shell-break';
+    const dustMaterial = new THREE.MeshStandardMaterial({
+      color: 0xb89166,
+      roughness: 1,
+      transparent: true,
+      opacity: 0.8
+    });
+    for (let index = 0; index < (isBreak ? 10 : 4); index += 1) {
+      const angle = (index / (isBreak ? 10 : 4)) * Math.PI * 2 + 0.23;
+      const speed = isBreak ? 90 + (index % 4) * 24 : 42 + index * 7;
+      const particle = new THREE.Mesh(
+        new THREE.DodecahedronGeometry(isBreak ? 4.5 + index % 3 : 2.8, 0),
+        dustMaterial.clone()
+      );
+      particle.name = isBreak ? 'volumetric-block-debris' : 'block-impact-dust';
+      particle.position.set(x, y, z + index % 3);
+      particle.scale.set(1.1, 0.8, 0.72);
+      this.spawnBlockEffect(particle, {
+        life: isBreak ? 0.78 : 0.45,
+        velocity: new THREE.Vector3(Math.cos(angle) * speed, Math.sin(angle) * speed - 55, (index % 2 ? 1 : -1) * 12),
+        angularVelocity: new THREE.Vector3(2 + index, 3 + index * 0.4, 5 - index * 0.2),
+        gravity: isBreak ? 560 : 360
+      });
+    }
+
+    if (state.impactKind === 'coin-reward') {
+      const visibleRewardCount = Math.min(3, Math.max(1, Number(state.reward) || 1));
+      for (let index = 0; index < visibleRewardCount; index += 1) {
+        const coin = new THREE.Mesh(
+          new THREE.CylinderGeometry(10, 10, 4, 24),
+          new THREE.MeshStandardMaterial({
+            color: 0xffca3b,
+            emissive: 0x7b4300,
+            emissiveIntensity: 0.7,
+            roughness: 0.25,
+            metalness: 0.62
+          })
+        );
+        coin.name = 'block-reward-coin-pop';
+        coin.rotation.x = Math.PI / 2;
+        coin.position.set(x + (index - (visibleRewardCount - 1) / 2) * 14, y - 8, z + 8);
+        this.spawnBlockEffect(coin, {
+          life: 0.86,
+          velocity: new THREE.Vector3((index - 1) * 20, 128 + index * 10, 0),
+          angularVelocity: new THREE.Vector3(0, 8, 0),
+          gravity: 300,
+          kind: 'reward'
+        });
+      }
+    } else if (state.impactKind === 'power-reward') {
+      const glow = new THREE.Mesh(
+        new THREE.SphereGeometry(13, 18, 12),
+        new THREE.MeshBasicMaterial({
+          color: 0xb9ed79,
+          transparent: true,
+          opacity: 0.76,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        })
+      );
+      glow.name = 'block-power-leaf-glow';
+      glow.position.set(x, y, z + 8);
+      this.spawnBlockEffect(glow, {
+        life: 0.9,
+        velocity: new THREE.Vector3(0, 112, 0),
+        gravity: 160,
+        kind: 'reward'
+      });
+    }
+    this.blockShakeSeconds = Math.max(this.blockShakeSeconds, isBreak ? 0.2 : 0.1);
+    this.blockShakeAmplitude = Math.max(this.blockShakeAmplitude, isBreak ? 5.5 : 2.2);
+  }
+
+  updateBlockEffects(deltaSeconds) {
+    this.blockEffectClock += deltaSeconds;
+    for (const effect of this.blockEffects) {
+      effect.life -= deltaSeconds;
+      effect.velocity.y -= effect.gravity * deltaSeconds;
+      effect.mesh.position.addScaledVector(effect.velocity, deltaSeconds);
+      effect.mesh.rotation.x += effect.angularVelocity.x * deltaSeconds;
+      effect.mesh.rotation.y += effect.angularVelocity.y * deltaSeconds;
+      effect.mesh.rotation.z += effect.angularVelocity.z * deltaSeconds;
+      const remaining = Math.max(0, effect.life / effect.duration);
+      if (effect.mesh.material?.opacity !== undefined) {
+        effect.mesh.material.opacity = Math.min(effect.mesh.material.opacity, remaining);
+      }
+      if (effect.kind === 'reward') {
+        const pulse = 1 + Math.sin((1 - remaining) * Math.PI) * 0.28;
+        effect.mesh.scale.setScalar(pulse);
+      }
+    }
+    for (const effect of this.blockEffects.filter(effect => effect.life <= 0)) {
+      effect.mesh.removeFromParent();
+      effect.mesh.geometry?.dispose();
+      effect.mesh.material?.dispose();
+    }
+    this.blockEffects = this.blockEffects.filter(effect => effect.life > 0);
+    this.blockShakeSeconds = Math.max(0, this.blockShakeSeconds - deltaSeconds);
+    if (this.blockShakeSeconds === 0) this.blockShakeAmplitude = 0;
+  }
+
   buildMeadowWake() {
     const scale = 70;
     const points = MEADOW_WAKE_TERRAIN_POINTS;
@@ -380,48 +798,8 @@ export class CharacterRenderer {
     for (const definition of MEADOW_WAKE_PLATFORMS) this.buildPlatformVisual(definition);
 
     for (const definition of MEADOW_WAKE_BLOCK_DEFINITIONS) {
-      const { id, type, x, lift, width, height } = definition;
-      const artType = type === 'hargold-only'
-        ? 'hargold'
-        : type === 'standard-breakable'
-          ? 'breakable'
-          : type;
-      const centreY = this.height / 2 - (heightAt(x) - lift) * scale;
-      const blockMaterial = type === 'hargold-only'
-        ? this.material(0x6d553c)
-        : type === 'coin'
-          ? this.material(0xd99a22)
-          : type === 'power-up'
-            ? this.material(0x3d8750)
-            : stone;
-      const block = this.box(
-        type,
-        x * scale,
-        centreY,
-        width * scale,
-        height * scale,
-        type === 'hargold-only' ? 86 : 82,
-        blockMaterial
-      );
-      if (type === 'coin' || type === 'power-up') {
-        const emblem = new THREE.Mesh(
-          type === 'coin'
-            ? new THREE.TorusGeometry(11, 3.5, 8, 20)
-            : new THREE.ConeGeometry(10, 25, 5),
-          type === 'coin' ? gold : this.material(0xe6d477)
-        );
-        emblem.name = type === 'coin' ? 'trail-coin-emblem' : 'explorer-leaf-emblem';
-        emblem.position.set(0, 0, 43);
-        if (type === 'power-up') emblem.rotation.z = -0.35;
-        block.add(emblem);
-      }
-      this.blockSlots.push({
-        id,
-        type: artType,
-        gameplayType: type,
-        placeholder: block,
-        baseY: centreY
-      });
+      const centreY = this.height / 2 - (heightAt(definition.x) - definition.lift) * scale;
+      this.buildMeadowBlockVisual(definition, centreY);
     }
     const visualCoins = createMeadowWakeCoins(heightAt);
     visualCoins.forEach(({ x, y }, index) => {
@@ -588,6 +966,7 @@ export class CharacterRenderer {
         hargold: this.prepareImportedAsset(hargoldBlockGltf.scene)
       };
       for (const slot of this.blockSlots) {
+        if (slot.productionVisual) continue;
         if (!blockTemplates[slot.type]) continue;
         const importedBlock = blockTemplates[slot.type].clone(true);
         importedBlock.name = slot.type === 'hargold' ? 'HargoldOnlyBlockVisual' : 'BreakableBlockVisual';
@@ -781,23 +1160,47 @@ export class CharacterRenderer {
     }
   }
 
-  updateBlocks(blocks) {
+  updateBlocks(blocks, deltaSeconds) {
     const states = new Map(blocks.map(block => [block.id, block]));
     for (const slot of this.blockSlots) {
       const state = states.get(slot.id);
-      const visual = slot.visual || slot.placeholder;
-      visual.visible = !state?.broken && (!state?.hidden || state.revealed);
+      if (!state) continue;
+      const visual = slot.root || slot.visual || slot.placeholder;
+      if ((state.impactSerial ?? 0) < slot.lastImpactSerial) {
+        slot.lastImpactSerial = 0;
+      }
+      if ((state.impactSerial ?? 0) > slot.lastImpactSerial) {
+        slot.lastImpactSerial = state.impactSerial;
+        this.spawnBlockImpact(slot, state);
+      }
+
+      const revealed = !state.hidden || state.revealed;
+      if (revealed && !slot.wasRevealed) slot.revealProgress = 0;
+      slot.wasRevealed = revealed;
+      slot.revealProgress = revealed
+        ? Math.min(1, (slot.revealProgress ?? 1) + deltaSeconds * 8.5)
+        : 0;
+      visual.visible = !state.broken && revealed;
       if (!visual.visible) continue;
-      const bump = state?.bumpSeconds ?? 0;
-      visual.position.y = slot.baseY + (bump > 0 ? Math.sin(Math.min(1, bump / 0.12) * Math.PI) * 10 : 0);
-      if ((slot.type === 'coin' || slot.type === 'power-up') && visual.material?.color) {
-        visual.material.color.setHex(
-          state?.consumed
-            ? 0x716b5d
-            : slot.type === 'coin'
-              ? 0xd99a22
-              : 0x3d8750
-        );
+      const bump = state.bumpSeconds ?? 0;
+      const duration = Math.max(0.001, state.bumpDuration ?? 0.18);
+      const bumpProgress = bump > 0 ? 1 - bump / duration : 1;
+      const bumpOffset = bump > 0 ? Math.sin(bumpProgress * Math.PI) * 11 : 0;
+      visual.position.y = slot.baseY + bumpOffset;
+      const revealEase = 1 - Math.pow(1 - slot.revealProgress, 3);
+      const bumpSquash = bump > 0 ? Math.sin(bumpProgress * Math.PI) : 0;
+      visual.scale.set(
+        revealEase * (1 + bumpSquash * 0.06),
+        revealEase * (1 - bumpSquash * 0.08),
+        revealEase
+      );
+      if (slot.active && slot.used) {
+        slot.active.visible = !state.consumed;
+        slot.used.visible = Boolean(state.consumed);
+      }
+      if (slot.flash) {
+        slot.flash.visible = (state.flashSeconds ?? 0) > 0;
+        slot.flash.material.opacity = Math.min(0.62, (state.flashSeconds ?? 0) * 3.9);
       }
     }
   }
@@ -829,14 +1232,19 @@ export class CharacterRenderer {
     mobs = [],
     projectiles = []
   }, deltaSeconds) {
-    this.world.position.x = -cameraX - this.width / 2;
+    this.updateBlockEffects(deltaSeconds);
+    const shakeRatio = Math.min(1, this.blockShakeSeconds / 0.2);
+    const shakeX = Math.sin(this.blockEffectClock * 91) * this.blockShakeAmplitude * shakeRatio;
+    const shakeY = Math.cos(this.blockEffectClock * 77) * this.blockShakeAmplitude * 0.55 * shakeRatio;
+    this.world.position.x = -cameraX - this.width / 2 + shakeX;
+    this.world.position.y = shakeY;
     this.environmentArt.update(cameraX, deltaSeconds);
     for (const mesh of this.collectibleMeshes) {
       const source = mesh.userData.kind === 'coin' ? coins[mesh.userData.index] : compassCoins[mesh.userData.index];
       mesh.visible = !source?.taken;
       mesh.rotation.y += deltaSeconds * 2.7;
     }
-    this.updateBlocks(blocks);
+    this.updateBlocks(blocks, deltaSeconds);
     this.updatePlatforms(platforms);
     this.updateMobs(mobs, deltaSeconds);
     this.updateProjectiles(projectiles);

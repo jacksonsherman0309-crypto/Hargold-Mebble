@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js?v=authored-foreground-1';
+import { CharacterRenderer } from './character-renderer.js?v=block-production-1';
 import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
 import {
   MEADOW_WAKE_PITS,
@@ -8,7 +8,7 @@ import {
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins,
   createMeadowWakePlatforms
-} from './content/meadow-wake-course.js?v=authored-foreground-1';
+} from './content/meadow-wake-course.js?v=block-production-1';
 import {
   attackMob,
   createMob,
@@ -29,7 +29,7 @@ import {
   stepCoursePlatforms,
   transportRiderWithPlatform,
   supportHeightAt
-} from './gameplay/levels/platform-block-runtime.js?v=authored-foreground-1';
+} from './gameplay/levels/platform-block-runtime.js?v=block-production-1';
 
 /*
  * Browser-compatible test entry.
@@ -533,6 +533,10 @@ function restartCourse() {
     block.consumed = false;
     block.revealed = !block.hidden;
     block.bumpSeconds = 0;
+    block.bumpDuration = 0;
+    block.flashSeconds = 0;
+    block.impactSerial = 0;
+    block.impactKind = 'idle';
   }
   resetCoursePlatforms(platforms);
   player = createMotionState({ footX: session.spawnX, footY: terrain.heightAt(session.spawnX) });
@@ -726,6 +730,7 @@ function fixedUpdate(dt) {
   if (!player.grounded) {
     resolveOneWayPlatformLanding(player, previousPlayerFootY, activeSurfaces, motionBody(player));
   }
+  player.blockBreakStrength = player.hero === 'Hargold' || session.healthLayers > 1 ? 1 : 0;
   const blockEvent = resolveBlockHeadHit(player, previousHeadY, blocks, motionBody(player));
   if (blockEvent?.type === 'block-broken') {
     notice = blockEvent.blockType === 'hargold-only'
@@ -734,6 +739,9 @@ function fixedUpdate(dt) {
     noticeSeconds = 1.5;
   } else if (blockEvent?.type === 'block-rejected') {
     notice = 'That reinforced block requires Hargold.';
+    noticeSeconds = 1.8;
+  } else if (blockEvent?.type === 'block-too-strong') {
+    notice = 'This stonework needs explorer strength or a rolling Shellback.';
     noticeSeconds = 1.8;
   } else if (blockEvent?.type === 'block-coin') {
     awardStandardCoins(blockEvent.reward);

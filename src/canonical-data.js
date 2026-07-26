@@ -1,4 +1,4 @@
-export const CANON_VERSION = '2026-07-25-authored-foreground-density-1';
+export const CANON_VERSION = '2026-07-25-meadow-block-production-1';
 
 export const GAME_RULES = Object.freeze({
   platform: {
@@ -81,6 +81,17 @@ export const GAME_RULES = Object.freeze({
     exactStandardTypeCount: 4,
     types: ['standard-breakable', 'hargold-only', 'coin', 'power-up'],
     coinBlockUsesCoinSymbol: true,
+    standardBreakRequiresApprovedStrengthOrAction: true,
+    hargoldOnlyRejectsMebble: true,
+    rollingShellBreaksStandardOnly: true,
+    spentRewardBlocksRemainSolid: true,
+    hiddenBlocksBecomeSolidOnReveal: true,
+    requiredFeedback: Object.freeze([
+      'bump-displacement',
+      'squash-recovery',
+      'impact-response',
+      'outcome-specific-reward-or-debris'
+    ]),
     coinRewardPercentages: Object.freeze({ 1: 78, 5: 14, 10: 7, 100: 1 })
   },
   powerUps: [

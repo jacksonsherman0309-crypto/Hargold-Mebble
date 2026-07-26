@@ -34,6 +34,12 @@ assert.match(renderer, /shellback\.glb/);
 assert.match(renderer, /breakable_block\.glb/);
 assert.match(renderer, /hargold_block\.glb/);
 assert.match(renderer, /meadow_ledge\.glb/);
+assert.match(renderer, /buildMeadowBlockVisual/);
+assert.match(renderer, /chamferedBlockGeometry/);
+assert.match(renderer, /hand-set-breakable-stone/);
+assert.match(renderer, /volumetric-block-debris/);
+assert.match(renderer, /block-reward-coin-pop/);
+assert.match(renderer, /spent-block-body/);
 assert.match(renderer, /MeadowWakeEnvironmentArt/);
 assert.match(renderer, /environmentArt\.update\(cameraX, deltaSeconds\)/);
 assert.match(environmentRenderer, /backgroundFar\.position\.x = -cameraX \* 0\.018/);
@@ -81,7 +87,7 @@ assert.match(characterValidator, /segmented rigid limb geometry is forbidden/);
 
 const liveHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 assert.match(liveHtml, /data-action="sprint"/);
-assert.match(liveHtml, /authored-foreground-1/);
+assert.match(liveHtml, /block-production-1/);
 assert.match(renderer, /continuous-skin-3/);
 
 console.log(`Meadow Wake art pipeline checks passed from ${root}`);

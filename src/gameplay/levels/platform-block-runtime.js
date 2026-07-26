@@ -1,4 +1,19 @@
 const CONTACT_EPSILON = 0.035;
+const BLOCK_BUMP_SECONDS = 0.18;
+const BLOCK_FLASH_SECONDS = 0.16;
+
+function registerBlockImpact(block, kind, { bumpSeconds = BLOCK_BUMP_SECONDS } = {}) {
+  block.impactSerial = (block.impactSerial ?? 0) + 1;
+  block.impactKind = kind;
+  block.bumpDuration = bumpSeconds;
+  block.bumpSeconds = bumpSeconds;
+  block.flashSeconds = BLOCK_FLASH_SECONDS;
+}
+
+function standardBreakStrength(state) {
+  if (Number.isFinite(state.blockBreakStrength)) return state.blockBreakStrength;
+  return state.hero === 'Hargold' ? 1 : 0;
+}
 
 export function platformTop(platform, x = platform.x) {
   const seesawOffset = platform.motion?.type === 'seesaw'
@@ -73,8 +88,11 @@ export function resolveBlockHeadHit(state, previousHeadY, blocks, body) {
       currentHeadY <= underside + CONTACT_EPSILON;
     if (!crossedUnderside) continue;
 
-    const canBreak = block.type === 'standard-breakable' ||
-      (block.type === 'hargold-only' && state.hero === 'Hargold');
+    const requiredStrength = block.requiredStrength ?? 1;
+    const canBreakStandard = block.type === 'standard-breakable' &&
+      standardBreakStrength(state) >= requiredStrength;
+    const canBreakHargold = block.type === 'hargold-only' && state.hero === 'Hargold';
+    const canBreak = canBreakStandard || canBreakHargold;
     const rewardType = !block.consumed && block.type === 'coin'
       ? 'block-coin'
       : !block.consumed && block.type === 'power-up'
@@ -82,20 +100,39 @@ export function resolveBlockHeadHit(state, previousHeadY, blocks, body) {
         : null;
     block.broken = canBreak;
     block.revealed = true;
-    block.bumpSeconds = canBreak ? 0.18 : 0.14;
     if (rewardType) block.consumed = true;
+    const rejectedType = block.type === 'standard-breakable'
+      ? 'block-too-strong'
+      : block.type === 'hargold-only'
+        ? 'block-rejected'
+        : 'block-used';
+    const eventType = canBreak
+      ? 'block-broken'
+      : rewardType ?? rejectedType;
+    registerBlockImpact(
+      block,
+      canBreak
+        ? 'break'
+        : rewardType
+          ? block.type === 'coin'
+            ? 'coin-reward'
+            : 'power-reward'
+          : eventType === 'block-used'
+            ? 'used-hit'
+            : 'heavy-hit',
+      { bumpSeconds: canBreak ? 0.2 : 0.16 }
+    );
     state.footY = underside + body.height;
     state.velocityY = Math.max(0.8, Math.abs(state.velocityY) * 0.08);
     state.grounded = false;
     state.supportPlatformId = null;
     state.locomotion = 'fall';
     return {
-      type: canBreak
-        ? 'block-broken'
-        : rewardType ?? (block.consumed ? 'block-used' : 'block-rejected'),
+      type: eventType,
       blockId: block.id,
       blockType: block.type,
       hero: state.hero,
+      impactSerial: block.impactSerial,
       reward: rewardType === 'block-coin'
         ? (block.reward ?? 1)
         : rewardType === 'block-power-up'
@@ -146,7 +183,7 @@ export function breakBlocksWithRollingShell(shellBody, blocks) {
       shellBody.y + shellBody.height > blockBody.y;
     if (!overlaps) continue;
     block.broken = true;
-    block.bumpSeconds = 0.18;
+    registerBlockImpact(block, 'shell-break', { bumpSeconds: 0.2 });
     broken.push(block.id);
   }
   return broken;
@@ -155,6 +192,7 @@ export function breakBlocksWithRollingShell(shellBody, blocks) {
 export function stepBlockFeedback(blocks, deltaSeconds) {
   for (const block of blocks) {
     block.bumpSeconds = Math.max(0, block.bumpSeconds - deltaSeconds);
+    block.flashSeconds = Math.max(0, (block.flashSeconds ?? 0) - deltaSeconds);
   }
 }
 

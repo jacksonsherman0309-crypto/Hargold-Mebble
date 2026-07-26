@@ -182,6 +182,16 @@ Additional named materials may visually theme a Hargold-only block, but they do 
 
 Visible course blocks and traversable platforms are gameplay geometry. A rendered block must respond to a valid underside hit, enforce its hero interaction rule, and persist its consumed or destroyed state. A rendered one-way platform must support landing from above while permitting travel from below.
 
+Block interaction follows the locked original Meadow Wake feedback hierarchy:
+
+- Standard breakable blocks require an approved strength state or authored break action; an under-strength hit bumps and rebounds without destroying the block.
+- Hargold-only blocks reject Mebble with distinct heavy-impact feedback and remain intact.
+- A rolling Shellback may destroy standard breakable masonry where the authored course uses it to teach or open a route; it cannot destroy Hargold-only reinforcement.
+- Coin and power-up blocks become visibly spent but remain solid after dispensing their one-time reward.
+- A hidden reward block is non-solid before discovery, reveals on a valid underside strike, and becomes normal solid block geometry afterward.
+- Every strike must show a short force-transfer sequence: block displacement, squash/recovery, impact flash or material response, and an outcome-specific reward or debris effect.
+- Meadow Wake block art uses original volumetric fieldstone, timber, carved-panel, moss, rivet, and explorer-emblem construction. It may use familiar platformer readability but must not copy another game's block shape language, symbols, textures, meshes, code, or effects.
+
 ### Coin blocks
 
 - Bright yellow/gold is allowed.

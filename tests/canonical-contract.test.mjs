@@ -39,6 +39,17 @@ assert.deepEqual(GAME_RULES.health.instantDeathHazards, ['pit', 'lava', 'poison'
 
 assert.equal(GAME_RULES.blocks.exactStandardTypeCount, 4);
 assert.equal(GAME_RULES.blocks.types.length, 4);
+assert.equal(GAME_RULES.blocks.standardBreakRequiresApprovedStrengthOrAction, true);
+assert.equal(GAME_RULES.blocks.hargoldOnlyRejectsMebble, true);
+assert.equal(GAME_RULES.blocks.rollingShellBreaksStandardOnly, true);
+assert.equal(GAME_RULES.blocks.spentRewardBlocksRemainSolid, true);
+assert.equal(GAME_RULES.blocks.hiddenBlocksBecomeSolidOnReveal, true);
+assert.deepEqual(GAME_RULES.blocks.requiredFeedback, [
+  'bump-displacement',
+  'squash-recovery',
+  'impact-response',
+  'outcome-specific-reward-or-debris'
+]);
 assert.equal(sum(Object.values(GAME_RULES.blocks.coinRewardPercentages)), 100);
 assert.deepEqual(GAME_RULES.blocks.coinRewardPercentages, { 1: 78, 5: 14, 10: 7, 100: 1 });
 

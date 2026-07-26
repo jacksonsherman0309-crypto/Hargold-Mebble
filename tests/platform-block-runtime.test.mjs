@@ -72,7 +72,7 @@ assert.equal(
 );
 assert.equal(landingState.supportPlatformId, null);
 
-function hitBlock(hero, blockType) {
+function hitBlock(hero, blockType, blockBreakStrength) {
   const block = {
     id: `${hero}-${blockType}`,
     type: blockType,
@@ -86,6 +86,7 @@ function hitBlock(hero, blockType) {
   const body = { x: 1.6, y: 4.2, width: 0.8, height: 1.82 };
   const state = {
     hero,
+    blockBreakStrength,
     footY: body.y + body.height,
     velocityY: -6,
     grounded: false,
@@ -96,10 +97,17 @@ function hitBlock(hero, blockType) {
   return { block, state, event };
 }
 
-const standardHit = hitBlock('Mebble', 'standard-breakable');
+const standardHit = hitBlock('Mebble', 'standard-breakable', 1);
 assert.equal(standardHit.event?.type, 'block-broken');
 assert.equal(standardHit.block.broken, true);
 assert.ok(standardHit.state.velocityY > 0, 'a block hit must stop upward motion');
+assert.equal(standardHit.block.impactKind, 'break');
+assert.equal(standardHit.block.impactSerial, 1);
+
+const weakStandardHit = hitBlock('Mebble', 'standard-breakable', 0);
+assert.equal(weakStandardHit.event?.type, 'block-too-strong');
+assert.equal(weakStandardHit.block.broken, false);
+assert.equal(weakStandardHit.block.impactKind, 'heavy-hit');
 
 const rejectedHit = hitBlock('Mebble', 'hargold-only');
 assert.equal(rejectedHit.event?.type, 'block-rejected');
@@ -119,8 +127,10 @@ assert.deepEqual(
 );
 assert.equal(shellBlocks[0].broken, true);
 assert.equal(shellBlocks[1].broken, false);
+assert.equal(shellBlocks[0].impactKind, 'shell-break');
 stepBlockFeedback(shellBlocks, 1);
 assert.equal(shellBlocks[0].bumpSeconds, 0);
+assert.equal(shellBlocks[0].flashSeconds, 0);
 
 const solidBlocks = [
   { id: 'solid', type: 'hargold-only', x: 4, y: 5, width: 0.8, height: 0.8, broken: false }
@@ -176,7 +186,16 @@ assert.equal(hiddenReward?.type, 'block-coin');
 assert.equal(hiddenReward?.reward, 10);
 assert.equal(hiddenCoinBlock.revealed, true);
 assert.equal(hiddenCoinBlock.consumed, true);
+assert.equal(hiddenCoinBlock.impactKind, 'coin-reward');
 assert.ok(activeCourseSurfaces([], [hiddenCoinBlock]).length);
+const spentReward = resolveBlockHeadHit(
+  { ...hiddenState, velocityY: -6 },
+  4.48,
+  [hiddenCoinBlock],
+  hiddenBody
+);
+assert.equal(spentReward?.type, 'block-used');
+assert.equal(hiddenCoinBlock.broken, false, 'spent reward blocks remain solid');
 
 const movingPlatforms = createMeadowWakePlatforms();
 const movingStep = movingPlatforms.find(item => item.id === 'first-moving-step');
@@ -215,7 +234,7 @@ assert.equal(MEADOW_WAKE_SECTIONS.length, 7);
 assert.equal(MEADOW_WAKE_COMPASS_COIN_DEFINITIONS.length, 3);
 assert.ok(MEADOW_WAKE_COIN_DEFINITIONS.length >= 120);
 assert.ok(MEADOW_WAKE_PLATFORMS.length >= 35);
-assert.ok(MEADOW_WAKE_BLOCK_DEFINITIONS.length >= 30);
+assert.ok(MEADOW_WAKE_BLOCK_DEFINITIONS.length >= 48);
 assert.ok(meadowWakePitRatio() >= 0.1 && meadowWakePitRatio() <= 0.2);
 assert.ok(Math.abs(
   MEADOW_WAKE_PITS.reduce((total, pit) => total + pit.to - pit.from, 0) - 19
