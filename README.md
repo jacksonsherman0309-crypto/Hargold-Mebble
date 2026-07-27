@@ -36,6 +36,21 @@ Each course retains its authored identity, mechanics, beat flow, enemy roster an
 
 Shared schemas, loaders, validators, pooling, simulation, and editor tools may support the campaign. They may not generate generic replacements for authored courses.
 
+## Purpose-driven course construction
+
+Use [`docs/purpose-driven-level-blueprint.md`](docs/purpose-driven-level-blueprint.md) when authoring, converting, reviewing, or implementing course geometry and encounters.
+
+It establishes the required production grammar for:
+
+- functional block and structural-terrain placement;
+- permanent versus breakable route surfaces;
+- grounded-route, platform, and pit composition;
+- mechanic introduction and escalation;
+- enemy placement as traversal choreography;
+- recovery spacing, camera readability, and mandatory validation failures.
+
+Use [`schemas/level-blueprint.schema.json`](schemas/level-blueprint.schema.json) for machine-readable authored blueprint data and [`data/level-blueprints/world-1-template.json`](data/level-blueprints/world-1-template.json) as a planning scaffold. The template must be replaced with each course's exact authored content; it is not a universal course generator.
+
 ## Archived files already added directly
 
 These smaller files are already in GitHub:
@@ -53,6 +68,7 @@ Codex must begin with [`AGENTS.md`](AGENTS.md). Key sources include:
 - [`docs/canonical-design-bible.md`](docs/canonical-design-bible.md) — current design direction and hero canon.
 - [`docs/world-specific-archive-policy.md`](docs/world-specific-archive-policy.md) — mandatory authored-course preservation policy.
 - [`docs/level-production-plan.md`](docs/level-production-plan.md) — current campaign requirements.
+- [`docs/purpose-driven-level-blueprint.md`](docs/purpose-driven-level-blueprint.md) — functional terrain, blocks, pits, platforms, and enemy choreography contract.
 - [`docs/game-mechanics.md`](docs/game-mechanics.md) — gameplay mechanics.
 - [`docs/movement-and-collision-spec.md`](docs/movement-and-collision-spec.md) — movement and interaction contract.
 - [`src/canonical-data.js`](src/canonical-data.js) — current executable rules and campaign facts.
