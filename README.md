@@ -82,6 +82,22 @@ It locks these rules:
 
 Machine-readable values are stored in [`data/canonical/hidden-block-hint-and-xray-amendment.json`](data/canonical/hidden-block-hint-and-xray-amendment.json) and validated by [`schemas/hidden-block-hint-and-xray-amendment.schema.json`](schemas/hidden-block-hint-and-xray-amendment.schema.json). This amendment supersedes broader hidden-block hint suggestions in older planning material.
 
+## Level-clear currency rewards
+
+[`docs/level-clear-currency-reward-system.md`](docs/level-clear-currency-reward-system.md) is the newest authority for end-of-level currency payouts.
+
+Every valid level clear awards currency based on a 100-point performance score:
+
+- 25 guaranteed points for completing the course;
+- up to 25 points for clear speed;
+- up to 15 points for score-eligible standard coins;
+- up to 20 points for the three Compass Coins;
+- up to 15 points for the percentage of eligible mobs defeated.
+
+Difficulty applies a substantial final multiplier: Easy `1.0×`, Normal `1.5×`, Hard `2.5×`, and Impossible `4.0×`. Each course and difficulty must define its own base reward, gold/par/cutoff times, coin target, and stable eligible-mob IDs. Random coin-block payouts cannot change the performance score, and scoring eligibility cannot change any mob design, behavior, placement, or roster.
+
+Machine-readable values are stored in [`data/canonical/level-clear-currency-reward-system.json`](data/canonical/level-clear-currency-reward-system.json) and validated by [`schemas/level-clear-currency-reward-system.schema.json`](schemas/level-clear-currency-reward-system.schema.json). The final currency name, icon, wallet cap, shop prices, and repeat-clear payout policy remain intentionally unresolved.
+
 ## Archived files already added directly
 
 These smaller files are already in GitHub:
@@ -97,6 +113,7 @@ The larger standalone HTML builds, complete archived preproduction files, charac
 Codex must begin with [`AGENTS.md`](AGENTS.md). Key sources include:
 
 - [`docs/canonical-design-bible.md`](docs/canonical-design-bible.md) — current design direction and hero canon.
+- [`docs/level-clear-currency-reward-system.md`](docs/level-clear-currency-reward-system.md) — newest end-of-level performance score, difficulty multiplier, currency payout, results, and persistence authority.
 - [`docs/hidden-block-hint-and-xray-amendment.md`](docs/hidden-block-hint-and-xray-amendment.md) — newest hidden-block hint, difficulty, Impossible-label, and Mebble X-ray authority.
 - [`docs/course-format-and-hero-action-amendment.md`](docs/course-format-and-hero-action-amendment.md) — newest course-orientation, cape-glide, twirl-removal, and hero-slam authority.
 - [`docs/world-specific-archive-policy.md`](docs/world-specific-archive-policy.md) — mandatory authored-course preservation policy.
@@ -105,6 +122,7 @@ Codex must begin with [`AGENTS.md`](AGENTS.md). Key sources include:
 - [`docs/game-mechanics.md`](docs/game-mechanics.md) — gameplay mechanics, except where superseded by newer amendments.
 - [`docs/movement-and-collision-spec.md`](docs/movement-and-collision-spec.md) — movement and interaction contract, except where superseded by newer amendments.
 - [`src/canonical-data.js`](src/canonical-data.js) — current executable rules and campaign facts.
+- [`data/canonical/level-clear-currency-reward-system.json`](data/canonical/level-clear-currency-reward-system.json) — machine-readable newest reward rules pending runtime implementation.
 - [`data/canonical/hidden-block-hint-and-xray-amendment.json`](data/canonical/hidden-block-hint-and-xray-amendment.json) — machine-readable newest hidden-block and X-ray rules pending runtime migration.
 - [`data/canonical/course-and-action-amendment.json`](data/canonical/course-and-action-amendment.json) — machine-readable course/action rules pending migration into affected runtime modules.
 - [`src/runtime/fixed-step.js`](src/runtime/fixed-step.js) — deterministic 120 Hz simulation foundation.
