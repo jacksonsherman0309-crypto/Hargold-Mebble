@@ -1,0 +1,216 @@
+{
+  "$schema": "../../schemas/hidden-chest-mimic-and-world-trove-system.schema.json",
+  "version": "2026-07-27",
+  "status": "canonical_design_contract_pending_runtime_implementation",
+  "scope": {
+    "completionBearingCourses": "all",
+    "campaignWorldCount": 10,
+    "mobContentMustRemainUntouched": true
+  },
+  "perCourseChestPair": {
+    "genuineChestCount": 1,
+    "mimicCount": 1,
+    "genuineChest": {
+      "mainRoutePlacementAllowed": false,
+      "requiredAccessMethods": [
+        "hidden_area",
+        "tricky_gameplay_mechanic",
+        "timed_mechanism",
+        "hidden_switch",
+        "multi_step_mechanism",
+        "other_explicitly_approved_difficult_access"
+      ],
+      "reward": {
+        "extraLives": 2,
+        "currencyAmountPolicy": "course_authored_undecided"
+      },
+      "lifeCap": 99,
+      "lifeOverflowPolicy": "unresolved"
+    },
+    "mimic": {
+      "classificationUntilBehaviorApproval": "environmental_chest_hazard_or_interactable",
+      "countsAsNormalMob": false,
+      "preTriggerIndistinguishable": true,
+      "visualParityFields": [
+        "mesh",
+        "silhouette",
+        "scale",
+        "proportions",
+        "materials",
+        "colors",
+        "closed_pose",
+        "idle_presentation",
+        "shadow",
+        "highlight",
+        "interaction_treatment",
+        "pre_trigger_sound",
+        "camera_treatment",
+        "reward_framing"
+      ],
+      "prohibitedPreTriggerTells": [
+        "eyes",
+        "teeth",
+        "breathing",
+        "shaking",
+        "particles",
+        "discoloration",
+        "altered_lighting",
+        "unusual_sound",
+        "ui_warning",
+        "camera_warning",
+        "placement_grammar_tell"
+      ],
+      "placementParityRequired": true,
+      "identityRevealMoment": "on_reach_and_activation",
+      "postRevealBehavior": "unresolved",
+      "xrayMayIdentifyMimic": false
+    },
+    "repeatabilityPolicy": "unresolved",
+    "transactionIdempotencyRequired": true
+  },
+  "worldTreasureTroves": {
+    "trovesPerWorld": 1,
+    "totalCampaignTroves": 10,
+    "expertlyHidden": true,
+    "purpose": "reward_exploration_and_secret_seeking",
+    "interior": {
+      "largeCoinPathRequired": true,
+      "coinPathBeginsAfterEntranceDiscovery": true,
+      "coinPathDetectableFromMainCourseOnNonEasy": false,
+      "primaryChestAtCoinPathEnd": true
+    },
+    "reward": {
+      "extraLives": 7,
+      "currencyAmountPolicy": "world_authored_massive_undecided",
+      "mustExceedNormalChestCurrency": true,
+      "specialRewardCount": 1,
+      "specialRewardPolicy": "world_authored_undecided_except_worlds_2_and_7"
+    },
+    "lifeCap": 99,
+    "lifeOverflowPolicy": "unresolved",
+    "difficultyLocationPolicy": {
+      "easyLocationMustDifferFromAllHigherDifficulties": true,
+      "normalHardImpossibleMayShareOrDiffer": true,
+      "locationAuthoredPerDifficulty": true
+    },
+    "hintPolicy": {
+      "easy": {
+        "gameplayHintAllowed": true,
+        "hintLanguage": "unresolved_do_not_implement_until_approved"
+      },
+      "normal": {
+        "gameplayHintAllowed": false
+      },
+      "hard": {
+        "gameplayHintAllowed": false
+      },
+      "impossible": {
+        "gameplayHintAllowed": false
+      }
+    },
+    "prohibitedNonEasyHintChannels": [
+      "coins_before_entrance",
+      "weather_interaction",
+      "audio",
+      "music_change",
+      "lighting",
+      "glow",
+      "reflection",
+      "shadow",
+      "outline",
+      "scenery_gap",
+      "crack",
+      "marking",
+      "asymmetry",
+      "camera_pause",
+      "camera_zoom",
+      "camera_pan",
+      "camera_focus",
+      "ui_indicator",
+      "map_marker",
+      "counter",
+      "notification",
+      "npc_dialogue",
+      "environmental_text",
+      "particles",
+      "dust",
+      "mist",
+      "snow",
+      "sand",
+      "footprints",
+      "visible_room_geometry",
+      "automatic_route_assistance"
+    ],
+    "xrayPolicy": {
+      "revealsHiddenBlocksOnly": true,
+      "revealsTroveEntrance": false,
+      "revealsTroveRoom": false,
+      "revealsChestIdentity": false,
+      "revealsShortestRoute": false
+    },
+    "accessRequirements": {
+      "deterministic": true,
+      "randomizedSolutionAllowed": false,
+      "allowedExamples": [
+        "deep_hidden_switch",
+        "multi_stage_switch_sequence",
+        "strict_timed_mechanism",
+        "difficult_character_ability_sequence",
+        "unusual_deterministic_interaction_chain",
+        "concealed_optional_route_continuation",
+        "non_routine_activation_order",
+        "world_specific_exploration_puzzle"
+      ],
+      "mustRespectNoUnderwaterLevels": true,
+      "mustRespectNoVerticalLevels": true
+    }
+  },
+  "exclusiveTroveSkills": {
+    "world2": {
+      "rewardType": "learned_skill",
+      "skillIdentity": "undecided",
+      "onlyAcquisitionSource": "world_2_treasure_trove"
+    },
+    "world7": {
+      "rewardType": "learned_skill",
+      "skillIdentity": "undecided",
+      "onlyAcquisitionSource": "world_7_treasure_trove"
+    },
+    "prohibitedAlternativeSources": [
+      "normal_level_completion",
+      "other_chest",
+      "other_trove",
+      "shop",
+      "mob_drop",
+      "boss_drop",
+      "power_up_block",
+      "currency_purchase",
+      "achievement",
+      "difficulty_completion",
+      "other_campaign_path"
+    ],
+    "persistentProfileUnlockRequired": true
+  },
+  "saveTracking": [
+    "genuine_course_chest_discovered",
+    "genuine_course_chest_reward_claimed",
+    "course_mimic_triggered",
+    "world_trove_discovered",
+    "world_trove_reward_claimed",
+    "world_2_trove_skill_acquired",
+    "world_7_trove_skill_acquired"
+  ],
+  "unresolved": [
+    "normal_chest_currency_amounts",
+    "trove_currency_amounts",
+    "mimic_post_reveal_behavior",
+    "mimic_damage_and_defeat_rules",
+    "mimic_reward_outcome",
+    "easy_trove_hint_language",
+    "world_2_skill_identity_and_mechanics",
+    "world_7_skill_identity_and_mechanics",
+    "other_world_special_rewards",
+    "life_overflow_behavior",
+    "reward_repeatability_across_replays_and_difficulties"
+  ]
+}
