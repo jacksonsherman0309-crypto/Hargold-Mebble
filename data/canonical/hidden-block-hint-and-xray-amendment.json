@@ -1,0 +1,129 @@
+{
+  "$schema": "../../schemas/hidden-block-hint-and-xray-amendment.schema.json",
+  "authority": {
+    "approvedDate": "2026-07-27",
+    "supersedesOlderHintRules": true,
+    "highestDifficulty": "Impossible",
+    "supersededHighestDifficultyLabel": "Nightmare"
+  },
+  "allowedPreDiscoveryHintChannels": [
+    "coins",
+    "weather"
+  ],
+  "prohibitedPreDiscoveryHintChannels": [
+    "shadows",
+    "wall_markings",
+    "sound_cues",
+    "lighting",
+    "scenery_asymmetry",
+    "block_row_gaps",
+    "camera_emphasis",
+    "ui_markers",
+    "text_tutorials",
+    "non_weather_particles"
+  ],
+  "difficultyOrder": [
+    "Easy",
+    "Normal",
+    "Hard",
+    "Impossible"
+  ],
+  "difficultyRules": {
+    "Easy": {
+      "coinHints": "allowed_primary",
+      "weatherHints": "allowed_readable",
+      "jumpBlockingFrequency": "very_few",
+      "firstContactMustUsuallyBeRecoverable": true
+    },
+    "Normal": {
+      "coinHints": "allowed_reduced",
+      "weatherHints": "allowed_moderate",
+      "jumpBlockingFrequency": "selected_levels",
+      "everyLevelRequiresJumpBlocker": false
+    },
+    "Hard": {
+      "coinHints": "prohibited",
+      "weatherHints": "light_brief_only",
+      "jumpBlockingFrequency": "common",
+      "continuousBlockOutlineProhibited": true
+    },
+    "Impossible": {
+      "coinHints": "prohibited",
+      "weatherHints": "prohibited",
+      "allNaturalHints": "prohibited",
+      "jumpBlockingFrequency": "highest",
+      "discoveryMethods": [
+        "testing",
+        "memory",
+        "level_knowledge",
+        "mebble_xray_view"
+      ]
+    }
+  },
+  "weatherHintRules": {
+    "collisionReactive": true,
+    "changesCollision": false,
+    "permanentlyRevealsBlock": false,
+    "supportedAtmosphere": [
+      "snow",
+      "sand",
+      "mist",
+      "rain",
+      "ash",
+      "pollen"
+    ]
+  },
+  "coinHintRules": {
+    "enabledDifficulties": [
+      "Easy",
+      "Normal"
+    ],
+    "disabledDifficulties": [
+      "Hard",
+      "Impossible"
+    ],
+    "literalBlockOutlineProhibited": true,
+    "arrowGraphicProhibited": true
+  },
+  "jumpBlockingRules": {
+    "deterministicPlacement": true,
+    "consistentCollision": true,
+    "requiredRouteMustRemainPossible": true,
+    "visibleAfterDiscovery": true,
+    "randomLocationsProhibited": true,
+    "impossibleRouteStateProhibited": true
+  },
+  "mebbleXrayView": {
+    "name": "X-ray View",
+    "hero": "Mebble",
+    "learnedProgressionSkill": true,
+    "availableByDefault": false,
+    "randomPowerup": false,
+    "worksOnAllDifficulties": true,
+    "revealsAllHiddenBlockCategories": true,
+    "worksThroughWeather": true,
+    "revealsLocationAndBounds": true,
+    "automaticallyActivatesBlocks": false,
+    "automaticallyConsumesBlocks": false,
+    "changesCollision": false,
+    "originalVisualIdentityRequired": true,
+    "unresolvedImplementationDetails": [
+      "input_mapping",
+      "duration",
+      "cooldown",
+      "resource_cost",
+      "held_or_toggled"
+    ],
+    "prohibitedUnapprovedBehavior": [
+      "consumable_cost",
+      "random_failure",
+      "difficulty_lockout"
+    ]
+  },
+  "mobScope": {
+    "designChangesAllowed": false,
+    "behaviorChangesAllowed": false,
+    "placementChangesAllowed": false,
+    "rosterChangesAllowed": false
+  }
+}
