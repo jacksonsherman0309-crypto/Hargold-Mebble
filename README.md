@@ -51,6 +51,20 @@ It establishes the required production grammar for:
 
 Use [`schemas/level-blueprint.schema.json`](schemas/level-blueprint.schema.json) for machine-readable authored blueprint data and [`data/level-blueprints/world-1-template.json`](data/level-blueprints/world-1-template.json) as a planning scaffold. The template must be replaced with each course's exact authored content; it is not a universal course generator.
 
+## Locked course format and hero actions
+
+[`docs/course-format-and-hero-action-amendment.md`](docs/course-format-and-hero-action-amendment.md) is the newest authority for course orientation and the affected movement animations. It locks the following repository-wide rules:
+
+- no underwater levels or prolonged swimming courses;
+- no vertical levels, vertical towers, or continuous vertical autoscroll;
+- horizontal side-scrolling progression remains mandatory;
+- Mebble's cape opens into a broad wing-like glide silhouette with limited slow-fall and horizontal correction;
+- the general airborne twirl is removed unless a later explicit exception is approved;
+- Hargold's slam is a belly-first flop;
+- Mebble's slam is a fist-first dive bomb.
+
+Machine-readable values are stored in [`data/canonical/course-and-action-amendment.json`](data/canonical/course-and-action-amendment.json) and validated by [`schemas/course-and-action-amendment.schema.json`](schemas/course-and-action-amendment.schema.json). Older documents, prototypes, tests, and archived plans must be migrated when they conflict.
+
 ## Archived files already added directly
 
 These smaller files are already in GitHub:
@@ -66,12 +80,14 @@ The larger standalone HTML builds, complete archived preproduction files, charac
 Codex must begin with [`AGENTS.md`](AGENTS.md). Key sources include:
 
 - [`docs/canonical-design-bible.md`](docs/canonical-design-bible.md) — current design direction and hero canon.
+- [`docs/course-format-and-hero-action-amendment.md`](docs/course-format-and-hero-action-amendment.md) — newest course-orientation, cape-glide, twirl-removal, and hero-slam authority.
 - [`docs/world-specific-archive-policy.md`](docs/world-specific-archive-policy.md) — mandatory authored-course preservation policy.
 - [`docs/level-production-plan.md`](docs/level-production-plan.md) — current campaign requirements.
 - [`docs/purpose-driven-level-blueprint.md`](docs/purpose-driven-level-blueprint.md) — functional terrain, blocks, pits, platforms, and enemy choreography contract.
-- [`docs/game-mechanics.md`](docs/game-mechanics.md) — gameplay mechanics.
-- [`docs/movement-and-collision-spec.md`](docs/movement-and-collision-spec.md) — movement and interaction contract.
+- [`docs/game-mechanics.md`](docs/game-mechanics.md) — gameplay mechanics, except where superseded by the newer amendment.
+- [`docs/movement-and-collision-spec.md`](docs/movement-and-collision-spec.md) — movement and interaction contract, except where superseded by the newer amendment.
 - [`src/canonical-data.js`](src/canonical-data.js) — current executable rules and campaign facts.
+- [`data/canonical/course-and-action-amendment.json`](data/canonical/course-and-action-amendment.json) — machine-readable newest rules pending migration into affected runtime modules.
 - [`src/runtime/fixed-step.js`](src/runtime/fixed-step.js) — deterministic 120 Hz simulation foundation.
 - [`docs/historical-build-handoff.md`](docs/historical-build-handoff.md) — archived Build 025–030 scope and production boundaries.
 - `archive/imported-packages` — preserved complete world, level, mob, boss, and runtime archives after import.
