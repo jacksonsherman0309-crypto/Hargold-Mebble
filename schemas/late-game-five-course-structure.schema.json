@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hargold-mebble.local/schemas/late-game-five-course-structure.schema.json",
+  "title": "Late-Game Five-Course Structure",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "authority",
+    "totalCoursesIncludesBoss",
+    "worlds",
+    "optionalInCourseContentAllowed",
+    "optionalContentMayUnlockAdditionalCourse",
+    "supersedes"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "authority": { "const": "newest" },
+    "totalCoursesIncludesBoss": { "const": true },
+    "worlds": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "worldId",
+          "label",
+          "courseCount",
+          "standardCourseCount",
+          "bossCourseIndex",
+          "boss",
+          "forkedRoute",
+          "hiddenExitCourse",
+          "additionalSecretCourse"
+        ],
+        "properties": {
+          "worldId": { "enum": [8, 9, 10] },
+          "label": { "type": "string", "minLength": 1 },
+          "courseCount": { "const": 5 },
+          "standardCourseCount": { "const": 4 },
+          "bossCourseIndex": { "const": 5 },
+          "boss": { "enum": ["Bone Crusher", "Tempest Warden", "General Gobbler"] },
+          "forkedRoute": { "const": false },
+          "hiddenExitCourse": { "const": false },
+          "additionalSecretCourse": { "const": false }
+        }
+      }
+    },
+    "optionalInCourseContentAllowed": { "const": true },
+    "optionalContentMayUnlockAdditionalCourse": { "const": false },
+    "supersedes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}
