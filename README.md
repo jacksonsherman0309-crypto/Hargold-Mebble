@@ -116,6 +116,7 @@ It locks these rules:
 - Easy is the only difficulty that may eventually receive a separately approved trove hint;
 - Normal, Hard, and Impossible troves have no gameplay hints of any kind;
 - the interior coin path cannot be seen or detected before entry on Normal, Hard, or Impossible;
+- Mebble's X-ray View reveals hidden blocks only and never reveals a trove entrance, trove room, shortest route, or real-versus-mimic chest identity;
 - trove discovery, chest claims, mimic triggers, and exclusive-skill awards require idempotent save tracking.
 
 Machine-readable values are stored in [`data/canonical/hidden-chest-mimic-and-world-trove-system.json`](data/canonical/hidden-chest-mimic-and-world-trove-system.json) and validated by [`schemas/hidden-chest-mimic-and-world-trove-system.schema.json`](schemas/hidden-chest-mimic-and-world-trove-system.schema.json). Mimic behavior, currency amounts, Easy hint language, reward repeatability, life overflow, the World 2 and World 7 skill designs, and the other world-specific special rewards remain intentionally unresolved.
