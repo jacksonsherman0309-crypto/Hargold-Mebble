@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hargold-mebble.local/schemas/hidden-block-hint-and-xray-amendment.schema.json",
+  "title": "Hidden Block Hint and Mebble X-Ray Amendment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "authority",
+    "allowedPreDiscoveryHintChannels",
+    "prohibitedPreDiscoveryHintChannels",
+    "difficultyOrder",
+    "difficultyRules",
+    "weatherHintRules",
+    "coinHintRules",
+    "jumpBlockingRules",
+    "mebbleXrayView",
+    "mobScope"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "approvedDate",
+        "supersedesOlderHintRules",
+        "highestDifficulty",
+        "supersededHighestDifficultyLabel"
+      ],
+      "properties": {
+        "approvedDate": { "type": "string", "format": "date" },
+        "supersedesOlderHintRules": { "const": true },
+        "highestDifficulty": { "const": "Impossible" },
+        "supersededHighestDifficultyLabel": { "const": "Nightmare" }
+      }
+    },
+    "allowedPreDiscoveryHintChannels": {
+      "type": "array",
+      "prefixItems": [
+        { "const": "coins" },
+        { "const": "weather" }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "prohibitedPreDiscoveryHintChannels": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "difficultyOrder": {
+      "type": "array",
+      "prefixItems": [
+        { "const": "Easy" },
+        { "const": "Normal" },
+        { "const": "Hard" },
+        { "const": "Impossible" }
+      ],
+      "items": false,
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "difficultyRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["Easy", "Normal", "Hard", "Impossible"],
+      "properties": {
+        "Easy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["coinHints", "weatherHints", "jumpBlockingFrequency", "firstContactMustUsuallyBeRecoverable"],
+          "properties": {
+            "coinHints": { "const": "allowed_primary" },
+            "weatherHints": { "const": "allowed_readable" },
+            "jumpBlockingFrequency": { "const": "very_few" },
+            "firstContactMustUsuallyBeRecoverable": { "const": true }
+          }
+        },
+        "Normal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["coinHints", "weatherHints", "jumpBlockingFrequency", "everyLevelRequiresJumpBlocker"],
+          "properties": {
+            "coinHints": { "const": "allowed_reduced" },
+            "weatherHints": { "const": "allowed_moderate" },
+            "jumpBlockingFrequency": { "const": "selected_levels" },
+            "everyLevelRequiresJumpBlocker": { "const": false }
+          }
+        },
+        "Hard": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["coinHints", "weatherHints", "jumpBlockingFrequency", "continuousBlockOutlineProhibited"],
+          "properties": {
+            "coinHints": { "const": "prohibited" },
+            "weatherHints": { "const": "light_brief_only" },
+            "jumpBlockingFrequency": { "const": "common" },
+            "continuousBlockOutlineProhibited": { "const": true }
+          }
+        },
+        "Impossible": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["coinHints", "weatherHints", "allNaturalHints", "jumpBlockingFrequency", "discoveryMethods"],
+          "properties": {
+            "coinHints": { "const": "prohibited" },
+            "weatherHints": { "const": "prohibited" },
+            "allNaturalHints": { "const": "prohibited" },
+            "jumpBlockingFrequency": { "const": "highest" },
+            "discoveryMethods": {
+              "type": "array",
+              "minItems": 4,
+              "uniqueItems": true,
+              "contains": { "const": "mebble_xray_view" },
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "weatherHintRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collisionReactive", "changesCollision", "permanentlyRevealsBlock", "supportedAtmosphere"],
+      "properties": {
+        "collisionReactive": { "const": true },
+        "changesCollision": { "const": false },
+        "permanentlyRevealsBlock": { "const": false },
+        "supportedAtmosphere": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "coinHintRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabledDifficulties", "disabledDifficulties", "literalBlockOutlineProhibited", "arrowGraphicProhibited"],
+      "properties": {
+        "enabledDifficulties": {
+          "type": "array",
+          "prefixItems": [{ "const": "Easy" }, { "const": "Normal" }],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "disabledDifficulties": {
+          "type": "array",
+          "prefixItems": [{ "const": "Hard" }, { "const": "Impossible" }],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "literalBlockOutlineProhibited": { "const": true },
+        "arrowGraphicProhibited": { "const": true }
+      }
+    },
+    "jumpBlockingRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deterministicPlacement",
+        "consistentCollision",
+        "requiredRouteMustRemainPossible",
+        "visibleAfterDiscovery",
+        "randomLocationsProhibited",
+        "impossibleRouteStateProhibited"
+      ],
+      "properties": {
+        "deterministicPlacement": { "const": true },
+        "consistentCollision": { "const": true },
+        "requiredRouteMustRemainPossible": { "const": true },
+        "visibleAfterDiscovery": { "const": true },
+        "randomLocationsProhibited": { "const": true },
+        "impossibleRouteStateProhibited": { "const": true }
+      }
+    },
+    "mebbleXrayView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "hero",
+        "learnedProgressionSkill",
+        "availableByDefault",
+        "randomPowerup",
+        "worksOnAllDifficulties",
+        "revealsAllHiddenBlockCategories",
+        "worksThroughWeather",
+        "revealsLocationAndBounds",
+        "automaticallyActivatesBlocks",
+        "automaticallyConsumesBlocks",
+        "changesCollision",
+        "originalVisualIdentityRequired",
+        "unresolvedImplementationDetails",
+        "prohibitedUnapprovedBehavior"
+      ],
+      "properties": {
+        "name": { "const": "X-ray View" },
+        "hero": { "const": "Mebble" },
+        "learnedProgressionSkill": { "const": true },
+        "availableByDefault": { "const": false },
+        "randomPowerup": { "const": false },
+        "worksOnAllDifficulties": { "const": true },
+        "revealsAllHiddenBlockCategories": { "const": true },
+        "worksThroughWeather": { "const": true },
+        "revealsLocationAndBounds": { "const": true },
+        "automaticallyActivatesBlocks": { "const": false },
+        "automaticallyConsumesBlocks": { "const": false },
+        "changesCollision": { "const": false },
+        "originalVisualIdentityRequired": { "const": true },
+        "unresolvedImplementationDetails": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string" }
+        },
+        "prohibitedUnapprovedBehavior": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "mobScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["designChangesAllowed", "behaviorChangesAllowed", "placementChangesAllowed", "rosterChangesAllowed"],
+      "properties": {
+        "designChangesAllowed": { "const": false },
+        "behaviorChangesAllowed": { "const": false },
+        "placementChangesAllowed": { "const": false },
+        "rosterChangesAllowed": { "const": false }
+      }
+    }
+  }
+}
