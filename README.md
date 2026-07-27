@@ -98,6 +98,26 @@ Difficulty applies a substantial final multiplier: Easy `1.0×`, Normal `1.5×`,
 
 Machine-readable values are stored in [`data/canonical/level-clear-currency-reward-system.json`](data/canonical/level-clear-currency-reward-system.json) and validated by [`schemas/level-clear-currency-reward-system.schema.json`](schemas/level-clear-currency-reward-system.schema.json). The final currency name, icon, wallet cap, shop prices, and repeat-clear payout policy remain intentionally unresolved.
 
+## Hidden reward chests, chest mimics, and world treasure troves
+
+[`docs/hidden-chest-mimic-and-world-trove-system.md`](docs/hidden-chest-mimic-and-world-trove-system.md) is the newest authority for course chests and world treasure troves.
+
+It locks these rules:
+
+- every completion-bearing course contains exactly one genuine hidden reward chest and exactly one chest mimic;
+- the genuine chest requires a hidden area, tricky mechanic, timed mechanism, hidden switch, or comparable difficult access;
+- every genuine course chest awards exactly 2 extra lives plus an authored, still-undecided currency amount;
+- the mimic must look, sound, frame, and place identically enough that the player cannot identify it before reaching and activating it;
+- Mebble's X-ray View cannot distinguish the mimic from the genuine chest;
+- every world contains exactly one expertly hidden treasure trove;
+- each trove contains an interior coin path leading to a chest with exactly 7 extra lives, a massive authored currency amount, and one special reward;
+- the World 2 and World 7 trove rewards are exclusive learned skills unavailable anywhere else in the game;
+- Easy uses a different trove location from the higher difficulties;
+- Normal, Hard, and Impossible troves have no gameplay hints of any kind;
+- trove discovery, chest claims, mimic triggers, and exclusive-skill awards require idempotent save tracking.
+
+Machine-readable values are stored in [`data/canonical/hidden-chest-mimic-and-world-trove-system.json`](data/canonical/hidden-chest-mimic-and-world-trove-system.json) and validated by [`schemas/hidden-chest-mimic-and-world-trove-system.schema.json`](schemas/hidden-chest-mimic-and-world-trove-system.schema.json). Mimic behavior, currency amounts, Easy hint language, reward repeatability, life overflow, the World 2 and World 7 skill designs, and the other world-specific special rewards remain intentionally unresolved.
+
 ## Archived files already added directly
 
 These smaller files are already in GitHub:
@@ -113,6 +133,7 @@ The larger standalone HTML builds, complete archived preproduction files, charac
 Codex must begin with [`AGENTS.md`](AGENTS.md). Key sources include:
 
 - [`docs/canonical-design-bible.md`](docs/canonical-design-bible.md) — current design direction and hero canon.
+- [`docs/hidden-chest-mimic-and-world-trove-system.md`](docs/hidden-chest-mimic-and-world-trove-system.md) — newest per-course chest pair, mimic parity, world trove, no-hint, and exclusive-skill authority.
 - [`docs/level-clear-currency-reward-system.md`](docs/level-clear-currency-reward-system.md) — newest end-of-level performance score, difficulty multiplier, currency payout, results, and persistence authority.
 - [`docs/hidden-block-hint-and-xray-amendment.md`](docs/hidden-block-hint-and-xray-amendment.md) — newest hidden-block hint, difficulty, Impossible-label, and Mebble X-ray authority.
 - [`docs/course-format-and-hero-action-amendment.md`](docs/course-format-and-hero-action-amendment.md) — newest course-orientation, cape-glide, twirl-removal, and hero-slam authority.
@@ -122,11 +143,12 @@ Codex must begin with [`AGENTS.md`](AGENTS.md). Key sources include:
 - [`docs/game-mechanics.md`](docs/game-mechanics.md) — gameplay mechanics, except where superseded by newer amendments.
 - [`docs/movement-and-collision-spec.md`](docs/movement-and-collision-spec.md) — movement and interaction contract, except where superseded by newer amendments.
 - [`src/canonical-data.js`](src/canonical-data.js) — current executable rules and campaign facts.
+- [`data/canonical/hidden-chest-mimic-and-world-trove-system.json`](data/canonical/hidden-chest-mimic-and-world-trove-system.json) — machine-readable newest chest, mimic, trove, and exclusive-skill rules pending runtime implementation.
 - [`data/canonical/level-clear-currency-reward-system.json`](data/canonical/level-clear-currency-reward-system.json) — machine-readable newest reward rules pending runtime implementation.
 - [`data/canonical/hidden-block-hint-and-xray-amendment.json`](data/canonical/hidden-block-hint-and-xray-amendment.json) — machine-readable newest hidden-block and X-ray rules pending runtime migration.
 - [`data/canonical/course-and-action-amendment.json`](data/canonical/course-and-action-amendment.json) — machine-readable course/action rules pending migration into affected runtime modules.
 - [`src/runtime/fixed-step.js`](src/runtime/fixed-step.js) — deterministic 120 Hz simulation foundation.
-- [`docs/historical-build-handoff.md`](docs/historical-build-handoff.md) — archived Build 025–030 scope and production boundaries.
+- [`docs/historical-build-handoff.md`](docs/historical-build-handoff.md) — archived Build 025–030 handoff and production boundaries.
 - `archive/imported-packages` — preserved complete world, level, mob, boss, and runtime archives after import.
 
 ## Run the current browser prototype
