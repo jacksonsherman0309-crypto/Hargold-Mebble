@@ -65,6 +65,23 @@ Use [`schemas/level-blueprint.schema.json`](schemas/level-blueprint.schema.json)
 
 Machine-readable values are stored in [`data/canonical/course-and-action-amendment.json`](data/canonical/course-and-action-amendment.json) and validated by [`schemas/course-and-action-amendment.schema.json`](schemas/course-and-action-amendment.schema.json). Older documents, prototypes, tests, and archived plans must be migrated when they conflict.
 
+## Hidden-block hints and Mebble X-ray View
+
+[`docs/hidden-block-hint-and-xray-amendment.md`](docs/hidden-block-hint-and-xray-amendment.md) is the newest authority for hidden-block clues and Mebble's learned detection skill.
+
+It locks these rules:
+
+- hidden blocks may be hinted only by coins or approved weather interaction;
+- Easy allows readable coin and weather hints;
+- Normal allows reduced coin and weather hints;
+- Hard prohibits coin hints and permits only a light, brief weather display;
+- Impossible prohibits coin, weather, audio, lighting, scenery, UI, camera, and every other natural hint;
+- Impossible replaces Nightmare as the fourth and highest difficulty label;
+- Mebble learns `X-ray View`, which can reveal every hidden block category on every difficulty without automatically activating or consuming the blocks;
+- mob design, behavior, placement, and roster remain untouched by this amendment.
+
+Machine-readable values are stored in [`data/canonical/hidden-block-hint-and-xray-amendment.json`](data/canonical/hidden-block-hint-and-xray-amendment.json) and validated by [`schemas/hidden-block-hint-and-xray-amendment.schema.json`](schemas/hidden-block-hint-and-xray-amendment.schema.json). This amendment supersedes broader hidden-block hint suggestions in older planning material.
+
 ## Archived files already added directly
 
 These smaller files are already in GitHub:
@@ -80,14 +97,16 @@ The larger standalone HTML builds, complete archived preproduction files, charac
 Codex must begin with [`AGENTS.md`](AGENTS.md). Key sources include:
 
 - [`docs/canonical-design-bible.md`](docs/canonical-design-bible.md) — current design direction and hero canon.
+- [`docs/hidden-block-hint-and-xray-amendment.md`](docs/hidden-block-hint-and-xray-amendment.md) — newest hidden-block hint, difficulty, Impossible-label, and Mebble X-ray authority.
 - [`docs/course-format-and-hero-action-amendment.md`](docs/course-format-and-hero-action-amendment.md) — newest course-orientation, cape-glide, twirl-removal, and hero-slam authority.
 - [`docs/world-specific-archive-policy.md`](docs/world-specific-archive-policy.md) — mandatory authored-course preservation policy.
 - [`docs/level-production-plan.md`](docs/level-production-plan.md) — current campaign requirements.
-- [`docs/purpose-driven-level-blueprint.md`](docs/purpose-driven-level-blueprint.md) — functional terrain, blocks, pits, platforms, and enemy choreography contract.
-- [`docs/game-mechanics.md`](docs/game-mechanics.md) — gameplay mechanics, except where superseded by the newer amendment.
-- [`docs/movement-and-collision-spec.md`](docs/movement-and-collision-spec.md) — movement and interaction contract, except where superseded by the newer amendment.
+- [`docs/purpose-driven-level-blueprint.md`](docs/purpose-driven-level-blueprint.md) — functional terrain, blocks, pits, platforms, and enemy choreography contract, except where superseded by the hidden-block amendment.
+- [`docs/game-mechanics.md`](docs/game-mechanics.md) — gameplay mechanics, except where superseded by newer amendments.
+- [`docs/movement-and-collision-spec.md`](docs/movement-and-collision-spec.md) — movement and interaction contract, except where superseded by newer amendments.
 - [`src/canonical-data.js`](src/canonical-data.js) — current executable rules and campaign facts.
-- [`data/canonical/course-and-action-amendment.json`](data/canonical/course-and-action-amendment.json) — machine-readable newest rules pending migration into affected runtime modules.
+- [`data/canonical/hidden-block-hint-and-xray-amendment.json`](data/canonical/hidden-block-hint-and-xray-amendment.json) — machine-readable newest hidden-block and X-ray rules pending runtime migration.
+- [`data/canonical/course-and-action-amendment.json`](data/canonical/course-and-action-amendment.json) — machine-readable course/action rules pending migration into affected runtime modules.
 - [`src/runtime/fixed-step.js`](src/runtime/fixed-step.js) — deterministic 120 Hz simulation foundation.
 - [`docs/historical-build-handoff.md`](docs/historical-build-handoff.md) — archived Build 025–030 scope and production boundaries.
 - `archive/imported-packages` — preserved complete world, level, mob, boss, and runtime archives after import.
