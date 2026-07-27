@@ -1,0 +1,344 @@
+{
+  "levelId": "world-1-authored-template",
+  "world": 1,
+  "title": "Replace With Authored Course Title",
+  "archetype": "grounded_intro",
+  "authoredIdentity": {
+    "summary": "Describe the exact course identity and why it belongs in World 1.",
+    "signature": "Describe the unique final impression or set piece.",
+    "mustPreserve": [
+      "Exact primary mechanic",
+      "Exact enemy purposes",
+      "Three authored Compass Coin solutions",
+      "Mandatory route for both heroes",
+      "Checkpoint and recovery rhythm"
+    ]
+  },
+  "targetClearTimeSeconds": {
+    "expert": 105,
+    "firstClear": 180,
+    "exploratory": 300
+  },
+  "routeComposition": {
+    "groundPercent": 72,
+    "platformPercent": 18,
+    "pitPercent": 10
+  },
+  "primaryMechanic": "Replace with the exact authored mechanic",
+  "secondaryMechanic": null,
+  "primaryEnemyFamily": "Camp Critter",
+  "secondaryEnemyFamilies": ["Shellback"],
+  "segments": [
+    {
+      "segmentId": "s01-opening-read",
+      "role": "opening_read",
+      "terrainProfile": "Broad safe ground with a shallow rise and full forward visibility.",
+      "requiredAction": "Move and perform one normal jump without pit consequence.",
+      "optionalAction": "Reach a low reward block.",
+      "blocks": [
+        {
+          "kind": "coin_block",
+          "count": 1,
+          "breakability": "interactive_unbreakable",
+          "purposeTags": ["reward_container", "mechanic_tutorial"],
+          "mandatoryRouteDependency": false,
+          "notes": "Introduces upward block interaction without serving as filler."
+        }
+      ],
+      "platforms": [],
+      "pits": [],
+      "enemies": [
+        {
+          "mobId": "Camp Critter",
+          "pattern": "basic_approach",
+          "purpose": "Teach the common ground enemy on broad safe terrain.",
+          "movementBoundsVisible": true,
+          "blindLandingRisk": false,
+          "notes": "Single isolated introduction."
+        }
+      ],
+      "reward": "Small coin reward",
+      "collectibleStatus": null,
+      "recovery": "Entire segment is low pressure.",
+      "camera": "Show the next landform and keep all collision edges readable.",
+      "difficultyScore": 1,
+      "validationFlags": []
+    },
+    {
+      "segmentId": "s02-first-interaction",
+      "role": "first_interaction",
+      "terrainProfile": "Safe ground shaped around the primary mechanic.",
+      "requiredAction": "Use the primary mechanic once in isolation.",
+      "optionalAction": null,
+      "blocks": [],
+      "platforms": [],
+      "pits": [],
+      "enemies": [],
+      "reward": null,
+      "collectibleStatus": null,
+      "recovery": "Safe floor remains beneath the mechanic.",
+      "camera": "Reveal the full mechanic cycle before commitment.",
+      "difficultyScore": 1.5,
+      "validationFlags": []
+    },
+    {
+      "segmentId": "s03-confirmation",
+      "role": "confirmation",
+      "terrainProfile": "A minor variation of the first interaction.",
+      "requiredAction": "Repeat the mechanic with one added movement decision.",
+      "optionalAction": "Take a small elevated reward route.",
+      "blocks": [
+        {
+          "kind": "structural_terrain",
+          "count": 3,
+          "breakability": "unbreakable",
+          "purposeTags": ["elevation_step", "landing_surface"],
+          "mandatoryRouteDependency": true,
+          "notes": "Required route support must never be breakable."
+        }
+      ],
+      "platforms": [],
+      "pits": [],
+      "enemies": [],
+      "reward": "Useful reward or power-up support",
+      "collectibleStatus": null,
+      "recovery": "Broad landing after the action.",
+      "camera": "Keep both route heights visible.",
+      "difficultyScore": 2,
+      "validationFlags": []
+    },
+    {
+      "segmentId": "s04-elevation-change",
+      "role": "elevation_change",
+      "terrainProfile": "Run-up flat, shallow hill, crest, and stable descending shelf.",
+      "requiredAction": "Adjust jump timing to uneven terrain.",
+      "optionalAction": "Use the crest to reach an upper shelf.",
+      "blocks": [],
+      "platforms": [],
+      "pits": [],
+      "enemies": [
+        {
+          "mobId": "Camp Critter",
+          "pattern": "terrain_assisted",
+          "purpose": "Change the enemy approach angle using the hill crest.",
+          "movementBoundsVisible": true,
+          "blindLandingRisk": false,
+          "notes": "Enemy becomes visible before the player commits over the crest."
+        }
+      ],
+      "reward": null,
+      "collectibleStatus": null,
+      "recovery": "Stable shelf after the slope.",
+      "camera": "Do not let the crest hide collision-critical information.",
+      "difficultyScore": 2.5,
+      "validationFlags": []
+    },
+    {
+      "segmentId": "s05-meaningful-encounter",
+      "role": "meaningful_encounter",
+      "terrainProfile": "Primary mechanic terrain combined with one enemy family.",
+      "requiredAction": "Read the terrain and enemy as one encounter.",
+      "optionalAction": "Reach Compass Coin 1 through a safer or more skillful branch.",
+      "blocks": [],
+      "platforms": [],
+      "pits": [],
+      "enemies": [
+        {
+          "mobId": "Shellback",
+          "pattern": "enemy_as_tool",
+          "purpose": "Connect combat interaction to traversal or reward access.",
+          "movementBoundsVisible": true,
+          "blindLandingRisk": false,
+          "notes": "Do not substitute a generic archetype for the named mob."
+        }
+      ],
+      "reward": null,
+      "collectibleStatus": "Compass Coin 1 authored solution placeholder",
+      "recovery": "Safe main route remains available.",
+      "camera": "Frame the enemy, reward, and reconnection point together.",
+      "difficultyScore": 3,
+      "validationFlags": []
+    },
+    {
+      "segmentId": "s06-optional-route",
+      "role": "optional_route",
+      "terrainProfile": "Upper and lower routes that reconnect cleanly.",
+      "requiredAction": "Complete the lower mandatory route with either hero.",
+      "optionalAction": "Use the upper route for speed, coins, or a secret hint.",
+      "blocks": [
+        {
+          "kind": "standard_breakable",
+          "count": 2,
+          "breakability": "breakable",
+          "purposeTags": ["destructible_shortcut", "secret_route_hint"],
+          "mandatoryRouteDependency": false,
+          "notes": "Breaking these blocks changes an optional route only."
+        }
+      ],
+      "platforms": [
+        {
+          "motion": "fixed",
+          "purpose": "risky_shortcut",
+          "approachReadable": true,
+          "destinationReadable": true,
+          "recoveryAvailable": true,
+          "notes": "Optional platform route drops safely back to the mandatory path on failure."
+        }
+      ],
+      "pits": [],
+      "enemies": [],
+      "reward": "Coins or secret-route information",
+      "collectibleStatus": null,
+      "recovery": "Both routes reconnect on broad terrain.",
+      "camera": "Show both routes and the reconnection point.",
+      "difficultyScore": 3.5,
+      "validationFlags": []
+    },
+    {
+      "segmentId": "s07-pre-checkpoint-test",
+      "role": "pre_checkpoint_test",
+      "terrainProfile": "Moderate combination of established terrain and enemy behavior.",
+      "requiredAction": "Complete a combined challenge without any new rule.",
+      "optionalAction": null,
+      "blocks": [],
+      "platforms": [],
+      "pits": [
+        {
+          "purpose": "basic_jump_test",
+          "consequence": "instant_death",
+          "previewed": true,
+          "landingReadable": true,
+          "notes": "First meaningful pit has generous takeoff and landing space."
+        }
+      ],
+      "enemies": [],
+      "reward": "Checkpoint after earned success",
+      "collectibleStatus": null,
+      "recovery": "Checkpoint and broad stable ground immediately follow.",
+      "camera": "Show the entire jump before commitment.",
+      "difficultyScore": 4,
+      "validationFlags": []
+    },
+    {
+      "segmentId": "s08-post-checkpoint-variation",
+      "role": "post_checkpoint_variation",
+      "terrainProfile": "Primary mechanic in a changed terrain context.",
+      "requiredAction": "Apply the learned rule with one secondary modifier.",
+      "optionalAction": null,
+      "blocks": [],
+      "platforms": [],
+      "pits": [],
+      "enemies": [],
+      "reward": "Power-up support before escalation when required",
+      "collectibleStatus": null,
+      "recovery": "Short safe setup after the checkpoint.",
+      "camera": "Preview the changed context before player entry.",
+      "difficultyScore": 4.5,
+      "validationFlags": []
+    },
+    {
+      "segmentId": "s09-advanced-combination",
+      "role": "advanced_combination",
+      "terrainProfile": "Established mechanic combined with one established hazard or enemy.",
+      "requiredAction": "Coordinate movement timing and enemy reading.",
+      "optionalAction": null,
+      "blocks": [
+        {
+          "kind": "structural_terrain",
+          "count": 4,
+          "breakability": "unbreakable",
+          "purposeTags": ["hazard_cover", "landing_surface"],
+          "mandatoryRouteDependency": true,
+          "notes": "Provides permanent cover and a required landing."
+        }
+      ],
+      "platforms": [],
+      "pits": [],
+      "enemies": [
+        {
+          "mobId": "Replace with authored secondary mob",
+          "pattern": "overhead_pressure",
+          "purpose": "Prevent automatic jumping while preserving a readable safe response.",
+          "movementBoundsVisible": true,
+          "blindLandingRisk": false,
+          "notes": "Use only when this enemy belongs to the authored course roster."
+        }
+      ],
+      "reward": null,
+      "collectibleStatus": null,
+      "recovery": "Stable ground after the combination.",
+      "camera": "Keep projectile or aerial lanes fully readable.",
+      "difficultyScore": 5,
+      "validationFlags": []
+    },
+    {
+      "segmentId": "s10-optional-mastery",
+      "role": "optional_mastery",
+      "terrainProfile": "Optional skill route above or adjacent to the main path.",
+      "requiredAction": "Continue safely on the mandatory route.",
+      "optionalAction": "Use advanced movement for Compass Coin 2 or 3.",
+      "blocks": [],
+      "platforms": [
+        {
+          "motion": "fixed",
+          "purpose": "collectible_route",
+          "approachReadable": true,
+          "destinationReadable": true,
+          "recoveryAvailable": true,
+          "notes": "Failure returns the player to the main route rather than causing death where practical."
+        }
+      ],
+      "pits": [],
+      "enemies": [],
+      "reward": null,
+      "collectibleStatus": "Compass Coin 2 or 3 authored solution placeholder",
+      "recovery": "Safe drop or route reconnection.",
+      "camera": "Show the mastery route and safe fallback.",
+      "difficultyScore": 5.5,
+      "validationFlags": []
+    },
+    {
+      "segmentId": "s11-final-exam",
+      "role": "final_exam",
+      "terrainProfile": "Strongest legal combination of previously introduced course rules.",
+      "requiredAction": "Complete the primary mechanic under established enemy or pit pressure.",
+      "optionalAction": null,
+      "blocks": [],
+      "platforms": [],
+      "pits": [],
+      "enemies": [],
+      "reward": null,
+      "collectibleStatus": null,
+      "recovery": "Broad stable ground immediately after success.",
+      "camera": "No new hazard may enter from outside the visible play area.",
+      "difficultyScore": 6,
+      "validationFlags": []
+    },
+    {
+      "segmentId": "s12-goal-approach",
+      "role": "goal_approach",
+      "terrainProfile": "Short celebratory run with a visible goal.",
+      "requiredAction": "Reach the goal without an unfair last-second hazard.",
+      "optionalAction": "Perform one satisfying final jump.",
+      "blocks": [],
+      "platforms": [],
+      "pits": [],
+      "enemies": [],
+      "reward": "Goal completion",
+      "collectibleStatus": null,
+      "recovery": "Low-pressure finish.",
+      "camera": "Goal remains visible and collision edges stay clear.",
+      "difficultyScore": 1.5,
+      "validationFlags": []
+    }
+  ],
+  "validationNotes": [
+    "Replace every placeholder with exact authored course content.",
+    "Do not use this file to generate generic replacements for archived course plans.",
+    "Verify that route percentages total 100.",
+    "Verify that every collision-bearing block has a purpose tag.",
+    "Verify that every mandatory route works for Hargold with currently unlocked abilities.",
+    "Verify that no required platform is breakable.",
+    "Verify that enemy placements retain named mob behavior and authored purpose."
+  ]
+}
