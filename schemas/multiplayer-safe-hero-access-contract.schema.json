@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hargold-mebble.local/schemas/multiplayer-safe-hero-access-contract.schema.json",
+  "title": "Multiplayer-Safe Hero Access Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "status",
+    "routine_switching_required",
+    "future_multiplayer_compatible",
+    "core_rule",
+    "approved_shared_access_results",
+    "single_player_rules",
+    "multiplayer_rules",
+    "forbidden_patterns",
+    "required_obstacle_fields"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "string" },
+    "status": { "const": "canonical" },
+    "routine_switching_required": { "const": false },
+    "future_multiplayer_compatible": { "const": true },
+    "core_rule": { "type": "string", "minLength": 1 },
+    "approved_shared_access_results": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "single_player_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "swapping_allowed",
+        "routine_back_and_forth_forbidden",
+        "mandatory_hero_interactions_grouped",
+        "shared_route_must_remain_open",
+        "common_jumps_checkpoints_exits_require_swapping"
+      ],
+      "properties": {
+        "swapping_allowed": { "const": true },
+        "routine_back_and_forth_forbidden": { "const": true },
+        "mandatory_hero_interactions_grouped": { "const": true },
+        "shared_route_must_remain_open": { "const": true },
+        "common_jumps_checkpoints_exits_require_swapping": { "const": false }
+      }
+    },
+    "multiplayer_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "no_permanent_stranding",
+        "mandatory_doors_wait_for_both",
+        "single_use_mechanisms_may_strand_second_player",
+        "hero_routes_require_regroup_point",
+        "both_heroes_reach_all_mandatory_checkpoints",
+        "both_heroes_reach_normal_exit",
+        "boss_arena_must_admit_both",
+        "disconnect_and_death_must_not_corrupt_mechanisms"
+      ],
+      "properties": {
+        "no_permanent_stranding": { "const": true },
+        "mandatory_doors_wait_for_both": { "const": true },
+        "single_use_mechanisms_may_strand_second_player": { "const": false },
+        "hero_routes_require_regroup_point": { "const": true },
+        "both_heroes_reach_all_mandatory_checkpoints": { "const": true },
+        "both_heroes_reach_normal_exit": { "const": true },
+        "boss_arena_must_admit_both": { "const": true },
+        "disconnect_and_death_must_not_corrupt_mechanisms": { "const": true }
+      }
+    },
+    "forbidden_patterns": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "required_obstacle_fields": {
+      "type": "array",
+      "minItems": 13,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}
