@@ -113,6 +113,7 @@ It locks these rules:
 - each trove contains an interior coin path leading to a chest with exactly 7 extra lives, a massive authored currency amount, and one special reward;
 - the World 2 and World 7 trove rewards are exclusive learned skills unavailable anywhere else in the game;
 - Easy uses a different trove location from the higher difficulties;
+- Easy is the only difficulty that may eventually receive a separately approved trove hint;
 - Normal, Hard, and Impossible troves have no gameplay hints of any kind;
 - trove discovery, chest claims, mimic triggers, and exclusive-skill awards require idempotent save tracking.
 
