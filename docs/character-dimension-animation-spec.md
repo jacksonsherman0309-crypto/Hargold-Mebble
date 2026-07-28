@@ -249,6 +249,78 @@ elbow and knee loops, adequate hands, rounded footwear, clean neck transitions,
 stable cape topology and normals, clean UVs, and planned LODs. Optimization may
 remove hidden waste but may not destroy visible roundness.
 
+## Organic construction gate
+
+The locked character sheets and the approved compact/tall featureless frames
+are the silhouette authority. The full body volume must fit that silhouette
+before secondary costume, facial, surface, or material detail is approved.
+
+Each hero requires one connected watertight deforming body surface integrating
+the face, neck, torso, shoulders, arms, hands, fingers, pelvis, thighs, knees,
+and shins. Multiple disconnected anatomical islands inside one object do not
+count as a connected body. Facial masses such as Hargold's nose and cheeks and
+Mebble's long-neck transition and Adam's apple must emerge from that body
+surface rather than read as attached primitives.
+
+Soft clothing must wrap the body as continuous garment surfaces. Boots must be
+single rounded connected forms with an intentional ankle transition. Belts,
+capes, collars, hats, glasses, backpacks, and rigid hardware may remain
+separate only where their real construction, articulation, or secondary motion
+requires it.
+
+The structural validator must verify connected-component count, watertightness,
+deforming bone-group coverage, continuous garments, and unified boots. On
+July 27, 2026 the user explicitly approved the supplied Meshy appearances and
+their usable built-in clips for live gameplay testing. That live-test approval
+overrides the earlier animation-integration freeze for those supplied rigs; it
+does not mark the remaining production checklist or missing clip set complete.
+
+### Clean-room construction references
+
+The user-supplied external character images are observable craft benchmarks
+only. They may inform compact-versus-tall volume distribution, rounded joint
+flow, limb taper, mesh-density priorities, profile readability, and expected
+finish. No external identity, costume, color, logo, texture, mesh, topology,
+rig, weight, animation, or proprietary measurement may enter a project asset.
+
+Repository-safe modeling references are rendered from the original connected
+Hargold and Mebble bodies:
+
+- `assets/previews/construction-reference/hargold-construction-reference.png`;
+- `assets/previews/construction-reference/mebble-construction-reference.png`.
+
+Each source board contains original featureless neutral, run-contact,
+run-extension, jump-apex, landing, and silhouette targets. Separate
+`hargold-current-body-audit.png` and `mebble-current-body-audit.png` boards
+expose the active clay body, wireframe, side silhouette, and run deformation.
+These expose construction weaknesses without copying external art and do not
+substitute for senior retopology or visual approval.
+
+## Character-only gameplay readability
+
+The locked hero appearance remains authoritative. Readability work must not
+redesign the mesh, alter proportions, recolor costumes, change facial features,
+retime animation, or modify collision.
+
+The live renderer uses a subtle camera-facing inverted-hull contour outside the
+hero silhouette. It is dark but not pure black and remains between one and two
+CSS pixels at the gameplay camera. A local material treatment adds broad
+camera-aware rim light, upper key, front fill, shadow-floor preservation, and
+distance-aware midtone clarity. These terms are continuous and unbanded; this
+is not cel shading.
+
+Only the visible hero meshes receive this pass. Broad authored background
+profiles can vary the rim and contour response, but all changes smooth over
+time. Full-scene edge detection and per-pixel background-driven flicker are
+forbidden. Low, balanced, and high presets must preserve the same silhouette
+contract while limiting device-pixel-ratio and normal-map cost for mobile.
+
+Validation must include both heroes at 100–150 pixels tall and at the
+932-by-430 phone viewport against bright grassland, dense forest, dark cave,
+bright stone, sunset, snow/ice, toxic green, and busy-gameplay stress
+backgrounds. Actual authored world art remains the final acceptance context;
+diagnostic backdrops are stress fixtures, not claims that those worlds exist.
+
 ## Required validation scene
 
 Show both heroes in neutral presentation and through the actual gameplay camera:
@@ -276,5 +348,6 @@ substitutes for those assets. Do not modify mobs, enemies, bosses, levels, or
 unrelated assets during this character-production stage.
 
 Neutral-pose beauty renders cannot approve proportions. The approval sequence
-is bind deformation, then 100–150 pixel action silhouettes, then gameplay-camera
-motion, and only then close facial, cloth, accessory, and material finish.
+is locked-silhouette fit, connected-body verification, bind deformation,
+100–150 pixel action silhouettes, gameplay-camera motion, and only then close
+facial, cloth, accessory, material, and animation finish.

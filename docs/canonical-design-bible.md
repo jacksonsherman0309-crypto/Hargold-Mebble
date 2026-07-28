@@ -69,9 +69,25 @@ The latest approved Hargold and Mebble model is locked. Do not change proportion
 - `docs/character-dimension-animation-spec.md` is the binding dimensional construction, three-quarter gameplay orientation, rig, animation, shading, camera-readability, and validation contract.
 - The rejected blockout and doll-like procedural geometry remain superseded. Production replacements must be newly modeled original Hargold and Mebble geometry built from empty Blender scenes. Do not reuse the rejected character geometry or substitute another generic humanoid base.
 - The replacement must preserve the locked identities, silhouettes, proportions, clothing, colors, accessories, and defining facial features above.
+- The locked sheets and approved compact/tall frames are the silhouette source of truth. Fit the complete body volume inside that approved silhouette before adding secondary costume, surface, facial, or material detail.
 - Production meshes require smooth rounded topology, clean deformation edge flow, sculpted faces, expressive brows, detailed hands and boots, layered garments, authored cloth folds, clean UVs, optimized game topology, and planned LODs.
+- Each hero requires one connected watertight skinned body surface integrating the face, neck, torso, shoulders, arms, hands, fingers, pelvis, thighs, knees, and shins. Multiple disconnected anatomical islands inside one Blender object do not satisfy this requirement.
+- Soft garments must be continuous wrapped surfaces and each boot must be a single rounded connected form. Belts, capes, collars, hats, gloves, backpacks, and rigid hardware may remain separate only where their real construction and secondary motion require it.
 - Hero bodies and soft garments must deform as continuous skinned surfaces. Bone-parented upper-arm, forearm, elbow, hand, thigh, or shin pieces that read as an articulated wooden doll are not acceptable production geometry.
 - Character construction is action-first. Proportions must be approved in run, jump, landing, skid, slam, carry, wall-contact, and character-specific action poses before close facial or material polish.
+- The July 27, 2026 user-supplied Meshy appearances are explicitly approved for live gameplay animation testing. This approval authorizes the canonical Meshy rigs and every usable supplied clip to replace the earlier runtime exports without redesigning either visible character.
+- The supplied packages contain walk and run only. Their integration does not mark missing idle, jump, fall, land, crouch, damage, defeat, respawn, hero-special, facial, cloth, or secondary-motion clips complete, and it does not close the remaining topology, deformation, UV, LOD, or export-readiness checklist items.
+- The binding production checklist is
+  `assets/blender/character-production-checklist.json`. Silhouette,
+  proportions, skeleton, and connected body are approved; joint deformation is
+  the active incomplete gate. Facial topology, hand topology, clothing
+  integration, surface refinement, production UVs, final textures, final
+  animation polish, gameplay validation, LODs, and export-ready classification
+  remain incomplete.
+- Joint-deformation approval requires clavicle/deltoid and upper-arm-twist
+  preservation, non-collapsing elbows and sleeve volume, pelvis/upper-thigh
+  volume, knee/pant volume, and smooth ankle-to-boot transitions. Structural
+  setup and automated validation do not replace stress-pose visual approval.
 - The July 26 compact/tall featureless animation mannequins are the authoritative construction frames for joint placement, motion proportions, deformation, and side-view pose readability. Hargold is fitted around the compact frame and Mebble around the tall frame only after those featureless rigs pass action tests.
 - The July 26 locked-frame correction makes each approved mannequin pose an
   exact tracing frame rather than a neighboring example. Production fitting
@@ -87,20 +103,25 @@ The latest approved Hargold and Mebble model is locked. Do not change proportion
 - The mannequins are clean-room original project guides built from the approved normalized ranges. They are not copied game meshes, rigs, animation clips, or extracted proprietary measurements, and they do not override the locked Hargold and Mebble identity sheets.
 - Primary approval uses a true side gameplay profile. Small action-dependent camera reveal is secondary and may clarify the face or skeleton, but it cannot conceal a weak profile silhouette.
 - Every hero silhouette must remain identifiable at 100–150 pixels tall. Arms and hands must separate from the torso, feet must create a stable readable ground-contact shape, shoulders must have deformable volume, and backpacks/capes must retain a distinct overlap instead of merging into one body mass.
+- Live gameplay uses a character-only readability treatment that preserves the locked hero geometry, proportions, costume, colors, facial features, animation timing, and collision. The default combines a subtle 1–2 CSS-pixel camera-facing external contour with soft local key/fill, a camera-aware rim, a shadow floor, restrained material normalization, and distance-aware midtone simplification.
+- Readability response may adapt only to broad authored background profiles and must smooth between profiles. It must not sample or react to every background pixel, apply full-scene edge detection, produce a heavy black cartoon outline, or replace the existing environment lighting.
+- Low, balanced, and high presets must keep the contour within the same 1–2 CSS-pixel contract and cap device pixel ratio for mobile suitability. Both heroes require gameplay-camera validation against bright grassland, dense forest, dark cave, bright stone, sunset, snow/ice, toxic green, and busy-gameplay backgrounds.
 - Hargold requires longer readable forearms, hands enlarged by roughly 20–30 percent over the rejected candidate, larger boots, defined shoulders, and less spherical cheek transitions while preserving his locked short round identity.
 - Mebble requires a slightly wider torso, longer separated arms, larger boots, a more tapered visible neck, a stronger Adam's apple profile, glasses offset clearly from the face, and a cape yoke that wraps naturally over the shoulders while preserving his locked tall thin identity.
 - Character approval requires action-pose and gameplay-camera deformation review; a neutral T-pose or still turntable is not sufficient evidence of an animated production character.
 - Final materials require authored PBR texture sets, including base color, roughness, normal detail, and ambient-occlusion support where appropriate. Procedural flat-color materials are not a final substitute.
 - Production rigs require IK/FK limbs, finger articulation, eye, brow, jaw and mouth controls, gameplay sockets, and secondary controls for Hargold's hat, feather and scarf and Mebble's hat, cape and clothing.
-- Every gameplay clip must be newly authored with readable anticipation, controlled squash and stretch, follow-through, overlapping secondary motion, lively idle posing, reliable foot contacts, and seamless state blending.
-- Do not replace the active runtime character files until front, three-quarter, side, and back turnarounds; jump, run, skid, landing, hurt, and character-specific action poses; live 2.75D gameplay-camera captures; and deformation checks have all passed review.
+- User-supplied Meshy clips may be imported directly when their skeleton and bind pose match the selected canonical supplied rig. Every other gameplay clip must still be original to this project and meet the readable anticipation, controlled squash and stretch, follow-through, overlap, foot-contact, and seamless-blending standard.
+- The July 27 explicit live-test approval overrides the earlier runtime-replacement freeze for these supplied rigs only. Runtime use is not a claim that the full production-character checklist is complete.
 - Nintendo games may be used only as a broad craftsmanship, readability, responsiveness, and finish benchmark. Do not copy proprietary tuning values, poses, animation data, code, meshes, materials, textures, or protected designs.
+- The user-supplied platformer images inspected on July 26 are clean-room construction benchmarks only. They may inform compact-versus-tall volume distribution, rounded joint flow, limb taper, gameplay silhouette, and deformation-readiness principles; they may not supply identity, costume, colors, logos, vertices, topology, rigs, weights, textures, animation data, or proprietary measurements.
+- `docs/character-construction-benchmark.md` and `assets/blender/character-construction-benchmark.json` record that boundary. The original project reference boards in `assets/previews/construction-reference/` are the repository-safe source images for Hargold and Mebble construction review.
 
 ## 4. Core movement
 
 - Smooth acceleration and responsive deceleration.
-- Both heroes use the same shared horizontal base-controller tuning for walking, running, sprinting, turning, braking, and air control.
-- Walk, run, and sprint are separate locomotion targets with seamless speed-driven blending.
+- Both heroes use the same shared horizontal base-controller tuning for walking, running, full-speed locomotion, turning, braking, and air control.
+- Directional hold accelerates through the walk, run, and full-speed tiers. There is no separate manual sprint action; animation selection blends from actual controller velocity.
 - Precise, readable jump arcs.
 - Variable jump height based on input hold duration.
 - Coyote time and jump buffering are allowed for responsiveness.

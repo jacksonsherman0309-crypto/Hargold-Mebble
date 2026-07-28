@@ -36,3 +36,31 @@ Codex instruction:
 Read AGENTS.md and docs/world-specific-archive-policy.md first. Then inspect this entire imported package, not only summary files.
 Treat every world and level as authored, world-specific content. Do not flatten the archive into a universal level template.
 Current canon overrides conflicting historical names, but reusable code, mechanics, enemy behavior, encounter data, and boss logic must be preserved and realigned rather than discarded.
+
+Meshy character animation import completed: 2026-07-27
+Local preserved package root: archive/imported-packages/20260727-meshy-animation
+Source archives inspected: 5
+Unique 3D assets inspected in Blender: 8
+Inspection failures: 0
+
+Imported source archives:
+archive/imported-packages/20260727-meshy-animation/zip-sources/Meshy_AI_Hargold_Rig_biped.zip
+archive/imported-packages/20260727-meshy-animation/zip-sources/Meshy_AI_Hargold_Rig_biped (1).zip
+archive/imported-packages/20260727-meshy-animation/zip-sources/Meshy_AI_Mebble_Rig_biped.zip
+archive/imported-packages/20260727-meshy-animation/zip-sources/Meshy_AI_Mebble_Rig_biped (1).zip
+archive/imported-packages/20260727-meshy-animation/zip-sources/Meshy_AI_Mebble_Rig_biped (1) (1).zip
+
+Processed canonical gameplay assets:
+assets/exports/meshy/hargold_canonical_gameplay_rig.glb
+assets/exports/meshy/mebble_canonical_gameplay_rig.glb
+assets/exports/meshy/gameplay-rig-build-manifest.json
+
+Machine-readable inspection and mapping:
+data/character-animation-inventory.json
+data/processed-character-rig-validation.json
+data/character-rig-selection.json
+data/animation-retarget-map.json
+data/animation-state-mapping.json
+data/animation-validation-capture-manifest.json
+
+The raw ZIP and expanded-package directories are preserved locally. The processed canonical GLBs, manifests, mappings, tests, and report are the repository-ready live integration. Only walk and run animation takes were supplied; all other required production takes remain explicitly missing.

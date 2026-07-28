@@ -24,7 +24,7 @@ Both Hargold and Mebble share this complete baseline:
 - run;
 - sprint;
 - separate walk/run acceleration targets;
-- a separate sprint target and acceleration target;
+- automatic acceleration through the full-speed tier without a separate manual sprint action;
 - release deceleration;
 - low-speed turnaround;
 - high-speed skid;
@@ -270,7 +270,7 @@ The movement layer should expose animation intent without hard-coding a particul
 
 ## 12. Required movement tests
 
-- Walk/run/sprint target speeds and transitions.
+- Walk/run/full-speed target speeds and automatic acceleration transitions.
 - Identical horizontal base tuning for Hargold and Mebble.
 - Release stopping distance.
 - Low-speed turn and high-speed skid.

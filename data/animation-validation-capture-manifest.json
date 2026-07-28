@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-27",
+  "level": "1-1 Meadow Wake",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "captures": [
+    {
+      "path": "assets/previews/meshy-animation-validation/hargold-walk-debug.png",
+      "sha256": "BB418F57E359A432AB259EE6BFF0A641DC40F3EE11898110ECF9DA49A31D5F51",
+      "bytes": 147573,
+      "hero": "Hargold",
+      "mode": "direct-debug-playback",
+      "clip": "hargold_walk",
+      "proves": [
+        "processed Hargold mesh and skeleton load in the live level",
+        "supplied walk clip plays through the developer animation panel",
+        "only one Hargold mesh is visible"
+      ]
+    },
+    {
+      "path": "assets/previews/meshy-animation-validation/mebble-run-debug.png",
+      "sha256": "529114D29799E41A06FBB477FA7459ED99ADA3C6DCC9C2CD0C4EC65F69CDBB4B",
+      "bytes": 147571,
+      "hero": "Mebble",
+      "mode": "direct-debug-playback",
+      "clip": "mebble_run",
+      "proves": [
+        "processed Mebble mesh and skeleton load in the live level",
+        "supplied run clip plays through the developer animation panel",
+        "only one Mebble mesh is visible"
+      ]
+    },
+    {
+      "path": "assets/previews/meshy-animation-validation/hargold-live-full-speed.png",
+      "sha256": "A096BF96B1692CEB2F0B8A36F53FC67D4BFB90FCEFF6337A3185EE0CEEDA0319",
+      "bytes": 161304,
+      "hero": "Hargold",
+      "mode": "controller-driven",
+      "movementState": "sprint",
+      "velocityX": 6.905,
+      "clipSelection": "hargold_run",
+      "proves": [
+        "directional hold reaches the sprint speed tier without a manual sprint button",
+        "controller world motion and imported in-place animation coexist",
+        "Hargold is rendered in the playable Meadow Wake camera"
+      ]
+    },
+    {
+      "path": "assets/previews/meshy-animation-validation/mebble-live-full-speed.png",
+      "sha256": "B0B5409EE5324C27DC1A361D84DF1B0A18FB5E7C986ABDA71AA5092BBD252FD2",
+      "bytes": 162433,
+      "hero": "Mebble",
+      "mode": "controller-driven",
+      "movementState": "sprint",
+      "velocityX": 6.905,
+      "clipSelection": "mebble_run",
+      "proves": [
+        "safe live hero swapping retains feet and momentum",
+        "controller world motion and imported in-place animation coexist",
+        "Mebble is rendered in the playable Meadow Wake camera"
+      ]
+    }
+  ]
+}

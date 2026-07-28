@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "status": "locked-clean-room-observable-construction-benchmark",
+  "authority": {
+    "identity": [
+      "assets/references/Hargold locked production character sheet.png",
+      "assets/references/Mebble locked production character sheet.png"
+    ],
+    "proportions": "tools/blender/animation_mannequin_spec.py",
+    "constructionReferenceImages": {
+      "Hargold": "../previews/construction-reference/hargold-construction-reference.png",
+      "Mebble": "../previews/construction-reference/mebble-construction-reference.png"
+    },
+    "currentBodyAuditImages": {
+      "Hargold": "../previews/construction-reference/hargold-current-body-audit.png",
+      "Mebble": "../previews/construction-reference/mebble-current-body-audit.png"
+    }
+  },
+  "cleanRoomBoundary": {
+    "benchmarkInput": "user-supplied observable gameplay and promotional images inspected in-session only",
+    "repositoryCopiesOfBenchmarkArt": false,
+    "permittedAnalysis": [
+      "compact-versus-tall volume distribution",
+      "silhouette readability",
+      "rounded body transitions",
+      "limb taper",
+      "joint deformation principles",
+      "mesh-density distribution principles",
+      "profile action readability"
+    ],
+    "forbiddenTransfer": [
+      "facial features",
+      "clothing",
+      "colors",
+      "hats",
+      "logos",
+      "accessories",
+      "textures",
+      "character identity",
+      "mesh vertices",
+      "topology",
+      "rigs",
+      "animation data"
+    ]
+  },
+  "sharedConstructionLanguage": [
+    "one connected watertight deforming body",
+    "rounded continuous shoulder-to-arm and hip-to-leg flow",
+    "radius-tapered limbs rather than tubes or stretched spheres",
+    "wrapped soft clothing rather than floating armor panels",
+    "stable oversized-but-rounded gameplay footwear",
+    "hands readable at 100–150 pixels",
+    "joint-support density concentrated at shoulders elbows wrists hips knees ankles neck mouth and eyelids",
+    "solid-black side silhouette approval",
+    "neutral construction cannot substitute for run jump landing and skid deformation review"
+  ],
+  "characters": {
+    "Hargold": {
+      "frame": "compact",
+      "headsTall": 2.94,
+      "heightRelativeToHargold": 1.0,
+      "normalized": {
+        "headHeight": 0.34,
+        "torsoHeight": 0.32,
+        "visibleLegLength": 0.22,
+        "shoulderWidth": 0.46,
+        "hipWidth": 0.39,
+        "armLengthShoulderToHand": 0.37,
+        "footLength": 0.25
+      },
+      "read": [
+        "short",
+        "broad",
+        "round",
+        "sturdy",
+        "dense",
+        "low-centred"
+      ],
+      "constructionPriorities": [
+        "large rounded head integrated through a short neck",
+        "broad deformable chest and belly volume",
+        "thick tapered arms and legs",
+        "large rounded boots with a smooth ankle transition",
+        "clear separation of hands arms belly backpack and boots in profile"
+      ]
+    },
+    "Mebble": {
+      "frame": "tall",
+      "heightRelativeToHargold": 1.26,
+      "normalized": {
+        "headHeight": 0.29,
+        "neckHeight": 0.17,
+        "torsoHeight": 0.315,
+        "visibleLegLength": 0.33,
+        "shoulderWidth": 0.34,
+        "hipWidth": 0.275,
+        "armLengthShoulderToHand": 0.42,
+        "footLength": 0.24
+      },
+      "read": [
+        "tall",
+        "thin",
+        "lanky",
+        "agile",
+        "light",
+        "high-centred"
+      ],
+      "constructionPriorities": [
+        "long tapered neck visibly integrated into head and chest",
+        "longer torso and limbs than Hargold",
+        "narrower shoulders waist and hips",
+        "slim tapered arms and legs without cylindrical sections",
+        "relaxed profile stance with readable glasses cape hands and boots"
+      ]
+    }
+  }
+}

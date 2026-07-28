@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "retargetingRequiredForLiveGlbClips": false,
+  "reason": "Each hero's selected GLB mesh, walking GLB, and running GLB use the same 24 bone names, parent hierarchy, and bind transforms.",
+  "identityBoneMap": {
+    "Hips": "Hips",
+    "LeftUpLeg": "LeftUpLeg",
+    "LeftLeg": "LeftLeg",
+    "LeftFoot": "LeftFoot",
+    "LeftToeBase": "LeftToeBase",
+    "RightUpLeg": "RightUpLeg",
+    "RightLeg": "RightLeg",
+    "RightFoot": "RightFoot",
+    "RightToeBase": "RightToeBase",
+    "Spine02": "Spine02",
+    "Spine01": "Spine01",
+    "Spine": "Spine",
+    "LeftShoulder": "LeftShoulder",
+    "LeftArm": "LeftArm",
+    "LeftForeArm": "LeftForeArm",
+    "LeftHand": "LeftHand",
+    "RightShoulder": "RightShoulder",
+    "RightArm": "RightArm",
+    "RightForeArm": "RightForeArm",
+    "RightHand": "RightHand",
+    "neck": "neck",
+    "Head": "Head",
+    "head_end": "head_end",
+    "headfront": "headfront"
+  },
+  "validation": {
+    "hands": "direct bone targets; no remap",
+    "feet": "direct bone targets; no remap",
+    "hips": "direct bone target; animated local hip motion retained",
+    "head": "direct bone target; no remap",
+    "shoulders": "direct bone targets; no remap",
+    "knees": "LeftLeg and RightLeg direct targets; no remap",
+    "scale": "uniform runtime normalization from imported visible bounds to locked gameplay height",
+    "facing": "positive uniform scale with Y-axis rotation; negative skeleton scale forbidden"
+  },
+  "fbxAlternateExportPolicy": {
+    "status": "preserved-and-inventoried-not-retargeted",
+    "reason": "The FBX walking files are alternate exports of the same named walking takes already present in compatible GLB form. Their Blender-normalized bind matrices differ by container coordinate conversion, so duplicating them would add no unique motion and would require unnecessary axis retargeting.",
+    "destructiveOverwrite": false
+  },
+  "rootMotionPolicy": {
+    "controllerOwnsTranslation": true,
+    "armatureNodeTranslationChannels": 0,
+    "armatureNodeRotationChannels": 0,
+    "hipAnimationPreserved": true,
+    "neutralizationApplied": "none required",
+    "runtimeGroupPositionControlledByPhysics": true
+  }
+}
