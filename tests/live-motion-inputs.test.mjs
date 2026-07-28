@@ -21,10 +21,5 @@ assert.match(gameSource, /navigator\.getGamepads/);
 assert.match(inputSource, /groundSlamPressed: pressed\.down/);
 assert.match(html, /data-action="slam"/);
 assert.match(html, /Jump \/ twirl \/ glide: Space/);
-assert.doesNotMatch(html, /data-action="sprint"/);
-assert.doesNotMatch(html, /data-action="run"/);
-assert.doesNotMatch(gameSource, /touch\.sprint|gamepad\.sprint|input\.sprint/);
-assert.match(gameSource, /AnimationDebugPanel/);
-assert.match(gameSource, /animationDebugDrive === 'right'/);
 
 console.log('Live unified movement wiring checks passed.');

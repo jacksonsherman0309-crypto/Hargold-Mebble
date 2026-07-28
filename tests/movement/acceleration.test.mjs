@@ -9,18 +9,14 @@ function terminal(input) {
   return state;
 }
 
-const automaticFullSpeed = terminal({});
-const obsoleteButtonsIgnored = terminal({ run: true, sprint: true });
-assert.ok(
-  Math.abs(automaticFullSpeed.velocityX - MOVEMENT_TUNING.sprintSpeed) < 0.03,
-  'directional hold must reach the existing full-speed tier without a sprint button'
-);
-assert.ok(
-  Math.abs(obsoleteButtonsIgnored.velocityX - automaticFullSpeed.velocityX) < 1e-9,
-  'legacy run/sprint flags may not change live target speed'
-);
+const walk = terminal({});
+const run = terminal({ run: true });
+const sprint = terminal({ run: true, sprint: true });
+assert.ok(Math.abs(walk.velocityX - MOVEMENT_TUNING.walkSpeed) < 0.03);
+assert.ok(run.velocityX > walk.velocityX);
+assert.ok(sprint.velocityX > run.velocityX);
 
-const coasting = terminal({});
+const coasting = terminal({ run: true });
 const beforeRelease = coasting.velocityX;
 step(coasting);
 assert.ok(coasting.velocityX > 0 && coasting.velocityX < beforeRelease);
@@ -30,8 +26,8 @@ lowReverse.velocityX = MOVEMENT_TUNING.skidThreshold * 0.5;
 step(lowReverse, { left: true, run: true });
 assert.notEqual(lowReverse.movementState, MOVEMENT_STATES.SKID);
 
-const highReverse = terminal({});
-step(highReverse, { left: true });
+const highReverse = terminal({ run: true, sprint: true });
+step(highReverse, { left: true, run: true, sprint: true });
 assert.equal(highReverse.movementState, MOVEMENT_STATES.SKID);
 
 const uphill = makeState();
@@ -41,8 +37,8 @@ const sloped = angle => ({
   hasGroundAt: () => true,
   surfaceAt: () => ({ angle, normal: { x: Math.sin(angle), y: -Math.cos(angle) } })
 });
-simulate(uphill, 2, () => ({ ...noInput, right: true }), sloped(-0.3));
-simulate(downhill, 2, () => ({ ...noInput, right: true }), sloped(0.3));
+simulate(uphill, 2, () => ({ ...noInput, right: true, run: true }), sloped(-0.3));
+simulate(downhill, 2, () => ({ ...noInput, right: true, run: true }), sloped(0.3));
 assert.ok(downhill.velocityX > uphill.velocityX);
 
 console.log('Unified acceleration, coasting, skid, and slope checks passed.');

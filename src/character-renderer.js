@@ -13,69 +13,30 @@ import {
 import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=meadow-rooms-6';
 import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=meadow-rooms-6';
 import { GAME_RULES } from './canonical-data.js';
-import {
-  importedAnimationFor,
-  importedClipMetadata
-} from './animation/character-animation-config.js?v=meshy-rigs-1';
-import {
-  BACKGROUND_READABILITY_PROFILES,
-  CHARACTER_READABILITY_QUALITY,
-  broadMeadowWakeProfileAt,
-  resolveReadabilityMode,
-  resolveReadabilityQuality
-} from './rendering/character-readability-config.js?v=readability-pass-1';
-import {
-  CharacterReadabilityPass,
-  createReadabilityDiagnosticBackdrop
-} from './rendering/character-readability.js?v=readability-pass-1';
 
 const PRESENTATION = GAME_RULES.characterPresentation;
 const GAME_PIXELS_PER_METRE = PRESENTATION.gameplayScale.gamePixelsPerMetre;
 const ACTION_REVEAL_DEGREES = PRESENTATION.orientation.revealDegreesByAction;
 const MODEL_SPECS = Object.freeze({
   Hargold: Object.freeze({
-    url: new URL(
-      '../assets/exports/meshy/hargold_canonical_gameplay_rig.glb?v=meshy-live-1',
-      import.meta.url
-    ).href,
+    url: new URL('../assets/exports/hargold_character.glb?v=locked-fit-4', import.meta.url).href,
     assetHeightMetres: PRESENTATION.gameplayScale.heroHeightMetres.Hargold
   }),
   Mebble: Object.freeze({
-    url: new URL(
-      '../assets/exports/meshy/mebble_canonical_gameplay_rig.glb?v=meshy-live-1',
-      import.meta.url
-    ).href,
+    url: new URL('../assets/exports/mebble_character.glb?v=locked-fit-4', import.meta.url).href,
     assetHeightMetres: PRESENTATION.gameplayScale.heroHeightMetres.Mebble
   })
 });
+
+const FALLBACK_CLIPS = Object.freeze({});
 
 export class CharacterRenderer {
   constructor({ mount, width, height, onProgress = () => {} }) {
     this.width = width;
     this.height = height;
     this.onProgress = onProgress;
-    this.runtimeParameters = new URLSearchParams(location.search);
-    this.readabilityMode = resolveReadabilityMode(
-      this.runtimeParameters.get('readability')
-    );
-    this.readabilityQualityName = resolveReadabilityQuality(
-      this.runtimeParameters.get('readabilityQuality')
-    );
-    this.readabilityQuality =
-      CHARACTER_READABILITY_QUALITY[this.readabilityQualityName];
-    const requestedBackdrop = this.runtimeParameters.get(
-      'readabilityBackdrop'
-    );
-    this.readabilityBackdropOverride =
-      BACKGROUND_READABILITY_PROFILES[requestedBackdrop]
-        ? requestedBackdrop
-        : null;
-    this.readabilityPairPreview =
-      this.runtimeParameters.get('readabilityPair') === 'overlap';
     this.models = new Map();
-    this.readabilityPasses = new Map();
     this.failed = new Set();
-    this.animationDebugOverride = null;
     this.courseAssetsReady = false;
     this.environmentArtReady = false;
     this.scene = new THREE.Scene();
@@ -93,10 +54,7 @@ export class CharacterRenderer {
       antialias: true,
       powerPreference: 'high-performance'
     });
-    this.renderer.setPixelRatio(Math.min(
-      window.devicePixelRatio || 1,
-      this.readabilityQuality.maximumPixelRatio
-    ));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.setSize(width, height, false);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -107,23 +65,6 @@ export class CharacterRenderer {
     this.renderer.domElement.className = 'character-layer';
     this.renderer.domElement.setAttribute('aria-hidden', 'true');
     mount.append(this.renderer.domElement);
-    this.readabilityViewport = {
-      width: Math.max(1, this.renderer.domElement.clientWidth || width),
-      height: Math.max(1, this.renderer.domElement.clientHeight || height)
-    };
-    this.readabilityResizeObserver = new ResizeObserver(entries => {
-      const bounds = entries[0]?.contentRect;
-      if (!bounds) return;
-      this.readabilityViewport.width = Math.max(1, bounds.width);
-      this.readabilityViewport.height = Math.max(1, bounds.height);
-      for (const readability of this.readabilityPasses.values()) {
-        readability.updateViewport(
-          this.readabilityViewport.width,
-          this.readabilityViewport.height
-        );
-      }
-    });
-    this.readabilityResizeObserver.observe(this.renderer.domElement);
 
     this.scene.fog = new THREE.Fog(0x9fd7d1, 700, 1800);
     this.scene.add(new THREE.HemisphereLight(0xfff4d3, 0x29452f, 2.55));
@@ -149,15 +90,6 @@ export class CharacterRenderer {
     this.backgroundFar = new THREE.Group();
     this.backgroundMid = new THREE.Group();
     this.scene.add(this.backgroundFar, this.backgroundMid);
-    if (this.readabilityBackdropOverride) {
-      this.readabilityDiagnosticBackdrop =
-        createReadabilityDiagnosticBackdrop({
-          profileName: this.readabilityBackdropOverride,
-          width,
-          height
-        });
-      this.scene.add(this.readabilityDiagnosticBackdrop);
-    }
     this.collectibleMeshes = [];
     this.blockSlots = [];
     this.blockEffects = [];
@@ -1170,19 +1102,9 @@ export class CharacterRenderer {
     this.onProgress(`Loading ${hero} 3D model...`);
     try {
       const gltf = await this.loader.loadAsync(spec.url);
-      const sourceRoot = gltf.scene;
-      sourceRoot.updateMatrixWorld(true);
-      const bounds = new THREE.Box3().setFromObject(sourceRoot);
-      const centre = bounds.getCenter(new THREE.Vector3());
-      const rawHeight = Math.max(0.0001, bounds.max.y - bounds.min.y);
-      sourceRoot.position.x -= centre.x;
-      sourceRoot.position.y -= bounds.min.y;
-      sourceRoot.position.z -= centre.z;
-      const root = new THREE.Group();
-      root.add(sourceRoot);
+      const root = gltf.scene;
       root.name = `${hero}_runtime`;
-      const runtimeScale =
-        GAME_PIXELS_PER_METRE * (spec.assetHeightMetres / rawHeight);
+      const runtimeScale = GAME_PIXELS_PER_METRE;
       const defaultReveal = THREE.MathUtils.degToRad(ACTION_REVEAL_DEGREES.default);
       const rightFacingYaw = Math.PI / 2 - defaultReveal;
       root.rotation.y = rightFacingYaw;
@@ -1199,32 +1121,17 @@ export class CharacterRenderer {
         }
       });
       this.scene.add(root);
-      const readability = new CharacterReadabilityPass({
-        hero,
-        root,
-        viewport: this.readabilityViewport,
-        mode: this.readabilityMode,
-        quality: this.readabilityQualityName
-      });
-      this.readabilityPasses.set(hero, readability);
       const mixer = new THREE.AnimationMixer(root);
       const clips = new Map(gltf.animations.map(clip => [clip.name, clip]));
-      const skeletonRoot =
-        root.getObjectByName(`${hero}_Canonical_Gameplay_Rig`) ?? sourceRoot;
       this.models.set(hero, {
-        hero,
         root,
-        sourceRoot,
-        skeletonRoot,
         mixer,
         clips,
         action: null,
         actionName: '',
         baseScale: runtimeScale,
         currentYaw: rightFacingYaw,
-        currentFacing: 1,
-        rawHeightMetres: rawHeight,
-        readability
+        currentFacing: 1
       });
       this.onProgress(this.statusText());
     } catch (error) {
@@ -1250,68 +1157,34 @@ export class CharacterRenderer {
     return this.models.has(hero);
   }
 
-  selectClip(hero, locomotion, horizontalSpeed, grounded) {
-    return importedAnimationFor({ hero, locomotion, horizontalSpeed, grounded });
+  selectClip(hero, locomotion, glide) {
+    if (hero === 'Mebble' && glide !== 'closed') {
+      if (glide === 'opening') return 'glide-open';
+      if (glide === 'closing') return 'glide-close';
+      return 'glide-sustain';
+    }
+    return FALLBACK_CLIPS[locomotion] || locomotion || 'idle';
   }
 
   play(model, requestedName, horizontalSpeed = 0) {
-    const name = model.clips.has(requestedName) ? requestedName : 'rest-pose';
-    if (name === 'rest-pose') {
-      if (model.actionName !== name) {
-        if (model.action) model.action.fadeOut(0.16);
-        model.action = null;
-        model.actionName = name;
-      }
-      return;
-    }
+    const name = model.clips.has(requestedName) ? requestedName : 'idle';
     if (model.actionName !== name) {
       const next = model.mixer.clipAction(model.clips.get(name));
       next.reset();
       next.enabled = true;
       next.setEffectiveWeight(1);
       next.play();
-      const blendSeconds = 0.16;
+      const blendSeconds = ['skid', 'turn-low', 'hurt'].includes(name) ? 0.08 : 0.12;
       if (model.action) model.action.crossFadeTo(next, blendSeconds, true);
       model.action = next;
       model.actionName = name;
     }
     if (model.action) {
-      const authoredSpeed =
-        importedClipMetadata(model.hero, name)?.authoredSpeedMetresPerSecond ?? 0;
+      const authoredSpeed = name === 'walk' ? 3.2 : name === 'run' ? 5.7 : name === 'sprint' ? 7.15 : 0;
       model.action.setEffectiveTimeScale(
         authoredSpeed ? THREE.MathUtils.clamp(Math.abs(horizontalSpeed) / authoredSpeed, 0.65, 1.35) : 1
       );
     }
-  }
-
-  setAnimationDebugOverride(override) {
-    this.animationDebugOverride = { ...override };
-  }
-
-  clearAnimationDebugOverride() {
-    this.animationDebugOverride = null;
-  }
-
-  getAnimationDebugSnapshot() {
-    const override = this.animationDebugOverride;
-    if (!override) return null;
-    const model = this.models.get(override.hero);
-    if (!model) return null;
-    const world = new THREE.Vector3();
-    model.skeletonRoot.getWorldPosition(world);
-    return {
-      clipId: model.actionName || override.clipId,
-      timeSeconds: model.action?.time ?? 0,
-      durationSeconds: model.action?.getClip().duration ?? 0,
-      speed: Number(override.speed ?? 1),
-      loop: Boolean(override.loop),
-      facing: Number(override.facing ?? model.currentFacing),
-      skeletonRootWorld: { x: world.x, y: world.y, z: world.z }
-    };
-  }
-
-  getReadabilitySnapshot(hero) {
-    return this.readabilityPasses.get(hero)?.snapshot() ?? null;
   }
 
   updateMobs(mobs, deltaSeconds) {
@@ -1435,7 +1308,6 @@ export class CharacterRenderer {
     locomotion,
     glide,
     horizontalSpeed = 0,
-    grounded = true,
     cameraX = 0,
     cameraY = 0,
     coins = [],
@@ -1473,14 +1345,10 @@ export class CharacterRenderer {
     this.updateMobs(mobs, deltaSeconds);
     this.updateProjectiles(projectiles);
     for (const [modelHero, model] of this.models) {
-      const debug = this.animationDebugOverride;
-      const activeHero = debug?.hero ?? hero;
-      const active =
-        this.readabilityPairPreview ||
-        modelHero === activeHero;
+      const active = modelHero === hero;
       model.root.visible = active;
       if (!active) continue;
-      const direction = Number(debug?.facing ?? facing) < 0 ? -1 : 1;
+      const direction = facing < 0 ? -1 : 1;
       model.root.scale.setScalar(model.baseScale);
       const orientationKey = glide !== 'closed'
         ? 'glide'
@@ -1500,42 +1368,12 @@ export class CharacterRenderer {
       model.currentYaw += yawDelta * (1 - Math.exp(-turnResponsiveness * deltaSeconds));
       model.currentFacing = direction;
       model.root.rotation.y = model.currentYaw;
-      const pairOffset = this.readabilityPairPreview
-        ? modelHero === 'Hargold' ? -24 : 24
-        : 0;
       model.root.position.set(
-        screenX - this.width / 2 + pairOffset,
+        screenX - this.width / 2,
         this.height / 2 - screenY + cameraY,
         110
       );
-      const worldX = (screenX + cameraX) / GAME_PIXELS_PER_METRE;
-      model.readability.update({
-        background:
-          this.readabilityBackdropOverride ??
-          broadMeadowWakeProfileAt(worldX),
-        deltaSeconds,
-        heroScreenHeightPixels:
-          MODEL_SPECS[modelHero].assetHeightMetres *
-          GAME_PIXELS_PER_METRE *
-          this.camera.zoom
-      });
-      const requestedClip = debug?.clipId ??
-        this.selectClip(modelHero, locomotion, horizontalSpeed, grounded);
-      this.play(model, requestedClip, debug ? 0 : horizontalSpeed);
-      if (debug && model.action) {
-        model.action.paused = Boolean(debug.paused);
-        model.action.setLoop(debug.loop ? THREE.LoopRepeat : THREE.LoopOnce, debug.loop ? Infinity : 1);
-        model.action.clampWhenFinished = !debug.loop;
-        model.action.setEffectiveTimeScale(Number(debug.speed ?? 1));
-        if (debug.restart) {
-          model.action.reset().play();
-          debug.restart = false;
-        }
-        if (debug.paused && Number.isFinite(debug.normalizedTime)) {
-          model.action.time = THREE.MathUtils.clamp(debug.normalizedTime, 0, 1) *
-            model.action.getClip().duration;
-        }
-      }
+      this.play(model, this.selectClip(hero, locomotion, glide), horizontalSpeed);
       model.mixer.update(deltaSeconds);
     }
     this.renderer.render(this.scene, this.camera);

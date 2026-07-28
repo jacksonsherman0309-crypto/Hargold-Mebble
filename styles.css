@@ -87,56 +87,6 @@ footer { justify-content: center; border-radius: 0 0 18px 18px; }
 .controls .slam { width: clamp(58px, 7vw, 76px); height: clamp(52px, 6.5vw, 68px); }
 .controls .action { width: clamp(62px, 8vw, 82px); height: clamp(58px, 7vw, 76px); }
 
-.animation-debug-panel {
-  position: absolute;
-  z-index: 8;
-  top: 12px;
-  right: 12px;
-  width: min(320px, 42vw);
-  max-height: calc(100% - 24px);
-  overflow: auto;
-  display: grid;
-  gap: 8px;
-  padding: 12px;
-  color: #efffe9;
-  background: rgba(5, 14, 9, .94);
-  border: 1px solid rgba(190, 235, 164, .46);
-  border-radius: 12px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, .42);
-  font-size: 12px;
-}
-.animation-debug-panel h2 {
-  margin: 0 0 2px;
-  font-size: 15px;
-}
-.animation-debug-control {
-  display: grid;
-  grid-template-columns: 92px minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
-}
-.animation-debug-control input,
-.animation-debug-control select,
-.animation-debug-panel button {
-  width: 100%;
-}
-.animation-debug-panel button {
-  padding: 6px 8px;
-  color: inherit;
-  background: #29472f;
-  border: 1px solid #709168;
-  border-radius: 7px;
-}
-.animation-debug-telemetry {
-  margin: 2px 0 0;
-  padding: 8px;
-  overflow: auto;
-  color: #c9f4bc;
-  background: #07100a;
-  border-radius: 7px;
-  font: 11px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
-}
-
 @media (hover: hover) and (pointer: fine) {
   .controls { opacity: .62; }
 }
@@ -148,7 +98,6 @@ footer { justify-content: center; border-radius: 0 0 18px 18px; }
   .game-wrap { width: 100vw; }
   .left-controls, .right-controls { gap: 6px; }
   .controls { padding: 7px; }
-  .animation-debug-panel { width: min(300px, 72vw); }
 }
 
 @media (orientation: landscape) and (max-height: 600px) {

@@ -38,19 +38,19 @@ function simulate(state, seconds, inputForStep) {
   return state;
 }
 
-const automaticState = createMotionState();
-simulate(automaticState, 1, () => ({ right: true }));
-assert.ok(Math.abs(automaticState.velocityX - TUNING.sprintSpeed) < 1e-9);
-assert.equal(automaticState.locomotion, 'sprint');
+const runState = createMotionState();
+simulate(runState, 1, () => ({ right: true, run: true }));
+assert.ok(Math.abs(runState.velocityX - TUNING.runSpeed) < 1e-9);
+assert.equal(runState.locomotion, 'run');
 
-const obsoleteButtonState = createMotionState();
-simulate(obsoleteButtonState, 1, () => ({ right: true, run: true, sprint: true }));
-assert.equal(obsoleteButtonState.velocityX, automaticState.velocityX);
-assert.equal(obsoleteButtonState.locomotion, automaticState.locomotion);
+const sprintState = createMotionState();
+simulate(sprintState, 1, () => ({ right: true, run: true, sprint: true }));
+assert.ok(Math.abs(sprintState.velocityX - TUNING.sprintSpeed) < 1e-9);
+assert.equal(sprintState.locomotion, 'sprint');
 
-simulate(automaticState, 1, () => ({}));
-assert.equal(automaticState.velocityX, 0);
-assert.equal(automaticState.locomotion, 'idle');
+simulate(runState, 1, () => ({}));
+assert.equal(runState.velocityX, 0);
+assert.equal(runState.locomotion, 'idle');
 
 const skidState = createMotionState();
 skidState.velocityX = TUNING.runSpeed;

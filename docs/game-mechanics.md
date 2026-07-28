@@ -30,7 +30,7 @@ This is the authoritative gameplay specification for Codex and all collaborators
 - Use smooth acceleration rather than immediately snapping to maximum speed.
 - Deceleration must remain responsive enough for precise landings.
 - Hargold and Mebble share identical horizontal base-controller tuning for walk, run, sprint, turning, braking, and air control.
-- Directional hold accelerates through walk, run, and full-speed locomotion. There is no separate manual sprint action; animation blending follows actual horizontal velocity.
+- Walk, run, and sprint are distinct speed targets and animation states.
 - Jump height should respond to how long the jump control is held.
 - Air twirl is limited to once per airborne sequence, preserves horizontal momentum, and applies a short bounded hang-time window without adding jump height as a second launch.
 - Ground slam uses explicit startup, descent, impact, and recovery phases. A held airborne Down input becomes an ordinary fast fall when the ground-slam clearance and airborne-time requirements are not satisfied.

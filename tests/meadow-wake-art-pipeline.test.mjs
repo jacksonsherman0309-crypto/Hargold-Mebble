@@ -91,12 +91,11 @@ assert.ok(
   MEADOW_WAKE_SCENERY_BEATS.every(beat => beat.props.length >= 4),
   'every authored Meadow Wake beat must carry its own scenery finish'
 );
-assert.match(renderer, /importedAnimationFor/);
-assert.match(renderer, /importedClipMetadata/);
+assert.match(renderer, /name === 'sprint'/);
 assert.match(renderer, /ACTION_REVEAL_DEGREES/);
 assert.match(renderer, /GAME_PIXELS_PER_METRE/);
 assert.match(renderer, /assetHeightMetres/);
-assert.match(renderer, /GAME_PIXELS_PER_METRE \* \(spec\.assetHeightMetres \/ rawHeight\)/);
+assert.match(renderer, /runtimeScale = GAME_PIXELS_PER_METRE/);
 assert.doesNotMatch(renderer, /scale\.x\s*=\s*direction/);
 assert.match(renderer, /model\.root\.scale\.setScalar\(model\.baseScale\)/);
 assert.match(renderer, /model\.currentYaw \+= yawDelta/);
@@ -108,8 +107,8 @@ for (const texture of Object.values(manifest.environmentTextures)) {
   assert.ok(statSync(texturePath).size > 1_000_000, `${texture} must be a production-resolution texture`);
 }
 
-assert.match(characterManifest.status, /locked-silhouette-organic-v5-active/);
-assert.match(characterManifest.activeRuntimeStatus, /production-organic-silhouette-v5-candidate-active/);
+assert.match(characterManifest.status, /mannequin-fitted-v4-active/);
+assert.match(characterManifest.activeRuntimeStatus, /mannequin-fitted-v4-candidate/);
 assert.equal(characterManifest.references.ApprovedPairTarget.status, 'present-approved-2026-07-25');
 assert.ok(statSync(approvedCharacterTarget).size > 2_000_000);
 assert.equal(characterManifest.dimensionalPresentation.classification, '2.75D');
@@ -122,15 +121,7 @@ assert.ok(characterManifest.sharedAnimationClipsRequired.includes('crawl'));
 assert.ok(characterManifest.sharedAnimationClipsRequired.includes('victory'));
 for (const hero of ['Hargold', 'Mebble']) {
   const spec = characterManifest.characters[hero];
-  assert.match(spec.status, /production-organic-silhouette-v5-candidate-active/);
-  assert.ok(
-    spec.implemented.model.some(entry => /one connected watertight skin body/.test(entry)),
-    `${hero} must declare the connected organic body gate`
-  );
-  assert.ok(
-    spec.implemented.model.some(entry => /single-piece rounded/.test(entry)),
-    `${hero} must declare unified rounded boots`
-  );
+  assert.match(spec.status, /mannequin-fitted-v4-candidate/);
   assert.ok(
     statSync(new URL(`../assets/blender/${spec.blend}`, import.meta.url)).size > 500_000,
     `${hero} replacement source must contain the modeled, rigged, textured asset`
@@ -161,8 +152,8 @@ assert.match(motionValidator, /motionRangeByFamily/);
 assert.match(motionValidator, /finalApprovalEligible/);
 
 const liveHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-assert.doesNotMatch(liveHtml, /data-action="sprint"/);
-assert.match(liveHtml, /readability-pass-1/);
-assert.match(renderer, /canonical_gameplay_rig\.glb/);
+assert.match(liveHtml, /data-action="sprint"/);
+assert.match(liveHtml, /movement-foundation-1/);
+assert.match(renderer, /locked-fit-4/);
 
 console.log(`Meadow Wake art pipeline checks passed from ${root}`);

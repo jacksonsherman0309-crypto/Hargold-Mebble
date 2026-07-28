@@ -1,4 +1,4 @@
-export const CANON_VERSION = '2026-07-28-character-readability-pass-1';
+export const CANON_VERSION = '2026-07-26-hierarchical-movement-foundation-1';
 
 export const GAME_RULES = Object.freeze({
   platform: {
@@ -20,50 +20,6 @@ export const GAME_RULES = Object.freeze({
     environment: 'fully-rendered-3d',
     gameplayPlane: 'strict-linear-side-scrolling',
     classification: '2.75D',
-    modelApprovalGate: Object.freeze({
-      silhouetteAuthority: 'locked-character-sheets-and-approved-compact-tall-frames',
-      cleanRoomConstructionBenchmark: 'observable-craft-principles-only',
-      repositoryConstructionReferences: Object.freeze({
-        Hargold: 'assets/previews/construction-reference/hargold-construction-reference.png',
-        Mebble: 'assets/previews/construction-reference/mebble-construction-reference.png'
-      }),
-      externalIdentityOrAssetTransferForbidden: true,
-      constructionOrder: Object.freeze([
-        'locked-silhouette',
-        'connected-organic-body',
-        'bind-deformation',
-        '100–150-pixel-actions',
-        'gameplay-camera',
-        'secondary-detail-and-animation-polish'
-      ]),
-      oneConnectedWatertightBodyRequired: true,
-      wrappedSoftGarmentsRequired: true,
-      singlePieceRoundedBootsRequired: true,
-      appearanceApprovedForLiveAnimationImport: true,
-      animationIntegrationAuthorized: true,
-      animationPolishFrozenUntilModelApproval: false,
-      productionChecklist: 'assets/blender/character-production-checklist.json',
-      approvedMilestones: Object.freeze([
-        'silhouette',
-        'proportions',
-        'skeleton',
-        'connected-body'
-      ]),
-      activeMilestone: 'joint-deformation',
-      incompleteMilestones: Object.freeze([
-        'joint-deformation',
-        'facial-topology',
-        'hand-topology',
-        'clothing-integration',
-        'surface-refinement',
-        'production-uvs',
-        'final-textures',
-        'final-animation-polish',
-        'gameplay-validation',
-        'lod-generation',
-        'export-ready-production-asset'
-      ])
-    }),
     orientation: Object.freeze({
       mode: 'true-side-primary-with-small-action-reveal',
       cameraBiasDegrees: 6,
@@ -162,14 +118,6 @@ export const GAME_RULES = Object.freeze({
     }),
     animation: Object.freeze({
       gameplayDriven: true,
-      liveRigSource: 'user-supplied Meshy rig packages imported 2026-07-27',
-      approvedImportedClips: Object.freeze({
-        Hargold: Object.freeze(['hargold_walk', 'hargold_run']),
-        Mebble: Object.freeze(['mebble_walk', 'mebble_run'])
-      }),
-      missingClipFallback: 'supplied bind/rest pose without fabricated animation',
-      everySuppliedUsableClipInDebugMenu: true,
-      controllerOwnsRootTranslation: true,
       distinctJumpStages: Object.freeze([
         'anticipation',
         'takeoff',
@@ -186,30 +134,7 @@ export const GAME_RULES = Object.freeze({
     }),
     productionTarget: 'assets/references/Hargold and Mebble approved production target.png',
     productionTargetSha256: 'A236AB062EE5FA8390CDDA7BA5EC21A7B4989CCB82F375CF34435E7A5B5FC05D',
-    validationRequiredInNeutralAndGameplayCamera: true,
-    readability: Object.freeze({
-      defaultMode: 'combined',
-      characterOnly: true,
-      externalContourPixels: Object.freeze({ minimum: 1, maximum: 2 }),
-      contourStyle: 'soft-dark-nonblack-camera-facing-external-hull',
-      lightingStyle: 'soft-camera-aware-rim-local-key-fill-shadow-floor',
-      adaptation: 'broad-background-profile-with-smoothed-response',
-      responseSmoothingSeconds: 0.32,
-      preservesGeometryProportionsColorsAnimationTimingAndCollision: true,
-      fullSceneEdgeDetectionForbidden: true,
-      backgroundProfiles: Object.freeze([
-        'bright-grassland',
-        'dense-forest',
-        'dark-cave',
-        'bright-stone',
-        'sunset',
-        'snow-ice',
-        'toxic-green',
-        'busy-gameplay'
-      ]),
-      qualityPresets: Object.freeze(['low', 'balanced', 'high']),
-      validationViewport: Object.freeze({ width: 932, height: 430 })
-    })
+    validationRequiredInNeutralAndGameplayCamera: true
   },
   movement: {
     architecture: Object.freeze({
@@ -247,8 +172,6 @@ export const GAME_RULES = Object.freeze({
     coyoteTimeAllowed: true,
     jumpBufferAllowed: true,
     sharedHorizontalBaseTuning: true,
-    manualSprintAction: false,
-    directionalHoldAcceleratesThroughAllSpeedTiers: true,
     locomotionTargets: Object.freeze(['walk', 'run', 'sprint']),
     requiredCharacterStates: Object.freeze([
       'idle', 'walk', 'run', 'sprint', 'crouch', 'crawl', 'slide',
@@ -575,9 +498,9 @@ export const LOCKED_HERO_DESIGN = Object.freeze({
     clothing: ['layered olive-green explorer jacket', 'tan shirt', 'wide-brim olive-green hat with brown band and orange feather', 'deep red-brown wrapped scarf/cape collar', 'brown field backpack with leaf badge', 'brown belt and explorer pouches', 'brown boots', 'brass-colored hardware'],
     face: ['dark moustache and rounded chin beard/goatee treatment from locked sheet', 'round friendly features', 'moderate—not exaggerated—smile'],
     gameplay: ['shared horizontal base-controller tuning', 'Hargold-only block breaking', 'heavy-rock ground-slam defeats', 'exclusive learned double jump'],
-    productionModel: ['new original artist-authored geometry built from an empty Blender scene', 'do not reuse the rejected doll-like procedural geometry or substitute a generic humanoid base', 'locked silhouette is the source of truth before secondary detail', 'one connected watertight skinned body integrating face, neck, torso, limbs, hands, fingers and legs', 'continuous wrapped soft garments and single-piece rounded boots', 'continuous skinned body and soft-garment surfaces with no rigid segmented limbs', 'smooth rounded deformation topology', 'sculpted face and expressive eyebrows', 'detailed hands and boots', 'layered clothing with authored folds', 'clean UVs and optimized LOD-ready topology', 'action-pose and gameplay-camera deformation approval', '100–150 pixel silhouette approval', 'deformable shoulder volume with separated arms', 'longer readable forearms and hands enlarged roughly 20–30 percent over the rejected candidate', 'larger stable boot silhouette', 'soft integrated cheek transitions'],
+    productionModel: ['new original artist-authored geometry built from an empty Blender scene', 'do not reuse the rejected doll-like procedural geometry or substitute a generic humanoid base', 'continuous skinned body and soft-garment surfaces with no rigid segmented limbs', 'smooth rounded deformation topology', 'sculpted face and expressive eyebrows', 'detailed hands and boots', 'layered clothing with authored folds', 'clean UVs and optimized LOD-ready topology', 'action-pose and gameplay-camera deformation approval', '100–150 pixel silhouette approval', 'deformable shoulder volume with separated arms', 'longer readable forearms and hands enlarged roughly 20–30 percent over the rejected candidate', 'larger stable boot silhouette', 'soft integrated cheek transitions'],
     productionRig: ['IK/FK limbs', 'finger articulation', 'eye, eyebrow, jaw and mouth controls', 'gameplay sockets', 'hat, feather and scarf secondary controls'],
-    productionAnimation: ['user-supplied Meshy walk and run clips approved for current live testing', 'all missing gameplay clips remain incomplete and must not be fabricated', 'anticipation and controlled squash/stretch', 'follow-through and overlapping secondary motion', 'reliable foot contacts', 'seamless state blending']
+    productionAnimation: ['new original gameplay clips', 'anticipation and controlled squash/stretch', 'follow-through and overlapping secondary motion', 'reliable foot contacts', 'seamless state blending']
   },
   Mebble: {
     reference: 'assets/references/Mebble locked production character sheet.png',
@@ -587,9 +510,9 @@ export const LOCKED_HERO_DESIGN = Object.freeze({
     definingFeatures: ['very long skinny neck', 'clearly visible protruding Adam’s apple', 'small brown top hat with green band and leaf detail', 'slightly crooked less-round glasses', 'very bushy eyebrows'],
     clothing: ['cream rolled-sleeve shirt', 'brown vest', 'dark trousers', 'double belts and explorer pouches', 'tall brown lace-up boots', 'green emblem cape that opens as parachute/glider'],
     gameplay: ['shared horizontal base-controller tuning', 'slightly higher jump', 'innate slow-fall and short glide'],
-    productionModel: ['new original artist-authored geometry built from an empty Blender scene', 'do not reuse the rejected doll-like procedural geometry or substitute a generic humanoid base', 'locked silhouette is the source of truth before secondary detail', 'one connected watertight skinned body integrating face, neck, torso, limbs, hands, fingers and legs', 'continuous wrapped soft garments and single-piece rounded boots', 'continuous skinned body and soft-garment surfaces with no rigid segmented limbs', 'smooth rounded deformation topology', 'sculpted face and expressive eyebrows', 'detailed hands and boots', 'layered clothing with authored folds', 'clean UVs and optimized LOD-ready topology', 'action-pose and gameplay-camera deformation approval', '100–150 pixel silhouette approval', 'deformable shoulder volume with arms separated from vest and cape', 'modestly wider torso with larger hands and boots', 'tapered visible neck and stronger Adam’s apple profile', 'glasses offset from the face and curved cape shoulder yoke'],
+    productionModel: ['new original artist-authored geometry built from an empty Blender scene', 'do not reuse the rejected doll-like procedural geometry or substitute a generic humanoid base', 'continuous skinned body and soft-garment surfaces with no rigid segmented limbs', 'smooth rounded deformation topology', 'sculpted face and expressive eyebrows', 'detailed hands and boots', 'layered clothing with authored folds', 'clean UVs and optimized LOD-ready topology', 'action-pose and gameplay-camera deformation approval', '100–150 pixel silhouette approval', 'deformable shoulder volume with arms separated from vest and cape', 'modestly wider torso with larger hands and boots', 'tapered visible neck and stronger Adam’s apple profile', 'glasses offset from the face and curved cape shoulder yoke'],
     productionRig: ['IK/FK limbs', 'finger articulation', 'eye, eyebrow, jaw and mouth controls', 'gameplay sockets', 'neck corrective and cape secondary controls'],
-    productionAnimation: ['user-supplied Meshy walk and run clips approved for current live testing', 'all missing gameplay clips remain incomplete and must not be fabricated', 'anticipation and controlled squash/stretch', 'follow-through and overlapping secondary motion', 'reliable foot contacts', 'seamless state blending'],
+    productionAnimation: ['new original gameplay clips', 'anticipation and controlled squash/stretch', 'follow-through and overlapping secondary motion', 'reliable foot contacts', 'seamless state blending'],
     visibilityRule: 'neck and Adam’s apple may not be hidden by collar, cape, pose or lighting'
   }
 });

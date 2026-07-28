@@ -134,18 +134,3 @@ When full File Library bytes can be supplied directly to the repository workspac
 5. Add regression tests before deleting or superseding old implementations.
 6. Preserve the original archive files for traceability.
 7. Mark obsolete behavior clearly rather than silently carrying it forward.
-
-## 2026-07-27 Meshy character animation packages
-
-Five user-supplied Meshy archives were preserved under `archive/imported-packages/20260727-meshy-animation`. Two Mebble ZIP files are byte-identical, leaving eight unique FBX/GLB files to inspect.
-
-The complete source-file, archive-entry, mesh, material, texture, skeleton, bind-pose, action, timing, root-motion, coordinate-system, and hash inventory is in `data/character-animation-inventory.json`. The exact-selection and live-integration report is `docs/character-animation-import-report.md`.
-
-Reusable content found:
-
-- one Hargold walking take and one Hargold running take;
-- one Mebble walking take and one Mebble running take;
-- exact 24-bone skeleton compatibility within each hero's selected GLB set;
-- user-supplied visible meshes and embedded base-color texture data.
-
-The zero-duration `clip0` actions are bind/rest takes, not gameplay animation clips. Alternate FBX walking exports and duplicate animation-package meshes are retained for traceability but are not layered into the live scene.

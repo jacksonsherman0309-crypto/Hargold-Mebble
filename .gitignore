@@ -1,12 +1,3 @@
 node_modules/
 .pnpm-store/
 *.blend1
-__pycache__/
-.codex-staged-block-check/
-DROP_FILES_HERE/*
-
-# User-supplied Meshy archives are preserved locally. One archive exceeds
-# GitHub's per-file limit, so only the inventoried, processed gameplay assets
-# and their reproducible build/validation metadata are committed.
-archive/imported-packages/20260727-meshy-animation/zip-sources/
-archive/imported-packages/20260727-meshy-animation/expanded/

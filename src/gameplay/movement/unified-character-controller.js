@@ -251,10 +251,11 @@ function enterGroundedLocomotion(state, input, dt, tuning, canStand) {
   const reversing = state.velocityX !== 0 &&
     direction !== 0 &&
     Math.sign(state.velocityX) !== direction;
-  // Directional hold owns the complete speed ramp. There is no separate
-  // manual sprint gate in the live controller: acceleration naturally carries
-  // the hero from the readable walk tier through run to full-speed locomotion.
-  const baseTargetSpeed = tuning.sprintSpeed;
+  const sprintReady = input.sprint &&
+    (speed >= tuning.sprintEntrySpeed || state.movementState === MOVEMENT_STATES.SPRINT);
+  const baseTargetSpeed = sprintReady
+    ? tuning.sprintSpeed
+    : input.run || input.sprint ? tuning.runSpeed : tuning.walkSpeed;
   const targetSpeed = baseTargetSpeed * terrain.maximumSpeedMultiplier;
   const response = selectHorizontalResponse({
     velocityX: state.velocityX,
@@ -296,13 +297,11 @@ function enterGroundedLocomotion(state, input, dt, tuning, canStand) {
     response.acceleration,
     dt
   );
-  const updatedSpeed = Math.abs(state.velocityX);
-  transition(state,
-    updatedSpeed >= tuning.sprintEntrySpeed
+  transition(
+    state,
+    sprintReady
       ? MOVEMENT_STATES.SPRINT
-      : updatedSpeed >= tuning.walkSpeed * 0.92
-        ? MOVEMENT_STATES.RUN
-        : MOVEMENT_STATES.WALK
+      : input.run || input.sprint ? MOVEMENT_STATES.RUN : MOVEMENT_STATES.WALK
   );
 }
 
@@ -315,12 +314,9 @@ function updateAirSteering(state, input, dt, profile, tuning) {
     return;
   }
   const reversing = state.velocityX !== 0 && Math.sign(state.velocityX) !== direction;
-  const speed = Math.abs(state.velocityX);
-  const maximum = speed >= tuning.sprintEntrySpeed
+  const maximum = input.sprint
     ? tuning.airMaximumSprintSpeed
-    : speed >= tuning.walkSpeed * 0.92
-      ? tuning.airMaximumRunSpeed
-      : tuning.airMaximumWalkSpeed;
+    : input.run ? tuning.airMaximumRunSpeed : tuning.airMaximumWalkSpeed;
   const sameDirectionAboveCap = !reversing &&
     Math.sign(state.velocityX) === direction &&
     Math.abs(state.velocityX) > maximum;
