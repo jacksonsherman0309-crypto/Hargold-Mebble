@@ -17,6 +17,17 @@ import {
   importedAnimationFor,
   importedClipMetadata
 } from './animation/character-animation-config.js?v=meshy-rigs-1';
+import {
+  BACKGROUND_READABILITY_PROFILES,
+  CHARACTER_READABILITY_QUALITY,
+  broadMeadowWakeProfileAt,
+  resolveReadabilityMode,
+  resolveReadabilityQuality
+} from './rendering/character-readability-config.js?v=readability-pass-1';
+import {
+  CharacterReadabilityPass,
+  createReadabilityDiagnosticBackdrop
+} from './rendering/character-readability.js?v=readability-pass-1';
 
 const PRESENTATION = GAME_RULES.characterPresentation;
 const GAME_PIXELS_PER_METRE = PRESENTATION.gameplayScale.gamePixelsPerMetre;
@@ -43,7 +54,26 @@ export class CharacterRenderer {
     this.width = width;
     this.height = height;
     this.onProgress = onProgress;
+    this.runtimeParameters = new URLSearchParams(location.search);
+    this.readabilityMode = resolveReadabilityMode(
+      this.runtimeParameters.get('readability')
+    );
+    this.readabilityQualityName = resolveReadabilityQuality(
+      this.runtimeParameters.get('readabilityQuality')
+    );
+    this.readabilityQuality =
+      CHARACTER_READABILITY_QUALITY[this.readabilityQualityName];
+    const requestedBackdrop = this.runtimeParameters.get(
+      'readabilityBackdrop'
+    );
+    this.readabilityBackdropOverride =
+      BACKGROUND_READABILITY_PROFILES[requestedBackdrop]
+        ? requestedBackdrop
+        : null;
+    this.readabilityPairPreview =
+      this.runtimeParameters.get('readabilityPair') === 'overlap';
     this.models = new Map();
+    this.readabilityPasses = new Map();
     this.failed = new Set();
     this.animationDebugOverride = null;
     this.courseAssetsReady = false;
@@ -63,7 +93,10 @@ export class CharacterRenderer {
       antialias: true,
       powerPreference: 'high-performance'
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.renderer.setPixelRatio(Math.min(
+      window.devicePixelRatio || 1,
+      this.readabilityQuality.maximumPixelRatio
+    ));
     this.renderer.setSize(width, height, false);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -74,6 +107,23 @@ export class CharacterRenderer {
     this.renderer.domElement.className = 'character-layer';
     this.renderer.domElement.setAttribute('aria-hidden', 'true');
     mount.append(this.renderer.domElement);
+    this.readabilityViewport = {
+      width: Math.max(1, this.renderer.domElement.clientWidth || width),
+      height: Math.max(1, this.renderer.domElement.clientHeight || height)
+    };
+    this.readabilityResizeObserver = new ResizeObserver(entries => {
+      const bounds = entries[0]?.contentRect;
+      if (!bounds) return;
+      this.readabilityViewport.width = Math.max(1, bounds.width);
+      this.readabilityViewport.height = Math.max(1, bounds.height);
+      for (const readability of this.readabilityPasses.values()) {
+        readability.updateViewport(
+          this.readabilityViewport.width,
+          this.readabilityViewport.height
+        );
+      }
+    });
+    this.readabilityResizeObserver.observe(this.renderer.domElement);
 
     this.scene.fog = new THREE.Fog(0x9fd7d1, 700, 1800);
     this.scene.add(new THREE.HemisphereLight(0xfff4d3, 0x29452f, 2.55));
@@ -99,6 +149,15 @@ export class CharacterRenderer {
     this.backgroundFar = new THREE.Group();
     this.backgroundMid = new THREE.Group();
     this.scene.add(this.backgroundFar, this.backgroundMid);
+    if (this.readabilityBackdropOverride) {
+      this.readabilityDiagnosticBackdrop =
+        createReadabilityDiagnosticBackdrop({
+          profileName: this.readabilityBackdropOverride,
+          width,
+          height
+        });
+      this.scene.add(this.readabilityDiagnosticBackdrop);
+    }
     this.collectibleMeshes = [];
     this.blockSlots = [];
     this.blockEffects = [];
@@ -1140,6 +1199,14 @@ export class CharacterRenderer {
         }
       });
       this.scene.add(root);
+      const readability = new CharacterReadabilityPass({
+        hero,
+        root,
+        viewport: this.readabilityViewport,
+        mode: this.readabilityMode,
+        quality: this.readabilityQualityName
+      });
+      this.readabilityPasses.set(hero, readability);
       const mixer = new THREE.AnimationMixer(root);
       const clips = new Map(gltf.animations.map(clip => [clip.name, clip]));
       const skeletonRoot =
@@ -1156,7 +1223,8 @@ export class CharacterRenderer {
         baseScale: runtimeScale,
         currentYaw: rightFacingYaw,
         currentFacing: 1,
-        rawHeightMetres: rawHeight
+        rawHeightMetres: rawHeight,
+        readability
       });
       this.onProgress(this.statusText());
     } catch (error) {
@@ -1240,6 +1308,10 @@ export class CharacterRenderer {
       facing: Number(override.facing ?? model.currentFacing),
       skeletonRootWorld: { x: world.x, y: world.y, z: world.z }
     };
+  }
+
+  getReadabilitySnapshot(hero) {
+    return this.readabilityPasses.get(hero)?.snapshot() ?? null;
   }
 
   updateMobs(mobs, deltaSeconds) {
@@ -1403,7 +1475,9 @@ export class CharacterRenderer {
     for (const [modelHero, model] of this.models) {
       const debug = this.animationDebugOverride;
       const activeHero = debug?.hero ?? hero;
-      const active = modelHero === activeHero;
+      const active =
+        this.readabilityPairPreview ||
+        modelHero === activeHero;
       model.root.visible = active;
       if (!active) continue;
       const direction = Number(debug?.facing ?? facing) < 0 ? -1 : 1;
@@ -1426,11 +1500,25 @@ export class CharacterRenderer {
       model.currentYaw += yawDelta * (1 - Math.exp(-turnResponsiveness * deltaSeconds));
       model.currentFacing = direction;
       model.root.rotation.y = model.currentYaw;
+      const pairOffset = this.readabilityPairPreview
+        ? modelHero === 'Hargold' ? -24 : 24
+        : 0;
       model.root.position.set(
-        screenX - this.width / 2,
+        screenX - this.width / 2 + pairOffset,
         this.height / 2 - screenY + cameraY,
         110
       );
+      const worldX = (screenX + cameraX) / GAME_PIXELS_PER_METRE;
+      model.readability.update({
+        background:
+          this.readabilityBackdropOverride ??
+          broadMeadowWakeProfileAt(worldX),
+        deltaSeconds,
+        heroScreenHeightPixels:
+          MODEL_SPECS[modelHero].assetHeightMetres *
+          GAME_PIXELS_PER_METRE *
+          this.camera.zoom
+      });
       const requestedClip = debug?.clipId ??
         this.selectClip(modelHero, locomotion, horizontalSpeed, grounded);
       this.play(model, requestedClip, debug ? 0 : horizontalSpeed);

@@ -1,4 +1,4 @@
-export const CANON_VERSION = '2026-07-27-meshy-live-animation-import-1';
+export const CANON_VERSION = '2026-07-28-character-readability-pass-1';
 
 export const GAME_RULES = Object.freeze({
   platform: {
@@ -186,7 +186,30 @@ export const GAME_RULES = Object.freeze({
     }),
     productionTarget: 'assets/references/Hargold and Mebble approved production target.png',
     productionTargetSha256: 'A236AB062EE5FA8390CDDA7BA5EC21A7B4989CCB82F375CF34435E7A5B5FC05D',
-    validationRequiredInNeutralAndGameplayCamera: true
+    validationRequiredInNeutralAndGameplayCamera: true,
+    readability: Object.freeze({
+      defaultMode: 'combined',
+      characterOnly: true,
+      externalContourPixels: Object.freeze({ minimum: 1, maximum: 2 }),
+      contourStyle: 'soft-dark-nonblack-camera-facing-external-hull',
+      lightingStyle: 'soft-camera-aware-rim-local-key-fill-shadow-floor',
+      adaptation: 'broad-background-profile-with-smoothed-response',
+      responseSmoothingSeconds: 0.32,
+      preservesGeometryProportionsColorsAnimationTimingAndCollision: true,
+      fullSceneEdgeDetectionForbidden: true,
+      backgroundProfiles: Object.freeze([
+        'bright-grassland',
+        'dense-forest',
+        'dark-cave',
+        'bright-stone',
+        'sunset',
+        'snow-ice',
+        'toxic-green',
+        'busy-gameplay'
+      ]),
+      qualityPresets: Object.freeze(['low', 'balanced', 'high']),
+      validationViewport: Object.freeze({ width: 932, height: 430 })
+    })
   },
   movement: {
     architecture: Object.freeze({

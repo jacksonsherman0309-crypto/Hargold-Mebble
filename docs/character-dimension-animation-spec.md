@@ -296,6 +296,31 @@ expose the active clay body, wireframe, side silhouette, and run deformation.
 These expose construction weaknesses without copying external art and do not
 substitute for senior retopology or visual approval.
 
+## Character-only gameplay readability
+
+The locked hero appearance remains authoritative. Readability work must not
+redesign the mesh, alter proportions, recolor costumes, change facial features,
+retime animation, or modify collision.
+
+The live renderer uses a subtle camera-facing inverted-hull contour outside the
+hero silhouette. It is dark but not pure black and remains between one and two
+CSS pixels at the gameplay camera. A local material treatment adds broad
+camera-aware rim light, upper key, front fill, shadow-floor preservation, and
+distance-aware midtone clarity. These terms are continuous and unbanded; this
+is not cel shading.
+
+Only the visible hero meshes receive this pass. Broad authored background
+profiles can vary the rim and contour response, but all changes smooth over
+time. Full-scene edge detection and per-pixel background-driven flicker are
+forbidden. Low, balanced, and high presets must preserve the same silhouette
+contract while limiting device-pixel-ratio and normal-map cost for mobile.
+
+Validation must include both heroes at 100–150 pixels tall and at the
+932-by-430 phone viewport against bright grassland, dense forest, dark cave,
+bright stone, sunset, snow/ice, toxic green, and busy-gameplay stress
+backgrounds. Actual authored world art remains the final acceptance context;
+diagnostic backdrops are stress fixtures, not claims that those worlds exist.
+
 ## Required validation scene
 
 Show both heroes in neutral presentation and through the actual gameplay camera:

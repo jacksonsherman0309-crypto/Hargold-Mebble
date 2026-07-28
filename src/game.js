@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js?v=meshy-rigs-2';
+import { CharacterRenderer } from './character-renderer.js?v=readability-pass-1';
 import {
   MEADOW_WAKE_ENEMY_ACTORS,
   MEADOW_WAKE_LEVEL_DATA
