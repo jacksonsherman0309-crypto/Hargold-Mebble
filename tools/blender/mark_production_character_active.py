@@ -12,11 +12,11 @@ def mark_active() -> dict:
     source = Path(bpy.data.filepath)
     hero = source.stem.removesuffix("_character").capitalize()
     scene = bpy.context.scene
-    if scene.get("geometryGeneration") != "production-mannequin-fitted-v4":
-        raise RuntimeError("refusing to activate a non-mannequin-fitted source")
+    if scene.get("geometryGeneration") != "production-organic-silhouette-v5":
+        raise RuntimeError("refusing to activate a non-organic-silhouette source")
     if scene.get("reusesPriorGeometry") is not False:
         raise RuntimeError("refusing to activate a source without no-reuse provenance")
-    scene["assetVersion"] = "4.1.0-locked-mannequin-fitted-candidate-active"
+    scene["assetVersion"] = "5.0.0-organic-silhouette-candidate-active"
     scene["referenceHash"] = (
         "4004C659783AC41ED09E6AF18D25F776DFB19BE44B9E7066289627E016A7B4E4"
         if hero == "Hargold"
@@ -25,7 +25,7 @@ def mark_active() -> dict:
     scene["author"] = "Hargold & Mebble production pipeline"
     scene["blenderVersion"] = bpy.app.version_string
     scene["reviewStatus"] = (
-        "locked-mannequin-fitted-candidate-active-visual-approval-pending"
+        "organic-silhouette-candidate-active-visual-approval-pending"
     )
     bpy.ops.wm.save_as_mainfile(filepath=str(source), check_existing=False)
     result = {"hero": hero, "source": str(source), "reviewStatus": scene["reviewStatus"]}

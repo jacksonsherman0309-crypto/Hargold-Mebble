@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "authority": "user-approved-production-checklist-2026-07-26",
+  "appliesTo": [
+    "Hargold",
+    "Mebble"
+  ],
+  "animationPolishPolicy": "frozen-until-mesh-construction-gates-complete",
+  "milestones": [
+    {
+      "id": "silhouette",
+      "label": "Silhouette approved",
+      "status": "approved"
+    },
+    {
+      "id": "proportions",
+      "label": "Proportions approved",
+      "status": "approved"
+    },
+    {
+      "id": "skeleton",
+      "label": "Skeleton approved",
+      "status": "approved"
+    },
+    {
+      "id": "connected-body",
+      "label": "Connected body approved",
+      "status": "approved"
+    },
+    {
+      "id": "joint-deformation",
+      "label": "Joint deformation complete",
+      "status": "in-progress",
+      "implementation": "preserve-volume-local-corrective-v1",
+      "automatedStructuralGate": "pass",
+      "visualStressGate": "pending",
+      "evidence": {
+        "Hargold": "assets/previews/joint-deformation/hargold-joint-deformation-stress.png",
+        "Mebble": "assets/previews/joint-deformation/mebble-joint-deformation-stress.png"
+      },
+      "regions": {
+        "shoulders": [
+          "clavicle deformation",
+          "deltoid volume preservation",
+          "upper-arm twist distribution"
+        ],
+        "elbows": [
+          "prevent collapse",
+          "preserve sleeve volume"
+        ],
+        "hips": [
+          "pelvis rotation",
+          "preserve upper-thigh volume"
+        ],
+        "knees": [
+          "maintain pant volume",
+          "preserve silhouette"
+        ],
+        "ankles": [
+          "smooth boot transition"
+        ]
+      }
+    },
+    {
+      "id": "facial-topology",
+      "label": "Facial topology complete",
+      "status": "pending",
+      "requiredLoops": [
+        "eyelids",
+        "eyebrows",
+        "cheeks",
+        "nostrils",
+        "mouth corners",
+        "upper lip",
+        "lower lip",
+        "jaw"
+      ]
+    },
+    {
+      "id": "hand-topology",
+      "label": "Hand topology complete",
+      "status": "pending",
+      "requirements": [
+        "thumb saddle",
+        "finger knuckles",
+        "proper palm thickness",
+        "stylized hand deformation"
+      ]
+    },
+    {
+      "id": "clothing-integration",
+      "label": "Clothing integration complete",
+      "status": "pending",
+      "requirements": [
+        "cape attachment",
+        "suspenders",
+        "belts",
+        "vest edges",
+        "sleeve openings",
+        "hat brim thickness"
+      ]
+    },
+    {
+      "id": "surface-refinement",
+      "label": "Surface refinement complete",
+      "status": "pending",
+      "requirements": [
+        "torso curvature",
+        "shoulder blending",
+        "hip blending",
+        "boot transitions",
+        "neck transitions"
+      ]
+    },
+    {
+      "id": "production-uvs",
+      "label": "Production UVs",
+      "status": "pending"
+    },
+    {
+      "id": "final-textures",
+      "label": "Final textures",
+      "status": "pending"
+    },
+    {
+      "id": "final-animation-polish",
+      "label": "Final animation polish",
+      "status": "blocked-by-mesh-gates",
+      "requirements": [
+        "anticipation",
+        "squash",
+        "stretch",
+        "overlap",
+        "follow-through",
+        "secondary motion",
+        "cape dynamics",
+        "hat motion"
+      ]
+    },
+    {
+      "id": "gameplay-validation",
+      "label": "Gameplay validation",
+      "status": "pending"
+    },
+    {
+      "id": "lod-generation",
+      "label": "LOD generation",
+      "status": "pending"
+    },
+    {
+      "id": "export-ready-production-asset",
+      "label": "Export-ready production asset",
+      "status": "pending"
+    }
+  ]
+}

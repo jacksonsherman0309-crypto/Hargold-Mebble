@@ -1,10 +1,15 @@
 # Blender character asset pipeline
 
-The active July 26 locked-frame mannequin-fitted v4 candidates were rebuilt from
+The active July 26 organic-silhouette v5 candidates were rebuilt from
 factory-empty scenes without reading or reusing the rejected July 25 geometry.
-Both candidates pass the automated mannequin-frame, topology, UV, binding,
-material, scale, action-library, motion-range, and GLB gates. Final shipped-art
-classification still requires the human approval gates below.
+Each hero now uses one connected organic skin surface, continuous wrapped soft
+garments, and single-piece rounded boots instead of separate limb and footwear
+sections. Radius-tapered constant-section limb sources replace the prior
+stretched-sphere construction so shoulders, elbows, hips, and knees no longer
+inherit a bulb-chain profile. Both candidates pass the automated mannequin-frame, connected-surface,
+topology, UV, binding, material, scale, action-library, motion-range, and GLB
+gates. Final shipped-art classification still requires the human approval
+gates below.
 
 The approved production route is newly modeled, entirely original character
 geometry built in empty Blender scenes against the locked Hargold and Mebble
@@ -41,6 +46,18 @@ The authoritative construction frames are:
 - `mannequins/tall_animation_mannequin.blend`
 - `../exports/mannequins/compact_animation_mannequin.glb`
 - `../exports/mannequins/tall_animation_mannequin.glb`
+
+The clean-room observable construction benchmark is
+`character-construction-benchmark.json`. Original project-only source boards
+are generated at:
+
+- `../previews/construction-reference/hargold-construction-reference.png`
+- `../previews/construction-reference/mebble-construction-reference.png`
+
+They avoid storing external benchmark artwork. The authoritative featureless
+source boards use the `*-construction-reference.png` names; the active-mesh
+diagnostic clay, wireframe, profile-silhouette, and run-deformation boards use
+`*-current-body-audit.png`.
 
 Build and validate these featureless frames before fitting character surfaces.
 The twenty-row comparison sheet is generated at
@@ -124,10 +141,12 @@ Run the production structural/runtime-export checks with:
 ```
 
 These validators enforce factory-empty provenance, no rejected-geometry reuse,
-canonical metre scale, mesh density and quad ratio, smooth UV-mapped surfaces,
-rig binding, locked silhouette parts, minimum action-readable hand, sleeve and
-boot dimensions, Mebble's wrapped cape yoke, material classes, action coverage,
-and runtime GLB structure. Run the functional motion checks separately:
+canonical metre scale, mesh density and quad ratio, a single connected
+watertight body, integrated anatomical deform groups, continuous wrapped
+garments, single-piece boots, smooth UV-mapped surfaces, rig binding, locked
+silhouette provenance, Mebble's visible-neck and wrapped-cape requirements,
+material classes, action coverage, and runtime GLB structure. Run the
+functional motion checks separately:
 
 ```powershell
 & 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background assets\blender\hargold_character.blend --python-exit-code 1 --python tools\blender\validate_character_motion.py

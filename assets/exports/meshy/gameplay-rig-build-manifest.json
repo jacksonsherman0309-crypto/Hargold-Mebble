@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "results": [
+    {
+      "hero": "Hargold",
+      "outputPath": "assets/exports/meshy/hargold_canonical_gameplay_rig.glb",
+      "bytes": 37367328,
+      "sha256": "A045E299A3F63EC45765C36D436EEF8C53AFDEE4BB7BDC98FD0A23537ABBEBEC",
+      "canonicalRig": "Hargold_Canonical_Gameplay_Rig",
+      "canonicalVisibleMeshSource": "archive/imported-packages/20260727-meshy-animation/expanded/Meshy_AI_Hargold_Rig_biped/Meshy_AI_Hargold_Rig_biped/Meshy_AI_Hargold_Rig_biped_Character_output.glb",
+      "canonicalVisibleMeshSourceSha256": "A102E775152F1A2783CD8E1F1FA32CA8089543E85B5C9C669320EF867ED7D62A",
+      "clips": [
+        "hargold_walk",
+        "hargold_run"
+      ],
+      "skeletonCompatibility": "exact GLB node names, hierarchy, and bind transforms",
+      "retargetingRequired": false,
+      "duplicateAnimationMeshesExported": false,
+      "controllerOwnsMovement": true
+    },
+    {
+      "hero": "Mebble",
+      "outputPath": "assets/exports/meshy/mebble_canonical_gameplay_rig.glb",
+      "bytes": 37906996,
+      "sha256": "392D8F9C12AD140AFA738AB118D3C3A63F9A40DA41DD8A061FE8A37F91DE3A3B",
+      "canonicalRig": "Mebble_Canonical_Gameplay_Rig",
+      "canonicalVisibleMeshSource": "archive/imported-packages/20260727-meshy-animation/expanded/Meshy_AI_Mebble_Rig_biped (1)/Meshy_AI_Mebble_Rig_biped/Meshy_AI_Mebble_Rig_biped_Animation_Walking_withSkin.glb",
+      "canonicalVisibleMeshSourceSha256": "E7A9F435022F3DCB6BD899172D27DDE1E1B8CC32BF77337E5E63527B47CF8C52",
+      "clips": [
+        "mebble_walk",
+        "mebble_run"
+      ],
+      "skeletonCompatibility": "exact GLB node names, hierarchy, and bind transforms",
+      "retargetingRequired": false,
+      "duplicateAnimationMeshesExported": false,
+      "controllerOwnsMovement": true
+    }
+  ]
+}
