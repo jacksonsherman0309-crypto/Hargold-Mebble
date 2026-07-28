@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js?v=meadow-rooms-6';
+import { CharacterRenderer } from './character-renderer.js?v=meshy-rigs-2';
 import {
   MEADOW_WAKE_ENEMY_ACTORS,
   MEADOW_WAKE_LEVEL_DATA
@@ -51,6 +51,7 @@ import { clamp } from './runtime/math.js';
 import { FixedStepLoop } from './runtime/fixed-step.js';
 import { fatalHazardEvent } from './runtime/hazards/fatal-hazards.js';
 import { createLinearGround } from './runtime/terrain/linear-ground.js';
+import { AnimationDebugPanel } from './animation/animation-debug-panel.js?v=meshy-rigs-1';
 
 /*
  * Browser game integration. Physics is owned by the unified controller under
@@ -69,8 +70,6 @@ const keys = new Set();
 const touch = {
   left: false,
   right: false,
-  run: false,
-  sprint: false,
   jump: false,
   slam: false,
   action: false,
@@ -80,6 +79,8 @@ const loop = new FixedStepLoop({ hz: 120 });
 const inputBuffer = createMovementInputBuffer();
 const runtimeParameters = new URLSearchParams(location.search);
 const movementDebugEnabled = runtimeParameters.has('debugMovement');
+const animationDebugEnabled = runtimeParameters.has('debugAnimation');
+const animationDebugDrive = runtimeParameters.get('debugDrive');
 const requestedArtPreviewX = Number(runtimeParameters.get('artPreview'));
 const initialCourseX = Number.isFinite(requestedArtPreviewX)
   ? clamp(requestedArtPreviewX, 1.8, WORLD_END - 1)
@@ -93,6 +94,7 @@ const characterRenderer = new CharacterRenderer({
     characterLoadStatus = message;
   }
 });
+let animationDebugPanel = null;
 
 const terrain = createLinearGround(MEADOW_WAKE_TERRAIN_POINTS);
 const pits = MEADOW_WAKE_PITS;
@@ -211,8 +213,6 @@ function readGamepadSnapshot() {
   return {
     left: horizontal < -0.35 || pressed(14),
     right: horizontal > 0.35 || pressed(15),
-    run: pressed(2) || pressed(3),
-    sprint: pressed(5),
     jump: pressed(0),
     down: vertical > 0.5 || pressed(13),
     action: pressed(1),
@@ -224,11 +224,14 @@ function readGamepadSnapshot() {
 function rawInputSnapshot() {
   const gamepad = readGamepadSnapshot();
   return {
-    left: keys.has('ArrowLeft') || keys.has('KeyA') || touch.left || gamepad.left,
-    right: keys.has('ArrowRight') || keys.has('KeyD') || touch.right || gamepad.right,
-    run: keys.has('KeyX') || keys.has('ShiftLeft') || keys.has('ShiftRight') ||
-      touch.run || touch.sprint || gamepad.run || gamepad.sprint,
-    sprint: keys.has('ShiftLeft') || keys.has('ShiftRight') || touch.sprint || gamepad.sprint,
+    left: keys.has('ArrowLeft') || keys.has('KeyA') || touch.left || gamepad.left ||
+      animationDebugDrive === 'left' &&
+        characterRenderer.isReady(player.hero) &&
+        !characterRenderer.animationDebugOverride,
+    right: keys.has('ArrowRight') || keys.has('KeyD') || touch.right || gamepad.right ||
+      animationDebugDrive === 'right' &&
+        characterRenderer.isReady(player.hero) &&
+        !characterRenderer.animationDebugOverride,
     jump: keys.has('Space') || keys.has('ArrowUp') || keys.has('KeyW') ||
       touch.jump || gamepad.jump,
     down: keys.has('ArrowDown') || keys.has('KeyS') || touch.slam || gamepad.down,
@@ -880,6 +883,7 @@ function frame(now) {
     locomotion: player.locomotion,
     glide: player.glide,
     horizontalSpeed: player.velocityX,
+    grounded: player.grounded,
     cameraX,
     cameraY,
     coins,
@@ -889,7 +893,23 @@ function frame(now) {
     mobs,
     projectiles
   }, elapsed);
+  animationDebugPanel?.update();
   requestAnimationFrame(frame);
+}
+
+if (animationDebugEnabled) {
+  animationDebugPanel = new AnimationDebugPanel({
+    renderer: characterRenderer,
+    getGameplaySnapshot: () => ({
+      movementState: player.movementState,
+      velocityX: player.velocityX,
+      velocityY: player.velocityY,
+      grounded: player.grounded
+    }),
+    onHeroRequested: requestedHero => {
+      if (requestedHero !== player.hero) trySwapUnifiedHero(player, { canOccupy });
+    }
+  });
 }
 
 addEventListener('keydown', event => {

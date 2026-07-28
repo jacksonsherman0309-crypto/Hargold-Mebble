@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 2,
-  "status": "locked-frame-mannequin-fitted-v4-active-final-art-approval-pending",
-  "activeRuntimeStatus": "production-mannequin-fitted-v4-candidate-active-visual-approval-pending",
+  "schemaVersion": 4,
+  "status": "locked-silhouette-organic-v5-active-final-art-approval-pending",
+  "activeRuntimeStatus": "production-organic-silhouette-v5-candidate-active-visual-approval-pending",
   "coordinateSystem": {"units": "metres", "up": "Z", "characterForward": "-Y", "origin": "between-feet-on-ground"},
   "dimensionalPresentation": {
     "construction": "complete-3d-skinned-models-with-modeled-front-back-and-sides",
@@ -24,6 +24,30 @@
       "airActions": "../previews/character-fit-air-action-frames.png",
       "status": "generated-with-forty-percent-mannequin-overlay"
     },
+    "CleanRoomConstructionBenchmark": {
+      "path": "character-construction-benchmark.json",
+      "status": "locked-observable-craft-principles-only",
+      "externalBenchmarkArtStoredInRepository": false
+    },
+    "ConstructionReferenceBoards": {
+      "Hargold": "../previews/construction-reference/hargold-construction-reference.png",
+      "Mebble": "../previews/construction-reference/mebble-construction-reference.png",
+      "status": "generated-from-original-authoritative-featureless-frames"
+    },
+    "CurrentBodyAuditBoards": {
+      "Hargold": "../previews/construction-reference/hargold-current-body-audit.png",
+      "Mebble": "../previews/construction-reference/mebble-current-body-audit.png",
+      "status": "diagnostic-clay-wireframe-silhouette-and-run-deformation"
+    },
+    "ProductionChecklist": {
+      "path": "character-production-checklist.json",
+      "status": "binding-milestone-order-joint-deformation-in-progress"
+    },
+    "JointDeformationStressBoards": {
+      "Hargold": "../previews/joint-deformation/hargold-joint-deformation-stress.png",
+      "Mebble": "../previews/joint-deformation/mebble-joint-deformation-stress.png",
+      "status": "automated-structural-pass-visual-review-pending"
+    },
     "ScaleOrientationProfile": {"path": "character-scale-orientation-profile.json", "status": "locked-clean-room-production-profile", "purpose": "canonical metre scale, hero/mob/block ratios, action-dependent gameplay orientation, articulation and approval gates"},
     "ApprovedPairTarget": {"path": "../references/Hargold and Mebble approved production target.png", "status": "present-approved-2026-07-25", "sha256": "A236AB062EE5FA8390CDDA7BA5EC21A7B4989CCB82F375CF34435E7A5B5FC05D", "purpose": "action-pose, surface-quality, material, expression and animation-readiness target; not a 3D asset"},
     "Mebble": {"path": "../references/Mebble locked production character sheet.png", "status": "present-locked-newest-authority", "historicalPath": "../references/Character design evolution of Mebble.png"},
@@ -32,15 +56,15 @@
   "characters": {
     "Hargold": {
       "blend": "hargold_character.blend",
-      "status": "production-mannequin-fitted-v4-candidate-active-visual-approval-pending",
+      "status": "production-organic-silhouette-v5-candidate-active-visual-approval-pending",
       "implemented": {
-        "model": ["new factory-empty production-mannequin-fitted-v4 geometry with no reuse of the rejected meshes", "fitted around the validated compact featureless animation frame", "8411 visible mesh vertices, 9378 polygons and 0.7646 quad ratio", "authored ring-loop head, torso, extended deformable sleeves, enlarged hands and fingers", "shoulder bulge loops and longer forearms for side-view separation", "larger constructed boots with separate shafts, toes, soles, heels and stitching", "softened integrated cheek transitions", "separate layered jacket, shirt, trousers, scarf/cape and belt pouches", "smooth oval eyes and facial shape keys", "modeled hair, moustache and rounded beard locks", "floppy wide-brim hat and tapered feather", "layered camping backpack, pocket, straps, bedroll, rope and leaf badge"],
-        "rig": ["97-bone armature", "center-of-mass control and lower/mid/upper spine chain", "neck base/mid/upper chain and clavicles", "IK/FK switches", "jaw, eye, lid, eyebrow and mouth-corner bones", "six facial properties", "all-five-finger chains", "foot and weighted toe articulation", "hat/scarf/feather secondary bones", "backpack and gear follow bones", "gameplay sockets"],
+        "model": ["new factory-empty production-organic-silhouette-v5 geometry with no reuse of the rejected meshes", "fitted around the validated compact featureless animation frame and locked Hargold silhouette", "89016 visible mesh vertices, 88971 polygons and 0.9922 quad ratio", "one connected watertight skin body integrating head, face, neck, torso, shoulders, arms, hands, all fingers, pelvis, thighs, knees and shins", "radius-tapered constant-section limb surfaces replace the rejected stretched-sphere bulb chains", "continuous wrapped jacket-and-sleeve and trouser-and-leg surfaces", "single-piece rounded boots integrating shaft, ankle, instep, toe, sole and heel", "integrated cheek and nose volumes", "separate close-wrapped shirt, scarf/cape and belt accessories", "smooth oval eyes and facial shape keys", "modeled hair, moustache and rounded beard locks", "floppy wide-brim hat and tapered feather", "rounded layered camping backpack, pocket, straps, bedroll, rope and leaf badge"],
+        "rig": ["97-bone armature", "preserve-volume armature deformation", "multi-segment B-Bone shoulders, arms, thighs, shins and feet", "localized shoulder/elbow/hip/knee/ankle corrective-smooth zones", "bend-driven pose-space volume keys", "center-of-mass control and lower/mid/upper spine chain", "neck base/mid/upper chain and clavicles", "IK/FK switches", "jaw, eye, lid, eyebrow and mouth-corner bones", "six facial properties", "all-five-finger chains", "foot and weighted toe articulation", "hat/scarf/feather secondary bones", "backpack and gear follow bones", "gameplay sockets"],
         "materials": ["packed 1K base-color/roughness/normal/AO texture channels", "Principled skin", "eyes/mouth", "hair", "cloth", "leather", "metal", "feather"],
         "animations": ["80 clean-room gameplay and locked review clips", "walk/run/sprint cycles", "jump and landing family", "crawl/slide/roll/wall-reaction/ledge states", "functional finger curls and facial expression ranges", "combat/hurt/victory", "Hargold-specific double-jump and block/strike clips"],
-        "validation": ["twenty-row true-side compact-mannequin/fitted-character comparison", "40% internal mannequin overlay", "duplicated locked reference skeleton with 3% maximum joint-error contract", "front and three-quarter identity renders", "left/right gameplay-profile renders", "run, double-jump and ground-slam pose renders", "15 action silhouettes rendered at 150 pixels", "production topology/UV/PBR/binding and silhouette-dimension validator", "clean-room motion-range validator", "action-specific orientation metadata", "GLB skin/mesh/morph/animation inspection"]
+        "validation": ["twenty-row true-side compact-mannequin/fitted-character comparison", "40% internal mannequin overlay", "duplicated locked reference skeleton with 3% maximum joint-error contract", "front and three-quarter identity renders", "left/right gameplay-profile renders", "run, double-jump and ground-slam pose renders", "15 action silhouettes rendered at 150 pixels", "five-zone neutral/extreme joint-deformation stress board", "production topology/UV/PBR/binding, corrective-deformation and silhouette-dimension validator", "clean-room motion-range validator", "action-specific orientation metadata", "GLB skin/mesh/26-morph/animation inspection"]
       },
-      "remainingProductionWork": ["senior character-artist visual approval against every locked-sheet view", "shoulder/hip/finger corrective-shape polish", "hand-painted texture detail beyond the packed procedural PBR maps", "LOD and material-atlas pass", "engine deformation review across every clip", "rear-view and close-cinematic polish", "final locked-sheet approval"],
+      "remainingProductionWork": ["visual approval of the structural joint-deformation pass", "dedicated facial topology", "production hand topology", "clothing integration and surface refinement", "production UV and final texture passes", "final animation polish after mesh approval", "live gameplay-camera validation", "LOD and material-atlas pass", "export-ready approval"],
       "modelsRequired": ["body/head", "eyes/teeth/tongue", "hair/moustache/rounded chin beard", "olive explorer jacket and tan shirt", "wide-brim olive hat with brown band and orange feather", "deep red-brown wrapped scarf/cape collar", "belt and explorer pouches", "brown field backpack with leaf badge", "boots", "hands"],
       "rigsRequired": ["gameplay deformation/control rig", "facial/eye rig", "cape/scarf secondary-motion rig", "hat-feather secondary rig"],
       "materialsRequired": ["skin", "eyes", "mouth", "hair/goatee", "green cloth", "red-brown cape/scarf", "brown leather", "metal hardware", "hat feather"],
@@ -48,15 +72,15 @@
     },
     "Mebble": {
       "blend": "mebble_character.blend",
-      "status": "production-mannequin-fitted-v4-candidate-active-visual-approval-pending",
+      "status": "production-organic-silhouette-v5-candidate-active-visual-approval-pending",
       "implemented": {
-        "model": ["new factory-empty production-mannequin-fitted-v4 geometry with no reuse of the rejected meshes", "fitted around the validated tall featureless animation frame", "7401 visible mesh vertices, 8272 polygons and 0.7582 quad ratio", "authored ring-loop head, tapered long neck, wider torso, extended deformable sleeves, enlarged hands and fingers", "stronger modeled Adam's apple profile", "glasses offset from the face", "larger constructed tall boots with separate shafts, toes, soles, heels and stitching", "curved shoulder-yoke cape with a profile-readable rear-sail glide morph and modeled emblem", "smooth oval eyes, smile line, tapered hair locks and bushy brows", "small top hat", "separate shirt, vest, straps, double belts and pouches"],
-        "rig": ["95-bone armature", "center-of-mass control and lower/mid/upper spine chain", "neck base/mid/upper chain and clavicles", "driven IK/FK switches", "jaw, eye, lid, eyebrow and mouth-corner bones", "six facial properties", "finger chains", "foot and weighted toe articulation", "Adam's-apple bone", "three-bone weighted cape chain", "cape-open controller and GlideOpen morph", "gameplay sockets"],
+        "model": ["new factory-empty production-organic-silhouette-v5 geometry with no reuse of the rejected meshes", "fitted around the validated tall featureless animation frame and locked Mebble silhouette", "87984 visible mesh vertices, 87891 polygons and 0.9936 quad ratio", "one connected watertight skin body integrating head, face, tapered long neck, Adam's apple, torso, shoulders, slim arms, hands, all fingers, pelvis, thighs, knees and shins", "radius-tapered constant-section limb surfaces replace the rejected stretched-sphere bulb chains", "continuous wrapped shirt-and-sleeve and trouser-and-leg surfaces", "close-wrapped layered vest", "single-piece rounded tall boots integrating shaft, ankle, instep, toe, sole and heel", "glasses offset from the face", "curved shoulder-yoke cape with a profile-readable rear-sail glide morph and modeled emblem", "smooth oval eyes, smile line, tapered hair locks and bushy brows", "small top hat", "separate straps, double belts and pouches"],
+        "rig": ["95-bone armature", "preserve-volume armature deformation", "multi-segment B-Bone shoulders, arms, thighs, shins and feet", "localized shoulder/elbow/hip/knee/ankle corrective-smooth zones", "bend-driven pose-space volume keys", "center-of-mass control and lower/mid/upper spine chain", "neck base/mid/upper chain and clavicles", "driven IK/FK switches", "jaw, eye, lid, eyebrow and mouth-corner bones", "six facial properties", "finger chains", "foot and weighted toe articulation", "Adam's-apple bone", "three-bone weighted cape chain", "cape-open controller and GlideOpen morph", "gameplay sockets"],
         "materials": ["packed 1K base-color/roughness/normal/AO texture channels", "Principled skin", "eyes/mouth", "hair", "glasses", "cloth/cape", "leather", "metal"],
         "animations": ["81 clean-room gameplay and locked review clips", "walk/run/sprint cycles", "jump and landing family", "crawl/slide/roll/wall-reaction/ledge states", "functional finger curls and facial expression ranges", "combat/hurt/victory", "five Mebble glide clips"],
-        "validation": ["twenty-row true-side tall-mannequin/fitted-character comparison", "40% internal mannequin overlay", "duplicated locked reference skeleton with 3% maximum joint-error contract", "front and three-quarter identity renders", "left/right gameplay-profile renders", "run, glide and ground-slam pose renders", "15 action silhouettes rendered at 150 pixels", "production topology/UV/PBR/binding and silhouette-dimension validator", "clean-room motion-range validator", "action-specific orientation metadata", "GLB skin/mesh/animation/morph inspection"]
+        "validation": ["twenty-row true-side tall-mannequin/fitted-character comparison", "40% internal mannequin overlay", "duplicated locked reference skeleton with 3% maximum joint-error contract", "front and three-quarter identity renders", "left/right gameplay-profile renders", "run, glide and ground-slam pose renders", "15 action silhouettes rendered at 150 pixels", "five-zone neutral/extreme joint-deformation stress board", "production topology/UV/PBR/binding, corrective-deformation and silhouette-dimension validator", "clean-room motion-range validator", "action-specific orientation metadata", "GLB skin/mesh/animation/31-morph inspection"]
       },
-      "remainingProductionWork": ["senior character-artist visual approval against every locked-sheet view", "shoulder/hip/neck/finger corrective-shape polish", "hand-painted texture detail beyond the packed procedural PBR maps", "cape collision and dynamic-secondary-motion tuning", "LOD and material-atlas pass", "engine deformation review across every clip", "rear-view and close-cinematic polish", "final locked-sheet approval"],
+      "remainingProductionWork": ["visual approval of the structural joint-deformation pass", "dedicated facial topology", "production hand topology", "clothing integration and surface refinement", "production UV and final texture passes", "final animation polish after mesh approval", "live gameplay-camera validation", "LOD and material-atlas pass", "export-ready approval"],
       "modelsRequired": ["body/head and long skinny neck", "protruding Adam's apple", "eyes/teeth/tongue", "hair/bushy eyebrows", "crooked less-round glasses", "small brown top hat with green band and leaf", "cream shirt/brown vest/dark trousers", "double belts/pouches", "tall lace-up boots", "hands", "green emblem cape/glider"],
       "rigsRequired": ["gameplay deformation/control rig", "facial/eye/brow rig", "Adam's-apple/neck corrective rig", "glasses and hat sockets", "cape fold/open/glide rig with secondary motion"],
       "materialsRequired": ["skin", "eyes", "mouth", "hair/eyebrows", "glasses", "hat", "shirt", "vest/trousers", "leather", "metal hardware", "green cape"],
@@ -79,5 +103,5 @@
   "requiredValidationActions": ["idle", "walk", "run", "sprint", "acceleration", "skid", "physical-direction-reversal", "standard-jump", "running-jump", "Hargold-double-jump", "ascent", "apex", "fall", "landing", "hard-landing", "crouch", "sprint-slide", "stomp", "bounce", "ground-slam", "damage", "Hargold-block-break", "Mebble-slow-fall", "Mebble-glide", "level-completion"],
   "requiredSockets": ["SOCKET_hand_l", "SOCKET_hand_r", "SOCKET_head", "SOCKET_back", "SOCKET_vfx_feet", "SOCKET_vfx_center"],
   "requiredMetadata": ["assetVersion", "canonVersion", "referenceHash", "author", "blenderVersion", "reviewStatus"],
-  "exports": {"Hargold": "../exports/hargold_character.glb", "Mebble": "../exports/mebble_character.glb", "status": "production-mannequin-fitted-v4-runtime-exports-active"}
+  "exports": {"Hargold": "../exports/hargold_character.glb", "Mebble": "../exports/mebble_character.glb", "status": "production-organic-silhouette-v5-runtime-exports-active"}
 }

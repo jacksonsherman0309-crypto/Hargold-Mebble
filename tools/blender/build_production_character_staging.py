@@ -35,7 +35,33 @@ STAGING_BLEND = ROOT / "assets" / "blender" / "production-staging"
 STAGING_EXPORT = ROOT / "assets" / "exports" / "production-staging"
 STAGING_PREVIEW = ROOT / "assets" / "previews" / "production-staging"
 FIT_PREVIEW = ROOT / "assets" / "previews" / "mannequin-fit"
-GENERATION = "production-mannequin-fitted-v4"
+GENERATION = "production-organic-silhouette-v5"
+JOINT_DEFORMATION_PASS = "preserve-volume-local-corrective-v1"
+
+JOINT_CORRECTIVE_SETTINGS = {
+    "shoulders": {
+        "radius": {"Hargold": 0.130, "Mebble": 0.085},
+        "factor": 0.42, "iterations": 3, "bulge": 0.014,
+    },
+    "elbows": {
+        "radius": {"Hargold": 0.105, "Mebble": 0.070},
+        "factor": 0.38, "iterations": 3, "bulge": 0.024,
+    },
+    "hips": {
+        "radius": {"Hargold": 0.130, "Mebble": 0.090},
+        "factor": 0.36, "iterations": 3, "bulge": 0.016,
+    },
+    "knees": {
+        "radius": {"Hargold": 0.100, "Mebble": 0.070},
+        "factor": 0.38, "iterations": 3, "bulge": 0.018,
+    },
+    # The ankle centre lies inside the integrated boot shell. Its mask must
+    # reach the outside shaft surface, not stop at the anatomical centreline.
+    "ankles": {
+        "radius": {"Hargold": 0.075, "Mebble": 0.070},
+        "factor": 0.32, "iterations": 2, "bulge": 0.010,
+    },
+}
 
 
 def move_to(obj, collection):
@@ -152,6 +178,8 @@ def annulus_mesh(name, z, inner_radius, outer_radius, thickness, material, colle
     bpy.ops.object.mode_set(mode="EDIT")
     bpy.ops.uv.smart_project(island_margin=0.02)
     bpy.ops.object.mode_set(mode="OBJECT")
+    for polygon in obj.data.polygons:
+        polygon.use_smooth = True
     obj.select_set(False)
     return finish_mesh(obj, material, collection, "authored-quad-annulus")
 
@@ -201,6 +229,224 @@ def ellipsoid_mesh(name, center, radii, material, collection, segments=32, rings
     return finish_mesh(obj, material, collection, "authored-latitude-loop-surface")
 
 
+def source_ellipsoid(center, radii):
+    """Create a temporary organic volume used only by the v5 union remesh."""
+    bpy.ops.mesh.primitive_ico_sphere_add(
+        subdivisions=3,
+        radius=1.0,
+        location=center,
+    )
+    obj = bpy.context.object
+    obj.name = "SOURCE_organic_volume"
+    obj.scale = radii
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    obj["production_part"] = False
+    obj["export_enabled"] = False
+    return obj
+
+
+def source_capsule(start, end, radius, depth_scale=1.0):
+    """Create a true constant-section capsule between two rig landmarks.
+
+    The previous construction used one stretched sphere. That creates a
+    football-shaped limb which is widest halfway along each bone and pinches
+    where two bones meet—the exact bulb-chain look this rebuild rejects. A
+    cylinder plus overlapping rounded ends maintains a stable anatomical
+    section through the bone, while differently sized adjacent capsules and
+    the final union provide the intended shoulder/elbow/knee taper.
+    """
+    start_v = Vector(start)
+    end_v = Vector(end)
+    direction = end_v - start_v
+    if isinstance(radius, (tuple, list)):
+        start_radius, end_radius = radius
+    else:
+        start_radius = end_radius = radius
+    if direction.length <= 1e-6:
+        return source_ellipsoid(
+            start_v,
+            (
+                start_radius,
+                start_radius * depth_scale,
+                start_radius,
+            ),
+        )
+    bpy.ops.mesh.primitive_cone_add(
+        vertices=24,
+        radius1=start_radius,
+        radius2=end_radius,
+        depth=direction.length,
+        location=(start_v + end_v) * 0.5,
+    )
+    cylinder = bpy.context.object
+    cylinder.name = "SOURCE_organic_volume"
+    cylinder.rotation_euler = direction.to_track_quat("Z", "Y").to_euler()
+    cylinder.scale = (1.0, depth_scale, 1.0)
+    cylinder["production_part"] = False
+    cylinder["export_enabled"] = False
+    cap_start = source_ellipsoid(
+        start_v,
+        (
+            start_radius,
+            start_radius * depth_scale,
+            start_radius,
+        ),
+    )
+    cap_end = source_ellipsoid(
+        end_v,
+        (
+            end_radius,
+            end_radius * depth_scale,
+            end_radius,
+        ),
+    )
+    bpy.ops.object.select_all(action="DESELECT")
+    for part in (cylinder, cap_start, cap_end):
+        part.select_set(True)
+    bpy.context.view_layer.objects.active = cylinder
+    bpy.ops.object.join()
+    cylinder["production_part"] = False
+    cylinder["export_enabled"] = False
+    return cylinder
+
+
+def organic_union(
+    name,
+    parts,
+    material,
+    collection,
+    voxel=0.016,
+    smooth_iterations=4,
+    surface_role="continuous-organic-surface",
+):
+    """Fuse overlapping authored volumes into one watertight quad-remeshed mesh.
+
+    The source volumes are construction guides only. The saved asset contains
+    the resulting continuous surface, which removes seams at shoulders, hips,
+    wrists, knees, ankles, neck transitions, and boot sections.
+    """
+    if not parts:
+        raise ValueError(f"{name} requires at least one source volume")
+    bpy.ops.object.select_all(action="DESELECT")
+    for part in parts:
+        part.select_set(True)
+    bpy.context.view_layer.objects.active = parts[0]
+    bpy.ops.object.join()
+    obj = bpy.context.object
+    obj.name = name
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    obj.data.name = f"MESH_{name}"
+    obj.data.remesh_voxel_size = voxel
+    obj.data.remesh_voxel_adaptivity = 0.0
+    obj.data.use_remesh_fix_poles = True
+    obj.data.use_remesh_preserve_volume = True
+    bpy.ops.object.voxel_remesh()
+    if smooth_iterations:
+        smooth = obj.modifiers.new("OrganicSurfaceRelax", "SMOOTH")
+        smooth.factor = 0.34
+        smooth.iterations = smooth_iterations
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.modifier_apply(modifier=smooth.name)
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.uv.smart_project(island_margin=0.02)
+    bpy.ops.object.mode_set(mode="OBJECT")
+    finish_mesh(
+        obj,
+        material,
+        collection,
+        "continuous-organic-union-quad-remesh",
+    )
+    obj["surface_role"] = surface_role
+    obj["watertight_union"] = True
+    obj["joint_transition_standard"] = (
+        "rounded-overlap-shoulder-elbow-wrist-hip-knee-ankle-neck"
+    )
+    return obj
+
+
+def integrated_hand_sources(
+    parts,
+    side,
+    wrist_x,
+    wrist_z,
+    palm_size,
+    depth_offset=0.0,
+):
+    """Add a palm and five overlapping digits to the continuous skin volume."""
+    sign = -1 if side == "L" else 1
+    palm_center_x = sign * (wrist_x + palm_size * 0.56)
+    parts.append(source_ellipsoid(
+        (
+            palm_center_x,
+            depth_offset - 0.012,
+            wrist_z - palm_size * 0.04,
+        ),
+        (palm_size * 0.72, palm_size * 0.52, palm_size * 0.76),
+    ))
+    finger_offsets = (0.34, 0.13, -0.08, -0.29)
+    for finger_index, offset in enumerate(finger_offsets):
+        base = (
+            sign * (wrist_x + palm_size * 0.76),
+            depth_offset - palm_size * 0.07,
+            wrist_z + palm_size * offset,
+        )
+        length = palm_size * (0.92 - finger_index * 0.035)
+        tip = (
+            base[0] + sign * length,
+            base[1] - palm_size * 0.05,
+            base[2] - palm_size * 0.025,
+        )
+        parts.append(source_capsule(base, tip, palm_size * 0.135, 0.92))
+    thumb_base = (
+        sign * (wrist_x + palm_size * 0.45),
+        depth_offset - palm_size * 0.18,
+        wrist_z - palm_size * 0.42,
+    )
+    thumb_tip = (
+        thumb_base[0] + sign * palm_size * 0.70,
+        thumb_base[1] - palm_size * 0.10,
+        thumb_base[2] - palm_size * 0.30,
+    )
+    parts.append(source_capsule(
+        thumb_base,
+        thumb_tip,
+        palm_size * 0.17,
+        0.95,
+    ))
+
+
+def body_bones(hero):
+    names = [
+        "DEF_hips",
+        "DEF_spine_lower",
+        "DEF_spine_mid",
+        "DEF_spine_upper",
+        "DEF_chest",
+        "DEF_neck_base",
+        "DEF_neck_mid",
+        "DEF_neck_upper",
+        "DEF_head",
+        "DEF_jaw",
+    ]
+    for side in ("L", "R"):
+        names.extend((
+            f"DEF_clavicle.{side}",
+            f"DEF_upper_arm.{side}",
+            f"DEF_forearm.{side}",
+            f"DEF_hand.{side}",
+            f"DEF_thigh.{side}",
+            f"DEF_shin.{side}",
+        ))
+        for finger in ("thumb", "index", "middle", "ring", "pinky"):
+            names.extend((
+                f"DEF_{finger}.01.{side}",
+                f"DEF_{finger}.02.{side}",
+            ))
+    if hero == "Mebble":
+        names.append("DEF_adams_apple")
+    return names
+
+
 def rounded_box(name, location, scale, material, collection, bevel=0.04):
     bpy.ops.mesh.primitive_cube_add(size=1, location=location)
     obj = bpy.context.object
@@ -246,11 +492,26 @@ def curve_tube(
     obj = bpy.data.objects.new(name, curve)
     collection.objects.link(obj)
     obj.data.materials.append(material)
+    # Bake the evaluated tube before bone parenting. Keeping world-space
+    # spline points in a live Curve datablock lets Blender apply the bone frame
+    # a second time during constrained action evaluation, which detached small
+    # details in the side-view silhouette.
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.convert(target="MESH")
+    obj = bpy.context.object
+    obj.name = name
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.uv.smart_project(island_margin=0.02)
+    bpy.ops.object.mode_set(mode="OBJECT")
     obj["production_part"] = True
     obj["export_enabled"] = True
     obj["geometry_generation"] = GENERATION
-    obj["surface_construction"] = "authored-bezier-tube"
+    obj["surface_construction"] = "baked-authored-bezier-tube"
     obj["source_geometry_reused"] = False
+    obj["curve_transform_baked"] = True
     return obj
 
 
@@ -291,7 +552,14 @@ def point_segment_distance(point, start, end):
     return (point - (start + segment * t)).length
 
 
-def skin_to_bones(obj, armature, bone_names, max_influences=4):
+def skin_to_bones(
+    obj,
+    armature,
+    bone_names,
+    max_influences=4,
+    adjacency=0.075,
+    falloff=0.045,
+):
     groups = {name: obj.vertex_groups.new(name=name) for name in bone_names if name in armature.data.bones}
     segments = {
         name: (
@@ -306,14 +574,312 @@ def skin_to_bones(obj, armature, bone_names, max_influences=4):
             for name, (start, end) in segments.items()
         )[:max_influences]
         nearest = distances[0][0]
-        adjacent = [(distance, name) for distance, name in distances if distance <= nearest + 0.075]
-        raw = [(math.exp(-((distance - nearest) / 0.045) ** 2), name) for distance, name in adjacent]
+        adjacent = [
+            (distance, name)
+            for distance, name in distances
+            if distance <= nearest + adjacency
+        ]
+        raw = [
+            (math.exp(-((distance - nearest) / falloff) ** 2), name)
+            for distance, name in adjacent
+        ]
         total = sum(weight for weight, _ in raw)
         for weight, name in raw:
             groups[name].add([vertex.index], weight / total, "REPLACE")
     add_armature_modifier(obj, armature)
     obj["binding"] = "normalized-four-influence-production-skin"
     return obj
+
+
+def configure_bendy_deform_segments(armature):
+    """Distribute bends and axial twist through the production limb chains.
+
+    Preserve-volume armature deformation is already required by
+    ``add_armature_modifier``. Multiple B-Bone segments add the missing
+    longitudinal samples so upper-arm twist and large elbow/knee bends do not
+    rotate an entire limb section as one rigid tube.
+    """
+    segment_counts = {
+        "DEF_clavicle.L": 3,
+        "DEF_clavicle.R": 3,
+        "DEF_upper_arm.L": 5,
+        "DEF_upper_arm.R": 5,
+        "DEF_forearm.L": 4,
+        "DEF_forearm.R": 4,
+        "DEF_thigh.L": 5,
+        "DEF_thigh.R": 5,
+        "DEF_shin.L": 4,
+        "DEF_shin.R": 4,
+        "DEF_foot.L": 3,
+        "DEF_foot.R": 3,
+    }
+    for bone_name, segments in segment_counts.items():
+        bone = armature.data.bones.get(bone_name)
+        if bone is None:
+            continue
+        bone.bbone_segments = segments
+    armature["bendy_deform_segments"] = json.dumps(
+        segment_counts, sort_keys=True, separators=(",", ":")
+    )
+    armature["upper_arm_twist_distribution"] = "five-segment-preserve-volume"
+
+
+def joint_centres(armature):
+    bone_heads = {
+        "shoulders": ("DEF_upper_arm.L", "DEF_upper_arm.R"),
+        "elbows": ("DEF_forearm.L", "DEF_forearm.R"),
+        "hips": ("DEF_thigh.L", "DEF_thigh.R"),
+        "knees": ("DEF_shin.L", "DEF_shin.R"),
+        "ankles": ("DEF_foot.L", "DEF_foot.R"),
+    }
+    return {
+        zone: [
+            Vector(armature.data.bones[bone_name].head_local)
+            for bone_name in bone_names
+            if bone_name in armature.data.bones
+        ]
+        for zone, bone_names in bone_heads.items()
+    }
+
+
+def add_local_joint_corrective(
+    obj,
+    hero,
+    zone,
+    centres,
+    radius,
+    boot_band=False,
+):
+    """Mask a corrective-smooth modifier to one anatomical joint region."""
+    group_name = f"CORR_{zone}"
+    old_group = obj.vertex_groups.get(group_name)
+    if old_group is not None:
+        obj.vertex_groups.remove(old_group)
+    group = obj.vertex_groups.new(name=group_name)
+    weighted_vertices = 0
+    inner_radius = radius * 0.42
+    falloff_span = max(radius - inner_radius, 1e-6)
+    for vertex in obj.data.vertices:
+        if boot_band:
+            centre = centres[0]
+            vertical = abs(vertex.co.z - centre.z)
+            forward = abs(vertex.co.y - centre.y)
+            vertical_limit = radius * 1.20
+            forward_limit = radius * 1.60
+            if vertical >= vertical_limit or forward >= forward_limit:
+                continue
+            weight = (
+                (1.0 - vertical / vertical_limit)
+                * (1.0 - forward / forward_limit)
+            )
+        else:
+            distance = min((vertex.co - centre).length for centre in centres)
+            if distance >= radius:
+                continue
+            weight = 1.0 if distance <= inner_radius else (radius - distance) / falloff_span
+        if weight <= 0.0:
+            continue
+        group.add([vertex.index], weight, "REPLACE")
+        weighted_vertices += 1
+    if not weighted_vertices:
+        obj.vertex_groups.remove(group)
+        return 0
+
+    settings = JOINT_CORRECTIVE_SETTINGS[zone]
+    modifier = obj.modifiers.new(
+        f"JointCorrective_{zone.capitalize()}",
+        "CORRECTIVE_SMOOTH",
+    )
+    modifier.vertex_group = group_name
+    modifier.factor = settings["factor"]
+    modifier.iterations = settings["iterations"]
+    modifier.smooth_type = "LENGTH_WEIGHTED"
+    modifier.rest_source = "ORCO"
+    modifier.use_pin_boundary = True
+    return weighted_vertices
+
+
+def add_pose_space_volume_keys(
+    obj,
+    armature,
+    hero,
+    zone,
+    radius,
+    sides=("L", "R"),
+    boot_band=False,
+):
+    """Add sparse bend-driven volume keys for both sides of one joint.
+
+    Corrective Smooth preserves broad rest-volume relationships, but it cannot
+    reconstruct an inner bend after the skinned surface folds through itself.
+    These sparse keys expand the joint cross-section and compress its rest-axis
+    span as the driving bone bends. They are original project-authored
+    corrections, not imported animation or geometry.
+    """
+    driver_bone_prefix = {
+        "shoulders": "DEF_upper_arm",
+        "elbows": "DEF_forearm",
+        "hips": "DEF_thigh",
+        "knees": "DEF_shin",
+        "ankles": "DEF_foot",
+    }[zone]
+    settings = JOINT_CORRECTIVE_SETTINGS[zone]
+    if obj.data.shape_keys is None:
+        obj.shape_key_add(name="Basis")
+    basis = obj.data.shape_keys.key_blocks["Basis"]
+    created = []
+    for side in sides:
+        bone_name = f"{driver_bone_prefix}.{side}"
+        data_bone = armature.data.bones.get(bone_name)
+        if data_bone is None:
+            continue
+        centre = Vector(data_bone.head_local)
+        axis = Vector(data_bone.tail_local - data_bone.head_local).normalized()
+        key_name = f"CORR_{zone.capitalize()}Volume.{side}"
+        # Every corrective must begin from the immutable Basis coordinates.
+        # Blender's default ``from_mix=True`` can bake previously driven keys
+        # into each successive key, causing metre-scale cumulative deltas when
+        # multiple joint drivers activate.
+        key = obj.shape_key_add(name=key_name, from_mix=False)
+        changed = 0
+        inner_radius = radius * 0.38
+        falloff_span = max(radius - inner_radius, 1e-6)
+        object_factor = (
+            0.72 if obj.get("surface_role") == "single-piece-organic-boot"
+            else 0.90 if str(obj.get("surface_role", "")).startswith("continuous-wrapped")
+            else 1.0
+        )
+        bulge = settings["bulge"] * float(armature.get("target_height_metres")) * object_factor
+        for vertex in obj.data.vertices:
+            offset = vertex.co - centre
+            if boot_band:
+                vertical = abs(vertex.co.z - centre.z)
+                forward = abs(vertex.co.y - centre.y)
+                vertical_limit = radius * 1.20
+                forward_limit = radius * 1.60
+                if vertical >= vertical_limit or forward >= forward_limit:
+                    continue
+                weight = (
+                    (1.0 - vertical / vertical_limit)
+                    * (1.0 - forward / forward_limit)
+                )
+            else:
+                distance = offset.length
+                if distance >= radius:
+                    continue
+                weight = (
+                    1.0
+                    if distance <= inner_radius
+                    else (radius - distance) / falloff_span
+                )
+            radial = offset - axis * offset.dot(axis)
+            delta = Vector((0.0, 0.0, 0.0))
+            if radial.length > 1e-6:
+                delta += radial.normalized() * bulge * weight
+            # Draw the two sides of the flex zone toward the pivot while
+            # expanding them, closing the deep inner-elbow/knee crease.
+            delta -= axis * offset.dot(axis) * 0.24 * weight
+            key.data[vertex.index].co = basis.data[vertex.index].co + delta
+            changed += 1
+        if not changed:
+            obj.shape_key_remove(key)
+            continue
+        driver = key.driver_add("value").driver
+        driver.type = "SCRIPTED"
+        flex = driver.variables.new()
+        flex.name = "flex"
+        flex.type = "TRANSFORMS"
+        flex.targets[0].id = armature
+        flex.targets[0].bone_target = bone_name
+        flex.targets[0].transform_type = "ROT_X"
+        flex.targets[0].transform_space = "LOCAL_SPACE"
+        if zone == "shoulders":
+            twist = driver.variables.new()
+            twist.name = "twist"
+            twist.type = "TRANSFORMS"
+            twist.targets[0].id = armature
+            twist.targets[0].bone_target = bone_name
+            twist.targets[0].transform_type = "ROT_Y"
+            twist.targets[0].transform_space = "LOCAL_SPACE"
+            driver.expression = "min(1.0, max(abs(flex) / 1.45, abs(twist) / 0.70))"
+        else:
+            divisor = 1.55 if zone in {"elbows", "knees"} else 1.20
+            driver.expression = f"min(1.0, abs(flex) / {divisor:.2f})"
+        created.append(key_name)
+    return created
+
+
+def configure_joint_deformation(hero, armature, dims):
+    """Add the first production deformation pass without altering silhouette."""
+    configure_bendy_deform_segments(armature)
+    centres_by_zone = joint_centres(armature)
+    target_zones = {
+        f"GEO_{hero}_skin_body": ("shoulders", "elbows", "hips", "knees", "ankles"),
+        (
+            "GEO_Hargold_jacket"
+            if hero == "Hargold"
+            else "GEO_Mebble_shirt"
+        ): ("shoulders", "elbows", "hips"),
+        f"GEO_{hero}_trousers": ("hips", "knees", "ankles"),
+        f"GEO_{hero}_boot_L": ("ankles",),
+        f"GEO_{hero}_boot_R": ("ankles",),
+    }
+    if hero == "Mebble":
+        target_zones["GEO_Mebble_vest"] = ("shoulders", "hips")
+
+    for object_name, zones in target_zones.items():
+        obj = bpy.data.objects.get(object_name)
+        if obj is None or obj.type != "MESH":
+            continue
+        armature_modifiers = [
+            modifier
+            for modifier in obj.modifiers
+            if modifier.type == "ARMATURE" and modifier.object == armature
+        ]
+        for modifier in armature_modifiers:
+            modifier.use_deform_preserve_volume = True
+        counts = {}
+        boot_side = (
+            object_name.rsplit("_", 1)[-1]
+            if f"GEO_{hero}_boot_" in object_name
+            else None
+        )
+        for zone in zones:
+            settings = JOINT_CORRECTIVE_SETTINGS[zone]
+            radius = settings["radius"][hero] * dims["height"]
+            zone_centres = centres_by_zone[zone]
+            if boot_side and zone == "ankles":
+                zone_centres = [
+                    Vector(armature.data.bones[f"DEF_foot.{boot_side}"].head_local)
+                ]
+            count = add_local_joint_corrective(
+                obj,
+                hero,
+                zone,
+                zone_centres,
+                radius,
+                boot_band=bool(boot_side and zone == "ankles"),
+            )
+            if count:
+                counts[zone] = count
+                add_pose_space_volume_keys(
+                    obj,
+                    armature,
+                    hero,
+                    zone,
+                    radius,
+                    (
+                        (boot_side,)
+                        if boot_side
+                        else ("L", "R")
+                    ),
+                    boot_band=bool(boot_side and zone == "ankles"),
+                )
+        obj["joint_deformation_pass"] = JOINT_DEFORMATION_PASS
+        obj["joint_corrective_vertex_counts"] = json.dumps(
+            counts, sort_keys=True, separators=(",", ":")
+        )
+        obj["preserve_volume_skinning"] = bool(armature_modifiers)
 
 
 def parent_bone(obj, armature, bone_name):
@@ -323,18 +889,20 @@ def parent_bone(obj, armature, bone_name):
     return obj
 
 
-def add_shape_drivers(head, armature, center_z):
+def add_shape_drivers(head, armature, center_z, minimum_z=None):
     head.shape_key_add(name="Basis")
     smile = head.shape_key_add(name="SmileSoft")
     squash = head.shape_key_add(name="SquashStretch")
     for index, vertex in enumerate(head.data.vertices):
-        if vertex.co.y < -0.20 and vertex.co.z < center_z:
+        in_face = minimum_z is None or vertex.co.z >= minimum_z
+        if in_face and vertex.co.y < -0.20 and vertex.co.z < center_z:
             side = min(abs(vertex.co.x) / 0.42, 1.0)
             smile.data[index].co.z += side * 0.018
             smile.data[index].co.x += math.copysign(side * 0.012, vertex.co.x or 1)
-        squash.data[index].co.x *= 1.025
-        squash.data[index].co.y *= 1.025
-        squash.data[index].co.z = center_z + (vertex.co.z - center_z) * 0.96
+        if in_face:
+            squash.data[index].co.x *= 1.025
+            squash.data[index].co.y *= 1.025
+            squash.data[index].co.z = center_z + (vertex.co.z - center_z) * 0.96
     for shape_name, property_name, expression in (
         ("SmileSoft", "smile", "smile"),
         ("SquashStretch", "mouth_open", "mouth_open * 0.18"),
@@ -576,6 +1144,567 @@ def materials():
             else "surface"
         )
     return result
+
+
+def remove_segmented_foundation(hero):
+    """Remove the v4 construction pieces after its accessories are authored."""
+    exact = {
+        f"GEO_{hero}_head",
+        f"GEO_{hero}_skin_torso",
+        f"GEO_{hero}_long_neck",
+        f"GEO_{hero}_jacket",
+        f"GEO_{hero}_shirt",
+        f"GEO_{hero}_shirt_panel",
+        f"GEO_{hero}_vest",
+        f"GEO_{hero}_trousers",
+        f"GEO_{hero}_nose",
+        f"GEO_{hero}_adams_apple",
+    }
+    if hero == "Hargold":
+        exact.update({
+            "GEO_Hargold_backpack",
+            "GEO_Hargold_backpack_pocket",
+        })
+    for side in ("L", "R"):
+        exact.update({
+            f"GEO_{hero}_sleeve_{side}",
+            f"GEO_{hero}_leg_{side}",
+            f"GEO_{hero}_hand_{side}",
+            f"GEO_{hero}_thumb_{side}",
+            f"GEO_{hero}_ear_{side}",
+            f"GEO_{hero}_cheek_{side}",
+            f"GEO_{hero}_boot_shaft_{side}",
+            f"GEO_{hero}_boot_toe_{side}",
+            f"GEO_{hero}_boot_sole_{side}",
+            f"GEO_{hero}_boot_heel_{side}",
+        })
+        for finger in ("index", "middle", "ring", "pinky"):
+            exact.add(f"GEO_{hero}_{finger}_{side}")
+    for name in sorted(exact):
+        obj = bpy.data.objects.get(name)
+        if obj is not None:
+            bpy.data.objects.remove(obj, do_unlink=True)
+
+
+def organic_boot(hero, side, armature, geo, mats, dims):
+    sign = -1 if side == "L" else 1
+    x = sign * dims["leg_x"]
+    depth_offset = sign * (0.045 if hero == "Hargold" else 0.038)
+    width = 0.225 if hero == "Hargold" else 0.180
+    shaft_top = dims["foot_height"] * (1.36 if hero == "Hargold" else 1.48)
+    toe_length = dims["foot_length"]
+    parts = [
+        source_capsule(
+            (x, depth_offset + 0.03, 0.06),
+            (x, depth_offset + 0.035, shaft_top),
+            width * 0.98,
+            0.90,
+        ),
+        source_ellipsoid(
+            (x, depth_offset - toe_length * 0.36, 0.13),
+            (width * 1.12, toe_length * 0.46, 0.135),
+        ),
+        source_ellipsoid(
+            (x, depth_offset - toe_length * 0.72, 0.115),
+            (width * 1.03, toe_length * 0.17, 0.112),
+        ),
+        source_ellipsoid(
+            (x, depth_offset + 0.060, 0.115),
+            (width * 0.94, 0.105, 0.12),
+        ),
+        source_ellipsoid(
+            (x, depth_offset - toe_length * 0.34, 0.045),
+            (width * 1.17, toe_length * 0.58, 0.050),
+        ),
+    ]
+    boot = organic_union(
+        f"GEO_{hero}_boot_{side}",
+        parts,
+        mats["brown"],
+        geo,
+        voxel=0.014 if hero == "Hargold" else 0.013,
+        smooth_iterations=4,
+        surface_role="single-piece-organic-boot",
+    )
+    skin_to_bones(
+        boot,
+        armature,
+        [f"DEF_shin.{side}", f"DEF_foot.{side}", f"DEF_toe.{side}"],
+        3,
+        adjacency=0.12,
+        falloff=0.065,
+    )
+    boot["integrated_sections"] = "shaft/ankle/instep/toe/sole/heel"
+    boot["profile_contact_length_metres"] = toe_length
+    return boot
+
+
+def build_hargold_organic_foundation(armature, groups, mats, dims):
+    geo = groups["GEO"]
+    skin_parts = [
+        # Head, cheeks, nose, ears, and neck are deliberately fused so the
+        # facial profile grows out of one continuous skin surface.
+        source_ellipsoid((0, 0.005, 1.315), (0.445, 0.345, 0.350)),
+        source_ellipsoid((-0.205, -0.255, 1.220), (0.225, 0.155, 0.185)),
+        source_ellipsoid((0.205, -0.255, 1.220), (0.225, 0.155, 0.185)),
+        source_ellipsoid((0, -0.405, 1.300), (0.145, 0.155, 0.130)),
+        source_ellipsoid((-0.420, 0.005, 1.315), (0.086, 0.070, 0.112)),
+        source_ellipsoid((0.420, 0.005, 1.315), (0.086, 0.070, 0.112)),
+        source_capsule((0, 0, 1.075), (0, 0, 1.295), 0.245, 0.92),
+        # A single broad torso/pelvis mass supplies the compact low centre of
+        # gravity and gives the shoulders and thighs material to grow from.
+        source_ellipsoid((0, 0.025, 0.905), (0.500, 0.345, 0.485)),
+        source_ellipsoid((0, 0.025, 0.650), (0.440, 0.310, 0.285)),
+        source_ellipsoid((-0.365, 0.005, 1.220), (0.225, 0.205, 0.230)),
+        source_ellipsoid((0.365, 0.005, 1.220), (0.225, 0.205, 0.230)),
+    ]
+    for side, sign in (("L", -1), ("R", 1)):
+        depth_offset = sign * 0.045
+        skin_parts.extend((
+            source_capsule(
+                (sign * 0.390, depth_offset * 0.35, 1.225),
+                (sign * dims["elbow"], depth_offset, dims["elbow_z"]),
+                (0.176, 0.148),
+                0.98,
+            ),
+            source_capsule(
+                (sign * dims["elbow"], depth_offset, dims["elbow_z"]),
+                (sign * dims["wrist"], depth_offset, dims["wrist_z"]),
+                (0.148, 0.126),
+                0.96,
+            ),
+            source_ellipsoid(
+                (sign * dims["elbow"], depth_offset, dims["elbow_z"]),
+                (0.182, 0.154, 0.182),
+            ),
+            source_capsule(
+                (sign * dims["leg_x"], depth_offset * 0.35 + 0.020, dims["hip"]),
+                (sign * dims["leg_x"], depth_offset + 0.018, dims["knee"]),
+                (0.190, 0.166),
+                0.96,
+            ),
+            source_capsule(
+                (sign * dims["leg_x"], depth_offset + 0.018, dims["knee"]),
+                (sign * dims["leg_x"], depth_offset + 0.018, dims["ankle"]),
+                (0.158, 0.138),
+                0.94,
+            ),
+            source_ellipsoid(
+                (sign * dims["leg_x"], depth_offset + 0.018, dims["knee"]),
+                (0.170, 0.150, 0.170),
+            ),
+        ))
+        integrated_hand_sources(
+            skin_parts,
+            side,
+            dims["wrist"],
+            dims["wrist_z"],
+            0.178,
+            depth_offset,
+        )
+    body = organic_union(
+        "GEO_Hargold_skin_body",
+        skin_parts,
+        mats["skin"],
+        geo,
+        voxel=0.0164,
+        smooth_iterations=4,
+        surface_role="single-continuous-organic-body",
+    )
+    skin_to_bones(
+        body,
+        armature,
+        body_bones("Hargold"),
+        4,
+        adjacency=0.135,
+        falloff=0.075,
+    )
+    add_shape_drivers(body, armature, 1.315, minimum_z=0.965)
+    body["silhouette_authority"] = "locked-compact-mannequin"
+    body["integrated_anatomy"] = (
+        "head/face/neck/torso/shoulders/arms/hands/fingers/"
+        "pelvis/thighs/knees/shins"
+    )
+
+    jacket_parts = [
+        source_ellipsoid((0, 0.025, 0.920), (0.515, 0.365, 0.455)),
+        source_ellipsoid((0, 0.015, 1.165), (0.475, 0.340, 0.245)),
+        source_ellipsoid((-0.375, 0.005, 1.220), (0.235, 0.220, 0.235)),
+        source_ellipsoid((0.375, 0.005, 1.220), (0.235, 0.220, 0.235)),
+    ]
+    for sign in (-1, 1):
+        depth_offset = sign * 0.045
+        jacket_parts.extend((
+            source_capsule(
+                (sign * 0.395, depth_offset * 0.35, 1.225),
+                (sign * dims["elbow"], depth_offset, dims["elbow_z"]),
+                (0.192, 0.164),
+                1.00,
+            ),
+            source_capsule(
+                (sign * dims["elbow"], depth_offset, dims["elbow_z"]),
+                (
+                    sign * (dims["wrist"] - 0.015),
+                    depth_offset,
+                    dims["wrist_z"] + 0.010,
+                ),
+                (0.164, 0.142),
+                0.98,
+            ),
+            source_ellipsoid(
+                (sign * dims["elbow"], depth_offset, dims["elbow_z"]),
+                (0.198, 0.172, 0.194),
+            ),
+        ))
+    jacket = organic_union(
+        "GEO_Hargold_jacket",
+        jacket_parts,
+        mats["olive"],
+        geo,
+        voxel=0.017,
+        smooth_iterations=4,
+        surface_role="continuous-wrapped-jacket-and-sleeves",
+    )
+    skin_to_bones(
+        jacket,
+        armature,
+        [
+            "DEF_hips", "DEF_spine_lower", "DEF_spine_mid",
+            "DEF_spine_upper", "DEF_chest",
+            "DEF_clavicle.L", "DEF_upper_arm.L", "DEF_forearm.L",
+            "DEF_clavicle.R", "DEF_upper_arm.R", "DEF_forearm.R",
+        ],
+        4,
+        adjacency=0.13,
+        falloff=0.075,
+    )
+
+    trouser_parts = [
+        source_ellipsoid((0, 0.025, 0.635), (0.445, 0.315, 0.285)),
+    ]
+    for sign in (-1, 1):
+        depth_offset = sign * 0.045
+        trouser_parts.extend((
+            source_capsule(
+                (sign * dims["leg_x"], depth_offset * 0.35 + 0.020, dims["hip"]),
+                (sign * dims["leg_x"], depth_offset + 0.018, dims["knee"]),
+                (0.202, 0.178),
+                0.98,
+            ),
+            source_capsule(
+                (sign * dims["leg_x"], depth_offset + 0.018, dims["knee"]),
+                (
+                    sign * dims["leg_x"],
+                    depth_offset + 0.018,
+                    dims["ankle"] + 0.055,
+                ),
+                (0.168, 0.148),
+                0.96,
+            ),
+            source_ellipsoid(
+                (sign * dims["leg_x"], depth_offset + 0.018, dims["knee"]),
+                (0.184, 0.162, 0.180),
+            ),
+        ))
+    trousers = organic_union(
+        "GEO_Hargold_trousers",
+        trouser_parts,
+        mats["trouser"],
+        geo,
+        voxel=0.016,
+        smooth_iterations=4,
+        surface_role="continuous-wrapped-trousers-and-legs",
+    )
+    skin_to_bones(
+        trousers,
+        armature,
+        [
+            "DEF_hips",
+            "DEF_thigh.L", "DEF_shin.L",
+            "DEF_thigh.R", "DEF_shin.R",
+        ],
+        4,
+        adjacency=0.12,
+        falloff=0.065,
+    )
+
+    shirt = organic_union(
+        "GEO_Hargold_shirt_panel",
+        [source_ellipsoid((0, -0.353, 0.945), (0.270, 0.030, 0.285))],
+        mats["cream"],
+        geo,
+        voxel=0.012,
+        smooth_iterations=2,
+        surface_role="close-wrapped-shirt-front",
+    )
+    skin_to_bones(
+        shirt,
+        armature,
+        ["DEF_spine_lower", "DEF_spine_mid", "DEF_spine_upper", "DEF_chest"],
+        3,
+    )
+    pack = organic_union(
+        "GEO_Hargold_backpack",
+        [
+            source_ellipsoid((0, 0.390, 0.870), (0.385, 0.245, 0.390)),
+            source_ellipsoid((0, 0.445, 1.080), (0.330, 0.205, 0.225)),
+            source_ellipsoid((0, 0.470, 0.665), (0.310, 0.190, 0.205)),
+        ],
+        mats["olive_dark"],
+        groups["ATTACHMENTS"],
+        voxel=0.018,
+        smooth_iterations=4,
+        surface_role="rounded-layered-camping-backpack",
+    )
+    parent_bone(pack, armature, "DEF_backpack")
+    pack["independent_follow"] = "DEF_backpack"
+    pocket = organic_union(
+        "GEO_Hargold_backpack_pocket",
+        [
+            source_ellipsoid((0, 0.645, 0.790), (0.255, 0.105, 0.175)),
+            source_ellipsoid((0, 0.650, 0.875), (0.235, 0.095, 0.090)),
+        ],
+        mats["brown"],
+        groups["ATTACHMENTS"],
+        voxel=0.014,
+        smooth_iterations=3,
+        surface_role="layered-backpack-pocket",
+    )
+    parent_bone(pocket, armature, "DEF_backpack")
+    for side in ("L", "R"):
+        organic_boot("Hargold", side, armature, geo, mats, dims)
+
+
+def build_mebble_organic_foundation(armature, groups, mats, dims):
+    geo = groups["GEO"]
+    skin_parts = [
+        source_ellipsoid((0, 0.010, 1.900), (0.245, 0.205, 0.205)),
+        source_ellipsoid((-0.100, -0.155, 1.845), (0.128, 0.100, 0.112)),
+        source_ellipsoid((0.100, -0.155, 1.845), (0.128, 0.100, 0.112)),
+        source_ellipsoid((0, -0.230, 1.865), (0.076, 0.086, 0.068)),
+        source_ellipsoid((-0.232, 0.010, 1.890), (0.052, 0.047, 0.076)),
+        source_ellipsoid((0.232, 0.010, 1.890), (0.052, 0.047, 0.076)),
+        # Three overlapping tapered neck volumes preserve Mebble's defining
+        # negative space while avoiding a tube-to-head seam.
+        source_capsule(
+            (0, -0.095, 1.535),
+            (0, -0.165, 1.685),
+            (0.128, 0.108),
+            0.88,
+        ),
+        source_capsule(
+            (0, -0.165, 1.675),
+            (0, -0.095, 1.805),
+            (0.108, 0.096),
+            0.88,
+        ),
+        source_ellipsoid((0, -0.265, 1.655), (0.056, 0.060, 0.078)),
+        source_ellipsoid((0, 0.010, 1.260), (0.350, 0.235, 0.345)),
+        source_ellipsoid((0, 0.010, 1.105), (0.255, 0.195, 0.220)),
+        source_ellipsoid((-0.300, 0.005, 1.515), (0.130, 0.130, 0.105)),
+        source_ellipsoid((0.300, 0.005, 1.515), (0.130, 0.130, 0.105)),
+    ]
+    for side, sign in (("L", -1), ("R", 1)):
+        depth_offset = sign * 0.038
+        skin_parts.extend((
+            source_capsule(
+                (sign * 0.325, depth_offset * 0.35, 1.570),
+                (sign * dims["elbow"], depth_offset, dims["elbow_z"]),
+                (0.104, 0.086),
+                0.95,
+            ),
+            source_capsule(
+                (sign * dims["elbow"], depth_offset, dims["elbow_z"]),
+                (sign * dims["wrist"], depth_offset, dims["wrist_z"]),
+                (0.086, 0.071),
+                0.94,
+            ),
+            source_ellipsoid(
+                (sign * dims["elbow"], depth_offset, dims["elbow_z"]),
+                (0.112, 0.096, 0.112),
+            ),
+            source_capsule(
+                (sign * dims["leg_x"], depth_offset * 0.35 + 0.008, dims["hip"]),
+                (sign * dims["leg_x"], depth_offset + 0.006, dims["knee"]),
+                (0.116, 0.101),
+                0.94,
+            ),
+            source_capsule(
+                (sign * dims["leg_x"], depth_offset + 0.006, dims["knee"]),
+                (sign * dims["leg_x"], depth_offset + 0.006, dims["ankle"]),
+                (0.098, 0.082),
+                0.92,
+            ),
+            source_ellipsoid(
+                (sign * dims["leg_x"], depth_offset + 0.006, dims["knee"]),
+                (0.104, 0.090, 0.104),
+            ),
+        ))
+        integrated_hand_sources(
+            skin_parts,
+            side,
+            dims["wrist"],
+            dims["wrist_z"],
+            0.150,
+            depth_offset,
+        )
+    body = organic_union(
+        "GEO_Mebble_skin_body",
+        skin_parts,
+        mats["skin"],
+        geo,
+        voxel=0.014,
+        smooth_iterations=4,
+        surface_role="single-continuous-organic-body",
+    )
+    skin_to_bones(
+        body,
+        armature,
+        body_bones("Mebble"),
+        4,
+        adjacency=0.115,
+        falloff=0.065,
+    )
+    add_shape_drivers(body, armature, 1.855, minimum_z=1.610)
+    body["silhouette_authority"] = "locked-tall-mannequin"
+    body["integrated_anatomy"] = (
+        "head/face/long-neck/adams-apple/torso/shoulders/arms/"
+        "hands/fingers/pelvis/thighs/knees/shins"
+    )
+    body["neck_visibility_priority"] = True
+
+    shirt_parts = [
+        source_ellipsoid((0, 0.010, 1.245), (0.355, 0.245, 0.315)),
+        source_ellipsoid((-0.300, 0.005, 1.515), (0.138, 0.138, 0.112)),
+        source_ellipsoid((0.300, 0.005, 1.515), (0.138, 0.138, 0.112)),
+    ]
+    for sign in (-1, 1):
+        depth_offset = sign * 0.038
+        shirt_parts.extend((
+            source_capsule(
+                (sign * 0.325, depth_offset * 0.35, 1.565),
+                (sign * dims["elbow"], depth_offset, dims["elbow_z"]),
+                (0.118, 0.098),
+                0.98,
+            ),
+            source_capsule(
+                (sign * dims["elbow"], depth_offset, dims["elbow_z"]),
+                (
+                    sign * (dims["wrist"] - 0.012),
+                    depth_offset,
+                    dims["wrist_z"] + 0.008,
+                ),
+                (0.098, 0.082),
+                0.96,
+            ),
+            source_ellipsoid(
+                (sign * dims["elbow"], depth_offset, dims["elbow_z"]),
+                (0.128, 0.110, 0.126),
+            ),
+        ))
+    shirt = organic_union(
+        "GEO_Mebble_shirt",
+        shirt_parts,
+        mats["cream"],
+        geo,
+        voxel=0.015,
+        smooth_iterations=4,
+        surface_role="continuous-wrapped-shirt-and-sleeves",
+    )
+    skin_to_bones(
+        shirt,
+        armature,
+        [
+            "DEF_hips", "DEF_spine_lower", "DEF_spine_mid",
+            "DEF_spine_upper", "DEF_chest",
+            "DEF_clavicle.L", "DEF_upper_arm.L", "DEF_forearm.L",
+            "DEF_clavicle.R", "DEF_upper_arm.R", "DEF_forearm.R",
+        ],
+        4,
+        adjacency=0.115,
+        falloff=0.065,
+    )
+
+    vest = organic_union(
+        "GEO_Mebble_vest",
+        [
+            source_ellipsoid((0, 0.016, 1.245), (0.362, 0.252, 0.305)),
+            source_ellipsoid((-0.275, 0.008, 1.495), (0.092, 0.130, 0.090)),
+            source_ellipsoid((0.275, 0.008, 1.495), (0.092, 0.130, 0.090)),
+        ],
+        mats["brown"],
+        geo,
+        voxel=0.015,
+        smooth_iterations=3,
+        surface_role="close-wrapped-layered-vest",
+    )
+    skin_to_bones(
+        vest,
+        armature,
+        ["DEF_hips", "DEF_spine_lower", "DEF_spine_mid", "DEF_spine_upper", "DEF_chest"],
+        4,
+        adjacency=0.11,
+        falloff=0.06,
+    )
+
+    trouser_parts = [
+        source_ellipsoid((0, 0.010, 1.095), (0.260, 0.200, 0.215)),
+    ]
+    for sign in (-1, 1):
+        depth_offset = sign * 0.038
+        trouser_parts.extend((
+            source_capsule(
+                (sign * dims["leg_x"], depth_offset * 0.35 + 0.006, dims["hip"]),
+                (sign * dims["leg_x"], depth_offset + 0.006, dims["knee"]),
+                (0.124, 0.107),
+                0.96,
+            ),
+            source_capsule(
+                (sign * dims["leg_x"], depth_offset + 0.006, dims["knee"]),
+                (
+                    sign * dims["leg_x"],
+                    depth_offset + 0.006,
+                    dims["ankle"] + 0.050,
+                ),
+                (0.104, 0.086),
+                0.94,
+            ),
+            source_ellipsoid(
+                (sign * dims["leg_x"], depth_offset + 0.006, dims["knee"]),
+                (0.114, 0.098, 0.112),
+            ),
+        ))
+    trousers = organic_union(
+        "GEO_Mebble_trousers",
+        trouser_parts,
+        mats["trouser"],
+        geo,
+        voxel=0.014,
+        smooth_iterations=4,
+        surface_role="continuous-wrapped-trousers-and-legs",
+    )
+    skin_to_bones(
+        trousers,
+        armature,
+        [
+            "DEF_hips",
+            "DEF_thigh.L", "DEF_shin.L",
+            "DEF_thigh.R", "DEF_shin.R",
+        ],
+        4,
+        adjacency=0.105,
+        falloff=0.06,
+    )
+    for side in ("L", "R"):
+        organic_boot("Mebble", side, armature, geo, mats, dims)
+
+
+def replace_with_organic_foundation(hero, armature, groups, mats, dims):
+    remove_segmented_foundation(hero)
+    if hero == "Hargold":
+        build_hargold_organic_foundation(armature, groups, mats, dims)
+    else:
+        build_mebble_organic_foundation(armature, groups, mats, dims)
 
 
 def build_hargold(armature, groups, mats, dims):
@@ -900,9 +2029,9 @@ def build_hargold(armature, groups, mats, dims):
         "GEO_Hargold_backpack_leaf_badge",
         "Y",
         [
-            (0.585, 0.020, 0.014, 0.0, 0.93),
-            (0.655, 0.095, 0.055, -0.018, 0.94),
-            (0.670, 0.025, 0.018, 0.070, 0.99),
+            (0.700, 0.020, 0.014, 0.0, 0.93),
+            (0.730, 0.095, 0.055, -0.018, 0.94),
+            (0.745, 0.025, 0.018, 0.070, 0.99),
         ],
         mats["olive_light"],
         attach,
@@ -911,7 +2040,7 @@ def build_hargold(armature, groups, mats, dims):
     parent_bone(leaf_badge, armature, "DEF_backpack")
     leaf_vein = curve_tube(
         "GEO_Hargold_backpack_leaf_vein",
-        [(-0.065, 0.685, 0.91), (0.0, 0.69, 0.95), (0.065, 0.68, 0.99)],
+        [(-0.065, 0.760, 0.91), (0.0, 0.765, 0.95), (0.065, 0.755, 0.99)],
         0.008,
         mats["cream"],
         attach,
@@ -1190,12 +2319,12 @@ def build_mebble(armature, groups, mats, dims):
     hood = curve_tube(
         "GEO_Mebble_hood",
         [
-            (0.24, 0, dims["shoulder"] - 0.01),
-            (0, -0.19, dims["shoulder"] - 0.03),
-            (-0.24, 0, dims["shoulder"] - 0.01),
-            (0, 0.20, dims["shoulder"] + 0.01),
+            (0.215, 0, dims["shoulder"] - 0.075),
+            (0, -0.175, dims["shoulder"] - 0.095),
+            (-0.215, 0, dims["shoulder"] - 0.075),
+            (0, 0.180, dims["shoulder"] - 0.055),
         ],
-        0.065, mats["olive_dark"], attach, cyclic=True,
+        0.040, mats["olive_dark"], attach, cyclic=True,
     )
     parent_bone(hood, armature, "DEF_chest")
     cape = cape_grid(
@@ -1716,6 +2845,12 @@ def build(hero):
         build_hargold(armature, groups, mats, dims)
     else:
         build_mebble(armature, groups, mats, dims)
+    # The accessory authoring pass above is retained, but every segmented v4
+    # anatomical and garment surface is discarded before the asset is saved.
+    # These v5 foundations are new factory-empty organic unions fitted to the
+    # locked mannequin frame.
+    replace_with_organic_foundation(hero, armature, groups, mats, dims)
+    configure_joint_deformation(hero, armature, dims)
     locked_reference_rig = add_locked_mannequin_rig_reference(armature, groups)
     skeleton_objects = add_fit_skeleton_overlay(armature, groups, mats)
     riglib.add_production_actions(armature, hero)
@@ -1727,8 +2862,8 @@ def build(hero):
         action["negative_scale_mirroring"] = False
     setup_scene(hero, dims["height"], groups, mats)
     scene = bpy.context.scene
-    scene["assetVersion"] = "4.1.0-locked-mannequin-fit-staging"
-    scene["canonVersion"] = "2026-07-26-locked-mannequin-frame-2"
+    scene["assetVersion"] = "5.0.0-organic-silhouette-staging"
+    scene["canonVersion"] = "2026-07-26-organic-silhouette-rebuild-1"
     scene["referenceHash"] = (
         "4004C659783AC41ED09E6AF18D25F776DFB19BE44B9E7066289627E016A7B4E4"
         if hero == "Hargold"
@@ -1745,14 +2880,21 @@ def build(hero):
     scene["negativeScaleMirroring"] = False
     scene["physicalDirectionChange"] = True
     scene["silhouetteValidationPixels"] = "100-150"
-    scene["constructionPriority"] = "mannequin-rig-action-first"
+    scene["constructionPriority"] = "locked-silhouette-organic-deformation-first"
+    scene["animationPolishStatus"] = "frozen-pending-model-approval"
+    scene["bodyConstruction"] = "single-continuous-organic-union"
+    scene["garmentConstruction"] = "continuous-wrapped-deforming-layers"
+    scene["bootConstruction"] = "single-piece-rounded-union"
+    scene["jointDeformationPass"] = JOINT_DEFORMATION_PASS
+    scene["jointDeformationImplementation"] = "implemented-structural-stress-review-pending"
+    scene["jointDeformationVisualApproval"] = False
     scene["fitAuthority"] = SPEC_ID
     scene["mannequinSpecHash"] = spec_hash()
     scene["lockedMannequinRig"] = locked_reference_rig.name
     scene["maximumJointAlignmentErrorFraction"] = 0.03
     scene["sharedWorldScaleCamera"] = True
     scene["reviewStatus"] = (
-        "locked-mannequin-fitted-staging-visual-approval-required"
+        "organic-silhouette-staging-visual-approval-required"
     )
     scene["lockedReference"] = str(ROOT / "assets" / "references" / f"{hero} locked production character sheet.png")
     scene["benchmarkBoundary"] = "clean-room-craft-principles-only"

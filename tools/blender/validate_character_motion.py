@@ -158,7 +158,7 @@ def validate() -> dict:
 
     if scene.get("reviewStatus") != "approved-production-character":
         warnings.append(
-            "The active mannequin-fitted candidate still requires final human art-direction approval."
+            "The organic-silhouette candidate still requires final human art-direction approval."
         )
     if not math.isclose(float(target["runtimeNormalizationScale"]), 1.0, abs_tol=1e-5):
         warnings.append(
