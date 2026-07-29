@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 1,
-  "authority": "user-approved-production-checklist-2026-07-26",
+  "schemaVersion": 2,
+  "authority": "locked-original-meshy-animation-directive-2026-07-28",
   "appliesTo": [
     "Hargold",
     "Mebble"
   ],
-  "animationPolishPolicy": "frozen-until-mesh-construction-gates-complete",
+  "animationPolishPolicy": "active-on-locked-original-meshy-rigs-with-source-capability-gates-explicit",
   "milestones": [
     {
       "id": "silhouette",
@@ -30,10 +30,10 @@
     {
       "id": "joint-deformation",
       "label": "Joint deformation complete",
-      "status": "in-progress",
-      "implementation": "preserve-volume-local-corrective-v1",
-      "automatedStructuralGate": "pass",
-      "visualStressGate": "pending",
+      "status": "rig-limited-in-progress",
+      "implementation": "locked-24-bone-meshy-skin-plus-runtime-contact-correction",
+      "automatedStructuralGate": "locked-rig-and-bind-inventory-pass",
+      "visualStressGate": "live-gameplay-review-required",
       "evidence": {
         "Hargold": "assets/previews/joint-deformation/hargold-joint-deformation-stress.png",
         "Mebble": "assets/previews/joint-deformation/mebble-joint-deformation-stress.png"
@@ -64,7 +64,7 @@
     {
       "id": "facial-topology",
       "label": "Facial topology complete",
-      "status": "pending",
+      "status": "blocked-by-locked-source-rig",
       "requiredLoops": [
         "eyelids",
         "eyebrows",
@@ -79,7 +79,7 @@
     {
       "id": "hand-topology",
       "label": "Hand topology complete",
-      "status": "pending",
+      "status": "blocked-by-locked-source-rig",
       "requirements": [
         "thumb saddle",
         "finger knuckles",
@@ -90,7 +90,7 @@
     {
       "id": "clothing-integration",
       "label": "Clothing integration complete",
-      "status": "pending",
+      "status": "locked-mesh-preserved-secondary-controls-missing",
       "requirements": [
         "cape attachment",
         "suspenders",
@@ -103,7 +103,7 @@
     {
       "id": "surface-refinement",
       "label": "Surface refinement complete",
-      "status": "pending",
+      "status": "locked-mesh-preserved",
       "requirements": [
         "torso curvature",
         "shoulder blending",
@@ -115,17 +115,22 @@
     {
       "id": "production-uvs",
       "label": "Production UVs",
-      "status": "pending"
+      "status": "locked-mesh-preserved"
     },
     {
       "id": "final-textures",
       "label": "Final textures",
-      "status": "pending"
+      "status": "locked-mesh-preserved"
     },
     {
       "id": "final-animation-polish",
       "label": "Final animation polish",
-      "status": "blocked-by-mesh-gates",
+      "status": "in-progress",
+      "runtimeLibrary": "src/animation/locked-meshy-animation-library.js",
+      "runtimePresentationClipCounts": {
+        "Hargold": 37,
+        "Mebble": 39
+      },
       "requirements": [
         "anticipation",
         "squash",
@@ -140,17 +145,18 @@
     {
       "id": "gameplay-validation",
       "label": "Gameplay validation",
-      "status": "pending"
+      "status": "in-progress",
+      "validationCourse": "src/content/animation-validation-course.js"
     },
     {
       "id": "lod-generation",
       "label": "LOD generation",
-      "status": "pending"
+      "status": "pending-source-lod0-only"
     },
     {
       "id": "export-ready-production-asset",
       "label": "Export-ready production asset",
-      "status": "pending"
+      "status": "blocked-by-facial-finger-secondary-and-lod-source-controls"
     }
   ]
 }

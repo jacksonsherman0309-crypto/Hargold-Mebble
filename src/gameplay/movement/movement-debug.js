@@ -37,8 +37,6 @@ export function updateMovementTelemetry(state, input, contacts = {}) {
     input: Object.freeze({
       left: Boolean(input.left),
       right: Boolean(input.right),
-      run: Boolean(input.run),
-      sprint: Boolean(input.sprint),
       jumpPressed: Boolean(input.jumpPressed),
       jumpHeld: Boolean(input.jumpHeld),
       downPressed: Boolean(input.downPressed ?? input.groundSlamPressed),

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "retargetingRequiredForLiveGlbClips": false,
   "reason": "Each hero's selected GLB mesh, walking GLB, and running GLB use the same 24 bone names, parent hierarchy, and bind transforms.",
   "identityBoneMap": {
@@ -42,6 +42,27 @@
     "status": "preserved-and-inventoried-not-retargeted",
     "reason": "The FBX walking files are alternate exports of the same named walking takes already present in compatible GLB form. Their Blender-normalized bind matrices differ by container coordinate conversion, so duplicating them would add no unique motion and would require unnecessary axis retargeting.",
     "destructiveOverwrite": false
+  },
+  "rejectedProceduralCharacterPolicy": {
+    "sources": [
+      "assets/exports/hargold_character.glb",
+      "assets/exports/mebble_character.glb",
+      "assets/exports/production-staging/hargold_character.glb",
+      "assets/exports/production-staging/mebble_character.glb",
+      "assets/exports/mannequins/compact_animation_mannequin.glb",
+      "assets/exports/mannequins/tall_animation_mannequin.glb"
+    ],
+    "visibleMeshRuntimeUse": false,
+    "actionRetargetRuntimeUse": false,
+    "reason": "The meshes were rejected by the user, and the 95/97-bone rigs have different bind axes, proportions, control hierarchies, and deformation assumptions from the locked 24-bone Meshy skins.",
+    "preservation": "quarantined as historical project-authored reference assets only"
+  },
+  "projectAuthoredLockedRigPolicy": {
+    "source": "src/animation/locked-meshy-animation-library.js",
+    "method": "additive local-space animation over the loaded locked rig's own bind transforms",
+    "visibleMeshReplacement": false,
+    "baseRigReplacement": false,
+    "rootMotion": false
   },
   "rootMotionPolicy": {
     "controllerOwnsTranslation": true,

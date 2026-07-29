@@ -15,7 +15,7 @@ const milestones = new Map(
   checklist.milestones.map((milestone) => [milestone.id, milestone])
 );
 
-assert.equal(checklist.schemaVersion, 1);
+assert.equal(checklist.schemaVersion, 2);
 assert.deepEqual(
   GAME_RULES.characterPresentation.modelApprovalGate.approvedMilestones,
   ['silhouette', 'proportions', 'skeleton', 'connected-body']
@@ -27,22 +27,34 @@ for (const milestone of
 
 assert.equal(
   GAME_RULES.characterPresentation.modelApprovalGate.activeMilestone,
-  'joint-deformation'
+  'final-animation-polish'
 );
-assert.equal(milestones.get('joint-deformation')?.status, 'in-progress');
+assert.equal(milestones.get('joint-deformation')?.status, 'rig-limited-in-progress');
 assert.equal(
   milestones.get('joint-deformation')?.automatedStructuralGate,
-  'pass'
+  'locked-rig-and-bind-inventory-pass'
 );
 assert.equal(
   milestones.get('joint-deformation')?.visualStressGate,
-  'pending'
+  'live-gameplay-review-required'
 );
 assert.equal(
   milestones.get('final-animation-polish')?.status,
-  'blocked-by-mesh-gates'
+  'in-progress'
 );
-assert.match(checklist.animationPolishPolicy, /frozen/);
+assert.match(checklist.animationPolishPolicy, /active-on-locked-original-meshy-rigs/);
+assert.equal(
+  milestones.get('facial-topology')?.status,
+  'blocked-by-locked-source-rig'
+);
+assert.equal(
+  milestones.get('hand-topology')?.status,
+  'blocked-by-locked-source-rig'
+);
+assert.deepEqual(
+  milestones.get('final-animation-polish')?.runtimePresentationClipCounts,
+  { Hargold: 37, Mebble: 39 }
+);
 
 for (const milestone of
   GAME_RULES.characterPresentation.modelApprovalGate.incompleteMilestones) {

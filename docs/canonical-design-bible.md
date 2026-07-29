@@ -67,23 +67,23 @@ The latest approved Hargold and Mebble model is locked. Do not change proportion
 ### Production character quality
 
 - `docs/character-dimension-animation-spec.md` is the binding dimensional construction, three-quarter gameplay orientation, rig, animation, shading, camera-readability, and validation contract.
-- The rejected blockout and doll-like procedural geometry remain superseded. Production replacements must be newly modeled original Hargold and Mebble geometry built from empty Blender scenes. Do not reuse the rejected character geometry or substitute another generic humanoid base.
-- The replacement must preserve the locked identities, silhouettes, proportions, clothing, colors, accessories, and defining facial features above.
+- The original user-supplied Meshy Hargold and Mebble meshes and their matching 24-bone rigs are the locked animation targets. Do not replace either visible mesh, select another base rig, restart modeling, or load the rejected procedural character exports.
+- The locked Meshy targets preserve the approved identities, silhouettes, proportions, clothing, colors, accessories, and defining facial features above. The locked PNG sheets remain identity references and are not themselves rigged assets.
 - The locked sheets and approved compact/tall frames are the silhouette source of truth. Fit the complete body volume inside that approved silhouette before adding secondary costume, surface, facial, or material detail.
 - Production meshes require smooth rounded topology, clean deformation edge flow, sculpted faces, expressive brows, detailed hands and boots, layered garments, authored cloth folds, clean UVs, optimized game topology, and planned LODs.
 - Each hero requires one connected watertight skinned body surface integrating the face, neck, torso, shoulders, arms, hands, fingers, pelvis, thighs, knees, and shins. Multiple disconnected anatomical islands inside one Blender object do not satisfy this requirement.
 - Soft garments must be continuous wrapped surfaces and each boot must be a single rounded connected form. Belts, capes, collars, hats, gloves, backpacks, and rigid hardware may remain separate only where their real construction and secondary motion require it.
 - Hero bodies and soft garments must deform as continuous skinned surfaces. Bone-parented upper-arm, forearm, elbow, hand, thigh, or shin pieces that read as an articulated wooden doll are not acceptable production geometry.
 - Character construction is action-first. Proportions must be approved in run, jump, landing, skid, slam, carry, wall-contact, and character-specific action poses before close facial or material polish.
-- The July 27, 2026 user-supplied Meshy appearances are explicitly approved for live gameplay animation testing. This approval authorizes the canonical Meshy rigs and every usable supplied clip to replace the earlier runtime exports without redesigning either visible character.
-- The supplied packages contain walk and run only. Their integration does not mark missing idle, jump, fall, land, crouch, damage, defeat, respawn, hero-special, facial, cloth, or secondary-motion clips complete, and it does not close the remaining topology, deformation, UV, LOD, or export-readiness checklist items.
+- The July 27, 2026 user-supplied Meshy appearances are explicitly approved and locked for live gameplay animation. The supplied walk and run clips remain the authoritative sustained locomotion cycles. Additional presentation clips may animate only this exact skeleton using its own bind transforms; rejected procedural actions may not be retargeted.
+- The locked rigs contain 24 body bones and no morph targets. They do not contain facial, eyelid, eyebrow, jaw, mouth, individual-finger, cape, scarf, hat, feather, glasses, belt, backpack-follow, or pose-space corrective controls. These remain source-asset authoring blockers and must not be described as functional.
 - The binding production checklist is
   `assets/blender/character-production-checklist.json`. Silhouette,
-  proportions, skeleton, and connected body are approved; joint deformation is
-  the active incomplete gate. Facial topology, hand topology, clothing
-  integration, surface refinement, production UVs, final textures, final
-  animation polish, gameplay validation, LODs, and export-ready classification
-  remain incomplete.
+  proportions, skeleton, and connected body are approved. Animation refinement
+  on the locked Meshy body skeleton is the active gate. Facial, finger,
+  independent secondary controls, reviewed corrective deformation, mobile LODs,
+  and export-ready classification remain incomplete because the locked source
+  rigs do not provide those controls.
 - Joint-deformation approval requires clavicle/deltoid and upper-arm-twist
   preservation, non-collapsing elbows and sleeve volume, pelvis/upper-thigh
   volume, knee/pant volume, and smooth ankle-to-boot transitions. Structural

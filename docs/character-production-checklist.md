@@ -1,57 +1,40 @@
 # Character production checklist
 
-Last updated: July 26, 2026
+Last updated: July 28, 2026
 
-This is the binding completion order for both Hargold and Mebble. The
-machine-readable authority is
+The machine-readable authority is
 `assets/blender/character-production-checklist.json`.
 
-The silhouette, proportions, skeleton, and connected-body gates are approved.
-That approval does not mark either character as a final production asset.
-Animation polish remains frozen until joint deformation, facial topology, hand
-topology, clothing integration, and surface refinement are complete.
+The original Meshy Hargold and Mebble meshes and 24-bone rigs are locked. The
+animation pass may add clips, state-machine logic, contact correction,
+validation tooling, and future reviewed controls to those exact assets. It may
+not replace their visible meshes or select another base rig.
 
-## Current gate: joint deformation
+## Current gate: locked-rig animation refinement
 
-Status: **in progress**.
+- [x] Locked original Meshy models selected
+- [x] Rejected altered/procedural models quarantined
+- [x] Supplied walk and run retained
+- [x] Automatic walk-to-full-run acceleration; no manual run/sprint action
+- [x] Shared body-state presentation library
+- [x] Hargold double-jump body clip
+- [x] Mebble glide body clips
+- [x] Velocity-linked locomotion, phase synchronization, and responsive blends
+- [x] Foot-height correction and bounded slope adaptation
+- [x] Live validation stations and animation debug surface
+- [ ] Joint-deformation visual stress approval
+- [ ] Facial controls and facial animation
+- [ ] Finger bones and hand/finger poses
+- [ ] Independent cape, scarf, hat, feather, glasses, belt, and backpack motion
+- [ ] Corrective shapes or corrective bones
+- [ ] Complete live gameplay visual pass
+- [ ] LOD generation and mobile profiling
+- [ ] Export-ready production approval
 
-The first structural pass uses preserve-volume armature deformation,
-multi-segment B-Bone limb chains, and localized corrective-smooth masks on the
-connected body, sleeve garments, trousers, and boot ankles. It covers:
+The facial, finger, accessory, and corrective boxes cannot be checked with the
+present source GLBs: both rigs have 24 body bones and zero morph targets.
+Documentation and body poses are not substitutes for those missing controls.
 
-- clavicle and shoulder bending, deltoid volume, and upper-arm twist;
-- elbow bend volume and sleeve preservation;
-- pelvis/hip rotation and upper-thigh volume;
-- knee bending and pant silhouette;
-- ankle-to-boot transition.
-
-Structural implementation is not enough to close the gate. Both heroes must
-pass the generated stress-pose sheet and senior visual review without joint
-collapse, candy-wrapper twist, garment volume loss, or silhouette breaks.
-
-The automated structural sub-gate passes for both active Blender sources and
-runtime GLBs. Visual approval remains pending. The fixed-camera evidence is:
-
-- `assets/previews/joint-deformation/hargold-joint-deformation-stress.png`
-- `assets/previews/joint-deformation/mebble-joint-deformation-stress.png`
-
-## Locked milestone order
-
-- [x] Silhouette approved
-- [x] Proportions approved
-- [x] Skeleton approved
-- [x] Connected body approved
-- [ ] Joint deformation complete — structural pass; visual review pending
-- [ ] Facial topology complete
-- [ ] Hand topology complete
-- [ ] Clothing integration complete
-- [ ] Surface refinement complete
-- [ ] Production UVs
-- [ ] Final textures
-- [ ] Final animation polish
-- [ ] Gameplay validation
-- [ ] LOD generation
-- [ ] Export-ready production asset
-
-No unchecked item may be reported as complete without the corresponding source
-asset, automated validation where applicable, and visual evidence.
+No unchecked item may be reported as complete without a saved source asset,
+runtime integration where applicable, automated validation where practical,
+and gameplay-camera visual evidence.

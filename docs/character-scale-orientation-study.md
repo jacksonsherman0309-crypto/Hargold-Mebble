@@ -3,6 +3,10 @@
 Status: locked clean-room production target
 Applies to: Hargold and Mebble Blender sources, runtime GLBs, animation review, gameplay camera review
 
+July 28 runtime authority: apply this study to the locked original Meshy
+meshes/rigs. Historical procedural character sources are rejected and may not
+become live or supply retargeted actions.
+
 ## Boundary
 
 Nintendo footage and official screenshots are used only to study observable platform-character craft: silhouette readability, broad relative scale, camera-facing bias, action staging, overlap, and follow-through. No Nintendo mesh, rig, animation curve, proprietary dimension, code, or protected character proportion is a source asset for this project.

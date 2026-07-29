@@ -305,14 +305,23 @@ The movement layer should expose animation intent without hard-coding a particul
 - Compression/crushing metadata where used.
 - Deterministic replay from identical inputs.
 
-## 13. Rig-dependent work remaining
+## 13. Rig-dependent integration status
 
-These items cannot be finalized until real production models and animation exist:
+The locked original Meshy models now exist in the live runtime. Body animation
+selection, velocity-linked walk/run playback, phase synchronization, in-place
+root-motion policy, grounded foot-height correction, bounded slope adaptation,
+and responsive transition blending are implemented.
 
-- collider dimensions measured against final meshes;
-- per-animation foot-contact markers;
-- stride synchronization to movement speed;
-- root-motion reconciliation if any clip contains translation;
-- final landing, wall-contact, slide, spin, attack, and hurt transition blending;
-- Mebble cape and clothing secondary motion;
-- collider-to-visible-body alignment in all hero states.
+The following still require reviewed source-asset work:
+
+- authored per-clip left/right foot-contact markers;
+- collider-to-visible-body review in every hero state;
+- source-rig corrective shapes or bones for stressed joints;
+- facial and individual finger controls;
+- Mebble cape and clothing secondary controls;
+- hat, feather, glasses, belt, backpack, and scarf controls;
+- final target-device visual and performance approval.
+
+The current locked rigs have 24 body bones and zero morph targets. Missing
+facial, finger, cape, accessory, and corrective controls cannot be finalized
+only in the runtime state machine.

@@ -57,6 +57,7 @@ Codex must begin with [`AGENTS.md`](AGENTS.md). Key sources include:
 - [`docs/movement-and-collision-spec.md`](docs/movement-and-collision-spec.md) — movement and interaction contract.
 - [`src/canonical-data.js`](src/canonical-data.js) — current executable rules and campaign facts.
 - [`src/runtime/fixed-step.js`](src/runtime/fixed-step.js) — deterministic 120 Hz simulation foundation.
+- [`docs/locked-meshy-animation-production.md`](docs/locked-meshy-animation-production.md) — current locked character assets, animation clips, validation course, quarantine policy, and verified source-rig limits.
 - [`docs/historical-build-handoff.md`](docs/historical-build-handoff.md) — archived Build 025–030 scope and production boundaries.
 - `archive/imported-packages` — preserved complete world, level, mob, boss, and runtime archives after import.
 
@@ -68,8 +69,19 @@ Current controls:
 
 - Move: `A` / `D` or arrow keys
 - Jump: `Space`, `W`, or up arrow
+- Ground slam / fast fall: `S` or down arrow
+- Attack / interact: `E`
 - Swap hero: `Q`
 - Restart: `R`
+
+Holding left or right automatically accelerates from the slower movement tier
+to full running speed. There is no separate run or sprint button.
+
+Animation validation is available at:
+
+```text
+?animationValidation=1&debugAnimation=1
+```
 
 ## Run contract checks
 
@@ -83,6 +95,17 @@ The repository currently contains a playable browser prototype, canonical specif
 
 The archived Build 018–030 work includes substantial enemy catalogs, combat and interaction rules, boss runtimes and plans, encounter scheduling, pooling, save/progression, editor data, and distinct plans for 90 courses. Some archived geometry outputs deliberately contain pending positions rather than finished collision coordinates.
 
-The project still does not contain finished production 3D meshes, skeletons, skin weights, materials, textures, animation clips, completed 90-level collision geometry, a full Unity project, final audio, or target-device profiling.
+The repository now contains the locked original user-supplied Meshy Hargold and
+Mebble visible meshes, 24-bone skins, embedded materials/textures, supplied
+walk/run clips, and a modular controller-linked body-animation package. These
+are real runtime assets.
+
+The locked source rigs still do not contain facial morphs, finger bones,
+independent cape/hat/glasses/accessory controls, pose-space correctives, or
+mobile LODs. The project also does not contain completed collision geometry for
+the current 83-slot campaign, a full Unity project, final audio, or
+target-device profiling. The older 90-slot scaffolds remain preserved pending
+the authored World 1–7 slot remap required by
+`docs/campaign-level-count-override.md`.
 
 Planning documents, schemas, manifests, tests, and contracts must never be reported as completed production assets.

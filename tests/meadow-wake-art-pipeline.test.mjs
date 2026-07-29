@@ -91,7 +91,7 @@ assert.ok(
   MEADOW_WAKE_SCENERY_BEATS.every(beat => beat.props.length >= 4),
   'every authored Meadow Wake beat must carry its own scenery finish'
 );
-assert.match(renderer, /importedAnimationFor/);
+assert.match(renderer, /animationIntentFor/);
 assert.match(renderer, /importedClipMetadata/);
 assert.match(renderer, /ACTION_REVEAL_DEGREES/);
 assert.match(renderer, /GAME_PIXELS_PER_METRE/);
@@ -108,8 +108,8 @@ for (const texture of Object.values(manifest.environmentTextures)) {
   assert.ok(statSync(texturePath).size > 1_000_000, `${texture} must be a production-resolution texture`);
 }
 
-assert.match(characterManifest.status, /locked-silhouette-organic-v5-active/);
-assert.match(characterManifest.activeRuntimeStatus, /production-organic-silhouette-v5-candidate-active/);
+assert.match(characterManifest.status, /locked-original-meshy-rigs-active/);
+assert.match(characterManifest.activeRuntimeStatus, /locked-original-meshy-body-animation-library-active/);
 assert.equal(characterManifest.references.ApprovedPairTarget.status, 'present-approved-2026-07-25');
 assert.ok(statSync(approvedCharacterTarget).size > 2_000_000);
 assert.equal(characterManifest.dimensionalPresentation.classification, '2.75D');
@@ -117,27 +117,18 @@ assert.equal(characterManifest.dimensionalPresentation.negativeScaleMirroringFor
 assert.ok(characterManifest.requiredValidationViews.includes('gameplay-three-quarter-side'));
 assert.ok(characterManifest.requiredValidationActions.includes('physical-direction-reversal'));
 assert.ok(characterManifest.requiredValidationActions.includes('Mebble-glide'));
-assert.ok(characterManifest.sharedAnimationClipsRequired.includes('sprint'));
-assert.ok(characterManifest.sharedAnimationClipsRequired.includes('crawl'));
-assert.ok(characterManifest.sharedAnimationClipsRequired.includes('victory'));
+assert.equal(characterManifest.lockedAssetPolicy.replaceVisibleMesh, false);
+assert.equal(characterManifest.lockedAssetPolicy.selectDifferentBaseRig, false);
+assert.equal(characterManifest.lockedAssetPolicy.retargetRejectedProceduralActions, false);
 for (const hero of ['Hargold', 'Mebble']) {
   const spec = characterManifest.characters[hero];
-  assert.match(spec.status, /production-organic-silhouette-v5-candidate-active/);
+  assert.match(spec.status, /locked-original-meshy-rig-active/);
+  assert.equal(spec.rig.bones, 24);
+  assert.equal(spec.rig.morphTargets, 0);
+  assert.equal(spec.rig.suppliedClips.length, 2);
   assert.ok(
-    spec.implemented.model.some(entry => /one connected watertight skin body/.test(entry)),
-    `${hero} must declare the connected organic body gate`
-  );
-  assert.ok(
-    spec.implemented.model.some(entry => /single-piece rounded/.test(entry)),
-    `${hero} must declare unified rounded boots`
-  );
-  assert.ok(
-    statSync(new URL(`../assets/blender/${spec.blend}`, import.meta.url)).size > 500_000,
-    `${hero} replacement source must contain the modeled, rigged, textured asset`
-  );
-  assert.ok(
-    statSync(new URL(`../assets/exports/${hero.toLowerCase()}_character.glb`, import.meta.url)).size > 3_000_000,
-    `${hero} replacement GLB must contain the full animation library`
+    statSync(new URL(`../assets/blender/${spec.runtime}`, import.meta.url)).size > 30_000_000,
+    `${hero} locked Meshy runtime GLB must exist`
   );
 }
 
@@ -162,7 +153,7 @@ assert.match(motionValidator, /finalApprovalEligible/);
 
 const liveHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 assert.doesNotMatch(liveHtml, /data-action="sprint"/);
-assert.match(liveHtml, /meshy-live-2/);
+assert.match(liveHtml, /locked-animation-1/);
 assert.match(renderer, /canonical_gameplay_rig\.glb/);
 
 console.log(`Meadow Wake art pipeline checks passed from ${root}`);

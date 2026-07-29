@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "decisionDate": "2026-07-27",
+  "schemaVersion": 2,
+  "decisionDate": "2026-07-28",
   "appearancePolicy": {
     "approvedAppearanceLocked": true,
     "redesignAllowed": false,
@@ -20,10 +20,12 @@
       "stable metre-scale glTF orientation",
       "walk and run can be merged by direct node targeting without retargeting"
     ],
-    "runtimeClips": [
+    "embeddedSuppliedClips": [
       "hargold_walk",
       "hargold_run"
-    ]
+    ],
+    "runtimePresentationClipCount": 37,
+    "runtimePresentationLibrary": "src/animation/locked-meshy-animation-library.js"
   },
   "Mebble": {
     "canonicalRigName": "Mebble_Canonical_Gameplay_Rig",
@@ -38,10 +40,12 @@
       "stable metre-scale glTF orientation",
       "walk and run can be merged by direct node targeting without retargeting"
     ],
-    "runtimeClips": [
+    "embeddedSuppliedClips": [
       "mebble_walk",
       "mebble_run"
-    ]
+    ],
+    "runtimePresentationClipCount": 39,
+    "runtimePresentationLibrary": "src/animation/locked-meshy-animation-library.js"
   },
   "duplicateAndAlternateSources": [
     {
@@ -63,8 +67,28 @@
     "oneVisibleMeshPerHero": true,
     "duplicateAnimationMeshesExported": false,
     "controllerOwnsMovement": true,
-    "retargetingRequired": false,
+    "retargetingRequiredForSuppliedWalkRun": false,
+    "additionalClipPolicy": "project-authored additive local-space tracks built from each locked rig's own bind transforms",
+    "rejectedProceduralMeshRuntimeUse": false,
+    "rejectedProceduralActionRetargetUse": false,
     "rootNodeMotionPresent": false,
     "hipMotionPreserved": true
+  },
+  "lockedRigCapabilityLimits": {
+    "boneCount": 24,
+    "morphTargetCount": 0,
+    "missingControls": [
+      "eyelids",
+      "eye direction",
+      "eyebrows",
+      "jaw",
+      "mouth corners",
+      "cheeks",
+      "individual fingers",
+      "cape",
+      "hat feather",
+      "glasses"
+    ],
+    "policy": "Do not claim these controls exist and do not replace the approved Meshy meshes to fabricate them."
   }
 }

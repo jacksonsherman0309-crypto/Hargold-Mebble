@@ -78,4 +78,6 @@ retopology. Final approval still requires purpose-built edge flow around the
 shoulders, elbows, wrists, hips, knees, ankles, neck, mouth, and eyelids;
 corrective shapes; hand and facial refinement; and every-pose inspection.
 
-Animation polish remains frozen until that model-construction gate is approved.
+The July 28 directive locks the original Meshy models and authorizes body
+animation refinement on those exact rigs. This historical construction
+benchmark remains reference-only and cannot reactivate a replacement mesh.

@@ -1,112 +1,103 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "controllerPolicy": {
     "movementAuthority": "deterministic fixed-step velocity controller",
     "manualSprintAction": false,
-    "locomotionSelection": "damped horizontal speed",
+    "locomotionSelection": "movement state plus measured horizontal and vertical velocity",
     "walkMaximumBeforeBlendMetresPerSecond": 4.15,
     "runMinimumMetresPerSecond": 4.15,
     "rootMotion": false,
-    "missingClipPolicy": "retain the supplied bind/rest pose and preserve gameplay; do not fabricate a replacement clip"
+    "locomotionPhaseSynchronization": true,
+    "footHeightCorrection": "grounded contact clips only",
+    "terrainAdaptation": "bounded side-profile slope tilt",
+    "interruptionPolicy": "gameplay state changes and explicit cues supersede presentation one-shots",
+    "missingClipPolicy": "fall back to the nearest locked-rig authored body action without replacing the approved mesh"
+  },
+  "sources": {
+    "suppliedMeshy": [
+      "{hero}_walk",
+      "{hero}_run"
+    ],
+    "projectAuthoredLockedRig": "src/animation/locked-meshy-animation-library.js",
+    "rejectedProceduralCharacterActions": {
+      "runtimeUse": false,
+      "visibleMeshUse": false,
+      "status": "reference-only; not retargeted because bind axes and proportions differ"
+    }
   },
   "heroes": {
     "Hargold": {
-      "clips": {
-        "walk": "hargold_walk",
-        "run": "hargold_run"
-      }
+      "clipCount": 37,
+      "suppliedClips": [
+        "hargold_walk",
+        "hargold_run"
+      ],
+      "exclusiveClips": [
+        "hargold_double_jump"
+      ]
     },
     "Mebble": {
-      "clips": {
-        "walk": "mebble_walk",
-        "run": "mebble_run"
-      }
+      "clipCount": 39,
+      "suppliedClips": [
+        "mebble_walk",
+        "mebble_run"
+      ],
+      "exclusiveClips": [
+        "mebble_glide_open",
+        "mebble_glide_sustain",
+        "mebble_glide_close"
+      ]
     }
   },
   "requiredLiveStates": {
-    "Idle": {
-      "mapping": "rest-pose",
-      "status": "missing-supplied-clip"
-    },
-    "MoveStart": {
-      "mapping": "{hero}_walk",
-      "status": "closest-supplied-clip"
-    },
-    "Walk": {
-      "mapping": "{hero}_walk",
-      "status": "exact"
-    },
-    "Run": {
-      "mapping": "{hero}_run",
-      "status": "exact"
-    },
-    "MoveStop": {
-      "mapping": "{hero}_walk -> rest-pose cross-fade",
-      "status": "closest-supplied-clip"
-    },
-    "Turn": {
-      "mapping": "speed-selected {hero}_walk or {hero}_run plus valid Y-axis facing rotation",
-      "status": "closest-supplied-clip"
-    },
-    "JumpStart": {
-      "mapping": "rest-pose",
-      "status": "missing-supplied-clip"
-    },
-    "JumpRise": {
-      "mapping": "rest-pose",
-      "status": "missing-supplied-clip"
-    },
-    "JumpApex": {
-      "mapping": "rest-pose",
-      "status": "missing-supplied-clip"
-    },
-    "Fall": {
-      "mapping": "rest-pose",
-      "status": "missing-supplied-clip"
-    },
-    "Land": {
-      "mapping": "rest-pose",
-      "status": "missing-supplied-clip"
-    },
-    "Crouch": {
-      "mapping": "rest-pose",
-      "status": "missing-supplied-clip"
-    },
-    "Damage": {
-      "mapping": "rest-pose",
-      "status": "missing-supplied-clip"
-    },
-    "Defeat": {
-      "mapping": "rest-pose",
-      "status": "missing-supplied-clip"
-    },
-    "Respawn": {
-      "mapping": "rest-pose",
-      "status": "missing-supplied-clip"
-    }
+    "NeutralIdle": { "mapping": "{hero}_idle", "status": "authored-locked-rig" },
+    "SecondaryIdle": { "mapping": "{hero}_idle_secondary", "status": "authored-locked-rig" },
+    "MoveStart": { "mapping": "{hero}_walk_start", "status": "authored-locked-rig" },
+    "Walk": { "mapping": "{hero}_walk", "status": "exact-supplied" },
+    "WalkRunAcceleration": { "mapping": "{hero}_walk_run_accel", "status": "authored-locked-rig" },
+    "Run": { "mapping": "{hero}_run", "status": "exact-supplied" },
+    "MoveStop": { "mapping": "{hero}_run_decelerate", "status": "authored-locked-rig" },
+    "Turn": { "mapping": "{hero}_turnaround", "status": "authored-locked-rig" },
+    "Skid": { "mapping": "{hero}_skid", "status": "authored-locked-rig" },
+    "Crouch": { "mapping": "{hero}_crouch", "status": "authored-locked-rig" },
+    "Crawl": { "mapping": "{hero}_crawl", "status": "authored-locked-rig" },
+    "Slide": { "mapping": "{hero}_slide", "status": "authored-locked-rig" },
+    "JumpAnticipation": { "mapping": "{hero}_jump_anticipation", "status": "authored-locked-rig-responsive-one-frame-entry" },
+    "JumpStart": { "mapping": "{hero}_jump_takeoff", "status": "authored-locked-rig-early-airborne-window" },
+    "JumpRise": { "mapping": "{hero}_jump_rise", "status": "authored-locked-rig" },
+    "RunningJump": { "mapping": "{hero}_running_jump", "status": "authored-locked-rig" },
+    "JumpApex": { "mapping": "{hero}_jump_apex", "status": "authored-locked-rig" },
+    "Fall": { "mapping": "{hero}_jump_fall", "status": "authored-locked-rig" },
+    "AirAdjust": { "mapping": "{hero}_air_adjust", "status": "authored-locked-rig" },
+    "Twirl": { "mapping": "{hero}_air_spin", "status": "authored-locked-rig" },
+    "StompBounce": { "mapping": "{hero}_stomp_bounce", "status": "authored-locked-rig" },
+    "Land": { "mapping": "{hero}_land_soft", "status": "authored-locked-rig" },
+    "HeavyLand": { "mapping": "{hero}_land_heavy", "status": "authored-locked-rig" },
+    "GroundSlamStart": { "mapping": "{hero}_ground_slam_start", "status": "authored-locked-rig-approved-universal-mechanic" },
+    "GroundSlamFall": { "mapping": "{hero}_ground_slam_fall", "status": "authored-locked-rig-approved-universal-mechanic" },
+    "GroundSlamImpact": { "mapping": "{hero}_ground_slam_impact", "status": "authored-locked-rig-approved-universal-mechanic" },
+    "BlockHit": { "mapping": "{hero}_block_hit", "status": "authored-locked-rig" },
+    "Damage": { "mapping": "{hero}_hurt", "status": "authored-locked-rig" },
+    "Knockback": { "mapping": "{hero}_knockback", "status": "authored-locked-rig" },
+    "Defeat": { "mapping": "{hero}_defeat", "status": "authored-locked-rig" },
+    "LedgeStop": { "mapping": "{hero}_ledge_stop", "status": "authored-locked-rig" },
+    "PowerUpCollection": { "mapping": "{hero}_powerup_collect", "status": "authored-locked-rig" },
+    "PowerTransformation": { "mapping": "{hero}_power_transform", "status": "authored-locked-rig" },
+    "Victory": { "mapping": "{hero}_victory", "status": "authored-locked-rig" },
+    "SwapOut": { "mapping": "{hero}_swap_out", "status": "authored-locked-rig" },
+    "SwapIn": { "mapping": "{hero}_swap_in", "status": "authored-locked-rig" },
+    "HargoldDoubleJump": { "mapping": "hargold_double_jump", "status": "authored-locked-rig-progression-gated" },
+    "MebbleGlideOpen": { "mapping": "mebble_glide_open", "status": "authored-body-pose-cape-deformation-blocked-by-source-rig" },
+    "MebbleGlideSustain": { "mapping": "mebble_glide_sustain", "status": "authored-body-pose-cape-deformation-blocked-by-source-rig" },
+    "MebbleGlideClose": { "mapping": "mebble_glide_close", "status": "authored-body-pose-cape-deformation-blocked-by-source-rig" }
   },
   "debugOnlyClips": [],
-  "suppliedClipsWithoutGameplayUse": [],
-  "explicitMissingSuppliedClips": [
-    "idle",
-    "move-start",
-    "move-stop",
-    "turn",
-    "jump-start",
-    "jump-rise",
-    "jump-apex",
-    "fall",
-    "land",
-    "crouch",
-    "damage",
-    "defeat",
-    "respawn",
-    "attack",
-    "celebration",
-    "wave",
-    "interaction",
-    "hargold-double-jump",
-    "hargold-ground-slam",
-    "mebble-glide"
+  "knownRigLimitedStates": [
+    "facial expressions",
+    "individual finger poses",
+    "independent Mebble cape opening",
+    "independent Hargold scarf or cape motion",
+    "hat feather secondary motion",
+    "glasses secondary motion"
   ]
 }

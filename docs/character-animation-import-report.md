@@ -1,13 +1,17 @@
 # Meshy Character Animation Import Report
 
-Date: 2026-07-27
-Status: live browser integration complete for the animation takes actually supplied
+Date: 2026-07-28
+Status: locked Meshy body-animation refinement active
 
 ## Scope and authority
 
 The five user-supplied Meshy archives were preserved and inventoried without changing the approved Hargold or Mebble visual designs. The imported characters are user-supplied production inputs. This report records the technical contents; it does not make an independent ownership or licensing determination.
 
-The source packages contain only usable walk and run takes for each hero. They do **not** contain a complete production animation set. Missing takes remain explicitly missing rather than being represented as completed.
+The source packages contain only usable walk and run takes for each hero. The
+runtime now supplements those takes with project-authored local-space body
+clips built against the exact locked Meshy bind transforms. These runtime clips
+are not additional supplied Meshy takes and are not embedded into the source
+GLBs.
 
 ## Source package inventory
 
@@ -61,10 +65,20 @@ The processed assets were re-imported in Blender and recorded in `data/processed
 
 `data/animation-state-mapping.json` is the authoritative mapping table.
 
-- Grounded locomotion selects walk or run from actual controller velocity. MoveStart, MoveStop, and Turn currently use the nearest supplied locomotion take.
+- Grounded locomotion selects the supplied walk or run from actual controller
+  velocity. Dedicated project-authored locked-rig clips cover start,
+  acceleration, deceleration, turn, and skid.
 - Directional input accelerates through walk, run, and sprint speed tiers. There is no manual sprint button.
-- Idle, jump, fall, land, crouch, skid-specific, damage, defeat, respawn, double-jump, ground-slam, glide, attack, carry, and victory takes were not supplied. Those states retain the canonical mesh in its rest pose instead of fabricating or falsely labeling an animation.
-- Playback crossfades over 0.16 seconds, changes animation time scale with actual speed, and turns the character with positive uniform scale plus Y-axis rotation. Negative-scale mirroring is not used.
+- Body presentation clips now cover idle, jump phases, fall, landing, crouch,
+  crawl, slide, skid, twirl, stomp, damage, defeat, respawn, Hargold double
+  jump, approved ground slam, Mebble glide body poses, block/power reactions,
+  swapping, and victory. They are labeled `project-authored-locked-rig`, not
+  supplied Meshy animation.
+- Playback uses responsive per-transition crossfades, changes supplied gait
+  playback rate with actual speed, synchronizes locomotion phase, applies
+  grounded foot-height correction and bounded slope adaptation, and turns the
+  character with positive uniform scale plus Y-axis rotation. Negative-scale
+  mirroring is not used.
 - Safe Hargold/Mebble swapping, hero-specific abilities, combat, mob behavior, and world-specific rosters remain controller/runtime responsibilities.
 
 The developer panel is available with `?debugAnimation=1`. It supports hero/clip selection, pause, scrub, speed, loop, facing, restart, and a return to controller-driven gameplay. `?debugMovement=1` exposes controller telemetry. `debugDrive=left|right` is a developer-only deterministic capture aid and does not alter normal input.
@@ -92,11 +106,15 @@ Recommended optimization order: retain the present files as visual LOD0; author 
 
 The following work is still genuinely missing:
 
-- bespoke animation takes for every required state beyond walk/run;
-- final loop cleanup and foot-contact review;
-- dedicated facial, finger, cloth, cape, hat, and backpack secondary controls;
-- final joint-deformation review and corrective shapes;
-- production UV/material pass, platform LODs, and mobile memory profiling;
-- close-up and full gameplay-camera validation for the eventual complete animation set.
+- facial, eyelid, eyebrow, cheek, jaw, and mouth controls and animation;
+- individual finger bones and finger poses;
+- independent cloth, cape, scarf, hat, feather, glasses, belt, and backpack
+  controls;
+- joint corrective shapes or corrective bones and final deformation review;
+- platform LODs, mobile texture variants, compression tuning, and target-device
+  profiling;
+- clip-by-clip human visual approval from the full gameplay camera suite.
 
-This import makes the supplied walk/run data playable and testable. It does not claim that the remaining production animation, deformation, facial-rig, texture, or LOD milestones are complete.
+The source rigs have 24 bones and zero morph targets, so the first four items
+cannot be truthfully implemented as runtime animation without reviewed source
+rig and weight extensions. The active body package does not claim otherwise.

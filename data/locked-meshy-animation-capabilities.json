@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "verifiedDate": "2026-07-28",
+  "productionTarget": "original-user-supplied-meshy-rigs",
+  "visibleMeshReplacementAllowed": false,
+  "runtimeRootMotion": false,
+  "controllerOwnsWorldTranslation": true,
+  "heroes": {
+    "Hargold": {
+      "asset": "assets/exports/meshy/hargold_canonical_gameplay_rig.glb",
+      "assetSha256": "A045E299A3F63EC45765C36D436EEF8C53AFDEE4BB7BDC98FD0A23537ABBEBEC",
+      "meshCount": 1,
+      "skinCount": 1,
+      "deformBoneCount": 24,
+      "morphTargetCount": 0,
+      "embeddedSuppliedClips": [
+        "hargold_walk",
+        "hargold_run"
+      ],
+      "runtimePresentationClipCount": 37
+    },
+    "Mebble": {
+      "asset": "assets/exports/meshy/mebble_canonical_gameplay_rig.glb",
+      "assetSha256": "392D8F9C12AD140AFA738AB118D3C3A63F9A40DA41DD8A061FE8A37F91DE3A3B",
+      "meshCount": 1,
+      "skinCount": 1,
+      "deformBoneCount": 24,
+      "morphTargetCount": 0,
+      "embeddedSuppliedClips": [
+        "mebble_walk",
+        "mebble_run"
+      ],
+      "runtimePresentationClipCount": 39
+    }
+  },
+  "supportedByLockedRig": [
+    "hips",
+    "spine",
+    "neck",
+    "head",
+    "shoulders",
+    "upper arms",
+    "forearms",
+    "hands as single rigid deform groups",
+    "upper legs",
+    "lower legs",
+    "feet",
+    "toes"
+  ],
+  "missingFromLockedRig": {
+    "facial": [
+      "eye-direction controls",
+      "upper eyelid controls",
+      "lower eyelid controls",
+      "independent eyebrows",
+      "cheek controls",
+      "jaw control",
+      "mouth opening",
+      "mouth corners",
+      "expression morph targets"
+    ],
+    "hands": [
+      "finger bones",
+      "individual finger controls",
+      "thumb articulation"
+    ],
+    "secondary": [
+      "independent cape or scarf bones",
+      "cape-opening morph",
+      "hat controls",
+      "hat-feather controls",
+      "glasses controls",
+      "belt or backpack follow controls"
+    ],
+    "correctives": [
+      "joint corrective morph targets",
+      "pose-space deformation controls"
+    ]
+  },
+  "implementationPolicy": {
+    "projectAuthoredBodyClips": "additive local-space bone animation built from each locked rig's own bind transforms",
+    "suppliedWalkRunPolicy": "retained as the authoritative sustained locomotion cycles",
+    "rejectedProceduralAssets": "quarantined and never loaded or retargeted by the runtime",
+    "unsupportedControlPolicy": "document as an asset-authoring requirement; do not claim functional controls and do not replace the locked mesh"
+  }
+}

@@ -2,6 +2,12 @@
 
 Status: approved production contract, revised July 26, 2026.
 
+July 28 runtime authority: the original user-supplied Meshy meshes and their
+24-bone rigs are locked. The construction requirements below remain quality
+and validation criteria, but they do not authorize replacing either active
+mesh or selecting a different base rig. See
+`docs/locked-meshy-animation-production.md`.
+
 This contract uses the locked Hargold and Mebble sheets and
 `assets/references/Hargold and Mebble approved production target.png`.
 The combined target locks organic appeal, action posing, materials, expression,

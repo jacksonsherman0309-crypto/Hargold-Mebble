@@ -21,7 +21,7 @@ export const GAME_RULES = Object.freeze({
     gameplayPlane: 'strict-linear-side-scrolling',
     classification: '2.75D',
     modelApprovalGate: Object.freeze({
-      silhouetteAuthority: 'locked-character-sheets-and-approved-compact-tall-frames',
+      silhouetteAuthority: 'locked-original-meshy-rigs-plus-locked-character-sheets',
       cleanRoomConstructionBenchmark: 'observable-craft-principles-only',
       repositoryConstructionReferences: Object.freeze({
         Hargold: 'assets/previews/construction-reference/hargold-construction-reference.png',
@@ -39,6 +39,9 @@ export const GAME_RULES = Object.freeze({
       oneConnectedWatertightBodyRequired: true,
       wrappedSoftGarmentsRequired: true,
       singlePieceRoundedBootsRequired: true,
+      lockedMeshReplacementForbidden: true,
+      activeRuntimeRigManifest: 'data/character-rig-selection.json',
+      verifiedRigCapabilityManifest: 'data/locked-meshy-animation-capabilities.json',
       appearanceApprovedForLiveAnimationImport: true,
       animationIntegrationAuthorized: true,
       animationPolishFrozenUntilModelApproval: false,
@@ -49,7 +52,7 @@ export const GAME_RULES = Object.freeze({
         'skeleton',
         'connected-body'
       ]),
-      activeMilestone: 'joint-deformation',
+      activeMilestone: 'final-animation-polish',
       incompleteMilestones: Object.freeze([
         'joint-deformation',
         'facial-topology',
@@ -552,9 +555,9 @@ export const LOCKED_HERO_DESIGN = Object.freeze({
     clothing: ['layered olive-green explorer jacket', 'tan shirt', 'wide-brim olive-green hat with brown band and orange feather', 'deep red-brown wrapped scarf/cape collar', 'brown field backpack with leaf badge', 'brown belt and explorer pouches', 'brown boots', 'brass-colored hardware'],
     face: ['dark moustache and rounded chin beard/goatee treatment from locked sheet', 'round friendly features', 'moderate—not exaggerated—smile'],
     gameplay: ['shared horizontal base-controller tuning', 'Hargold-only block breaking', 'heavy-rock ground-slam defeats', 'exclusive learned double jump'],
-    productionModel: ['new original artist-authored geometry built from an empty Blender scene', 'do not reuse the rejected doll-like procedural geometry or substitute a generic humanoid base', 'locked silhouette is the source of truth before secondary detail', 'one connected watertight skinned body integrating face, neck, torso, limbs, hands, fingers and legs', 'continuous wrapped soft garments and single-piece rounded boots', 'continuous skinned body and soft-garment surfaces with no rigid segmented limbs', 'smooth rounded deformation topology', 'sculpted face and expressive eyebrows', 'detailed hands and boots', 'layered clothing with authored folds', 'clean UVs and optimized LOD-ready topology', 'action-pose and gameplay-camera deformation approval', '100–150 pixel silhouette approval', 'deformable shoulder volume with separated arms', 'longer readable forearms and hands enlarged roughly 20–30 percent over the rejected candidate', 'larger stable boot silhouette', 'soft integrated cheek transitions'],
-    productionRig: ['IK/FK limbs', 'finger articulation', 'eye, eyebrow, jaw and mouth controls', 'gameplay sockets', 'hat, feather and scarf secondary controls'],
-    productionAnimation: ['user-supplied Meshy walk and run clips approved for current live testing', 'all missing gameplay clips remain incomplete and must not be fabricated', 'anticipation and controlled squash/stretch', 'follow-through and overlapping secondary motion', 'reliable foot contacts', 'seamless state blending']
+    productionModel: ['original user-supplied Meshy visible mesh and 24-bone rig are locked as the active animation target', 'do not replace the locked mesh, select another base rig, or load the rejected doll-like procedural geometry', 'locked silhouette is the source of truth', 'one connected watertight body, wrapped garments, rounded boots, smooth topology and readable deformation remain quality requirements rather than claims about missing source controls', 'action-pose and gameplay-camera deformation approval', '100–150 pixel silhouette approval'],
+    productionRig: ['verified 24-bone Meshy biped supports body, hand-group, foot and toe motion', 'source contains no morph targets, finger bones, facial controls, cape controls, hat controls, feather controls or scarf controls', 'missing source controls remain explicit production blockers and must not be claimed as functional'],
+    productionAnimation: ['user-supplied Meshy walk and run clips remain authoritative for sustained locomotion', 'project-authored additive body clips target only the locked Meshy skeleton', 'anticipation and controlled squash/stretch', 'follow-through within available body bones', 'velocity-synchronized locomotion and reliable foot contacts', 'seamless interruptible state blending', 'facial, finger and independent secondary motion remain blocked by missing source controls']
   },
   Mebble: {
     reference: 'assets/references/Mebble locked production character sheet.png',
@@ -564,9 +567,9 @@ export const LOCKED_HERO_DESIGN = Object.freeze({
     definingFeatures: ['very long skinny neck', 'clearly visible protruding Adam’s apple', 'small brown top hat with green band and leaf detail', 'slightly crooked less-round glasses', 'very bushy eyebrows'],
     clothing: ['cream rolled-sleeve shirt', 'brown vest', 'dark trousers', 'double belts and explorer pouches', 'tall brown lace-up boots', 'green emblem cape that opens as parachute/glider'],
     gameplay: ['shared horizontal base-controller tuning', 'slightly higher jump', 'innate slow-fall and short glide'],
-    productionModel: ['new original artist-authored geometry built from an empty Blender scene', 'do not reuse the rejected doll-like procedural geometry or substitute a generic humanoid base', 'locked silhouette is the source of truth before secondary detail', 'one connected watertight skinned body integrating face, neck, torso, limbs, hands, fingers and legs', 'continuous wrapped soft garments and single-piece rounded boots', 'continuous skinned body and soft-garment surfaces with no rigid segmented limbs', 'smooth rounded deformation topology', 'sculpted face and expressive eyebrows', 'detailed hands and boots', 'layered clothing with authored folds', 'clean UVs and optimized LOD-ready topology', 'action-pose and gameplay-camera deformation approval', '100–150 pixel silhouette approval', 'deformable shoulder volume with arms separated from vest and cape', 'modestly wider torso with larger hands and boots', 'tapered visible neck and stronger Adam’s apple profile', 'glasses offset from the face and curved cape shoulder yoke'],
-    productionRig: ['IK/FK limbs', 'finger articulation', 'eye, eyebrow, jaw and mouth controls', 'gameplay sockets', 'neck corrective and cape secondary controls'],
-    productionAnimation: ['user-supplied Meshy walk and run clips approved for current live testing', 'all missing gameplay clips remain incomplete and must not be fabricated', 'anticipation and controlled squash/stretch', 'follow-through and overlapping secondary motion', 'reliable foot contacts', 'seamless state blending'],
+    productionModel: ['original user-supplied Meshy visible mesh and 24-bone rig are locked as the active animation target', 'do not replace the locked mesh, select another base rig, or load the rejected doll-like procedural geometry', 'locked silhouette is the source of truth', 'one connected watertight body, wrapped garments, rounded boots, smooth topology and readable deformation remain quality requirements rather than claims about missing source controls', 'action-pose and gameplay-camera deformation approval', '100–150 pixel silhouette approval'],
+    productionRig: ['verified 24-bone Meshy biped supports body, hand-group, foot and toe motion', 'source contains no morph targets, finger bones, facial controls, cape controls, hat controls or glasses controls', 'missing source controls remain explicit production blockers and must not be claimed as functional'],
+    productionAnimation: ['user-supplied Meshy walk and run clips remain authoritative for sustained locomotion', 'project-authored additive body clips target only the locked Meshy skeleton', 'anticipation and controlled squash/stretch', 'follow-through within available body bones', 'velocity-synchronized locomotion and reliable foot contacts', 'seamless interruptible state blending', 'facial, finger and independent cape, hat and glasses motion remain blocked by missing source controls'],
     visibilityRule: 'neck and Adam’s apple may not be hidden by collar, cape, pose or lighting'
   }
 });

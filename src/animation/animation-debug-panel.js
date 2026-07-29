@@ -59,7 +59,7 @@ export class AnimationDebugPanel {
 
     this.root.append(
       control('Hero', this.hero),
-      control('Imported clip', this.clip),
+      control('Animation clip', this.clip),
       control('Pause', this.pause),
       control('Playback speed', this.speed),
       control('Loop', this.loop),
@@ -89,7 +89,7 @@ export class AnimationDebugPanel {
       this.renderer.clearAnimationDebugOverride();
       this.root.dataset.active = 'false';
       this.telemetry.textContent =
-        'Gameplay control active.\nController velocity now selects the imported walk/run clips.';
+        'Gameplay control active.\nController state selects supplied locomotion and locked-rig authored actions.';
     });
     this.populateClips();
     this.apply(true);

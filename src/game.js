@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js?v=meshy-rigs-2';
+import { CharacterRenderer } from './character-renderer.js?v=locked-animation-1';
 import {
   MEADOW_WAKE_ENEMY_ACTORS,
   MEADOW_WAKE_LEVEL_DATA
@@ -12,6 +12,10 @@ import {
   createMeadowWakeCompassCoins,
   createMeadowWakePlatforms
 } from './content/meadow-wake-course.js?v=meadow-rooms-6';
+import {
+  ANIMATION_VALIDATION_STATIONS,
+  animationValidationStation
+} from './content/animation-validation-course.js?v=locked-animation-1';
 import {
   attackMob,
   createMob,
@@ -51,7 +55,7 @@ import { clamp } from './runtime/math.js';
 import { FixedStepLoop } from './runtime/fixed-step.js';
 import { fatalHazardEvent } from './runtime/hazards/fatal-hazards.js';
 import { createLinearGround } from './runtime/terrain/linear-ground.js';
-import { AnimationDebugPanel } from './animation/animation-debug-panel.js?v=meshy-rigs-1';
+import { AnimationDebugPanel } from './animation/animation-debug-panel.js?v=locked-animation-1';
 
 /*
  * Browser game integration. Physics is owned by the unified controller under
@@ -81,10 +85,16 @@ const runtimeParameters = new URLSearchParams(location.search);
 const movementDebugEnabled = runtimeParameters.has('debugMovement');
 const animationDebugEnabled = runtimeParameters.has('debugAnimation');
 const animationDebugDrive = runtimeParameters.get('debugDrive');
+const animationValidationEnabled = runtimeParameters.has('animationValidation');
+const initialValidationStation = animationValidationStation(
+  runtimeParameters.get('station')
+);
 const requestedArtPreviewX = Number(runtimeParameters.get('artPreview'));
 const initialCourseX = Number.isFinite(requestedArtPreviewX)
   ? clamp(requestedArtPreviewX, 1.8, WORLD_END - 1)
-  : 1.8;
+  : animationValidationEnabled
+    ? initialValidationStation.spawnX
+    : 1.8;
 let characterLoadStatus = 'Loading 3D characters...';
 const characterRenderer = new CharacterRenderer({
   mount: canvas.parentElement,
@@ -120,6 +130,54 @@ let mobActivation = createCourseMobActivation();
 let projectiles = [];
 let notice = 'Meadow Wake: stomp Critters; stomp then kick Shellbacks.';
 let noticeSeconds = 5;
+let animationCue = null;
+
+function setAnimationCue(type, durationSeconds) {
+  animationCue = { type, remainingSeconds: durationSeconds };
+}
+
+function moveToAnimationValidationStation(station) {
+  player = createUnifiedCharacterState({
+    hero: player.hero,
+    footX: station.spawnX,
+    footY: terrain.heightAt(station.spawnX),
+    doubleJumpUnlocked: session.doubleJumpUnlocked
+  });
+  inputBuffer.reset();
+  cameraX = player.footX * SCALE - W * 0.34;
+  notice = `${station.label}: ${station.validates.join(', ')}.`;
+  noticeSeconds = 4;
+  setAnimationCue('swap-in', 0.42);
+}
+
+function createAnimationValidationPanel() {
+  if (!animationValidationEnabled) return null;
+  const panel = document.createElement('aside');
+  panel.className = 'animation-validation-panel';
+  panel.setAttribute('aria-label', 'Animation validation course stations');
+  const heading = document.createElement('strong');
+  heading.textContent = 'Animation Validation Course';
+  const select = document.createElement('select');
+  select.setAttribute('aria-label', 'Validation station');
+  for (const station of ANIMATION_VALIDATION_STATIONS) {
+    const option = document.createElement('option');
+    option.value = station.id;
+    option.textContent = station.label;
+    option.selected = station.id === initialValidationStation.id;
+    select.append(option);
+  }
+  const detail = document.createElement('span');
+  const update = () => {
+    const station = animationValidationStation(select.value);
+    detail.textContent = station.validates.join(' · ');
+    moveToAnimationValidationStation(station);
+  };
+  select.addEventListener('change', update);
+  detail.textContent = initialValidationStation.validates.join(' · ');
+  panel.append(heading, select, detail);
+  document.querySelector('.game-wrap')?.append(panel);
+  return panel;
+}
 
 function createSession(spawnX = 1.8) {
   return {
@@ -260,6 +318,7 @@ function canOccupy(candidate) {
 function swapPlayer() {
   if (session.state !== 'playing') return;
   const result = trySwapUnifiedHero(player, { canOccupy });
+  if (result.accepted) setAnimationCue('swap-in', 0.42);
   notice = result.accepted
     ? `${result.hero} active — feet and momentum preserved.`
     : 'Swap blocked: Mebble cannot safely fit here.';
@@ -282,6 +341,7 @@ function respawn() {
   mobActivation.reset();
   mobs = [];
   mobActivation = createCourseMobActivation();
+  setAnimationCue('swap-in', 0.42);
 }
 
 function loseLife(hazardType) {
@@ -313,6 +373,7 @@ function damagePlayer(source, direction = 1) {
     }
   } else {
     applyMovementDamage(player, direction);
+    setAnimationCue('damage', 0.34);
     session.invulnerabilitySeconds = 0.8;
     notice = `${source}: one health layer lost.`;
     noticeSeconds = 1.8;
@@ -423,6 +484,7 @@ function updateCombat(input, previousPlayerFootY, dt) {
   session.attackSeconds = Math.max(0, session.attackSeconds - dt);
   if (input.actionPressed && (player.grounded || player.hero === 'Hargold')) {
     session.attackSeconds = player.hero === 'Hargold' ? 0.28 : 0.22;
+    setAnimationCue('attack', session.attackSeconds);
   }
 
   const playerBody = movementBody(player);
@@ -530,6 +592,10 @@ function updateCombat(input, previousPlayerFootY, dt) {
 
 function fixedUpdate(dt) {
   if (session.state !== 'playing') return;
+  if (animationCue) {
+    animationCue.remainingSeconds -= dt;
+    if (animationCue.remainingSeconds <= 0) animationCue = null;
+  }
   const input = inputBuffer.consumeStep();
   if (input.swapPressed) swapPlayer();
   stepCoursePlatforms(platforms, dt, {
@@ -603,21 +669,26 @@ function fixedUpdate(dt) {
   player.blockBreakStrength = player.hero === 'Hargold' || session.healthLayers > 1 ? 1 : 0;
   const blockEvent = resolveBlockHeadHit(player, previousHeadY, blocks, movementBody(player));
   if (blockEvent?.type === 'block-broken') {
+    setAnimationCue('block-hit', 0.28);
     notice = blockEvent.blockType === 'hargold-only'
       ? 'Hargold broke the reinforced explorer block.'
       : 'Breakable block smashed.';
     noticeSeconds = 1.5;
   } else if (blockEvent?.type === 'block-rejected') {
+    setAnimationCue('block-hit', 0.28);
     notice = 'That reinforced block requires Hargold.';
     noticeSeconds = 1.8;
   } else if (blockEvent?.type === 'block-too-strong') {
+    setAnimationCue('block-hit', 0.28);
     notice = 'This stonework needs explorer strength or a rolling Shellback.';
     noticeSeconds = 1.8;
   } else if (blockEvent?.type === 'block-coin') {
+    setAnimationCue('block-hit', 0.28);
     awardStandardCoins(blockEvent.reward);
     notice = `${blockEvent.reward} trail coin${blockEvent.reward === 1 ? '' : 's'} released.`;
     noticeSeconds = 1.3;
   } else if (blockEvent?.type === 'block-power-up') {
+    setAnimationCue('power-up-collect', 0.62);
     session.maximumHealthLayers = Math.max(2, session.maximumHealthLayers);
     session.healthLayers = session.maximumHealthLayers;
     notice = 'Explorer protection restored.';
@@ -881,9 +952,16 @@ function frame(now) {
     screenY: worldToScreenY(player.footY),
     facing: player.facing,
     locomotion: player.locomotion,
+    movementState: player.movementState,
+    previousMovementState: player.previousMovementState,
+    stateSeconds: player.stateSeconds,
+    airborneSeconds: player.airborneSeconds,
     glide: player.glide,
     horizontalSpeed: player.velocityX,
+    verticalSpeed: player.velocityY,
     grounded: player.grounded,
+    surfaceAngle: player.surfaceAngle ?? 0,
+    animationCue,
     cameraX,
     cameraY,
     coins,
@@ -911,6 +989,8 @@ if (animationDebugEnabled) {
     }
   });
 }
+
+createAnimationValidationPanel();
 
 addEventListener('keydown', event => {
   if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space'].includes(event.code)) event.preventDefault();

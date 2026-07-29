@@ -24,7 +24,11 @@ assert.match(html, /Jump \/ twirl \/ glide: Space/);
 assert.doesNotMatch(html, /data-action="sprint"/);
 assert.doesNotMatch(html, /data-action="run"/);
 assert.doesNotMatch(gameSource, /touch\.sprint|gamepad\.sprint|input\.sprint/);
+assert.doesNotMatch(inputSource, /['"]run['"]/);
+assert.doesNotMatch(inputSource, /['"]sprint['"]/);
 assert.match(gameSource, /AnimationDebugPanel/);
 assert.match(gameSource, /animationDebugDrive === 'right'/);
+assert.match(gameSource, /ANIMATION_VALIDATION_STATIONS/);
+assert.match(gameSource, /animationValidationEnabled/);
 
 console.log('Live unified movement wiring checks passed.');

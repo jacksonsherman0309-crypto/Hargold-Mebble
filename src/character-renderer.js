@@ -14,9 +14,12 @@ import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.
 import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=meadow-rooms-6';
 import { GAME_RULES } from './canonical-data.js';
 import {
-  importedAnimationFor,
+  animationIntentFor,
   importedClipMetadata
-} from './animation/character-animation-config.js?v=meshy-rigs-1';
+} from './animation/character-animation-config.js?v=locked-animation-1';
+import {
+  buildLockedMeshyAnimationClips
+} from './animation/locked-meshy-animation-library.js?v=locked-animation-1';
 
 const PRESENTATION = GAME_RULES.characterPresentation;
 const GAME_PIXELS_PER_METRE = PRESENTATION.gameplayScale.gamePixelsPerMetre;
@@ -1141,9 +1144,26 @@ export class CharacterRenderer {
       });
       this.scene.add(root);
       const mixer = new THREE.AnimationMixer(root);
-      const clips = new Map(gltf.animations.map(clip => [clip.name, clip]));
+      const authoredClips = buildLockedMeshyAnimationClips(root, hero);
+      const clips = new Map(
+        [...gltf.animations, ...authoredClips].map(clip => [clip.name, clip])
+      );
       const skeletonRoot =
         root.getObjectByName(`${hero}_Canonical_Gameplay_Rig`) ?? sourceRoot;
+      const footBones = [
+        root.getObjectByName('LeftFoot'),
+        root.getObjectByName('LeftToeBase'),
+        root.getObjectByName('RightFoot'),
+        root.getObjectByName('RightToeBase')
+      ].filter(Boolean);
+      root.updateMatrixWorld(true);
+      const footWorld = new THREE.Vector3();
+      const bindFootOffset = footBones.length
+        ? Math.min(...footBones.map(bone => {
+            bone.getWorldPosition(footWorld);
+            return footWorld.y - root.position.y;
+          }))
+        : 0;
       this.models.set(hero, {
         hero,
         root,
@@ -1153,10 +1173,15 @@ export class CharacterRenderer {
         clips,
         action: null,
         actionName: '',
+        animationIntent: null,
         baseScale: runtimeScale,
         currentYaw: rightFacingYaw,
         currentFacing: 1,
-        rawHeightMetres: rawHeight
+        rawHeightMetres: rawHeight,
+        footBones,
+        bindFootOffset,
+        currentGroundingOffset: 0,
+        currentSlope: 0
       });
       this.onProgress(this.statusText());
     } catch (error) {
@@ -1182,38 +1207,85 @@ export class CharacterRenderer {
     return this.models.has(hero);
   }
 
-  selectClip(hero, locomotion, horizontalSpeed, grounded) {
-    return importedAnimationFor({ hero, locomotion, horizontalSpeed, grounded });
+  selectClip(options) {
+    return animationIntentFor(options);
   }
 
-  play(model, requestedName, horizontalSpeed = 0) {
+  play(model, intent, horizontalSpeed = 0) {
+    const requestedName = intent.clipId;
     const name = model.clips.has(requestedName) ? requestedName : 'rest-pose';
     if (name === 'rest-pose') {
       if (model.actionName !== name) {
-        if (model.action) model.action.fadeOut(0.16);
+        if (model.action) model.action.fadeOut(intent.blendSeconds ?? 0.1);
         model.action = null;
         model.actionName = name;
+        model.animationIntent = intent;
       }
       return;
     }
     if (model.actionName !== name) {
+      const previous = model.action;
+      const previousDuration = previous?.getClip().duration ?? 0;
+      const previousPhase = previousDuration > 0
+        ? previous.time / previousDuration % 1
+        : 0;
       const next = model.mixer.clipAction(model.clips.get(name));
       next.reset();
       next.enabled = true;
       next.setEffectiveWeight(1);
+      next.setLoop(intent.loop ? THREE.LoopRepeat : THREE.LoopOnce, intent.loop ? Infinity : 1);
+      next.clampWhenFinished = !intent.loop;
+      if (intent.phaseSync && previous) {
+        next.time = previousPhase * next.getClip().duration;
+      }
       next.play();
-      const blendSeconds = 0.16;
-      if (model.action) model.action.crossFadeTo(next, blendSeconds, true);
+      const blendSeconds = intent.blendSeconds ?? 0.1;
+      if (previous) previous.crossFadeTo(next, blendSeconds, false);
       model.action = next;
       model.actionName = name;
+      model.animationIntent = intent;
     }
     if (model.action) {
       const authoredSpeed =
         importedClipMetadata(model.hero, name)?.authoredSpeedMetresPerSecond ?? 0;
       model.action.setEffectiveTimeScale(
-        authoredSpeed ? THREE.MathUtils.clamp(Math.abs(horizontalSpeed) / authoredSpeed, 0.65, 1.35) : 1
+        authoredSpeed
+          ? THREE.MathUtils.clamp(Math.abs(horizontalSpeed) / authoredSpeed, 0.55, 1.45)
+          : intent.playbackRate ?? 1
       );
     }
+  }
+
+  applyGroundContact(model, {
+    grounded,
+    footLock,
+    surfaceAngle = 0
+  }, deltaSeconds) {
+    const targetSlope = grounded
+      ? THREE.MathUtils.clamp(-surfaceAngle, -0.28, 0.28)
+      : 0;
+    const slopeBlend = 1 - Math.exp(-(grounded ? 12 : 8) * deltaSeconds);
+    model.currentSlope += (targetSlope - model.currentSlope) * slopeBlend;
+    model.root.rotation.z = model.currentSlope;
+
+    let targetOffset = 0;
+    if (grounded && footLock && model.footBones.length) {
+      model.root.updateMatrixWorld(true);
+      const point = new THREE.Vector3();
+      const currentFootOffset = Math.min(...model.footBones.map(bone => {
+        bone.getWorldPosition(point);
+        return point.y - model.root.position.y;
+      }));
+      targetOffset = THREE.MathUtils.clamp(
+        model.bindFootOffset - currentFootOffset,
+        -14,
+        14
+      );
+    }
+    const groundingBlend = 1 - Math.exp(-(grounded ? 24 : 14) * deltaSeconds);
+    model.currentGroundingOffset +=
+      (targetOffset - model.currentGroundingOffset) * groundingBlend;
+    model.root.position.y += model.currentGroundingOffset;
   }
 
   setAnimationDebugOverride(override) {
@@ -1363,7 +1435,14 @@ export class CharacterRenderer {
     locomotion,
     glide,
     horizontalSpeed = 0,
+    verticalSpeed = 0,
     grounded = true,
+    movementState = locomotion,
+    previousMovementState = movementState,
+    stateSeconds = 0,
+    airborneSeconds = 0,
+    surfaceAngle = 0,
+    animationCue = null,
     cameraX = 0,
     cameraY = 0,
     coins = [],
@@ -1431,9 +1510,27 @@ export class CharacterRenderer {
         this.height / 2 - screenY + cameraY,
         110
       );
-      const requestedClip = debug?.clipId ??
-        this.selectClip(modelHero, locomotion, horizontalSpeed, grounded);
-      this.play(model, requestedClip, debug ? 0 : horizontalSpeed);
+      const intent = debug
+        ? {
+            clipId: debug.clipId,
+            loop: Boolean(debug.loop),
+            blendSeconds: 0.04,
+            footLock: grounded,
+            playbackRate: Number(debug.speed ?? 1),
+            phaseSync: false
+          }
+        : this.selectClip({
+            hero: modelHero,
+            movementState,
+            previousMovementState,
+            stateSeconds,
+            airborneSeconds,
+            horizontalSpeed,
+            verticalSpeed,
+            grounded,
+            animationCue
+          });
+      this.play(model, intent, debug ? 0 : horizontalSpeed);
       if (debug && model.action) {
         model.action.paused = Boolean(debug.paused);
         model.action.setLoop(debug.loop ? THREE.LoopRepeat : THREE.LoopOnce, debug.loop ? Infinity : 1);
@@ -1449,6 +1546,11 @@ export class CharacterRenderer {
         }
       }
       model.mixer.update(deltaSeconds);
+      this.applyGroundContact(model, {
+        grounded,
+        footLock: Boolean(intent.footLock),
+        surfaceAngle
+      }, deltaSeconds);
     }
     this.renderer.render(this.scene, this.camera);
   }

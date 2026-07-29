@@ -1,7 +1,20 @@
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-07-27",
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-28",
   "level": "1-1 Meadow Wake",
+  "validationCourse": {
+    "module": "src/content/animation-validation-course.js",
+    "url": "?animationValidation=1&debugAnimation=1",
+    "stationCount": 10,
+    "browserSmokeStatus": "pass",
+    "browserSmokeEvidence": [
+      "status reached PLAYING at 120 Hz",
+      "both locked 3D character assets loaded",
+      "37 Hargold and 39 Mebble runtime presentation clips listed",
+      "validation station selector loaded with all ten stations",
+      "no startup module error after repair"
+    ]
+  },
   "viewport": {
     "width": 1280,
     "height": 720

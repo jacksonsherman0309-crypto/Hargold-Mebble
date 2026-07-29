@@ -17,19 +17,25 @@ assert.equal(inventory.assets.filter(asset => asset.actions.some(action => actio
 
 for (const hero of ['Hargold', 'Mebble']) {
   assert.equal(selection[hero].canonicalRigName, `${hero}_Canonical_Gameplay_Rig`);
-  assert.equal(selection[hero].runtimeClips.length, 2);
-  assert.equal(selection[hero].runtimePolicy, undefined);
+  assert.equal(selection[hero].embeddedSuppliedClips.length, 2);
+  assert.equal(
+    selection[hero].runtimePresentationClipCount,
+    hero === 'Hargold' ? 37 : 39
+  );
   const assetUrl = new URL(selection[hero].liveAsset, root);
   assert.ok((await stat(assetUrl)).size > 30_000_000);
 }
 assert.equal(selection.runtimePolicy.oneVisibleMeshPerHero, true);
-assert.equal(selection.runtimePolicy.retargetingRequired, false);
+assert.equal(selection.runtimePolicy.retargetingRequiredForSuppliedWalkRun, false);
+assert.equal(selection.runtimePolicy.rejectedProceduralMeshRuntimeUse, false);
+assert.equal(selection.runtimePolicy.rejectedProceduralActionRetargetUse, false);
 assert.equal(retarget.retargetingRequiredForLiveGlbClips, false);
 assert.equal(Object.keys(retarget.identityBoneMap).length, 24);
 assert.equal(mapping.controllerPolicy.manualSprintAction, false);
-assert.equal(mapping.requiredLiveStates.Walk.status, 'exact');
-assert.equal(mapping.requiredLiveStates.Run.status, 'exact');
-assert.equal(mapping.requiredLiveStates.JumpRise.status, 'missing-supplied-clip');
+assert.equal(mapping.requiredLiveStates.Walk.status, 'exact-supplied');
+assert.equal(mapping.requiredLiveStates.Run.status, 'exact-supplied');
+assert.equal(mapping.requiredLiveStates.JumpRise.status, 'authored-locked-rig');
+assert.match(mapping.requiredLiveStates.MebbleGlideOpen.status, /cape-deformation-blocked/);
 assert.deepEqual(mapping.debugOnlyClips, []);
 
 function glbJson(buffer) {
@@ -61,6 +67,9 @@ for (const [hero, expected] of [
 
 assert.match(rendererSource, /hargold_canonical_gameplay_rig\.glb/);
 assert.match(rendererSource, /mebble_canonical_gameplay_rig\.glb/);
+assert.match(rendererSource, /buildLockedMeshyAnimationClips/);
+assert.match(rendererSource, /applyGroundContact/);
+assert.match(rendererSource, /phaseSync/);
 assert.match(rendererSource, /setAnimationDebugOverride/);
 for (const phrase of ['pause', 'scrub', 'speed', 'loop', 'facing', 'Restart clip']) {
   assert.match(debugSource, new RegExp(phrase, 'i'));

@@ -1,5 +1,5 @@
 const DIGITAL_ACTIONS = Object.freeze([
-  'left', 'right', 'run', 'sprint', 'jump', 'down', 'action', 'swap', 'pause'
+  'left', 'right', 'jump', 'down', 'action', 'swap', 'pause'
 ]);
 
 export function createMovementInputBuffer() {
@@ -26,8 +26,6 @@ export function createMovementInputBuffer() {
       const step = {
         left: previous.left,
         right: previous.right,
-        run: previous.run,
-        sprint: previous.sprint,
         jumpPressed: pressed.jump,
         jumpReleased: released.jump,
         jumpHeld: previous.jump,

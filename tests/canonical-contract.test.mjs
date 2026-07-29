@@ -1,15 +1,25 @@
 import assert from 'node:assert/strict';
 import { CAMPAIGN, GAME_RULES, LOCKED_HERO_DESIGN, getLevel, getWorld } from '../src/canonical-data.js';
+import {
+  TOTAL_COMPLETION_SLOTS,
+  TOTAL_COMPASS_COIN_SLOTS
+} from '../src/campaign-level-count.js';
 
 const sum = values => values.reduce((total, value) => total + value, 0);
 
 assert.equal(CAMPAIGN.length, 10, 'campaign must contain 10 worlds');
-assert.equal(sum(CAMPAIGN.map(world => world.levels.length)), 90, 'campaign must contain 90 completion slots');
+assert.equal(
+  sum(CAMPAIGN.map(world => world.levels.length)),
+  90,
+  'legacy CAMPAIGN scaffolds remain preserved pending an authored World 1–7 slot remap'
+);
 assert.equal(
   sum(CAMPAIGN.flatMap(world => world.levels).map(() => GAME_RULES.collectibles.perLevel)),
   270,
-  'campaign must contain 270 Compass Coin slots'
+  'legacy CAMPAIGN scaffolds retain their old Compass Coin rows pending the authored remap'
 );
+assert.equal(TOTAL_COMPLETION_SLOTS, 83, 'current campaign authority must contain 83 completion slots');
+assert.equal(TOTAL_COMPASS_COIN_SLOTS, 249, 'current campaign authority must contain 249 Compass Coin slots');
 
 assert.deepEqual(GAME_RULES.campaign.difficultyModes, ['Easy', 'Normal', 'Hard', 'Nightmare']);
 assert.deepEqual(GAME_RULES.movement.wallJump, {
@@ -42,6 +52,15 @@ assert.equal(GAME_RULES.characterPresentation.modelApprovalGate.singlePieceRound
 assert.equal(GAME_RULES.characterPresentation.modelApprovalGate.animationPolishFrozenUntilModelApproval, false);
 assert.equal(GAME_RULES.characterPresentation.modelApprovalGate.appearanceApprovedForLiveAnimationImport, true);
 assert.equal(GAME_RULES.characterPresentation.modelApprovalGate.animationIntegrationAuthorized, true);
+assert.equal(GAME_RULES.characterPresentation.modelApprovalGate.lockedMeshReplacementForbidden, true);
+assert.match(
+  GAME_RULES.characterPresentation.modelApprovalGate.activeRuntimeRigManifest,
+  /character-rig-selection\.json$/
+);
+assert.match(
+  GAME_RULES.characterPresentation.modelApprovalGate.verifiedRigCapabilityManifest,
+  /locked-meshy-animation-capabilities\.json$/
+);
 assert.equal(
   GAME_RULES.characterPresentation.modelApprovalGate.cleanRoomConstructionBenchmark,
   'observable-craft-principles-only'
@@ -250,18 +269,16 @@ assert.equal(
 );
 assert.match(LOCKED_HERO_DESIGN.Hargold.clothing.join(' '), /backpack/);
 assert.match(LOCKED_HERO_DESIGN.Mebble.clothing.join(' '), /double belts/);
-assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /new original artist-authored geometry/);
-assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /continuous skinned/);
-assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /one connected watertight skinned body/);
+assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /original user-supplied Meshy/);
+assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /do not replace the locked mesh/);
 assert.match(LOCKED_HERO_DESIGN.Hargold.productionModel.join(' '), /locked silhouette is the source of truth/);
-assert.match(LOCKED_HERO_DESIGN.Mebble.productionModel.join(' '), /no rigid segmented limbs/);
-assert.match(LOCKED_HERO_DESIGN.Mebble.productionModel.join(' '), /empty Blender scene/);
-assert.match(LOCKED_HERO_DESIGN.Mebble.productionModel.join(' '), /single-piece rounded boots/);
+assert.match(LOCKED_HERO_DESIGN.Mebble.productionModel.join(' '), /original user-supplied Meshy/);
+assert.match(LOCKED_HERO_DESIGN.Mebble.productionModel.join(' '), /rounded boots/);
 assert.ok(LOCKED_HERO_DESIGN.Hargold.productionModel.includes('100–150 pixel silhouette approval'));
-assert.ok(LOCKED_HERO_DESIGN.Hargold.productionModel.includes('deformable shoulder volume with separated arms'));
 assert.ok(LOCKED_HERO_DESIGN.Mebble.productionModel.includes('100–150 pixel silhouette approval'));
-assert.ok(LOCKED_HERO_DESIGN.Mebble.productionModel.includes('glasses offset from the face and curved cape shoulder yoke'));
-assert.match(LOCKED_HERO_DESIGN.Mebble.productionAnimation.join(' '), /Meshy walk and run clips/);
+assert.match(LOCKED_HERO_DESIGN.Hargold.productionRig.join(' '), /24-bone Meshy biped/);
+assert.match(LOCKED_HERO_DESIGN.Mebble.productionRig.join(' '), /no morph targets/);
+assert.match(LOCKED_HERO_DESIGN.Mebble.productionAnimation.join(' '), /Meshy walk and run clips remain authoritative/);
 assert.match(LOCKED_HERO_DESIGN.Hargold.gameplay.join(' '), /exclusive learned double jump/);
 
 for (const world of CAMPAIGN) {

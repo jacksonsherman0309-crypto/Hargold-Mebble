@@ -1,5 +1,12 @@
 # Blender character asset pipeline
 
+> **Runtime authority update (July 28, 2026):** the original user-supplied
+> Meshy GLBs under `assets/exports/meshy/` are the locked production animation
+> targets. The procedural Blender characters and the replacement-build commands
+> documented below are historical/rejected and must not replace, render over,
+> or supply retargeted actions to the live heroes. Current animation authority
+> is documented in `docs/locked-meshy-animation-production.md`.
+
 The active July 26 organic-silhouette v5 candidates were rebuilt from
 factory-empty scenes without reading or reusing the rejected July 25 geometry.
 Each hero now uses one connected organic skin surface, continuous wrapped soft
