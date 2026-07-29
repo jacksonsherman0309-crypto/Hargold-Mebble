@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved gameplay rule. This document replaces the previous coin-block reward values.
+Approved gameplay rule. This document replaces the previous coin-block reward probabilities.
 
 ## Placement
 
@@ -16,9 +16,9 @@ When activated, each coin block makes one weighted reward roll:
 
 | Reward | Probability |
 |---:|---:|
-| 10 coins | 78% |
-| 50 coins | 14% |
-| 100 coins | 7% |
+| 10 coins | 84% |
+| 50 coins | 12% |
+| 100 coins | 3% |
 | 300 coins | 1% |
 
 The probabilities total 100%. A one-coin result is not permitted for these hidden coin blocks.
