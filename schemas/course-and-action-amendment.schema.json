@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hargold-mebble.local/schemas/course-and-action-amendment.schema.json",
+  "title": "Hargold & Mebble Course and Hero Action Amendment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "authority", "courseFormat", "twirl", "mebbleGlide", "slam", "blueprintDefaults"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"type": "string"},
+    "authority": {"const": "current-user-approved-canon"},
+    "courseFormat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["underwaterLevelsAllowed", "verticalLevelsAllowed", "requiredOrientation", "primaryTraversalMode", "localElevationSegmentsAllowed", "localElevationMustRemainSubordinate", "continuousVerticalAutoscrollAllowed", "prolongedSwimmingAllowed", "waterThemeAlternatives"],
+      "properties": {
+        "underwaterLevelsAllowed": {"const": false},
+        "verticalLevelsAllowed": {"const": false},
+        "requiredOrientation": {"const": "horizontal"},
+        "primaryTraversalMode": {"const": "grounded_side_scroll"},
+        "localElevationSegmentsAllowed": {"const": true},
+        "localElevationMustRemainSubordinate": {"const": true},
+        "continuousVerticalAutoscrollAllowed": {"const": false},
+        "prolongedSwimmingAllowed": {"const": false},
+        "waterThemeAlternatives": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}}
+      }
+    },
+    "twirl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["defaultAirTwirlAllowed", "hargoldDoubleJumpMayTwirl", "mebbleGlideUsesTwirl", "exceptionRequiresExplicitApproval"],
+      "properties": {
+        "defaultAirTwirlAllowed": {"const": false},
+        "hargoldDoubleJumpMayTwirl": {"const": false},
+        "mebbleGlideUsesTwirl": {"const": false},
+        "exceptionRequiresExplicitApproval": {"const": true}
+      }
+    },
+    "mebbleGlide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["innate", "capePresentation", "stableOutwardLimbPose", "riggedCapeDeformationRequired", "preserveLongNeckAndAdamsApple", "limitedHorizontalCorrection", "slowsDescent", "infiniteFlightAllowed", "heightGainAllowed", "depthLaneMovementAllowed", "requiredStates"],
+      "properties": {
+        "innate": {"const": true},
+        "capePresentation": {"const": "broad_wing_like_glide"},
+        "stableOutwardLimbPose": {"const": true},
+        "riggedCapeDeformationRequired": {"const": true},
+        "preserveLongNeckAndAdamsApple": {"const": true},
+        "limitedHorizontalCorrection": {"const": true},
+        "slowsDescent": {"const": true},
+        "infiniteFlightAllowed": {"const": false},
+        "heightGainAllowed": {"const": false},
+        "depthLaneMovementAllowed": {"const": false},
+        "requiredStates": {"type": "array", "minItems": 6, "uniqueItems": true, "items": {"type": "string"}}
+      }
+    },
+    "slam": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sharedGenericGroundPoundAllowed", "states", "hargold", "mebble"],
+      "properties": {
+        "sharedGenericGroundPoundAllowed": {"const": false},
+        "states": {"const": ["startup", "commitment", "descent", "impact", "recovery"]},
+        "hargold": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["action", "leadingContact", "feetFirstAllowed", "impactProfile"],
+          "properties": {
+            "action": {"const": "belly_flop"},
+            "leadingContact": {"const": ["belly", "forearms"]},
+            "feetFirstAllowed": {"const": false},
+            "impactProfile": {"const": "broad_heavy_body_impact"}
+          }
+        },
+        "mebble": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["action", "leadingContact", "feetFirstAllowed", "capeModeDuringDescent", "impactProfile"],
+          "properties": {
+            "action": {"const": "fist_first_dive_bomb"},
+            "leadingContact": {"const": ["leading_fist"]},
+            "feetFirstAllowed": {"const": false},
+            "capeModeDuringDescent": {"const": "folded_or_streaming"},
+            "impactProfile": {"const": "focused_fist_strike"}
+          }
+        }
+      }
+    },
+    "blueprintDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["courseOrientation", "underwaterGameplay", "verticalCourse", "primaryTraversalMode", "twirlRequired"],
+      "properties": {
+        "courseOrientation": {"const": "horizontal"},
+        "underwaterGameplay": {"const": false},
+        "verticalCourse": {"const": false},
+        "primaryTraversalMode": {"const": "grounded_side_scroll"},
+        "twirlRequired": {"const": false}
+      }
+    }
+  }
+}

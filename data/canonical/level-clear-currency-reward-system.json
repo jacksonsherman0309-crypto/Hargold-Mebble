@@ -1,0 +1,142 @@
+{
+  "$schema": "../../schemas/level-clear-currency-reward-system.schema.json",
+  "version": "2026-07-27",
+  "authority": "newest-explicit-user-approved-rule",
+  "currency": {
+    "internal_id": "level_clear_currency",
+    "development_label": "course currency",
+    "final_display_name_status": "unassigned",
+    "integer_only": true,
+    "minimum_reward": 0
+  },
+  "award_trigger": {
+    "event": "valid_level_clear",
+    "award_on_failure": false,
+    "award_once_per_clear_transaction": true,
+    "idempotent_transaction_required": true
+  },
+  "performance_score": {
+    "minimum_after_valid_clear": 25,
+    "maximum": 100,
+    "components": {
+      "course_clear": {
+        "maximum_points": 25,
+        "calculation": "fixed_on_valid_clear"
+      },
+      "speed": {
+        "maximum_points": 25,
+        "calculation": "piecewise_linear",
+        "gold_time_points": 25,
+        "par_time_points": 15,
+        "cutoff_time_points": 0,
+        "timer": {
+          "start": "normal_player_control_begins",
+          "end": "valid_level_exit_secured",
+          "exclude_loading": true,
+          "exclude_pause": true,
+          "exclude_mandatory_noninteractive_cinematics": true,
+          "exclude_post_clear_sequence": true,
+          "continues_through_checkpoint_death": true,
+          "resets_on_full_course_restart_or_reentry": true
+        }
+      },
+      "standard_coins": {
+        "maximum_points": 15,
+        "formula": "15 * min(1, performance_coin_units_collected / coin_reward_target)",
+        "randomized_payout_independent": true,
+        "randomized_coin_block_default_performance_units": 1,
+        "life_award_bonus_units": 0
+      },
+      "compass_coins": {
+        "maximum_points": 20,
+        "required_per_level": 3,
+        "points_by_count": {
+          "0": 0,
+          "1": 4,
+          "2": 10,
+          "3": 20
+        },
+        "must_be_collected_during_current_clear": true,
+        "saved_prior_collection_does_not_auto_count": true
+      },
+      "eligible_mobs": {
+        "maximum_points": 15,
+        "formula": "15 * eligible_mobs_defeated / eligible_mob_count",
+        "stable_unique_ids_required": true,
+        "each_instance_counts_once": true,
+        "zero_eligible_mobs_awards_full_points": true,
+        "excluded": [
+          "infinite_respawners",
+          "endless_summons",
+          "hazards",
+          "invulnerable_set_dressing",
+          "non_defeatable_objects",
+          "boss_damage_phases"
+        ],
+        "mob_content_must_remain_untouched": true
+      }
+    }
+  },
+  "difficulty_multipliers": {
+    "Easy": 1.0,
+    "Normal": 1.5,
+    "Hard": 2.5,
+    "Impossible": 4.0
+  },
+  "final_reward": {
+    "formula": "round(base_reward * difficulty_multiplier * performance_score / 100)",
+    "rounding": "nearest_integer",
+    "clamp_minimum": 0
+  },
+  "required_per_course_difficulty_fields": [
+    "base_reward",
+    "gold_time_seconds",
+    "par_time_seconds",
+    "reward_cutoff_seconds",
+    "coin_reward_target",
+    "eligible_mob_ids"
+  ],
+  "results_screen_order": [
+    "course_clear_points",
+    "clear_time_and_speed_points",
+    "standard_coins_and_coin_points",
+    "compass_coins_and_compass_points",
+    "eligible_mobs_and_mob_points",
+    "performance_score",
+    "difficulty_multiplier",
+    "final_reward",
+    "updated_wallet_balance"
+  ],
+  "persistence": {
+    "wallet_balance": true,
+    "lifetime_currency_earned": true,
+    "latest_breakdown_per_course_and_difficulty": true,
+    "best_score_per_course_and_difficulty": true,
+    "best_time_per_course_and_difficulty": true,
+    "highest_payout_per_course_and_difficulty": true
+  },
+  "unresolved": [
+    "final_currency_name",
+    "currency_icon_and_material",
+    "wallet_cap",
+    "repeat_clear_payout_policy",
+    "first_clear_bonus",
+    "additional_perfect_clear_bonus",
+    "purchase_catalogue",
+    "purchase_prices",
+    "save_scope"
+  ],
+  "production_boundary": {
+    "contract_only": true,
+    "runtime_implementation_claimed": false,
+    "required_future_work": [
+      "wallet_runtime",
+      "active_gameplay_timer",
+      "score_calculator",
+      "results_screen",
+      "save_migration",
+      "idempotent_reward_transaction",
+      "automated_tests"
+    ]
+  }
+}

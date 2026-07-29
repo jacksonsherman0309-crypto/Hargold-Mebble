@@ -1,0 +1,277 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hargold-mebble.local/schemas/hidden-chest-mimic-and-world-trove-system.schema.json",
+  "title": "Hidden Chest, Chest Mimic, and World Treasure Trove System",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "status",
+    "scope",
+    "perCourseChestPair",
+    "worldTreasureTroves",
+    "exclusiveTroveSkills",
+    "saveTracking",
+    "unresolved"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": "2026-07-27" },
+    "status": { "const": "canonical_design_contract_pending_runtime_implementation" },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completionBearingCourses", "campaignWorldCount", "mobContentMustRemainUntouched"],
+      "properties": {
+        "completionBearingCourses": { "const": "all" },
+        "campaignWorldCount": { "const": 10 },
+        "mobContentMustRemainUntouched": { "const": true }
+      }
+    },
+    "perCourseChestPair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["genuineChestCount", "mimicCount", "genuineChest", "mimic", "repeatabilityPolicy", "transactionIdempotencyRequired"],
+      "properties": {
+        "genuineChestCount": { "const": 1 },
+        "mimicCount": { "const": 1 },
+        "genuineChest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mainRoutePlacementAllowed", "requiredAccessMethods", "reward", "lifeCap", "lifeOverflowPolicy"],
+          "properties": {
+            "mainRoutePlacementAllowed": { "const": false },
+            "requiredAccessMethods": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "hidden_area",
+                  "tricky_gameplay_mechanic",
+                  "timed_mechanism",
+                  "hidden_switch",
+                  "multi_step_mechanism",
+                  "other_explicitly_approved_difficult_access"
+                ]
+              }
+            },
+            "reward": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["extraLives", "currencyAmountPolicy"],
+              "properties": {
+                "extraLives": { "const": 2 },
+                "currencyAmountPolicy": { "const": "course_authored_undecided" }
+              }
+            },
+            "lifeCap": { "const": 99 },
+            "lifeOverflowPolicy": { "const": "unresolved" }
+          }
+        },
+        "mimic": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "classificationUntilBehaviorApproval",
+            "countsAsNormalMob",
+            "preTriggerIndistinguishable",
+            "visualParityFields",
+            "prohibitedPreTriggerTells",
+            "placementParityRequired",
+            "identityRevealMoment",
+            "postRevealBehavior",
+            "xrayMayIdentifyMimic"
+          ],
+          "properties": {
+            "classificationUntilBehaviorApproval": { "const": "environmental_chest_hazard_or_interactable" },
+            "countsAsNormalMob": { "const": false },
+            "preTriggerIndistinguishable": { "const": true },
+            "visualParityFields": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "prohibitedPreTriggerTells": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "placementParityRequired": { "const": true },
+            "identityRevealMoment": { "const": "on_reach_and_activation" },
+            "postRevealBehavior": { "const": "unresolved" },
+            "xrayMayIdentifyMimic": { "const": false }
+          }
+        },
+        "repeatabilityPolicy": { "const": "unresolved" },
+        "transactionIdempotencyRequired": { "const": true }
+      }
+    },
+    "worldTreasureTroves": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trovesPerWorld",
+        "totalCampaignTroves",
+        "expertlyHidden",
+        "purpose",
+        "interior",
+        "reward",
+        "lifeCap",
+        "lifeOverflowPolicy",
+        "difficultyLocationPolicy",
+        "hintPolicy",
+        "prohibitedNonEasyHintChannels",
+        "xrayPolicy",
+        "accessRequirements"
+      ],
+      "properties": {
+        "trovesPerWorld": { "const": 1 },
+        "totalCampaignTroves": { "const": 10 },
+        "expertlyHidden": { "const": true },
+        "purpose": { "const": "reward_exploration_and_secret_seeking" },
+        "interior": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["largeCoinPathRequired", "coinPathBeginsAfterEntranceDiscovery", "coinPathDetectableFromMainCourseOnNonEasy", "primaryChestAtCoinPathEnd"],
+          "properties": {
+            "largeCoinPathRequired": { "const": true },
+            "coinPathBeginsAfterEntranceDiscovery": { "const": true },
+            "coinPathDetectableFromMainCourseOnNonEasy": { "const": false },
+            "primaryChestAtCoinPathEnd": { "const": true }
+          }
+        },
+        "reward": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["extraLives", "currencyAmountPolicy", "mustExceedNormalChestCurrency", "specialRewardCount", "specialRewardPolicy"],
+          "properties": {
+            "extraLives": { "const": 7 },
+            "currencyAmountPolicy": { "const": "world_authored_massive_undecided" },
+            "mustExceedNormalChestCurrency": { "const": true },
+            "specialRewardCount": { "const": 1 },
+            "specialRewardPolicy": { "const": "world_authored_undecided_except_worlds_2_and_7" }
+          }
+        },
+        "lifeCap": { "const": 99 },
+        "lifeOverflowPolicy": { "const": "unresolved" },
+        "difficultyLocationPolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["easyLocationMustDifferFromAllHigherDifficulties", "normalHardImpossibleMayShareOrDiffer", "locationAuthoredPerDifficulty"],
+          "properties": {
+            "easyLocationMustDifferFromAllHigherDifficulties": { "const": true },
+            "normalHardImpossibleMayShareOrDiffer": { "const": true },
+            "locationAuthoredPerDifficulty": { "const": true }
+          }
+        },
+        "hintPolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["easy", "normal", "hard", "impossible"],
+          "properties": {
+            "easy": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["gameplayHintAllowed", "hintLanguage"],
+              "properties": {
+                "gameplayHintAllowed": { "const": true },
+                "hintLanguage": { "const": "unresolved_do_not_implement_until_approved" }
+              }
+            },
+            "normal": { "$ref": "#/$defs/noHintDifficulty" },
+            "hard": { "$ref": "#/$defs/noHintDifficulty" },
+            "impossible": { "$ref": "#/$defs/noHintDifficulty" }
+          }
+        },
+        "prohibitedNonEasyHintChannels": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "xrayPolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["revealsHiddenBlocksOnly", "revealsTroveEntrance", "revealsTroveRoom", "revealsChestIdentity", "revealsShortestRoute"],
+          "properties": {
+            "revealsHiddenBlocksOnly": { "const": true },
+            "revealsTroveEntrance": { "const": false },
+            "revealsTroveRoom": { "const": false },
+            "revealsChestIdentity": { "const": false },
+            "revealsShortestRoute": { "const": false }
+          }
+        },
+        "accessRequirements": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["deterministic", "randomizedSolutionAllowed", "allowedExamples", "mustRespectNoUnderwaterLevels", "mustRespectNoVerticalLevels"],
+          "properties": {
+            "deterministic": { "const": true },
+            "randomizedSolutionAllowed": { "const": false },
+            "allowedExamples": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "mustRespectNoUnderwaterLevels": { "const": true },
+            "mustRespectNoVerticalLevels": { "const": true }
+          }
+        }
+      }
+    },
+    "exclusiveTroveSkills": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["world2", "world7", "prohibitedAlternativeSources", "persistentProfileUnlockRequired"],
+      "properties": {
+        "world2": { "$ref": "#/$defs/exclusiveSkill" },
+        "world7": { "$ref": "#/$defs/exclusiveSkill" },
+        "prohibitedAlternativeSources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "persistentProfileUnlockRequired": { "const": true }
+      }
+    },
+    "saveTracking": {
+      "type": "array",
+      "minItems": 7,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "unresolved": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "noHintDifficulty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gameplayHintAllowed"],
+      "properties": {
+        "gameplayHintAllowed": { "const": false }
+      }
+    },
+    "exclusiveSkill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rewardType", "skillIdentity", "onlyAcquisitionSource"],
+      "properties": {
+        "rewardType": { "const": "learned_skill" },
+        "skillIdentity": { "const": "undecided" },
+        "onlyAcquisitionSource": {
+          "enum": ["world_2_treasure_trove", "world_7_treasure_trove"]
+        }
+      }
+    }
+  }
+}

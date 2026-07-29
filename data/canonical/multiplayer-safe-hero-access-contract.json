@@ -1,0 +1,67 @@
+{
+  "$schema": "../../schemas/multiplayer-safe-hero-access-contract.schema.json",
+  "version": "2026-07-27",
+  "status": "canonical",
+  "routine_switching_required": false,
+  "future_multiplayer_compatible": true,
+  "core_rule": "Every asymmetric obstacle must let the capable hero create access for the other hero.",
+  "approved_shared_access_results": [
+    "permanent_gate_open",
+    "bridge_lowered_or_extended",
+    "shared_platform_created",
+    "shared_lift_activated",
+    "hazard_disabled_for_both",
+    "barrier_removed_with_persistent_opening",
+    "persistent_route_transformation",
+    "rope_ladder_ramp_or_stair_released",
+    "safe_regroup_point_created",
+    "cooperative_assist_with_recovery",
+    "alternate_route_reconnected"
+  ],
+  "single_player_rules": {
+    "swapping_allowed": true,
+    "routine_back_and_forth_forbidden": true,
+    "mandatory_hero_interactions_grouped": true,
+    "shared_route_must_remain_open": true,
+    "common_jumps_checkpoints_exits_require_swapping": false
+  },
+  "multiplayer_rules": {
+    "no_permanent_stranding": true,
+    "mandatory_doors_wait_for_both": true,
+    "single_use_mechanisms_may_strand_second_player": false,
+    "hero_routes_require_regroup_point": true,
+    "both_heroes_reach_all_mandatory_checkpoints": true,
+    "both_heroes_reach_normal_exit": true,
+    "boss_arena_must_admit_both": true,
+    "disconnect_and_death_must_not_corrupt_mechanisms": true
+  },
+  "forbidden_patterns": [
+    "alternating_mandatory_hero_gates",
+    "mebble_only_required_gap_without_hargold_access",
+    "hargold_only_required_barrier_without_mebble_access",
+    "one_way_hero_route_without_reconnection",
+    "mechanism_resets_before_partner_crosses",
+    "permanent_pressure_plate_abandonment",
+    "door_locks_after_first_player",
+    "single_hero_lift_without_return_cycle",
+    "single_hero_checkpoint",
+    "partner_stranding_collectible_or_exit",
+    "single_hero_boss_entry",
+    "multiplayer_solution_requiring_identity_swap"
+  ],
+  "required_obstacle_fields": [
+    "obstacle_id",
+    "capable_hero",
+    "blocked_hero",
+    "required_or_optional",
+    "activation_method",
+    "shared_access_result",
+    "persistence_rule",
+    "regroup_point",
+    "second_hero_crossing_method",
+    "single_player_resolution",
+    "multiplayer_resolution",
+    "reset_and_respawn_behavior",
+    "anti_stranding_validation"
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hargold-mebble.local/schemas/stump-launcher-interactive-terrain.schema.json",
+  "title": "Stump Launcher Interactive Terrain",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "canonical_name",
+    "classification",
+    "is_mob",
+    "is_enemy",
+    "is_hazard",
+    "fires_projectiles",
+    "contains_creature",
+    "core_function",
+    "usable_by",
+    "mandatory_uses_must_support_both_heroes",
+    "default_behavior",
+    "interaction_states",
+    "visual_requirements",
+    "authored_placement_fields",
+    "approved_purposes",
+    "multiplayer_rules",
+    "biome_variants",
+    "validation_failures",
+    "production_status"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "const": "stump-launcher" },
+    "canonical_name": { "const": "Stump Launcher" },
+    "classification": { "const": "interactive_terrain_launch_pad" },
+    "is_mob": { "const": false },
+    "is_enemy": { "const": false },
+    "is_hazard": { "const": false },
+    "fires_projectiles": { "const": false },
+    "contains_creature": { "const": false },
+    "core_function": { "type": "string", "minLength": 1 },
+    "usable_by": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": { "enum": ["Hargold", "Mebble"] },
+      "contains": { "const": "Hargold" }
+    },
+    "mandatory_uses_must_support_both_heroes": { "const": true },
+    "default_behavior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["damage_on_use", "launch_direction", "deterministic", "reusable", "short_reset_required", "safe_to_land_back_on"],
+      "properties": {
+        "damage_on_use": { "const": 0 },
+        "launch_direction": { "const": "upward_arc" },
+        "deterministic": { "const": true },
+        "reusable": { "const": true },
+        "short_reset_required": { "const": true },
+        "safe_to_land_back_on": { "const": true }
+      }
+    },
+    "interaction_states": {
+      "type": "array",
+      "items": { "enum": ["ready", "compression", "launch", "recoil", "reset"] },
+      "minItems": 5,
+      "uniqueItems": true
+    },
+    "visual_requirements": { "type": "object" },
+    "authored_placement_fields": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+    "approved_purposes": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+    "multiplayer_rules": { "type": "object" },
+    "biome_variants": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+    "validation_failures": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+    "production_status": { "const": "canonical_contract_only" }
+  }
+}

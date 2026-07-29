@@ -1,0 +1,102 @@
+{
+  "$schema": "../../schemas/stump-launcher-interactive-terrain.schema.json",
+  "id": "stump-launcher",
+  "canonical_name": "Stump Launcher",
+  "classification": "interactive_terrain_launch_pad",
+  "is_mob": false,
+  "is_enemy": false,
+  "is_hazard": false,
+  "fires_projectiles": false,
+  "contains_creature": false,
+  "core_function": "Launch Hargold and Mebble along a deterministic authored upward arc.",
+  "usable_by": ["Hargold", "Mebble"],
+  "mandatory_uses_must_support_both_heroes": true,
+  "default_behavior": {
+    "damage_on_use": 0,
+    "launch_direction": "upward_arc",
+    "deterministic": true,
+    "reusable": true,
+    "short_reset_required": true,
+    "safe_to_land_back_on": true
+  },
+  "interaction_states": [
+    "ready",
+    "compression",
+    "launch",
+    "recoil",
+    "reset"
+  ],
+  "visual_requirements": {
+    "rooted_hollow_stump": true,
+    "spring_leaf_pad": true,
+    "readable_side_view": true,
+    "biome_dressing_allowed": true,
+    "forbidden_features": [
+      "face",
+      "eyes",
+      "mouth",
+      "enemy_expression",
+      "creature",
+      "weapon",
+      "barrel",
+      "projectile"
+    ]
+  },
+  "authored_placement_fields": [
+    "launch_origin",
+    "launch_angle",
+    "launch_height",
+    "horizontal_displacement",
+    "apex_position",
+    "valid_landing_region",
+    "cooldown",
+    "air_steering",
+    "slam_modifier",
+    "failure_recovery",
+    "multiplayer_resolution"
+  ],
+  "approved_purposes": [
+    "elevated_route_access",
+    "gap_crossing",
+    "hidden_area_access",
+    "compass_coin_access",
+    "hidden_chest_access",
+    "switch_access",
+    "timed_traversal",
+    "multiplayer_regrouping"
+  ],
+  "multiplayer_rules": {
+    "may_not_strand_second_player": true,
+    "may_not_be_consumed_by_first_use": true,
+    "required_resolution_options": [
+      "quick_reset",
+      "simultaneous_launch",
+      "shared_access_mechanism",
+      "authored_regroup_point",
+      "second_launcher_or_return_mechanism"
+    ]
+  },
+  "biome_variants": [
+    "standard_woodland",
+    "autumn",
+    "jungle_overgrown",
+    "snowy_frozen",
+    "crystal",
+    "desert_dried",
+    "toxic_fen",
+    "ember_charred"
+  ],
+  "validation_failures": [
+    "classified_as_mob",
+    "contains_or_launches_creature",
+    "fires_projectile",
+    "damages_hero_by_default",
+    "mandatory_use_excludes_a_hero",
+    "unreadable_or_unfair_landing",
+    "nondeterministic_force",
+    "single_use_strands_partner",
+    "decorative_without_traversal_purpose",
+    "creates_prolonged_vertical_course"
+  ],
+  "production_status": "canonical_contract_only"
+}

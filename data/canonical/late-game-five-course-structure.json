@@ -1,0 +1,49 @@
+{
+  "$schema": "../../schemas/late-game-five-course-structure.schema.json",
+  "authority": "newest",
+  "totalCoursesIncludesBoss": true,
+  "worlds": [
+    {
+      "worldId": 8,
+      "label": "Secret World A",
+      "courseCount": 5,
+      "standardCourseCount": 4,
+      "bossCourseIndex": 5,
+      "boss": "Bone Crusher",
+      "forkedRoute": false,
+      "hiddenExitCourse": false,
+      "additionalSecretCourse": false
+    },
+    {
+      "worldId": 9,
+      "label": "Secret World B",
+      "courseCount": 5,
+      "standardCourseCount": 4,
+      "bossCourseIndex": 5,
+      "boss": "Tempest Warden",
+      "forkedRoute": false,
+      "hiddenExitCourse": false,
+      "additionalSecretCourse": false
+    },
+    {
+      "worldId": 10,
+      "label": "Final World",
+      "courseCount": 5,
+      "standardCourseCount": 4,
+      "bossCourseIndex": 5,
+      "boss": "General Gobbler",
+      "forkedRoute": false,
+      "hiddenExitCourse": false,
+      "additionalSecretCourse": false
+    }
+  ],
+  "optionalInCourseContentAllowed": true,
+  "optionalContentMayUnlockAdditionalCourse": false,
+  "supersedes": [
+    "eight-level structures for Worlds 8-10",
+    "fork pairs in Worlds 8-10",
+    "hidden-exit levels in Worlds 8-10",
+    "secret ninth levels in Worlds 8-10",
+    "five standard levels plus a separate boss course"
+  ]
+}

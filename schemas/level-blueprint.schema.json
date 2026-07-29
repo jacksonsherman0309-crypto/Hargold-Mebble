@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hargold-mebble.invalid/schemas/level-blueprint.schema.json",
+  "title": "Hargold & Mebble Authored Level Blueprint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "levelId",
+    "world",
+    "title",
+    "archetype",
+    "authoredIdentity",
+    "targetClearTimeSeconds",
+    "routeComposition",
+    "primaryMechanic",
+    "segments"
+  ],
+  "properties": {
+    "levelId": { "type": "string", "minLength": 1 },
+    "world": { "type": "integer", "minimum": 1, "maximum": 10 },
+    "title": { "type": "string", "minLength": 1 },
+    "archetype": {
+      "enum": [
+        "grounded_intro",
+        "mechanic_expansion",
+        "enemy_mechanic",
+        "projectile_course",
+        "ruin_vertical",
+        "glide_course",
+        "athletic_fork",
+        "ground_hazard_fork",
+        "castle_approach",
+        "secret_course",
+        "tower",
+        "castle",
+        "boss"
+      ]
+    },
+    "authoredIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "signature", "mustPreserve"],
+      "properties": {
+        "summary": { "type": "string", "minLength": 1 },
+        "signature": { "type": "string", "minLength": 1 },
+        "mustPreserve": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "targetClearTimeSeconds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expert", "firstClear", "exploratory"],
+      "properties": {
+        "expert": { "type": "integer", "minimum": 30 },
+        "firstClear": { "type": "integer", "minimum": 60 },
+        "exploratory": { "type": "integer", "minimum": 60 }
+      }
+    },
+    "routeComposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["groundPercent", "platformPercent", "pitPercent"],
+      "properties": {
+        "groundPercent": { "type": "number", "minimum": 0, "maximum": 100 },
+        "platformPercent": { "type": "number", "minimum": 0, "maximum": 100 },
+        "pitPercent": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "primaryMechanic": { "type": "string", "minLength": 1 },
+    "secondaryMechanic": { "type": ["string", "null"] },
+    "primaryEnemyFamily": { "type": ["string", "null"] },
+    "secondaryEnemyFamilies": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "maxItems": 4
+    },
+    "segments": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 16,
+      "items": { "$ref": "#/$defs/segment" }
+    },
+    "validationNotes": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "segment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "segmentId",
+        "role",
+        "terrainProfile",
+        "requiredAction",
+        "blocks",
+        "platforms",
+        "pits",
+        "enemies",
+        "recovery",
+        "camera",
+        "difficultyScore"
+      ],
+      "properties": {
+        "segmentId": { "type": "string", "minLength": 1 },
+        "role": {
+          "enum": [
+            "opening_read",
+            "first_interaction",
+            "confirmation",
+            "elevation_change",
+            "meaningful_encounter",
+            "optional_route",
+            "pre_checkpoint_test",
+            "post_checkpoint_variation",
+            "advanced_combination",
+            "optional_mastery",
+            "final_exam",
+            "goal_approach",
+            "custom"
+          ]
+        },
+        "terrainProfile": { "type": "string", "minLength": 1 },
+        "requiredAction": { "type": "string", "minLength": 1 },
+        "optionalAction": { "type": ["string", "null"] },
+        "blocks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/blockGroup" }
+        },
+        "platforms": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/platform" }
+        },
+        "pits": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/pit" }
+        },
+        "enemies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/enemyPlacement" }
+        },
+        "reward": { "type": ["string", "null"] },
+        "collectibleStatus": { "type": ["string", "null"] },
+        "recovery": { "type": "string", "minLength": 1 },
+        "camera": { "type": "string", "minLength": 1 },
+        "difficultyScore": { "type": "number", "minimum": 0, "maximum": 10 },
+        "validationFlags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "blockGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "count", "breakability", "purposeTags", "mandatoryRouteDependency"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "standard_breakable",
+            "hargold_only",
+            "coin_block",
+            "powerup_block",
+            "structural_terrain"
+          ]
+        },
+        "count": { "type": "integer", "minimum": 1 },
+        "breakability": { "enum": ["breakable", "hargold_only", "unbreakable", "interactive_unbreakable"] },
+        "purposeTags": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "route_support",
+              "jump_takeoff",
+              "landing_surface",
+              "elevation_step",
+              "enemy_control",
+              "hazard_cover",
+              "reward_container",
+              "powerup_delivery",
+              "secret_route_hint",
+              "route_gate",
+              "mechanic_tutorial",
+              "recovery_platform",
+              "moving_platform_anchor",
+              "destructible_shortcut",
+              "character_specific_interaction"
+            ]
+          }
+        },
+        "mandatoryRouteDependency": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    },
+    "platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["motion", "purpose", "approachReadable", "destinationReadable", "recoveryAvailable"],
+      "properties": {
+        "motion": { "enum": ["fixed", "horizontal", "vertical", "tilting", "swinging", "rotating", "falling", "rising"] },
+        "purpose": {
+          "enum": [
+            "bridge_gap",
+            "vertical_access",
+            "safe_route",
+            "risky_shortcut",
+            "enemy_carrier",
+            "timing_tutorial",
+            "recovery",
+            "collectible_route",
+            "pacing_control"
+          ]
+        },
+        "approachReadable": { "type": "boolean" },
+        "destinationReadable": { "type": "boolean" },
+        "recoveryAvailable": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    },
+    "pit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["purpose", "consequence", "previewed", "landingReadable"],
+      "properties": {
+        "purpose": {
+          "enum": [
+            "basic_jump_test",
+            "moving_platform_test",
+            "enemy_timing_test",
+            "momentum_test",
+            "vertical_drop",
+            "route_split",
+            "castle_hazard",
+            "athletic_sequence"
+          ]
+        },
+        "consequence": { "enum": ["instant_death", "damage", "route_reset", "safe_drop"] },
+        "previewed": { "type": "boolean" },
+        "landingReadable": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    },
+    "enemyPlacement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mobId", "pattern", "purpose", "movementBoundsVisible", "blindLandingRisk"],
+      "properties": {
+        "mobId": { "type": "string", "minLength": 1 },
+        "pattern": {
+          "enum": [
+            "basic_approach",
+            "terrain_assisted",
+            "jump_commitment",
+            "overhead_pressure",
+            "timed_emergence",
+            "platform_occupancy",
+            "enemy_as_tool",
+            "paired_behavior",
+            "recovery_encounter"
+          ]
+        },
+        "purpose": { "type": "string", "minLength": 1 },
+        "movementBoundsVisible": { "type": "boolean" },
+        "blindLandingRisk": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

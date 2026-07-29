@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hargold-mebble.local/schemas/level-clear-currency-reward-system.schema.json",
+  "title": "Hargold & Mebble Level-Clear Currency Reward System",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "authority",
+    "currency",
+    "award_trigger",
+    "performance_score",
+    "difficulty_multipliers",
+    "final_reward",
+    "required_per_course_difficulty_fields",
+    "results_screen_order",
+    "persistence",
+    "unresolved",
+    "production_boundary"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "authority": { "const": "newest-explicit-user-approved-rule" },
+    "currency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["internal_id", "development_label", "final_display_name_status", "integer_only", "minimum_reward"],
+      "properties": {
+        "internal_id": { "const": "level_clear_currency" },
+        "development_label": { "const": "course currency" },
+        "final_display_name_status": { "const": "unassigned" },
+        "integer_only": { "const": true },
+        "minimum_reward": { "const": 0 }
+      }
+    },
+    "award_trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event", "award_on_failure", "award_once_per_clear_transaction", "idempotent_transaction_required"],
+      "properties": {
+        "event": { "const": "valid_level_clear" },
+        "award_on_failure": { "const": false },
+        "award_once_per_clear_transaction": { "const": true },
+        "idempotent_transaction_required": { "const": true }
+      }
+    },
+    "performance_score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimum_after_valid_clear", "maximum", "components"],
+      "properties": {
+        "minimum_after_valid_clear": { "const": 25 },
+        "maximum": { "const": 100 },
+        "components": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["course_clear", "speed", "standard_coins", "compass_coins", "eligible_mobs"],
+          "properties": {
+            "course_clear": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["maximum_points", "calculation"],
+              "properties": {
+                "maximum_points": { "const": 25 },
+                "calculation": { "const": "fixed_on_valid_clear" }
+              }
+            },
+            "speed": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["maximum_points", "calculation", "gold_time_points", "par_time_points", "cutoff_time_points", "timer"],
+              "properties": {
+                "maximum_points": { "const": 25 },
+                "calculation": { "const": "piecewise_linear" },
+                "gold_time_points": { "const": 25 },
+                "par_time_points": { "const": 15 },
+                "cutoff_time_points": { "const": 0 },
+                "timer": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "start",
+                    "end",
+                    "exclude_loading",
+                    "exclude_pause",
+                    "exclude_mandatory_noninteractive_cinematics",
+                    "exclude_post_clear_sequence",
+                    "continues_through_checkpoint_death",
+                    "resets_on_full_course_restart_or_reentry"
+                  ],
+                  "properties": {
+                    "start": { "const": "normal_player_control_begins" },
+                    "end": { "const": "valid_level_exit_secured" },
+                    "exclude_loading": { "const": true },
+                    "exclude_pause": { "const": true },
+                    "exclude_mandatory_noninteractive_cinematics": { "const": true },
+                    "exclude_post_clear_sequence": { "const": true },
+                    "continues_through_checkpoint_death": { "const": true },
+                    "resets_on_full_course_restart_or_reentry": { "const": true }
+                  }
+                }
+              }
+            },
+            "standard_coins": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["maximum_points", "formula", "randomized_payout_independent", "randomized_coin_block_default_performance_units", "life_award_bonus_units"],
+              "properties": {
+                "maximum_points": { "const": 15 },
+                "formula": { "const": "15 * min(1, performance_coin_units_collected / coin_reward_target)" },
+                "randomized_payout_independent": { "const": true },
+                "randomized_coin_block_default_performance_units": { "const": 1 },
+                "life_award_bonus_units": { "const": 0 }
+              }
+            },
+            "compass_coins": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["maximum_points", "required_per_level", "points_by_count", "must_be_collected_during_current_clear", "saved_prior_collection_does_not_auto_count"],
+              "properties": {
+                "maximum_points": { "const": 20 },
+                "required_per_level": { "const": 3 },
+                "points_by_count": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["0", "1", "2", "3"],
+                  "properties": {
+                    "0": { "const": 0 },
+                    "1": { "const": 4 },
+                    "2": { "const": 10 },
+                    "3": { "const": 20 }
+                  }
+                },
+                "must_be_collected_during_current_clear": { "const": true },
+                "saved_prior_collection_does_not_auto_count": { "const": true }
+              }
+            },
+            "eligible_mobs": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["maximum_points", "formula", "stable_unique_ids_required", "each_instance_counts_once", "zero_eligible_mobs_awards_full_points", "excluded", "mob_content_must_remain_untouched"],
+              "properties": {
+                "maximum_points": { "const": 15 },
+                "formula": { "const": "15 * eligible_mobs_defeated / eligible_mob_count" },
+                "stable_unique_ids_required": { "const": true },
+                "each_instance_counts_once": { "const": true },
+                "zero_eligible_mobs_awards_full_points": { "const": true },
+                "excluded": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": [
+                      "infinite_respawners",
+                      "endless_summons",
+                      "hazards",
+                      "invulnerable_set_dressing",
+                      "non_defeatable_objects",
+                      "boss_damage_phases"
+                    ]
+                  },
+                  "minItems": 6,
+                  "maxItems": 6
+                },
+                "mob_content_must_remain_untouched": { "const": true }
+              }
+            }
+          }
+        }
+      }
+    },
+    "difficulty_multipliers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["Easy", "Normal", "Hard", "Impossible"],
+      "properties": {
+        "Easy": { "const": 1.0 },
+        "Normal": { "const": 1.5 },
+        "Hard": { "const": 2.5 },
+        "Impossible": { "const": 4.0 }
+      }
+    },
+    "final_reward": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formula", "rounding", "clamp_minimum"],
+      "properties": {
+        "formula": { "const": "round(base_reward * difficulty_multiplier * performance_score / 100)" },
+        "rounding": { "const": "nearest_integer" },
+        "clamp_minimum": { "const": 0 }
+      }
+    },
+    "required_per_course_difficulty_fields": {
+      "type": "array",
+      "const": [
+        "base_reward",
+        "gold_time_seconds",
+        "par_time_seconds",
+        "reward_cutoff_seconds",
+        "coin_reward_target",
+        "eligible_mob_ids"
+      ]
+    },
+    "results_screen_order": {
+      "type": "array",
+      "const": [
+        "course_clear_points",
+        "clear_time_and_speed_points",
+        "standard_coins_and_coin_points",
+        "compass_coins_and_compass_points",
+        "eligible_mobs_and_mob_points",
+        "performance_score",
+        "difficulty_multiplier",
+        "final_reward",
+        "updated_wallet_balance"
+      ]
+    },
+    "persistence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "wallet_balance",
+        "lifetime_currency_earned",
+        "latest_breakdown_per_course_and_difficulty",
+        "best_score_per_course_and_difficulty",
+        "best_time_per_course_and_difficulty",
+        "highest_payout_per_course_and_difficulty"
+      ],
+      "properties": {
+        "wallet_balance": { "const": true },
+        "lifetime_currency_earned": { "const": true },
+        "latest_breakdown_per_course_and_difficulty": { "const": true },
+        "best_score_per_course_and_difficulty": { "const": true },
+        "best_time_per_course_and_difficulty": { "const": true },
+        "highest_payout_per_course_and_difficulty": { "const": true }
+      }
+    },
+    "unresolved": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "minItems": 9
+    },
+    "production_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_only", "runtime_implementation_claimed", "required_future_work"],
+      "properties": {
+        "contract_only": { "const": true },
+        "runtime_implementation_claimed": { "const": false },
+        "required_future_work": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string" },
+          "minItems": 7
+        }
+      }
+    }
+  }
+}

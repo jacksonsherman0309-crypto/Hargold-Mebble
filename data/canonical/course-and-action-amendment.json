@@ -1,0 +1,76 @@
+{
+  "$schema": "../../schemas/course-and-action-amendment.schema.json",
+  "version": "2026-07-26",
+  "authority": "current-user-approved-canon",
+  "courseFormat": {
+    "underwaterLevelsAllowed": false,
+    "verticalLevelsAllowed": false,
+    "requiredOrientation": "horizontal",
+    "primaryTraversalMode": "grounded_side_scroll",
+    "localElevationSegmentsAllowed": true,
+    "localElevationMustRemainSubordinate": true,
+    "continuousVerticalAutoscrollAllowed": false,
+    "prolongedSwimmingAllowed": false,
+    "waterThemeAlternatives": [
+      "shoreline",
+      "docks",
+      "cliffs",
+      "flooded_platforms",
+      "tidal_mechanisms",
+      "rafts",
+      "breakwaters",
+      "dry_caves",
+      "surface_hazards"
+    ]
+  },
+  "twirl": {
+    "defaultAirTwirlAllowed": false,
+    "hargoldDoubleJumpMayTwirl": false,
+    "mebbleGlideUsesTwirl": false,
+    "exceptionRequiresExplicitApproval": true
+  },
+  "mebbleGlide": {
+    "innate": true,
+    "capePresentation": "broad_wing_like_glide",
+    "stableOutwardLimbPose": true,
+    "riggedCapeDeformationRequired": true,
+    "preserveLongNeckAndAdamsApple": true,
+    "limitedHorizontalCorrection": true,
+    "slowsDescent": true,
+    "infiniteFlightAllowed": false,
+    "heightGainAllowed": false,
+    "depthLaneMovementAllowed": false,
+    "requiredStates": [
+      "glide_entry",
+      "glide_sustain",
+      "glide_steer",
+      "glide_release",
+      "glide_landing",
+      "glide_interrupt"
+    ]
+  },
+  "slam": {
+    "sharedGenericGroundPoundAllowed": false,
+    "states": ["startup", "commitment", "descent", "impact", "recovery"],
+    "hargold": {
+      "action": "belly_flop",
+      "leadingContact": ["belly", "forearms"],
+      "feetFirstAllowed": false,
+      "impactProfile": "broad_heavy_body_impact"
+    },
+    "mebble": {
+      "action": "fist_first_dive_bomb",
+      "leadingContact": ["leading_fist"],
+      "feetFirstAllowed": false,
+      "capeModeDuringDescent": "folded_or_streaming",
+      "impactProfile": "focused_fist_strike"
+    }
+  },
+  "blueprintDefaults": {
+    "courseOrientation": "horizontal",
+    "underwaterGameplay": false,
+    "verticalCourse": false,
+    "primaryTraversalMode": "grounded_side_scroll",
+    "twirlRequired": false
+  }
+}
