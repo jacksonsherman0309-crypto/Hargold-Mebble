@@ -25,6 +25,7 @@ export function updateMovementTelemetry(state, input, contacts = {}) {
     glideSeconds: state.glideSeconds,
     glideExhausted: state.glideExhausted,
     groundSlamPhase: state.groundSlamPhase,
+    groundSlamBufferSeconds: state.groundSlamBufferSeconds,
     contacts: Object.freeze({ ...contacts }),
     sensorSummary: Object.freeze({
       foot: state.sensors?.foot?.length ?? 0,

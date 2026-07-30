@@ -19,6 +19,7 @@
       "{hero}_run"
     ],
     "projectAuthoredLockedRig": "src/animation/locked-meshy-animation-library.js",
+    "suppliedMeshyRuntimePolicy": "reference and debug only; the visible model and matching rig are locked, not the supplied gait animation",
     "rejectedProceduralCharacterActions": {
       "runtimeUse": false,
       "visibleMeshUse": false,
@@ -27,7 +28,7 @@
   },
   "heroes": {
     "Hargold": {
-      "clipCount": 37,
+      "clipCount": 41,
       "suppliedClips": [
         "hargold_walk",
         "hargold_run"
@@ -37,7 +38,7 @@
       ]
     },
     "Mebble": {
-      "clipCount": 39,
+      "clipCount": 43,
       "suppliedClips": [
         "mebble_walk",
         "mebble_run"
@@ -53,9 +54,10 @@
     "NeutralIdle": { "mapping": "{hero}_idle", "status": "authored-locked-rig" },
     "SecondaryIdle": { "mapping": "{hero}_idle_secondary", "status": "authored-locked-rig" },
     "MoveStart": { "mapping": "{hero}_walk_start", "status": "authored-locked-rig" },
-    "Walk": { "mapping": "{hero}_walk", "status": "exact-supplied" },
+    "Walk": { "mapping": "{hero}_walk_refined", "status": "project-authored-on-locked-rig" },
     "WalkRunAcceleration": { "mapping": "{hero}_walk_run_accel", "status": "authored-locked-rig" },
-    "Run": { "mapping": "{hero}_run", "status": "exact-supplied" },
+    "Run": { "mapping": "{hero}_run_refined", "status": "project-authored-on-locked-rig" },
+    "Sprint": { "mapping": "{hero}_sprint_refined", "status": "project-authored-on-locked-rig-distinct-full-speed-cycle" },
     "MoveStop": { "mapping": "{hero}_run_decelerate", "status": "authored-locked-rig" },
     "Turn": { "mapping": "{hero}_turnaround", "status": "authored-locked-rig" },
     "Skid": { "mapping": "{hero}_skid", "status": "authored-locked-rig" },
@@ -76,6 +78,7 @@
     "GroundSlamStart": { "mapping": "{hero}_ground_slam_start", "status": "authored-locked-rig-approved-universal-mechanic" },
     "GroundSlamFall": { "mapping": "{hero}_ground_slam_fall", "status": "authored-locked-rig-approved-universal-mechanic" },
     "GroundSlamImpact": { "mapping": "{hero}_ground_slam_impact", "status": "authored-locked-rig-approved-universal-mechanic" },
+    "GroundSlamRecovery": { "mapping": "{hero}_ground_slam_recover", "status": "authored-locked-rig-approved-universal-mechanic" },
     "BlockHit": { "mapping": "{hero}_block_hit", "status": "authored-locked-rig" },
     "Damage": { "mapping": "{hero}_hurt", "status": "authored-locked-rig" },
     "Knockback": { "mapping": "{hero}_knockback", "status": "authored-locked-rig" },
@@ -91,7 +94,10 @@
     "MebbleGlideSustain": { "mapping": "mebble_glide_sustain", "status": "authored-body-pose-cape-deformation-blocked-by-source-rig" },
     "MebbleGlideClose": { "mapping": "mebble_glide_close", "status": "authored-body-pose-cape-deformation-blocked-by-source-rig" }
   },
-  "debugOnlyClips": [],
+  "debugOnlyClips": [
+    "{hero}_walk",
+    "{hero}_run"
+  ],
   "knownRigLimitedStates": [
     "facial expressions",
     "individual finger poses",

@@ -4,41 +4,41 @@ const SUPPLIED_CLIPS = Object.freeze({
   Hargold: Object.freeze([
     Object.freeze({
       id: 'hargold_walk',
-      label: 'Walk · supplied Meshy take',
+      label: 'Walk · supplied Meshy reference take',
       durationSeconds: 1.03333343,
       loop: true,
       footLock: true,
       authoredSpeedMetresPerSecond: 3.2,
-      source: 'supplied-meshy'
+      source: 'supplied-meshy-reference'
     }),
     Object.freeze({
       id: 'hargold_run',
-      label: 'Run · supplied Meshy take',
+      label: 'Run · supplied Meshy reference take',
       durationSeconds: 0.63333333,
       loop: true,
       footLock: true,
       authoredSpeedMetresPerSecond: 5.7,
-      source: 'supplied-meshy'
+      source: 'supplied-meshy-reference'
     })
   ]),
   Mebble: Object.freeze([
     Object.freeze({
       id: 'mebble_walk',
-      label: 'Walk · supplied Meshy take',
+      label: 'Walk · supplied Meshy reference take',
       durationSeconds: 1.03333343,
       loop: true,
       footLock: true,
       authoredSpeedMetresPerSecond: 3.2,
-      source: 'supplied-meshy'
+      source: 'supplied-meshy-reference'
     }),
     Object.freeze({
       id: 'mebble_run',
-      label: 'Run · supplied Meshy take',
+      label: 'Run · supplied Meshy reference take',
       durationSeconds: 0.63333333,
       loop: true,
       footLock: true,
       authoredSpeedMetresPerSecond: 5.7,
-      source: 'supplied-meshy'
+      source: 'supplied-meshy-reference'
     })
   ])
 });
@@ -60,8 +60,9 @@ export const IMPORTED_CHARACTER_ANIMATIONS = Object.freeze(
     hero,
     Object.freeze({
       restPose: 'rest-pose',
-      walk: `${hero.toLowerCase()}_walk`,
-      run: `${hero.toLowerCase()}_run`,
+      walk: `${hero.toLowerCase()}_walk_refined`,
+      run: `${hero.toLowerCase()}_run_refined`,
+      sprint: `${hero.toLowerCase()}_sprint_refined`,
       clips: Object.freeze([
         ...SUPPLIED_CLIPS[hero],
         ...generatedClipMetadata(hero)
@@ -77,6 +78,7 @@ export const LIVE_ANIMATION_STATES = Object.freeze([
   'Walk',
   'WalkRunAcceleration',
   'Run',
+  'Sprint',
   'MoveStop',
   'Turn',
   'Skid',
@@ -97,6 +99,7 @@ export const LIVE_ANIMATION_STATES = Object.freeze([
   'GroundSlamStart',
   'GroundSlamFall',
   'GroundSlamImpact',
+  'GroundSlamRecovery',
   'Damage',
   'Knockback',
   'Defeat',
@@ -197,7 +200,6 @@ export function animationIntentFor({
         blendSeconds: 0.11
       });
     case 'run':
-    case 'sprint':
       if (
         ['idle', 'walk'].includes(previousMovementState) &&
         stateSeconds < 0.3
@@ -210,7 +212,13 @@ export function animationIntentFor({
       return looped(config.run, {
         footLock: true,
         phaseSync: true,
-        blendSeconds: 0.1
+        blendSeconds: 0.075
+      });
+    case 'sprint':
+      return looped(config.sprint, {
+        footLock: true,
+        phaseSync: true,
+        blendSeconds: 0.065
       });
     case 'brake':
       return oneShot(`${prefix}_run_decelerate`, { footLock: true, blendSeconds: 0.045 });
@@ -287,10 +295,14 @@ export function animationIntentFor({
     case 'ground-slam-fall':
       return looped(`${prefix}_ground_slam_fall`, { blendSeconds: 0.035 });
     case 'ground-slam-impact':
-    case 'ground-slam-recovery':
       return oneShot(`${prefix}_ground_slam_impact`, {
         footLock: true,
         blendSeconds: 0.02
+      });
+    case 'ground-slam-recovery':
+      return oneShot(`${prefix}_ground_slam_recover`, {
+        footLock: true,
+        blendSeconds: 0.018
       });
     case 'wall-contact':
     case 'ledge-grab':

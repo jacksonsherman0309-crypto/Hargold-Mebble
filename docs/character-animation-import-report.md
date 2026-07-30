@@ -1,6 +1,6 @@
 # Meshy Character Animation Import Report
 
-Date: 2026-07-28
+Date: 2026-07-30
 Status: locked Meshy body-animation refinement active
 
 ## Scope and authority
@@ -8,10 +8,11 @@ Status: locked Meshy body-animation refinement active
 The five user-supplied Meshy archives were preserved and inventoried without changing the approved Hargold or Mebble visual designs. The imported characters are user-supplied production inputs. This report records the technical contents; it does not make an independent ownership or licensing determination.
 
 The source packages contain only usable walk and run takes for each hero. The
-runtime now supplements those takes with project-authored local-space body
-clips built against the exact locked Meshy bind transforms. These runtime clips
-are not additional supplied Meshy takes and are not embedded into the source
-GLBs.
+visible models and their matching rigs are locked, but the supplied animation
+takes are not. They remain reference/debug sources. Live locomotion and actions
+use project-authored local-space body clips built against the exact locked
+Meshy bind transforms. These runtime clips are not additional supplied Meshy
+takes and are not embedded into the source GLBs.
 
 ## Source package inventory
 
@@ -39,10 +40,10 @@ The GLB coordinate contract is right-handed, +Y up, +Z forward, in metres. Both 
 
 | Hero | Source take | Canonical clip | Timing | Runtime policy |
 | --- | --- | --- | --- | --- |
-| Hargold | `running` | `hargold_run` | 0.633333 s; 20 sampled keys | looping, direct playback |
-| Hargold | `walking_man` | `hargold_walk` | 1.033333 s; 32 sampled keys | looping, direct playback |
-| Mebble | `running` | `mebble_run` | 0.633333 s; 20 sampled keys | looping, direct playback |
-| Mebble | `walking_man` | `mebble_walk` | 1.033333 s; 32 sampled keys | looping, direct playback |
+| Hargold | `running` | `hargold_run` | 0.633333 s; 20 sampled keys | reference/debug only |
+| Hargold | `walking_man` | `hargold_walk` | 1.033333 s; 32 sampled keys | reference/debug only |
+| Mebble | `running` | `mebble_run` | 0.633333 s; 20 sampled keys | reference/debug only |
+| Mebble | `walking_man` | `mebble_walk` | 1.033333 s; 32 sampled keys | reference/debug only |
 
 The source samples are spaced at approximately 1/30 second. Blender imports the actions into a 24 FPS scene, while GLB playback remains time-based and preserves source duration. Looping was enabled because the takes are named cyclic actions and have negligible endpoint root delta; visual loop quality remains a production review item.
 
@@ -65,16 +66,18 @@ The processed assets were re-imported in Blender and recorded in `data/processed
 
 `data/animation-state-mapping.json` is the authoritative mapping table.
 
-- Grounded locomotion selects the supplied walk or run from actual controller
-  velocity. Dedicated project-authored locked-rig clips cover start,
-  acceleration, deceleration, turn, and skid.
+- Grounded locomotion selects distinct project-authored `walk_refined`,
+  `run_refined`, or `sprint_refined` clips from actual controller velocity.
+  The full-speed tier is a separate gait rather than a time-scaled run.
+  Dedicated locked-rig clips also cover start, acceleration, deceleration,
+  turn, and skid.
 - Directional input accelerates through walk, run, and sprint speed tiers. There is no manual sprint button.
 - Body presentation clips now cover idle, jump phases, fall, landing, crouch,
   crawl, slide, skid, twirl, stomp, damage, defeat, respawn, Hargold double
-  jump, approved ground slam, Mebble glide body poses, block/power reactions,
+  jump, approved four-phase ground slam, Mebble glide body poses, block/power reactions,
   swapping, and victory. They are labeled `project-authored-locked-rig`, not
   supplied Meshy animation.
-- Playback uses responsive per-transition crossfades, changes supplied gait
+- Playback uses responsive per-transition crossfades, changes authored gait
   playback rate with actual speed, synchronizes locomotion phase, applies
   grounded foot-height correction and bounded slope adaptation, and turns the
   character with positive uniform scale plus Y-axis rotation. Negative-scale
@@ -85,12 +88,23 @@ The developer panel is available with `?debugAnimation=1`. It supports hero/clip
 
 ## Validation evidence
 
-Browser captures are listed with hashes and scenarios in `data/animation-validation-capture-manifest.json`.
+Browser captures are listed with hashes and scenarios in
+`data/animation-validation-capture-manifest.json`. The July 28 supplied-gait
+captures are retained as historical/reference evidence and are marked
+superseded where they no longer represent live clip selection.
 
 - `hargold-walk-debug.png`: direct Hargold walk playback in the live level.
 - `mebble-run-debug.png`: direct Mebble run playback in the live level.
-- `hargold-live-full-speed.png`: controller-driven Hargold sprint state at 6.905 m/s.
-- `mebble-live-full-speed.png`: controller-driven Mebble sprint state at 6.905 m/s.
+- `hargold-live-full-speed.png`: historical controller-driven Hargold sprint
+  state at 6.905 m/s before refined gait selection.
+- `mebble-live-full-speed.png`: historical controller-driven Mebble sprint
+  state at 6.905 m/s before refined gait selection.
+
+The July 30 interactive browser pass verified both refined sprint clips, the
+fully unlocked live level at 120 Hz with no console errors, and an immediate
+jump-plus-slam input progressing through impact with the new ring, dust, camera
+response, and recovery. Replacement saved captures remain pending and are not
+claimed by this report.
 
 The full automated suite covers GLB structure, skeleton mapping, clip availability, state mapping, input changes, deterministic motion, hero abilities, combat, world-specific mob rosters, level data, and the existing presentation contracts.
 

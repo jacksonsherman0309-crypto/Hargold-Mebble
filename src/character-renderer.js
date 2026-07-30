@@ -704,7 +704,9 @@ export class CharacterRenderer {
     velocity = new THREE.Vector3(),
     angularVelocity = new THREE.Vector3(),
     gravity = 520,
-    kind = 'debris'
+    kind = 'debris',
+    scaleFrom = 1,
+    scaleTo = 1
   } = {}) {
     this.world.add(mesh);
     this.blockEffects.push({
@@ -714,7 +716,9 @@ export class CharacterRenderer {
       velocity,
       angularVelocity,
       gravity,
-      kind
+      kind,
+      scaleFrom,
+      scaleTo
     });
   }
 
@@ -850,6 +854,81 @@ export class CharacterRenderer {
     this.blockShakeAmplitude = Math.max(this.blockShakeAmplitude, isBreak ? 5.5 : 2.2);
   }
 
+  triggerGroundSlamImpact({
+    hero,
+    footX,
+    footY,
+    visualRadius,
+    cameraShakeSeconds,
+    cameraShakePixels,
+    dustCount,
+    surfaceMaterial = 'normal'
+  }) {
+    const x = footX * 70;
+    const y = this.height / 2 - footY * 70;
+    const z = 126;
+    const surfaceColours = {
+      grass: 0xb8d37a,
+      soil: 0xa8794f,
+      stone: 0xc1b39b,
+      ice: 0xb9e9f4,
+      mud: 0x826342,
+      normal: 0xc8ae78
+    };
+    const colour = surfaceColours[surfaceMaterial] ?? surfaceColours.normal;
+    const targetScale = Math.max(1, visualRadius * 70 / 18);
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(18, hero === 'Hargold' ? 2.8 : 2.25, 8, 44),
+      new THREE.MeshBasicMaterial({
+        color: colour,
+        transparent: true,
+        opacity: 0.9,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      })
+    );
+    ring.name = `${hero.toLowerCase()}-ground-slam-impact-ring`;
+    ring.position.set(x, y - 2, z);
+    ring.scale.set(0.35, 0.11, 1);
+    this.spawnBlockEffect(ring, {
+      life: hero === 'Hargold' ? 0.42 : 0.34,
+      gravity: 0,
+      kind: 'ground-slam-ring',
+      scaleFrom: 0.35,
+      scaleTo: targetScale
+    });
+
+    const dustMaterial = new THREE.MeshStandardMaterial({
+      color: colour,
+      roughness: 1,
+      transparent: true,
+      opacity: 0.86
+    });
+    for (let index = 0; index < dustCount; index += 1) {
+      const direction = index % 2 ? 1 : -1;
+      const spread = (Math.floor(index / 2) + 1) / Math.ceil(dustCount / 2);
+      const particle = new THREE.Mesh(
+        new THREE.DodecahedronGeometry(2.7 + index % 3 * 0.9, 0),
+        dustMaterial.clone()
+      );
+      particle.name = 'ground-slam-impact-dust';
+      particle.position.set(x + direction * 8, y - 3, z - 8 + index % 4);
+      this.spawnBlockEffect(particle, {
+        life: 0.38 + index % 4 * 0.035,
+        velocity: new THREE.Vector3(
+          direction * (58 + spread * 122),
+          42 + (index % 4) * 15,
+          (index % 3 - 1) * 15
+        ),
+        angularVelocity: new THREE.Vector3(2 + index, 3 + index * 0.4, direction * 4),
+        gravity: 285,
+        kind: 'ground-slam-dust'
+      });
+    }
+    this.blockShakeSeconds = Math.max(this.blockShakeSeconds, cameraShakeSeconds);
+    this.blockShakeAmplitude = Math.max(this.blockShakeAmplitude, cameraShakePixels);
+  }
+
   updateBlockEffects(deltaSeconds) {
     this.blockEffectClock += deltaSeconds;
     for (const effect of this.blockEffects) {
@@ -868,6 +947,11 @@ export class CharacterRenderer {
         effect.mesh.scale.setScalar(pulse);
       } else if (effect.kind === 'collect') {
         effect.mesh.scale.setScalar(1 + (1 - remaining) * 1.15);
+      } else if (effect.kind === 'ground-slam-ring') {
+        const progress = 1 - remaining;
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const scale = THREE.MathUtils.lerp(effect.scaleFrom, effect.scaleTo, eased);
+        effect.mesh.scale.set(scale, scale * 0.3, 1);
       }
     }
     for (const effect of this.blockEffects.filter(effect => effect.life <= 0)) {

@@ -277,9 +277,12 @@ requires it.
 The structural validator must verify connected-component count, watertightness,
 deforming bone-group coverage, continuous garments, and unified boots. On
 July 27, 2026 the user explicitly approved the supplied Meshy appearances and
-their usable built-in clips for live gameplay testing. That live-test approval
-overrides the earlier animation-integration freeze for those supplied rigs; it
-does not mark the remaining production checklist or missing clip set complete.
+matching rigs for live gameplay testing. On July 30, 2026 the user clarified
+that only those models and rigs are locked: the supplied animation clips are
+replaceable references. Project-authored motion may therefore replace any
+supplied gait while preserving the exact locked skeleton, bind transforms,
+visible design, and controller-owned translation. This approval does not mark
+the remaining production checklist or missing rig controls complete.
 
 ### Clean-room construction references
 

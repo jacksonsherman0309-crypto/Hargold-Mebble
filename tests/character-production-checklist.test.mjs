@@ -42,7 +42,8 @@ assert.equal(
   milestones.get('final-animation-polish')?.status,
   'in-progress'
 );
-assert.match(checklist.animationPolishPolicy, /active-on-locked-original-meshy-rigs/);
+assert.match(checklist.animationPolishPolicy, /active-on-locked-original-meshy-models-and-rigs/);
+assert.match(checklist.animationPolishPolicy, /supplied-clips-are-replaceable/);
 assert.equal(
   milestones.get('facial-topology')?.status,
   'blocked-by-locked-source-rig'
@@ -53,7 +54,7 @@ assert.equal(
 );
 assert.deepEqual(
   milestones.get('final-animation-polish')?.runtimePresentationClipCounts,
-  { Hargold: 37, Mebble: 39 }
+  { Hargold: 41, Mebble: 43 }
 );
 
 for (const milestone of

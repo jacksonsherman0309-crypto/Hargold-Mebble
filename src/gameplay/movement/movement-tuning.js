@@ -68,6 +68,7 @@ export const MOVEMENT_TUNING = Object.freeze({
   fastFallAcceleration: 28,
   fastFallMinimumSpeed: 7,
   fastFallMaximumSpeed: 18,
+  groundSlamInputBufferSeconds: 0.14,
   minimumGroundSlamAirSeconds: 0.08,
   minimumGroundSlamClearance: 0.65,
   groundSlamPrepareSeconds: 0.1,

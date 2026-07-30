@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "decisionDate": "2026-07-28",
+  "decisionDate": "2026-07-30",
   "appearancePolicy": {
     "approvedAppearanceLocked": true,
     "redesignAllowed": false,
@@ -24,7 +24,7 @@
       "hargold_walk",
       "hargold_run"
     ],
-    "runtimePresentationClipCount": 37,
+    "runtimePresentationClipCount": 41,
     "runtimePresentationLibrary": "src/animation/locked-meshy-animation-library.js"
   },
   "Mebble": {
@@ -44,7 +44,7 @@
       "mebble_walk",
       "mebble_run"
     ],
-    "runtimePresentationClipCount": 39,
+    "runtimePresentationClipCount": 43,
     "runtimePresentationLibrary": "src/animation/locked-meshy-animation-library.js"
   },
   "duplicateAndAlternateSources": [
@@ -68,6 +68,9 @@
     "duplicateAnimationMeshesExported": false,
     "controllerOwnsMovement": true,
     "retargetingRequiredForSuppliedWalkRun": false,
+    "suppliedAnimationRuntimeAuthority": false,
+    "suppliedAnimationPolicy": "reference and animation-debug playback only",
+    "lockedAssetScope": "visible Meshy model and matching rig",
     "additionalClipPolicy": "project-authored additive local-space tracks built from each locked rig's own bind transforms",
     "rejectedProceduralMeshRuntimeUse": false,
     "rejectedProceduralActionRetargetUse": false,

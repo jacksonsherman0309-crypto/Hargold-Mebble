@@ -20,23 +20,25 @@ for (const hero of ['Hargold', 'Mebble']) {
   assert.equal(selection[hero].embeddedSuppliedClips.length, 2);
   assert.equal(
     selection[hero].runtimePresentationClipCount,
-    hero === 'Hargold' ? 37 : 39
+    hero === 'Hargold' ? 41 : 43
   );
   const assetUrl = new URL(selection[hero].liveAsset, root);
   assert.ok((await stat(assetUrl)).size > 30_000_000);
 }
 assert.equal(selection.runtimePolicy.oneVisibleMeshPerHero, true);
 assert.equal(selection.runtimePolicy.retargetingRequiredForSuppliedWalkRun, false);
+assert.equal(selection.runtimePolicy.suppliedAnimationRuntimeAuthority, false);
 assert.equal(selection.runtimePolicy.rejectedProceduralMeshRuntimeUse, false);
 assert.equal(selection.runtimePolicy.rejectedProceduralActionRetargetUse, false);
 assert.equal(retarget.retargetingRequiredForLiveGlbClips, false);
 assert.equal(Object.keys(retarget.identityBoneMap).length, 24);
 assert.equal(mapping.controllerPolicy.manualSprintAction, false);
-assert.equal(mapping.requiredLiveStates.Walk.status, 'exact-supplied');
-assert.equal(mapping.requiredLiveStates.Run.status, 'exact-supplied');
+assert.equal(mapping.requiredLiveStates.Walk.mapping, '{hero}_walk_refined');
+assert.equal(mapping.requiredLiveStates.Run.mapping, '{hero}_run_refined');
+assert.equal(mapping.requiredLiveStates.Sprint.mapping, '{hero}_sprint_refined');
 assert.equal(mapping.requiredLiveStates.JumpRise.status, 'authored-locked-rig');
 assert.match(mapping.requiredLiveStates.MebbleGlideOpen.status, /cape-deformation-blocked/);
-assert.deepEqual(mapping.debugOnlyClips, []);
+assert.deepEqual(mapping.debugOnlyClips, ['{hero}_walk', '{hero}_run']);
 
 function glbJson(buffer) {
   assert.equal(buffer.readUInt32LE(0), 0x46546c67);

@@ -1,13 +1,13 @@
 # Locked Meshy animation production
 
-Last verified: July 28, 2026
+Last verified: July 30, 2026
 
 ## Runtime authority
 
 | Purpose | Authoritative file |
 | --- | --- |
-| Hargold visible mesh, skin, supplied walk/run | `assets/exports/meshy/hargold_canonical_gameplay_rig.glb` |
-| Mebble visible mesh, skin, supplied walk/run | `assets/exports/meshy/mebble_canonical_gameplay_rig.glb` |
+| Hargold locked visible mesh and matching skin/rig | `assets/exports/meshy/hargold_canonical_gameplay_rig.glb` |
+| Mebble locked visible mesh and matching skin/rig | `assets/exports/meshy/mebble_canonical_gameplay_rig.glb` |
 | Body clip definitions | `src/animation/locked-meshy-animation-library.js` |
 | State-to-clip selection and blends | `src/animation/character-animation-config.js` |
 | Runtime mixing, phase sync, contact correction | `src/character-renderer.js` |
@@ -17,22 +17,25 @@ Last verified: July 28, 2026
 | Live validation stations | `src/content/animation-validation-course.js` |
 
 The controller owns world translation. Root motion is disabled. The supplied
-walk/run clips are retained unchanged as sustained gait sources; all additional
-body clips are additive local-space tracks authored against the exact local
-bind transforms of the locked 24-bone rigs.
+walk/run clips remain embedded source references and are available in the
+animation debug panel, but live locomotion does not select them. Refined walk,
+run, and full-speed sprint cycles and all other body clips are additive
+local-space tracks authored against the exact local bind transforms of the
+locked 24-bone rigs.
 
 ## Clip catalog
 
 Both heroes provide:
 
 - `idle`, `idle_secondary`;
-- `walk_start`, supplied `walk`, `walk_run_accel`, supplied `run`,
-  `run_decelerate`;
+- `walk_start`, `walk_refined`, `walk_run_accel`, `run_refined`,
+  `sprint_refined`, `run_decelerate`;
 - `turnaround`, `skid`, `crouch`, `crawl`, `slide`;
 - `jump_anticipation`, `jump_takeoff`, `jump_rise`, `jump_apex`, `jump_fall`,
   `running_jump`, `air_adjust`, `air_spin`;
 - `stomp_bounce`, `land_soft`, `land_heavy`;
-- `ground_slam_start`, `ground_slam_fall`, `ground_slam_impact`;
+- `ground_slam_start`, `ground_slam_fall`, `ground_slam_impact`,
+  `ground_slam_recover`;
 - `block_hit`, `hurt`, `knockback`, `defeat`, `ledge_stop`;
 - `powerup_collect`, `power_transform`, `victory`, `swap_out`, `swap_in`.
 
@@ -47,15 +50,23 @@ The GLBs continue to contain only the supplied walk and run animations.
 Holding a direction begins with the controller's lower speed tier and
 automatically accelerates through walk and run to maximum speed. There is no
 manual run or sprint button or buffered action. Releasing input decelerates;
-reversing at speed enters turn/skid presentation. Supplied gait playback rates
-are calculated from actual horizontal velocity, and walk/run phase is
-preserved across a clip change to reduce contact discontinuities.
+reversing at speed enters turn/skid presentation. Refined gait playback rates
+are calculated from actual horizontal velocity, walk/run/sprint phases are
+preserved across clip changes, and the full-speed tier has its own stride and
+body mechanics instead of accelerating the same run take.
 
 Jump, twirl, Hargold double jump, Mebble glide, stomp, approved universal
 ground slam, landings, damage, defeat, power reactions, victory, and swap
 states are selected from actual controller state or explicit gameplay events.
 Gameplay state changes interrupt presentation clips when control must remain
 responsive.
+
+An airborne Down/S/SLAM press has a short deterministic intent buffer so a
+press immediately after takeoff is not lost before minimum clearance is
+reached. A valid slam runs startup, committed descent, terrain impact, and a
+separate recovery clip. Live impact events drive dust/ring effects, camera
+response, and nearby mob contact through each mob's existing world-specific
+stomp behavior. An invalid low descending press remains an ordinary fast fall.
 
 ## Validation
 

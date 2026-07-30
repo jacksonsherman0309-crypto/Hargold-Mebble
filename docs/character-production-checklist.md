@@ -1,6 +1,6 @@
 # Character production checklist
 
-Last updated: July 28, 2026
+Last updated: July 30, 2026
 
 The machine-readable authority is
 `assets/blender/character-production-checklist.json`.
@@ -14,13 +14,15 @@ not replace their visible meshes or select another base rig.
 
 - [x] Locked original Meshy models selected
 - [x] Rejected altered/procedural models quarantined
-- [x] Supplied walk and run retained
+- [x] Supplied walk and run retained as replaceable reference/debug clips
+- [x] Refined project-authored walk, run, and full-speed sprint cycles active
 - [x] Automatic walk-to-full-run acceleration; no manual run/sprint action
 - [x] Shared body-state presentation library
 - [x] Hargold double-jump body clip
 - [x] Mebble glide body clips
 - [x] Velocity-linked locomotion, phase synchronization, and responsive blends
 - [x] Foot-height correction and bounded slope adaptation
+- [x] Buffered four-phase ground slam with live impact feedback and mob contact
 - [x] Live validation stations and animation debug surface
 - [ ] Joint-deformation visual stress approval
 - [ ] Facial controls and facial animation

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "verifiedDate": "2026-07-28",
+  "verifiedDate": "2026-07-30",
   "productionTarget": "original-user-supplied-meshy-rigs",
   "visibleMeshReplacementAllowed": false,
   "runtimeRootMotion": false,
@@ -17,7 +17,9 @@
         "hargold_walk",
         "hargold_run"
       ],
-      "runtimePresentationClipCount": 37
+      "runtimePresentationClipCount": 41,
+      "activeProjectAuthoredClipCount": 39,
+      "embeddedReferenceClipCount": 2
     },
     "Mebble": {
       "asset": "assets/exports/meshy/mebble_canonical_gameplay_rig.glb",
@@ -30,7 +32,9 @@
         "mebble_walk",
         "mebble_run"
       ],
-      "runtimePresentationClipCount": 39
+      "runtimePresentationClipCount": 43,
+      "activeProjectAuthoredClipCount": 41,
+      "embeddedReferenceClipCount": 2
     }
   },
   "supportedByLockedRig": [
@@ -79,7 +83,8 @@
   },
   "implementationPolicy": {
     "projectAuthoredBodyClips": "additive local-space bone animation built from each locked rig's own bind transforms",
-    "suppliedWalkRunPolicy": "retained as the authoritative sustained locomotion cycles",
+    "suppliedWalkRunPolicy": "retained as source-reference and debug clips only; not selected by live locomotion",
+    "runtimeLocomotionPolicy": "project-authored additive walk, run, and sprint cycles on each unchanged locked Meshy rig",
     "rejectedProceduralAssets": "quarantined and never loaded or retargeted by the runtime",
     "unsupportedControlPolicy": "document as an asset-authoring requirement; do not claim functional controls and do not replace the locked mesh"
   }

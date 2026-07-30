@@ -8,7 +8,7 @@ export const ANIMATION_VALIDATION_STATIONS = Object.freeze([
     id: 'acceleration-skid-lane',
     label: 'Acceleration, stop, reversal, skid',
     spawnX: 2.2,
-    validates: Object.freeze(['idle', 'walk-start', 'walk', 'run', 'deceleration', 'turnaround', 'skid'])
+    validates: Object.freeze(['idle', 'walk-start', 'walk', 'run', 'sprint', 'deceleration', 'turnaround', 'skid'])
   }),
   Object.freeze({
     id: 'gentle-slope-contact',

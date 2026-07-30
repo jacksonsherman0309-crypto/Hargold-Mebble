@@ -5,8 +5,10 @@ import * as THREE from '../../vendor/three/three.module.js';
  *
  * These clips never replace or reshape the approved visible meshes. They are
  * generated from each loaded rig's own bind transforms, so every key is an
- * additive local-space delta over the approved neutral pose. The two supplied
- * Meshy locomotion takes remain authoritative for sustained walk and run.
+ * additive local-space delta over the approved neutral pose. Imported Meshy
+ * takes remain available as source references, but the visible models and
+ * matching rigs are the only locked assets. Runtime locomotion is authored
+ * here so gait design can be refined without replacing either character.
  */
 
 const B = Object.freeze({
@@ -109,6 +111,146 @@ function recoilPose(amount = 1) {
   };
 }
 
+function gaitContactPose({
+  heavy,
+  stride,
+  armDrive,
+  lean,
+  leftLead,
+  compression
+}) {
+  const direction = leftLead ? 1 : -1;
+  const roll = (heavy ? 0.035 : 0.055) * direction;
+  return {
+    [B.spineLower]: [lean + compression * 0.08, 0, roll],
+    [B.spineMiddle]: [-lean * 0.18, 0, -roll * 0.36],
+    [B.chest]: [-lean * 0.34, 0, -roll * 0.72],
+    [B.neck]: [lean * 0.16, 0, roll * 0.42],
+    [B.head]: [-lean * 0.12, 0, -roll * 0.34],
+    [B.shoulderL]: [0, 0, -roll * 0.7],
+    [B.shoulderR]: [0, 0, -roll * 0.7],
+    [B.upperArmL]: [armDrive * direction, 0, -0.08],
+    [B.upperArmR]: [-armDrive * direction, 0, -0.08],
+    [B.forearmL]: [0.3 + Math.max(0, armDrive * -direction) * 0.22, 0, 0],
+    [B.forearmR]: [-0.3 - Math.max(0, armDrive * direction) * 0.22, 0, 0],
+    [B.handL]: [0.08 * direction, 0, -0.04],
+    [B.handR]: [-0.08 * direction, 0, -0.04],
+    [B.thighL]: [-stride * direction, 0, 0.035],
+    [B.thighR]: [stride * direction, 0, -0.035],
+    [B.shinL]: [leftLead ? 0.13 : 0.48 + stride * 0.26, 0, 0],
+    [B.shinR]: [leftLead ? 0.48 + stride * 0.26 : 0.13, 0, 0],
+    [B.footL]: [leftLead ? 0.12 : -0.24, 0, 0],
+    [B.footR]: [leftLead ? -0.24 : 0.12, 0, 0],
+    [B.toeL]: [leftLead ? -0.08 : 0.2, 0, 0],
+    [B.toeR]: [leftLead ? 0.2 : -0.08, 0, 0]
+  };
+}
+
+function gaitPassingPose({
+  heavy,
+  stride,
+  armDrive,
+  lean,
+  leftPassing,
+  lift
+}) {
+  const direction = leftPassing ? 1 : -1;
+  const roll = (heavy ? 0.02 : 0.04) * direction;
+  return {
+    [B.spineLower]: [lean - lift * 0.02, 0, roll],
+    [B.spineMiddle]: [-lean * 0.14, 0, -roll * 0.4],
+    [B.chest]: [-lean * 0.3, 0, -roll * 0.64],
+    [B.neck]: [lean * 0.15, 0, roll * 0.3],
+    [B.head]: [-lean * 0.11, 0, -roll * 0.28],
+    [B.upperArmL]: [armDrive * 0.2 * direction, 0, -0.07],
+    [B.upperArmR]: [-armDrive * 0.2 * direction, 0, -0.07],
+    [B.forearmL]: [0.34, 0, 0],
+    [B.forearmR]: [-0.34, 0, 0],
+    [B.thighL]: [leftPassing ? 0.16 * stride : -0.2 * stride, 0, 0.025],
+    [B.thighR]: [leftPassing ? -0.2 * stride : 0.16 * stride, 0, -0.025],
+    [B.shinL]: [leftPassing ? 0.74 + stride * 0.2 : 0.18, 0, 0],
+    [B.shinR]: [leftPassing ? 0.18 : 0.74 + stride * 0.2, 0, 0],
+    [B.footL]: [leftPassing ? -0.3 : 0.04, 0, 0],
+    [B.footR]: [leftPassing ? 0.04 : -0.3, 0, 0],
+    [B.toeL]: [leftPassing ? 0.12 : -0.04, 0, 0],
+    [B.toeR]: [leftPassing ? -0.04 : 0.12, 0, 0]
+  };
+}
+
+function refinedLocomotionMotions(hero) {
+  const prefix = hero.toLowerCase();
+  const heavy = hero === 'Hargold';
+  const definitions = [
+    {
+      id: 'walk_refined',
+      duration: heavy ? 0.74 : 0.78,
+      speed: 2.55,
+      stride: heavy ? 0.42 : 0.48,
+      armDrive: heavy ? 0.48 : 0.55,
+      lean: heavy ? 0.055 : 0.045,
+      lift: heavy ? 2.2 : 2.8,
+      compression: heavy ? 1.5 : 1.15
+    },
+    {
+      id: 'run_refined',
+      duration: heavy ? 0.52 : 0.56,
+      speed: 4.8,
+      stride: heavy ? 0.68 : 0.78,
+      armDrive: heavy ? 0.82 : 0.9,
+      lean: heavy ? 0.14 : 0.12,
+      lift: heavy ? 3.3 : 4.2,
+      compression: heavy ? 2.6 : 2
+    },
+    {
+      id: 'sprint_refined',
+      duration: heavy ? 0.43 : 0.46,
+      speed: 7.15,
+      stride: heavy ? 0.88 : 1.02,
+      armDrive: heavy ? 1.05 : 1.12,
+      lean: heavy ? 0.24 : 0.21,
+      lift: heavy ? 4.2 : 5.3,
+      compression: heavy ? 3.4 : 2.65
+    }
+  ];
+
+  return definitions.map(definition => motion(
+    `${prefix}_${definition.id}`,
+    definition.duration,
+    [
+      frame(
+        0,
+        gaitContactPose({ ...definition, heavy, leftLead: true }),
+        { [B.hips]: [0, -definition.compression, 0] }
+      ),
+      frame(
+        0.24,
+        gaitPassingPose({ ...definition, heavy, leftPassing: true }),
+        { [B.hips]: [0, definition.lift, 0] }
+      ),
+      frame(
+        0.5,
+        gaitContactPose({ ...definition, heavy, leftLead: false }),
+        { [B.hips]: [0, -definition.compression, 0] }
+      ),
+      frame(
+        0.74,
+        gaitPassingPose({ ...definition, heavy, leftPassing: false }),
+        { [B.hips]: [0, definition.lift, 0] }
+      ),
+      frame(
+        1,
+        gaitContactPose({ ...definition, heavy, leftLead: true }),
+        { [B.hips]: [0, -definition.compression, 0] }
+      )
+    ],
+    {
+      ...LOOP,
+      footLock: true,
+      authoredSpeedMetresPerSecond: definition.speed
+    }
+  ));
+}
+
 function sharedMotions(hero) {
   const prefix = hero.toLowerCase();
   const heavy = hero === 'Hargold';
@@ -118,6 +260,7 @@ function sharedMotions(hero) {
   const hipDrop = heavy ? -9 : -6;
 
   return [
+    ...refinedLocomotionMotions(hero),
     motion(`${prefix}_idle`, 2.8, [
       frame(0, {}),
       frame(0.5, {
@@ -430,11 +573,37 @@ function sharedMotions(hero) {
     ], LOOP),
     motion(`${prefix}_ground_slam_impact`, heavy ? 0.48 : 0.4, [
       frame(0, crouchedPose(0.72, -0.16)),
-      frame(0.2, crouchedPose(landingDepth * 1.12, 0.5), {
+      frame(0.18, {
+        ...crouchedPose(landingDepth * 1.18, 0.52),
+        [B.shoulderL]: [0.08, 0, -0.14],
+        [B.shoulderR]: [-0.08, 0, 0.14],
+        [B.neck]: [-0.12, 0, 0],
+        [B.head]: [0.1, 0, 0]
+      }, {
         [B.hips]: [0, hipDrop * 1.45, 0]
       }),
-      frame(0.68, crouchedPose(landingDepth * 0.7, 0.22), {
-        [B.hips]: [0, hipDrop * 0.6, 0]
+      frame(0.62, crouchedPose(landingDepth * 0.82, 0.28), {
+        [B.hips]: [0, hipDrop * 0.76, 0]
+      }),
+      frame(1, crouchedPose(landingDepth * 0.68, 0.18), {
+        [B.hips]: [0, hipDrop * 0.48, 0]
+      })
+    ], { ...ONCE, footLock: true }),
+    motion(`${prefix}_ground_slam_recover`, heavy ? 0.24 : 0.2, [
+      frame(0, crouchedPose(landingDepth * 0.68, 0.18), {
+        [B.hips]: [0, hipDrop * 0.48, 0]
+      }),
+      frame(0.58, {
+        [B.spineLower]: [-0.08, 0, 0],
+        [B.chest]: [0.1, 0, 0],
+        [B.neck]: [-0.04, 0, 0],
+        [B.thighL]: [-0.18, 0, 0.04],
+        [B.thighR]: [-0.18, 0, -0.04],
+        [B.shinL]: [0.3, 0, 0],
+        [B.shinR]: [0.3, 0, 0],
+        ...symmetricArms(0.18, 0.18, 0.08)
+      }, {
+        [B.hips]: [0, hipDrop * 0.12, 0]
       }),
       frame(1, {})
     ], { ...ONCE, footLock: true }),

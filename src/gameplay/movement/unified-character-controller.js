@@ -84,6 +84,7 @@ export function createUnifiedCharacterState({
     fastFalling: false,
     groundSlamming: false,
     groundSlamPhase: 'none',
+    groundSlamBufferSeconds: 0,
     groundSlamPrepareSeconds: 0,
     groundSlamImpactSeconds: 0,
     groundSlamRecoverySeconds: 0,
@@ -184,6 +185,7 @@ function startDoubleJump(state, tuning) {
 function startGroundSlam(state, tuning) {
   state.groundSlamming = true;
   state.groundSlamPhase = 'startup';
+  state.groundSlamBufferSeconds = 0;
   state.groundSlamPrepareSeconds = tuning.groundSlamPrepareSeconds;
   state.airTwirlUsed = true;
   state.airTwirlSeconds = 0;
@@ -212,6 +214,10 @@ function beginGroundSlamImpact(state, tuning, surface = {}) {
   );
   transition(state, MOVEMENT_STATES.GROUND_SLAM_IMPACT);
   emitMovementEvent(state, 'ground-slam-impact', {
+    hero: state.hero,
+    footX: state.footX,
+    footY: state.footY,
+    landingSpeed: state.landingSpeed,
     surfaceMaterial: surface.material ?? state.surfaceMaterial,
     strength: heroProfile(state.hero ?? 'Hargold').groundSlamStrength
   });
@@ -446,7 +452,8 @@ function updateTimers(state, dt) {
     'landingRecoverySeconds',
     'hurtLockSeconds',
     'invulnerabilitySeconds',
-    'dropThroughSeconds'
+    'dropThroughSeconds',
+    'groundSlamBufferSeconds'
   ];
   for (const name of timerNames) state[name] = Math.max(0, state[name] - dt);
   if (state.dropThroughSeconds <= 0) state.dropThroughPlatformId = null;
@@ -671,15 +678,26 @@ export function stepUnifiedCharacterController(
   }
 
   const slamClearance = groundHeightAt(state.footX) - state.footY;
+  const groundSlamPressed = Boolean(input.groundSlamPressed ?? input.downPressed);
+  const slamCanBecomeValid = !state.grounded &&
+    !state.groundSlamming &&
+    (
+      slamClearance >= tuning.minimumGroundSlamClearance ||
+      state.velocityY < -tuning.apexVelocityWindow
+    );
+  if (groundSlamPressed && slamCanBecomeValid) {
+    state.groundSlamBufferSeconds = tuning.groundSlamInputBufferSeconds;
+  }
   const canGroundSlam = !state.grounded &&
     !state.groundSlamming &&
     state.airborneSeconds >= tuning.minimumGroundSlamAirSeconds &&
     slamClearance >= tuning.minimumGroundSlamClearance;
-  if ((input.groundSlamPressed ?? input.downPressed) && canGroundSlam) {
+  if (state.groundSlamBufferSeconds > 0 && canGroundSlam) {
     startGroundSlam(state, tuning);
   }
   state.fastFalling = !state.grounded &&
     !state.groundSlamming &&
+    state.groundSlamBufferSeconds <= 0 &&
     input.fastFallHeld &&
     state.velocityY > tuning.apexVelocityWindow;
 
@@ -790,6 +808,7 @@ export function trySwapUnifiedHero(
   state.glide = 'closed';
   state.groundSlamming = false;
   state.groundSlamPhase = 'none';
+  state.groundSlamBufferSeconds = 0;
   state.airTwirlSeconds = 0;
   transition(state, MOVEMENT_STATES.SWAP_IN);
   emitMovementEvent(state, 'hero-swapped', { previousHero, nextHero });
@@ -817,6 +836,7 @@ export function applyMovementDamage(
   state.glide = 'closed';
   state.groundSlamming = false;
   state.groundSlamPhase = 'none';
+  state.groundSlamBufferSeconds = 0;
   state.airTwirlSeconds = 0;
   state.fastFalling = false;
   state.jumpCutAllowed = false;
@@ -845,6 +865,7 @@ export function applyMovementBounce(
   state.airborneSeconds = 0;
   state.groundSlamming = false;
   state.groundSlamPhase = 'none';
+  state.groundSlamBufferSeconds = 0;
   state.fastFalling = false;
   state.jumpCutAllowed = false;
   state.glide = 'closed';
@@ -885,6 +906,7 @@ export function applyMovementLanding(
     const hard = !glided && landingSpeed >= tuning.hardLandingSpeed;
     state.groundSlamming = false;
     state.groundSlamPhase = 'none';
+    state.groundSlamBufferSeconds = 0;
     state.landingRecoverySeconds = hard
       ? tuning.hardLandingRecoverySeconds
       : tuning.softLandingRecoverySeconds;

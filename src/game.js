@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js?v=locked-animation-1';
+import { CharacterRenderer } from './character-renderer.js?v=locked-animation-2';
 import {
   MEADOW_WAKE_ENEMY_ACTORS,
   MEADOW_WAKE_LEVEL_DATA
@@ -41,6 +41,10 @@ import { createActorActivationRuntime } from './gameplay/levels/actor-activation
 import { HERO_PROFILES } from './gameplay/movement/hero-profiles.js?v=unified-motion-2';
 import { createMovementInputBuffer } from './gameplay/movement/movement-input-buffer.js?v=unified-motion-2';
 import { MOVEMENT_STATES } from './gameplay/movement/movement-state-machine.js?v=unified-motion-2';
+import {
+  createGroundSlamImpactPresentation,
+  resolveGroundSlamMobImpacts
+} from './gameplay/movement/ground-slam-impact.js?v=unified-motion-3';
 import {
   applyMovementBounce,
   applyMovementDamage,
@@ -206,6 +210,7 @@ function createSession(spawnX = 1.8) {
     spawnX,
     invulnerabilitySeconds: 0,
     attackSeconds: 0,
+    slamImpactGraceSeconds: 0,
     enemiesDefeated: 0,
     doubleJumpUnlocked: false
   };
@@ -501,9 +506,44 @@ function defeatForPlayer(mob) {
   noticeSeconds = 1.2;
 }
 
+function handleMovementEvents(events) {
+  for (const event of events) {
+    if (event.type !== 'ground-slam-impact') continue;
+    const presentation = createGroundSlamImpactPresentation(event);
+    characterRenderer.triggerGroundSlamImpact(presentation);
+    session.slamImpactGraceSeconds = Math.max(session.slamImpactGraceSeconds, 0.14);
+    const results = resolveGroundSlamMobImpacts({
+      hero: event.hero,
+      footX: event.footX,
+      footY: event.footY,
+      mobs
+    });
+    let defeated = 0;
+    let shellChanged = false;
+    for (const result of results) {
+      if (result.outcome === 'defeat') {
+        defeated += 1;
+        session.enemiesDefeated += 1;
+      } else if (['shell-retracted', 'shell-stopped'].includes(result.outcome)) {
+        shellChanged = true;
+      } else if (result.outcome === 'damage-player') {
+        damagePlayer('Unsafe ground-slam target', 0);
+      }
+    }
+    if (defeated > 0) {
+      notice = `Ground slam defeated ${defeated} mob${defeated === 1 ? '' : 's'}.`;
+      noticeSeconds = 1.5;
+    } else if (shellChanged) {
+      notice = 'Ground slam forced the Shellback into its shell.';
+      noticeSeconds = 1.6;
+    }
+  }
+}
+
 function updateCombat(input, previousPlayerFootY, dt) {
   session.invulnerabilitySeconds = Math.max(0, session.invulnerabilitySeconds - dt);
   session.attackSeconds = Math.max(0, session.attackSeconds - dt);
+  session.slamImpactGraceSeconds = Math.max(0, session.slamImpactGraceSeconds - dt);
   if (input.actionPressed && (player.grounded || player.hero === 'Hargold')) {
     session.attackSeconds = player.hero === 'Hargold' ? 0.28 : 0.22;
     setAnimationCue('attack', session.attackSeconds);
@@ -544,7 +584,11 @@ function updateCombat(input, previousPlayerFootY, dt) {
       }
     }
 
-    if (!overlaps(playerBody, body) || !mob.damaging) continue;
+    if (
+      !overlaps(playerBody, body) ||
+      !mob.damaging ||
+      session.slamImpactGraceSeconds > 0
+    ) continue;
     const mobTop = body.y;
     const stompedFromAbove = player.velocityY > 0 &&
       previousPlayerFootY <= mobTop + 0.16 &&
@@ -688,6 +732,7 @@ function fixedUpdate(dt) {
   if (!player.grounded) {
     resolveOneWayPlatformLanding(player, previousPlayerFootY, activeSurfaces, movementBody(player));
   }
+  handleMovementEvents(player.events);
   player.blockBreakStrength = player.hero === 'Hargold' || session.healthLayers > 1 ? 1 : 0;
   const blockEvent = resolveBlockHeadHit(player, previousHeadY, blocks, movementBody(player));
   if (blockEvent?.type === 'block-broken') {
@@ -927,7 +972,7 @@ function drawOverlay() {
       `pos ${debug.position.x.toFixed(3)}, ${debug.position.y.toFixed(3)}  vel ${debug.velocity.x.toFixed(3)}, ${debug.velocity.y.toFixed(3)}`,
       `grounded ${debug.grounded}  support ${debug.supportPlatformId ?? 'terrain/none'}  normal ${debug.surfaceNormal.x.toFixed(2)}, ${debug.surfaceNormal.y.toFixed(2)}`,
       `buffer ${debug.jumpBufferSeconds.toFixed(3)}  coyote ${debug.coyoteSeconds.toFixed(3)}  twirl ${debug.twirlAvailable}  double ${debug.doubleJumpAvailable}`,
-      `glide ${debug.glideState} ${debug.glideSeconds.toFixed(2)}s  slam ${debug.groundSlamPhase}`
+      `glide ${debug.glideState} ${debug.glideSeconds.toFixed(2)}s  slam ${debug.groundSlamPhase}  intent ${debug.groundSlamBufferSeconds.toFixed(3)}s`
     ];
     ctx.fillStyle = 'rgba(5, 10, 8, .9)';
     ctx.fillRect(18, H - 158, 720, 138);

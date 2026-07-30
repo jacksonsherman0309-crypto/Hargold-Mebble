@@ -1,6 +1,6 @@
 # Character production status
 
-Last verified: July 28, 2026
+Last verified: July 30, 2026
 
 ## Locked production path
 
@@ -27,18 +27,22 @@ fixed-step controller; the character clips are in-place.
 `src/animation/locked-meshy-animation-library.js` constructs additive
 local-space body clips from each locked rig's own bind transforms. It does not
 read, render, or retarget the rejected procedural characters. The supplied
-Meshy walk and run remain the sustained locomotion cycles.
+Meshy walk and run remain available as debug references but are not selected
+by live locomotion.
 
-The runtime exposes 37 Hargold presentation clips and 39 Mebble presentation
+The runtime exposes 41 Hargold presentation clips and 43 Mebble presentation
 clips. These include controller-driven idles, acceleration and deceleration,
 turn and skid, crouch/crawl/slide, staged jumps and landings, twirl, stomp,
 ground slam, damage and defeat, block and power reactions, victory, swapping,
 Hargold's distinct double jump, and Mebble's glide body poses.
 
 Animation selection uses the real movement state and measured velocity.
-Locomotion playback rate follows ground speed, loop phase is preserved across
-walk/run changes, gameplay state changes can interrupt presentation one-shots,
-and grounded contact clips use bounded foot-height and slope correction.
+Separate project-authored walk, run, and full-speed sprint cycles follow ground
+speed, loop phase is preserved across gait changes, gameplay state changes can
+interrupt presentation one-shots, and grounded contact clips use bounded
+foot-height and slope correction. Ground slam now has buffered intent, staged
+startup/descent/impact/recovery presentation, terrain impact effects, camera
+response, and current-world mob contact.
 
 The dedicated live validation surface is:
 
@@ -93,11 +97,13 @@ The active selection and quarantine policies are machine-readable in
 Implemented and live:
 
 - locked original Meshy visible meshes and rigs;
-- supplied walk/run playback;
+- supplied walk/run retained as reference/debug clips;
+- refined project-authored walk/run/sprint playback on the locked rigs;
 - controller-linked body-animation state package;
 - automatic directional acceleration with no manual run or sprint action;
 - Hargold double-jump body animation;
 - Mebble glide body animation;
+- complete live ground-slam input, impact feedback, and current-world mob contact;
 - velocity synchronization, responsive crossfades, foot-height correction,
   slope adaptation, debug playback, and validation stations.
 

@@ -119,12 +119,20 @@ assert.deepEqual(
   ['anticipation', 'takeoff', 'ascent', 'apex', 'descent', 'contact', 'compression', 'recovery']
 );
 assert.deepEqual(
-  GAME_RULES.characterPresentation.animation.approvedImportedClips.Hargold,
+  GAME_RULES.characterPresentation.animation.availableImportedReferenceClips.Hargold,
   ['hargold_walk', 'hargold_run']
 );
 assert.deepEqual(
-  GAME_RULES.characterPresentation.animation.approvedImportedClips.Mebble,
+  GAME_RULES.characterPresentation.animation.availableImportedReferenceClips.Mebble,
   ['mebble_walk', 'mebble_run']
+);
+assert.deepEqual(
+  GAME_RULES.characterPresentation.animation.runtimeLocomotionClips.Hargold,
+  ['hargold_walk_refined', 'hargold_run_refined', 'hargold_sprint_refined']
+);
+assert.match(
+  GAME_RULES.characterPresentation.animation.lockedAssetScope,
+  /models and their matching 24-bone rigs/
 );
 assert.equal(GAME_RULES.movement.manualSprintAction, false);
 assert.equal(GAME_RULES.movement.directionalHoldAcceleratesThroughAllSpeedTiers, true);
@@ -278,7 +286,7 @@ assert.ok(LOCKED_HERO_DESIGN.Hargold.productionModel.includes('100–150 pixel s
 assert.ok(LOCKED_HERO_DESIGN.Mebble.productionModel.includes('100–150 pixel silhouette approval'));
 assert.match(LOCKED_HERO_DESIGN.Hargold.productionRig.join(' '), /24-bone Meshy biped/);
 assert.match(LOCKED_HERO_DESIGN.Mebble.productionRig.join(' '), /no morph targets/);
-assert.match(LOCKED_HERO_DESIGN.Mebble.productionAnimation.join(' '), /Meshy walk and run clips remain authoritative/);
+assert.match(LOCKED_HERO_DESIGN.Mebble.productionAnimation.join(' '), /clips are replaceable references/);
 assert.match(LOCKED_HERO_DESIGN.Hargold.gameplay.join(' '), /exclusive learned double jump/);
 
 for (const world of CAMPAIGN) {

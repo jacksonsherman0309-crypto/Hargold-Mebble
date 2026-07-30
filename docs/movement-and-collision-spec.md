@@ -55,7 +55,7 @@ Both Hargold and Mebble share this complete baseline:
 - normal fall;
 - fast fall;
 - terminal velocity;
-- ground slam triggered by a fresh airborne Down/S/SLAM press from ascent, apex, or descent, with prepare, committed descent, impact, and recovery phases;
+- ground slam triggered by a fresh airborne Down/S/SLAM press from ascent, apex, or descent, with a short deterministic intent buffer plus prepare, committed descent, impact, and recovery phases;
 - hard-landing event;
 - stomp bounce;
 - strong stomp bounce;

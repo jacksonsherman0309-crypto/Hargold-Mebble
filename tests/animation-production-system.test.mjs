@@ -32,8 +32,10 @@ const rendererSource = await readFile(
 assert.equal(capabilities.visibleMeshReplacementAllowed, false);
 assert.equal(capabilities.runtimeRootMotion, false);
 assert.equal(capabilities.controllerOwnsWorldTranslation, true);
-assert.equal(capabilities.heroes.Hargold.runtimePresentationClipCount, 37);
-assert.equal(capabilities.heroes.Mebble.runtimePresentationClipCount, 39);
+assert.equal(capabilities.heroes.Hargold.runtimePresentationClipCount, 41);
+assert.equal(capabilities.heroes.Mebble.runtimePresentationClipCount, 43);
+assert.equal(capabilities.heroes.Hargold.activeProjectAuthoredClipCount, 39);
+assert.equal(capabilities.heroes.Mebble.activeProjectAuthoredClipCount, 41);
 assert.equal(capabilities.heroes.Hargold.deformBoneCount, 24);
 assert.equal(capabilities.heroes.Mebble.deformBoneCount, 24);
 assert.equal(capabilities.heroes.Hargold.morphTargetCount, 0);
@@ -45,16 +47,23 @@ assert.ok(capabilities.missingFromLockedRig.secondary.includes('cape-opening mor
 for (const hero of ['Hargold', 'Mebble']) {
   const authored = authoredLockedMeshyMotions(hero);
   const clips = availableAnimationClips(hero);
-  const expectedCount = hero === 'Hargold' ? 37 : 39;
+  const expectedCount = hero === 'Hargold' ? 41 : 43;
   assert.equal(clips.length, expectedCount);
   assert.equal(
     authored.length,
-    hero === 'Hargold' ? 35 : 37,
-    `${hero} keeps two supplied locomotion clips plus its authored body package`
+    hero === 'Hargold' ? 39 : 41,
+    `${hero} keeps two supplied reference clips plus its authored body package`
   );
   assert.equal(new Set(clips.map(clip => clip.id)).size, expectedCount);
-  assert.ok(clips.some(clip => clip.id === `${hero.toLowerCase()}_walk` && clip.source === 'supplied-meshy'));
-  assert.ok(clips.some(clip => clip.id === `${hero.toLowerCase()}_run` && clip.source === 'supplied-meshy'));
+  assert.ok(clips.some(clip => clip.id === `${hero.toLowerCase()}_walk` && clip.source === 'supplied-meshy-reference'));
+  assert.ok(clips.some(clip => clip.id === `${hero.toLowerCase()}_run` && clip.source === 'supplied-meshy-reference'));
+  for (const gait of ['walk_refined', 'run_refined', 'sprint_refined']) {
+    assert.ok(authored.some(clip =>
+      clip.id === `${hero.toLowerCase()}_${gait}` &&
+      clip.authoredSpeedMetresPerSecond > 0 &&
+      clip.footLock
+    ));
+  }
   assert.ok(authored.every(clip => clip.source === 'project-authored-additive-locked-meshy-rig'));
   assert.ok(authored.every(clip => clip.frames.length >= 2));
   assert.ok(authored.every(clip => clip.frames[0].time === 0));
@@ -74,8 +83,9 @@ for (const clip of ['mebble_glide_open', 'mebble_glide_sustain', 'mebble_glide_c
 
 const stateScenarios = [
   ['idle', 'hargold_idle'],
-  ['walk', 'hargold_walk'],
-  ['run', 'hargold_run'],
+  ['walk', 'hargold_walk_refined'],
+  ['run', 'hargold_run_refined'],
+  ['sprint', 'hargold_sprint_refined'],
   ['skid', 'hargold_skid'],
   ['jump-startup', 'hargold_jump_anticipation'],
   ['rise', 'hargold_jump_rise'],
@@ -86,6 +96,7 @@ const stateScenarios = [
   ['ground-slam-startup', 'hargold_ground_slam_start'],
   ['ground-slam-fall', 'hargold_ground_slam_fall'],
   ['ground-slam-impact', 'hargold_ground_slam_impact'],
+  ['ground-slam-recovery', 'hargold_ground_slam_recover'],
   ['soft-land', 'hargold_land_soft'],
   ['hard-land', 'hargold_land_heavy'],
   ['damage', 'hargold_hurt'],

@@ -63,6 +63,21 @@ step(fastFall, {
 assert.equal(fastFall.groundSlamming, false);
 assert.equal(fastFall.fastFalling, true);
 
+const bufferedSlam = makeState({ grounded: false, footY: -1.2 });
+bufferedSlam.airborneSeconds = 0;
+bufferedSlam.velocityY = -7;
+step(bufferedSlam, {
+  downPressed: true,
+  downHeld: true,
+  groundSlamPressed: true,
+  fastFallHeld: true
+});
+assert.equal(bufferedSlam.groundSlamming, false);
+assert.ok(bufferedSlam.groundSlamBufferSeconds > 0);
+assert.equal(bufferedSlam.fastFalling, false);
+simulate(bufferedSlam, MOVEMENT_TUNING.minimumGroundSlamAirSeconds + dt, () => noInput);
+assert.equal(bufferedSlam.groundSlamPhase, 'startup');
+
 const slam = makeState({ grounded: false, footY: -4 });
 slam.airborneSeconds = MOVEMENT_TUNING.minimumGroundSlamAirSeconds;
 slam.glide = 'sustained';
@@ -71,8 +86,16 @@ assert.equal(slam.groundSlamPhase, 'startup');
 assert.equal(slam.glide, 'closed');
 simulate(slam, MOVEMENT_TUNING.groundSlamPrepareSeconds + dt, () => noInput);
 assert.equal(slam.groundSlamPhase, 'descent');
-for (let index = 0; index < 240 && !slam.grounded; index += 1) step(slam);
+let impactEvent = null;
+for (let index = 0; index < 240 && !slam.grounded; index += 1) {
+  const result = step(slam);
+  impactEvent ??= result.events.find(event => event.type === 'ground-slam-impact');
+}
 assert.equal(slam.movementState, MOVEMENT_STATES.GROUND_SLAM_IMPACT);
+assert.equal(impactEvent.hero, 'Hargold');
+assert.equal(impactEvent.strength, 'heavy');
+assert.equal(impactEvent.footX, slam.footX);
+assert.ok(impactEvent.landingSpeed >= MOVEMENT_TUNING.groundSlamSpeed);
 
 const groundedSlam = makeState();
 step(groundedSlam, { downPressed: true, downHeld: true, groundSlamPressed: true });

@@ -1,6 +1,6 @@
 # Hargold & Mebble — Canonical Game Mechanics
 
-Last consolidated: July 25, 2026
+Last consolidated: July 30, 2026
 
 This is the authoritative gameplay specification for Codex and all collaborators. Newer explicit user instructions override older rules. Existing prototype code is not authoritative when it conflicts with this file.
 
@@ -33,7 +33,7 @@ This is the authoritative gameplay specification for Codex and all collaborators
 - Directional hold accelerates through walk, run, and full-speed locomotion. There is no separate manual sprint action; animation blending follows actual horizontal velocity.
 - Jump height should respond to how long the jump control is held.
 - Air twirl is limited to once per airborne sequence, preserves horizontal momentum, and applies a short bounded hang-time window without adding jump height as a second launch.
-- Ground slam uses explicit startup, descent, impact, and recovery phases. A held airborne Down input becomes an ordinary fast fall when the ground-slam clearance and airborne-time requirements are not satisfied.
+- Ground slam uses explicit startup, descent, impact, and recovery phases. A short deterministic intent buffer preserves an airborne Down/S/SLAM press made just before the minimum airborne-time or clearance threshold. A low descending press that cannot become a valid slam remains an ordinary fast fall. A valid terrain impact produces readable impact feedback and routes nearby mob contact through the mob's existing world-specific stomp response.
 - Unrestricted wall jumping is disabled for both heroes unless a later explicit rule adds it.
 - Coyote time and jump buffering may be used to improve responsiveness without making jumps automatic.
 - All mandatory progression jumps must be possible with Hargold in the intended state.

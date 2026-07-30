@@ -1,6 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-28",
+  "generatedAt": "2026-07-30",
+  "captureSetStatus": "pre-refinement reference captures retained; refined gait and slam impact captures still need repository export",
   "level": "1-1 Meadow Wake",
   "validationCourse": {
     "module": "src/content/animation-validation-course.js",
@@ -10,7 +11,7 @@
     "browserSmokeEvidence": [
       "status reached PLAYING at 120 Hz",
       "both locked 3D character assets loaded",
-      "37 Hargold and 39 Mebble runtime presentation clips listed",
+      "41 Hargold and 43 Mebble runtime presentation clips listed",
       "validation station selector loaded with all ten stations",
       "no startup module error after repair"
     ]
@@ -18,6 +19,18 @@
   "viewport": {
     "width": 1280,
     "height": 720
+  },
+  "currentRuntimeValidation": {
+    "date": "2026-07-30",
+    "browserStatus": "pass",
+    "consoleErrors": 0,
+    "observed": [
+      "hargold_sprint_refined direct locked-rig playback",
+      "mebble_sprint_refined direct locked-rig playback",
+      "immediate jump-plus-slam input reached ground-slam-impact through the input buffer",
+      "ground-slam impact ring, dust, camera response, and recovery state rendered in live Meadow Wake gameplay"
+    ],
+    "savedCaptureStatus": "pending replacement captures; observations were interactive browser validation only"
   },
   "captures": [
     {
@@ -27,6 +40,7 @@
       "hero": "Hargold",
       "mode": "direct-debug-playback",
       "clip": "hargold_walk",
+      "status": "reference-debug-capture",
       "proves": [
         "processed Hargold mesh and skeleton load in the live level",
         "supplied walk clip plays through the developer animation panel",
@@ -40,6 +54,7 @@
       "hero": "Mebble",
       "mode": "direct-debug-playback",
       "clip": "mebble_run",
+      "status": "reference-debug-capture",
       "proves": [
         "processed Mebble mesh and skeleton load in the live level",
         "supplied run clip plays through the developer animation panel",
@@ -55,6 +70,7 @@
       "movementState": "sprint",
       "velocityX": 6.905,
       "clipSelection": "hargold_run",
+      "status": "superseded-pre-refinement-capture",
       "proves": [
         "directional hold reaches the sprint speed tier without a manual sprint button",
         "controller world motion and imported in-place animation coexist",
@@ -70,6 +86,7 @@
       "movementState": "sprint",
       "velocityX": 6.905,
       "clipSelection": "mebble_run",
+      "status": "superseded-pre-refinement-capture",
       "proves": [
         "safe live hero swapping retains feet and momentum",
         "controller world motion and imported in-place animation coexist",

@@ -1,4 +1,4 @@
-export const CANON_VERSION = '2026-07-27-meshy-live-animation-import-1';
+export const CANON_VERSION = '2026-07-30-locked-model-refined-motion-1';
 
 export const GAME_RULES = Object.freeze({
   platform: {
@@ -166,10 +166,23 @@ export const GAME_RULES = Object.freeze({
     animation: Object.freeze({
       gameplayDriven: true,
       liveRigSource: 'user-supplied Meshy rig packages imported 2026-07-27',
-      approvedImportedClips: Object.freeze({
+      availableImportedReferenceClips: Object.freeze({
         Hargold: Object.freeze(['hargold_walk', 'hargold_run']),
         Mebble: Object.freeze(['mebble_walk', 'mebble_run'])
       }),
+      runtimeLocomotionClips: Object.freeze({
+        Hargold: Object.freeze([
+          'hargold_walk_refined',
+          'hargold_run_refined',
+          'hargold_sprint_refined'
+        ]),
+        Mebble: Object.freeze([
+          'mebble_walk_refined',
+          'mebble_run_refined',
+          'mebble_sprint_refined'
+        ])
+      }),
+      lockedAssetScope: 'visible Meshy models and their matching 24-bone rigs; supplied animations remain replaceable references',
       missingClipFallback: 'supplied bind/rest pose without fabricated animation',
       everySuppliedUsableClipInDebugMenu: true,
       controllerOwnsRootTranslation: true,
@@ -557,7 +570,7 @@ export const LOCKED_HERO_DESIGN = Object.freeze({
     gameplay: ['shared horizontal base-controller tuning', 'Hargold-only block breaking', 'heavy-rock ground-slam defeats', 'exclusive learned double jump'],
     productionModel: ['original user-supplied Meshy visible mesh and 24-bone rig are locked as the active animation target', 'do not replace the locked mesh, select another base rig, or load the rejected doll-like procedural geometry', 'locked silhouette is the source of truth', 'one connected watertight body, wrapped garments, rounded boots, smooth topology and readable deformation remain quality requirements rather than claims about missing source controls', 'action-pose and gameplay-camera deformation approval', '100–150 pixel silhouette approval'],
     productionRig: ['verified 24-bone Meshy biped supports body, hand-group, foot and toe motion', 'source contains no morph targets, finger bones, facial controls, cape controls, hat controls, feather controls or scarf controls', 'missing source controls remain explicit production blockers and must not be claimed as functional'],
-    productionAnimation: ['user-supplied Meshy walk and run clips remain authoritative for sustained locomotion', 'project-authored additive body clips target only the locked Meshy skeleton', 'anticipation and controlled squash/stretch', 'follow-through within available body bones', 'velocity-synchronized locomotion and reliable foot contacts', 'seamless interruptible state blending', 'facial, finger and independent secondary motion remain blocked by missing source controls']
+    productionAnimation: ['the visible Meshy model and matching rig are locked; supplied Meshy animation clips are replaceable references rather than runtime authority', 'project-authored additive walk, run, sprint and action clips target only the locked Meshy skeleton', 'anticipation and controlled squash/stretch', 'follow-through within available body bones', 'velocity-synchronized locomotion and reliable foot contacts', 'seamless interruptible state blending', 'facial, finger and independent secondary motion remain blocked by missing source controls']
   },
   Mebble: {
     reference: 'assets/references/Mebble locked production character sheet.png',
@@ -569,7 +582,7 @@ export const LOCKED_HERO_DESIGN = Object.freeze({
     gameplay: ['shared horizontal base-controller tuning', 'slightly higher jump', 'innate slow-fall and short glide'],
     productionModel: ['original user-supplied Meshy visible mesh and 24-bone rig are locked as the active animation target', 'do not replace the locked mesh, select another base rig, or load the rejected doll-like procedural geometry', 'locked silhouette is the source of truth', 'one connected watertight body, wrapped garments, rounded boots, smooth topology and readable deformation remain quality requirements rather than claims about missing source controls', 'action-pose and gameplay-camera deformation approval', '100–150 pixel silhouette approval'],
     productionRig: ['verified 24-bone Meshy biped supports body, hand-group, foot and toe motion', 'source contains no morph targets, finger bones, facial controls, cape controls, hat controls or glasses controls', 'missing source controls remain explicit production blockers and must not be claimed as functional'],
-    productionAnimation: ['user-supplied Meshy walk and run clips remain authoritative for sustained locomotion', 'project-authored additive body clips target only the locked Meshy skeleton', 'anticipation and controlled squash/stretch', 'follow-through within available body bones', 'velocity-synchronized locomotion and reliable foot contacts', 'seamless interruptible state blending', 'facial, finger and independent cape, hat and glasses motion remain blocked by missing source controls'],
+    productionAnimation: ['the visible Meshy model and matching rig are locked; supplied Meshy animation clips are replaceable references rather than runtime authority', 'project-authored additive walk, run, sprint and action clips target only the locked Meshy skeleton', 'anticipation and controlled squash/stretch', 'follow-through within available body bones', 'velocity-synchronized locomotion and reliable foot contacts', 'seamless interruptible state blending', 'facial, finger and independent cape, hat and glasses motion remain blocked by missing source controls'],
     visibilityRule: 'neck and Adam’s apple may not be hidden by collar, cape, pose or lighting'
   }
 });

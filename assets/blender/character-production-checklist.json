@@ -5,7 +5,7 @@
     "Hargold",
     "Mebble"
   ],
-  "animationPolishPolicy": "active-on-locked-original-meshy-rigs-with-source-capability-gates-explicit",
+  "animationPolishPolicy": "active-on-locked-original-meshy-models-and-rigs-supplied-clips-are-replaceable-with-source-capability-gates-explicit",
   "milestones": [
     {
       "id": "silhouette",
@@ -128,8 +128,8 @@
       "status": "in-progress",
       "runtimeLibrary": "src/animation/locked-meshy-animation-library.js",
       "runtimePresentationClipCounts": {
-        "Hargold": 37,
-        "Mebble": 39
+        "Hargold": 41,
+        "Mebble": 43
       },
       "requirements": [
         "anticipation",
