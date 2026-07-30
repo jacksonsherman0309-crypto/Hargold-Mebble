@@ -56,6 +56,12 @@ import { FixedStepLoop } from './runtime/fixed-step.js';
 import { fatalHazardEvent } from './runtime/hazards/fatal-hazards.js';
 import { createLinearGround } from './runtime/terrain/linear-ground.js';
 import { AnimationDebugPanel } from './animation/animation-debug-panel.js?v=locked-animation-1';
+import { GAME_RULES } from './canonical-data.js';
+import {
+  FULLY_UNLOCKED_LIVE_TEST_PROFILE,
+  applyFullyUnlockedLiveTestProfile,
+  fullyUnlockedLiveTestEnabled
+} from './runtime/fully-unlocked-live-test.js?v=fully-unlocked-1';
 
 /*
  * Browser game integration. Physics is owned by the unified controller under
@@ -66,6 +72,7 @@ import { AnimationDebugPanel } from './animation/animation-debug-panel.js?v=lock
 const canvas = document.querySelector('#game');
 const ctx = canvas.getContext('2d');
 const status = document.querySelector('#status');
+const testModeBadge = document.querySelector('#test-mode-badge');
 const W = canvas.width;
 const H = canvas.height;
 const SCALE = 70;
@@ -82,6 +89,7 @@ const touch = {
 const loop = new FixedStepLoop({ hz: 120 });
 const inputBuffer = createMovementInputBuffer();
 const runtimeParameters = new URLSearchParams(location.search);
+const fullyUnlockedTestMode = fullyUnlockedLiveTestEnabled(runtimeParameters);
 const movementDebugEnabled = runtimeParameters.has('debugMovement');
 const animationDebugEnabled = runtimeParameters.has('debugAnimation');
 const animationDebugDrive = runtimeParameters.get('debugDrive');
@@ -117,20 +125,28 @@ const COURSE_ID = MEADOW_WAKE_LEVEL_DATA.id;
 const COURSE_NAME = MEADOW_WAKE_LEVEL_DATA.name;
 const COURSE_ROSTER = getCourseEnemyRoster(COURSE_ID);
 
+let session = createSession(initialCourseX);
 let player = createUnifiedCharacterState({
   footX: initialCourseX,
-  footY: terrain.heightAt(initialCourseX)
+  footY: terrain.heightAt(initialCourseX),
+  doubleJumpUnlocked: session.doubleJumpUnlocked
 });
 let cameraX = 0;
 let cameraY = 0;
 let lastFrame = performance.now();
-let session = createSession(initialCourseX);
 let mobs = [];
 let mobActivation = createCourseMobActivation();
 let projectiles = [];
-let notice = 'Meadow Wake: stomp Critters; stomp then kick Shellbacks.';
-let noticeSeconds = 5;
+let notice = fullyUnlockedTestMode
+  ? 'Fully unlocked test: Hargold double jump, Mebble glide, twirl, slam, combat, and swapping are ready.'
+  : 'Meadow Wake: stomp Critters; stomp then kick Shellbacks.';
+let noticeSeconds = fullyUnlockedTestMode ? 7 : 5;
 let animationCue = null;
+
+if (fullyUnlockedTestMode && testModeBadge) {
+  testModeBadge.hidden = false;
+  testModeBadge.textContent = FULLY_UNLOCKED_LIVE_TEST_PROFILE.label;
+}
 
 function setAnimationCue(type, durationSeconds) {
   animationCue = { type, remainingSeconds: durationSeconds };
@@ -180,7 +196,7 @@ function createAnimationValidationPanel() {
 }
 
 function createSession(spawnX = 1.8) {
-  return {
+  const nextSession = {
     healthLayers: 1,
     maximumHealthLayers: 1,
     lives: 3,
@@ -193,6 +209,12 @@ function createSession(spawnX = 1.8) {
     enemiesDefeated: 0,
     doubleJumpUnlocked: false
   };
+  return fullyUnlockedTestMode
+    ? applyFullyUnlockedLiveTestProfile(nextSession, {
+        maximumHealthLayers: GAME_RULES.health.maximumSurvivableHealthLayers,
+        maximumLives: GAME_RULES.health.maximumLives
+      })
+    : nextSession;
 }
 
 function createMobFromActor(placement) {
@@ -944,7 +966,8 @@ function frame(now) {
   );
   const targetCameraY = clamp(terrainFraming + airborneFollow, -78, 28);
   cameraY += (targetCameraY - cameraY) * Math.min(1, elapsed * 3.6);
-  status.textContent = `${session.state === 'playing' ? 'PLAYING' : session.state.toUpperCase()} · 120 Hz · ${characterLoadStatus}`;
+  const modeStatus = fullyUnlockedTestMode ? 'FULLY UNLOCKED TEST · ' : '';
+  status.textContent = `${modeStatus}${session.state === 'playing' ? 'PLAYING' : session.state.toUpperCase()} · 120 Hz · ${characterLoadStatus}`;
   draw();
   characterRenderer.render({
     hero: player.hero,

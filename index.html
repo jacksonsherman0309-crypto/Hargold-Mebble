@@ -11,7 +11,10 @@
   <main class="shell">
     <header class="hud">
       <div><strong>Meadow Wake · World 1-1</strong><span>Twelve handcrafted outdoor rooms · layered 3D Verdant Vale</span></div>
-      <div id="status">Loading 3D characters…</div>
+      <div class="runtime-status">
+        <span id="test-mode-badge" hidden>FULLY UNLOCKED TEST</span>
+        <span id="status">Loading 3D characters…</span>
+      </div>
     </header>
 
     <section class="game-wrap" aria-label="Playable game prototype">
@@ -48,6 +51,6 @@
       if (status) status.textContent = `ASSET ERROR · ${detail}`;
     });
   </script>
-  <script type="module" src="src/game.js?v=locked-animation-1" onerror="document.querySelector('#status').textContent='STARTUP ERROR · game module failed to load'"></script>
+  <script type="module" src="src/game.js?v=locked-animation-1-fully-unlocked-1" onerror="document.querySelector('#status').textContent='STARTUP ERROR · game module failed to load'"></script>
 </body>
 </html>

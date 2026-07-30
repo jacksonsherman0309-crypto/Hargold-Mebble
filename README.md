@@ -83,6 +83,19 @@ Animation validation is available at:
 ?animationValidation=1&debugAnimation=1
 ```
 
+The live Meadow Wake course can be opened with its implemented gameplay
+abilities and survivable health fully unlocked for testing:
+
+```text
+?fullyUnlocked=1
+```
+
+This URL-scoped test profile grants Hargold's learned double jump, three health
+layers, and 99 lives. Mebble's innate glide and the shared twirl, ground slam,
+combat, and safe hero swap remain available through their normal controls. It
+does not write progression or represent the still-unimplemented elemental
+power-up set; the ordinary URL keeps normal starting progression.
+
 ## Run contract checks
 
 ```bash

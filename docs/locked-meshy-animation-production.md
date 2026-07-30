@@ -63,6 +63,18 @@ Run the live validation course:
 
 `http://127.0.0.1:4173/?animationValidation=1&debugAnimation=1`
 
+For uninterrupted live-course input testing with every currently implemented
+hero ability available, use:
+
+`http://127.0.0.1:4173/?fullyUnlocked=1`
+
+The fully unlocked profile is query-scoped and non-persistent. It enables
+Hargold's learned double jump and starts the test session at the canonical
+three health layers and 99-life caps. Mebble's glide, shared air twirl, ground
+slam, combat, and hero swapping are already available through the live
+controller. Planned elemental power-ups are not claimed or simulated by this
+test profile.
+
 The station selector teleports the active hero to real Meadow Wake terrain
 rather than an editor-only mannequin scene. It covers:
 

@@ -23,6 +23,22 @@ button { font: inherit; }
 .hud { border-radius: 18px 18px 0 0; }
 .hud div:first-child { display: flex; flex-direction: column; }
 .hud span, footer { font-size: .85rem; opacity: .75; }
+.runtime-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+#test-mode-badge {
+  padding: 3px 8px;
+  color: #1e1600;
+  background: #f4cf53;
+  border-radius: 999px;
+  opacity: 1;
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .06em;
+}
 footer { justify-content: center; border-radius: 0 0 18px 18px; }
 
 .game-wrap {
