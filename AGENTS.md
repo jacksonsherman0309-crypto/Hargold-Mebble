@@ -7,19 +7,20 @@ Codex must load the current canon, the world-specific archive policy, the exact 
 1. `docs/campaign-level-count-override.md` — newest authoritative campaign-count rule: Worlds 1–7 contain eight total levels each, including the secret level.
 2. `docs/canonical-design-bible.md` — highest-level current design source of truth except where superseded by the newer campaign-count override.
 3. `docs/character-dimension-animation-spec.md` — approved fully 3D construction, three-quarter presentation, rig, animation, camera-readability, and validation contract.
-4. `docs/world-specific-archive-policy.md` — mandatory rule against flattening authored worlds and levels into a universal template.
-5. `docs/level-production-plan.md` — current campaign and level-construction requirements, subject to the campaign-count override.
-6. `docs/game-mechanics.md` — detailed gameplay mechanics.
-7. `docs/movement-and-collision-spec.md` — complete universal movement, collision, terrain, water, climbing, carrying, and deterministic-simulation contract.
-8. `src/campaign-level-count.js` — machine-readable authoritative level counts and campaign totals.
-9. `src/canonical-data.js` — machine-readable rules, campaign accounting, World 1 plans, and locked hero data; older nine-slot main-world values are legacy until remapped.
-10. `archive/physics/build-017-movement-spec.md` and `archive/physics/physics_completion_matrix.json` — archived full Build 017 physics contract.
-11. `archive/full-motion/hargold_mebble_full_motion_build_009_qa.json` — archived QA evidence for the earlier playable motion build.
-12. `docs/historical-build-handoff.md` — Build 025–030 handoff and production boundaries.
-13. `docs/archived-source-inventory.md` — earlier standalone artifacts and their transfer status.
-14. If `IMPORT_STATUS.txt` exists, read it, then inspect the complete package under the listed `archive/imported-packages/...` root.
-15. Read every exact world plan, course plan, encounter manifest, enemy definition, runtime file, and boss contract relevant to the requested task.
-16. Inspect the current implementation files relevant to the task.
+4. `docs/character-animation-numeric-spec.md` and `data/character-animation-numeric-spec.json` — approved original project-authored frame counts, joint-angle targets, contact phases, controller coupling, transitions, event markers, and animation tolerances. These files do not authorize use of any third-party animation asset.
+5. `docs/world-specific-archive-policy.md` — mandatory rule against flattening authored worlds and levels into a universal template.
+6. `docs/level-production-plan.md` — current campaign and level-construction requirements, subject to the campaign-count override.
+7. `docs/game-mechanics.md` — detailed gameplay mechanics.
+8. `docs/movement-and-collision-spec.md` — complete universal movement, collision, terrain, water, climbing, carrying, and deterministic-simulation contract.
+9. `src/campaign-level-count.js` — machine-readable authoritative level counts and campaign totals.
+10. `src/canonical-data.js` — machine-readable rules, campaign accounting, World 1 plans, and locked hero data; older nine-slot main-world values are legacy until remapped.
+11. `archive/physics/build-017-movement-spec.md` and `archive/physics/physics_completion_matrix.json` — archived full Build 017 physics contract.
+12. `archive/full-motion/hargold_mebble_full_motion_build_009_qa.json` — archived QA evidence for the earlier playable motion build.
+13. `docs/historical-build-handoff.md` — Build 025–030 handoff and production boundaries.
+14. `docs/archived-source-inventory.md` — earlier standalone artifacts and their transfer status.
+15. If `IMPORT_STATUS.txt` exists, read it, then inspect the complete package under the listed `archive/imported-packages/...` root.
+16. Read every exact world plan, course plan, encounter manifest, enemy definition, runtime file, and boss contract relevant to the requested task.
+17. Inspect the current implementation files relevant to the task.
 
 ## Authority and conflict rules
 
@@ -63,6 +64,7 @@ Codex must load the current canon, the world-specific archive policy, the exact 
 - Do not silently delete or merge existing boss, fork, or secret-course content while remapping old World 1–7 nine-slot plans into the new eight-total structure.
 - Preserve the locked Hargold and Mebble appearance requirements.
 - Do not copy Nintendo code, art, characters, enemies, levels, maps, music, names, vocal performances, or protected identifiers.
+- Implement character motion from the approved original numeric animation contract; do not import, trace, inspect, frame-match, or retarget third-party animation clips.
 - Add or update tests for every mechanic, data contract, save rule, progression rule, enemy behavior, boss counter, encounter rule, or level-plan invariant changed.
 - When code conflicts with current canon, fix or adapt the code rather than weakening the specification unless the user explicitly changes the design.
 
