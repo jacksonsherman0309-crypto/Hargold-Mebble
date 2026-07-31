@@ -1,0 +1,50 @@
+name: Fast complete animation catalog audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/animation-catalog-audit-fast.yml'
+      - 'tools/animation-catalog-audit-fast.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fast-complete-catalog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: |
+          npm install --no-save --no-package-lock playwright@1.54.1
+          npx playwright install --with-deps chromium
+      - name: Start preview
+        run: |
+          nohup npm run preview > /tmp/hm-fast-preview.log 2>&1 &
+          for attempt in $(seq 1 90); do
+            curl --fail --silent http://127.0.0.1:4173/ > /dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/hm-fast-preview.log
+          exit 1
+      - name: Play and capture all 84 listed animations
+        run: node tools/animation-catalog-audit-fast.mjs
+      - name: Preserve runtime log
+        if: always()
+        run: |
+          mkdir -p animation-audit-fast-output/logs
+          cp /tmp/hm-fast-preview.log animation-audit-fast-output/logs/preview.log || true
+      - name: Upload fast complete-catalog evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fast-all-listed-animation-evidence
+          path: animation-audit-fast-output
+          if-no-files-found: error
+          retention-days: 14
