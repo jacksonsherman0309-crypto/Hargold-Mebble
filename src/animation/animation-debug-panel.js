@@ -17,7 +17,12 @@ function control(label, input) {
 }
 
 export class AnimationDebugPanel {
-  constructor({ renderer, getGameplaySnapshot, onHeroRequested }) {
+  constructor({
+    renderer,
+    getGameplaySnapshot,
+    onHeroRequested,
+    startInGameplay = false
+  }) {
     this.renderer = renderer;
     this.getGameplaySnapshot = getGameplaySnapshot;
     this.onHeroRequested = onHeroRequested;
@@ -89,10 +94,15 @@ export class AnimationDebugPanel {
       this.renderer.clearAnimationDebugOverride();
       this.root.dataset.active = 'false';
       this.telemetry.textContent =
-        'Gameplay control active.\nController state selects supplied locomotion and locked-rig authored actions.';
+        'Gameplay control active.\nThe numeric semantic-pose runtime follows the controller; fixed clips remain available above for isolated rig inspection.';
     });
     this.populateClips();
-    this.apply(true);
+    if (startInGameplay) {
+      this.renderer.clearAnimationDebugOverride();
+      this.root.dataset.active = 'false';
+    } else {
+      this.apply(true);
+    }
   }
 
   populateClips() {
@@ -119,14 +129,40 @@ export class AnimationDebugPanel {
   update() {
     const gameplay = this.getGameplaySnapshot();
     const animation = this.renderer.getAnimationDebugSnapshot();
+    const live = this.renderer.getLiveAnimationTelemetry(gameplay?.hero);
     if (!gameplay) return;
     if (!animation) {
-      this.telemetry.textContent = [
+      const lines = [
         'Gameplay control active.',
         `state      ${gameplay.movementState}`,
         `velocity   ${gameplay.velocityX.toFixed(3)}, ${gameplay.velocityY.toFixed(3)}`,
         `grounded   ${gameplay.grounded}`
-      ].join('\n');
+      ];
+      if (live) {
+        lines.push(
+          `subphase   ${live.presentationSubphase}`,
+          `pose       ${live.selectedPoseState}`,
+          `phase      ${live.locomotionPhase.toFixed(4)}`,
+          `contacts   L:${live.leftFootContact} R:${live.rightFootContact}`,
+          `foot slip  ${live.measuredFootSlipPercentHeight.toFixed(3)}% H`,
+          `penetrate  ${live.verticalPenetrationPercentHeight.toFixed(3)}% H`,
+          `ground ETA ${Number.isFinite(live.predictedGroundSeconds)
+            ? `${live.predictedGroundSeconds.toFixed(3)}s`
+            : '—'}`,
+          `blend      ${live.blendSeconds.toFixed(4)}s`,
+          `flip mark  ${live.facingFlipMarker}`,
+          `rig limit  ${live.rigLimitedStatus.join(', ')}`
+        );
+      }
+      if (gameplay.recentEvents?.length) {
+        lines.push(
+          `events     ${gameplay.recentEvents
+            .slice(-8)
+            .map(event => event.type)
+            .join(' · ')}`
+        );
+      }
+      this.telemetry.textContent = lines.join('\n');
       return;
     }
     if (!this.pause.checked && animation.durationSeconds > 0) {

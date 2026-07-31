@@ -106,7 +106,14 @@ assert.deepEqual(
 );
 assert.equal(GAME_RULES.characterPresentation.gameplayScale.gamePixelsPerMetre, 70);
 assert.equal(GAME_RULES.characterPresentation.gameplayScale.finalBlenderAssetsMustUseGameplayMetres, true);
-assert.equal(GAME_RULES.characterPresentation.animationFrames.authority, 'compact-tall-locked-animation-frames-v2');
+assert.equal(
+  GAME_RULES.characterPresentation.animationFrames.authority,
+  'approved-original-numeric-character-animation-contract-v1'
+);
+assert.equal(
+  GAME_RULES.characterPresentation.animationFrames.numericAuthority,
+  'data/character-animation-numeric-spec.json'
+);
 assert.equal(GAME_RULES.characterPresentation.animationFrames.panelContract.fixedCameraAcrossHeroesAndRows, true);
 assert.equal(GAME_RULES.characterPresentation.animationFrames.panelContract.fittedOverlayOpacity, 0.4);
 assert.equal(GAME_RULES.characterPresentation.animationFrames.panelContract.maximumJointErrorFractionOfHeight, 0.03);
@@ -129,6 +136,14 @@ assert.deepEqual(
 assert.deepEqual(
   GAME_RULES.characterPresentation.animation.runtimeLocomotionClips.Hargold,
   ['hargold_walk_refined', 'hargold_run_refined', 'hargold_sprint_refined']
+);
+assert.equal(
+  GAME_RULES.characterPresentation.animation.semanticPoseRuntime,
+  'src/animation/character-animation-numeric-runtime.js'
+);
+assert.equal(
+  GAME_RULES.characterPresentation.animation.distanceDrivenLocomotionPhase,
+  true
 );
 assert.match(
   GAME_RULES.characterPresentation.animation.lockedAssetScope,
@@ -286,7 +301,7 @@ assert.ok(LOCKED_HERO_DESIGN.Hargold.productionModel.includes('100–150 pixel s
 assert.ok(LOCKED_HERO_DESIGN.Mebble.productionModel.includes('100–150 pixel silhouette approval'));
 assert.match(LOCKED_HERO_DESIGN.Hargold.productionRig.join(' '), /24-bone Meshy biped/);
 assert.match(LOCKED_HERO_DESIGN.Mebble.productionRig.join(' '), /no morph targets/);
-assert.match(LOCKED_HERO_DESIGN.Mebble.productionAnimation.join(' '), /clips are replaceable references/);
+assert.match(LOCKED_HERO_DESIGN.Mebble.productionAnimation.join(' '), /clips are replaceable debug references/);
 assert.match(LOCKED_HERO_DESIGN.Hargold.gameplay.join(' '), /exclusive learned double jump/);
 
 for (const world of CAMPAIGN) {

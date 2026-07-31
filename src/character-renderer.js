@@ -16,10 +16,15 @@ import { GAME_RULES } from './canonical-data.js';
 import {
   animationIntentFor,
   importedClipMetadata
-} from './animation/character-animation-config.js?v=locked-animation-1';
+} from './animation/character-animation-config.js?v=numeric-animation-1';
 import {
   buildLockedMeshyAnimationClips
-} from './animation/locked-meshy-animation-library.js?v=locked-animation-1';
+} from './animation/locked-meshy-animation-library.js?v=numeric-animation-1';
+import {
+  numericAnimationRigLimitedStatus,
+  sampleNumericCharacterPose,
+  semanticPoseToLockedRigDeltas
+} from './animation/character-animation-numeric-runtime.js?v=numeric-animation-1';
 
 const PRESENTATION = GAME_RULES.characterPresentation;
 const GAME_PIXELS_PER_METRE = PRESENTATION.gameplayScale.gamePixelsPerMetre;
@@ -1234,6 +1239,19 @@ export class CharacterRenderer {
       );
       const skeletonRoot =
         root.getObjectByName(`${hero}_Canonical_Gameplay_Rig`) ?? sourceRoot;
+      const bones = new Map();
+      root.traverse(object => {
+        if (object.isBone) bones.set(object.name, object);
+      });
+      const bindPose = new Map(
+        [...bones].map(([name, bone]) => [
+          name,
+          Object.freeze({
+            quaternion: bone.quaternion.clone(),
+            position: bone.position.clone()
+          })
+        ])
+      );
       const footBones = [
         root.getObjectByName('LeftFoot'),
         root.getObjectByName('LeftToeBase'),
@@ -1262,10 +1280,32 @@ export class CharacterRenderer {
         currentYaw: rightFacingYaw,
         currentFacing: 1,
         rawHeightMetres: rawHeight,
+        heroHeightPixels: GAME_PIXELS_PER_METRE * spec.assetHeightMetres,
+        bones,
+        bindPose,
         footBones,
+        footBonesBySide: {
+          left: [
+            root.getObjectByName('LeftFoot'),
+            root.getObjectByName('LeftToeBase')
+          ].filter(Boolean),
+          right: [
+            root.getObjectByName('RightFoot'),
+            root.getObjectByName('RightToeBase')
+          ].filter(Boolean)
+        },
         bindFootOffset,
         currentGroundingOffset: 0,
-        currentSlope: 0
+        currentForwardContactOffset: 0,
+        currentSlope: 0,
+        numericPoseActive: false,
+        numericPoseState: '',
+        numericBlend: null,
+        numericTelemetry: null,
+        footContactState: {
+          left: { planted: false, anchor: null },
+          right: { planted: false, anchor: null }
+        }
       });
       this.onProgress(this.statusText());
     } catch (error) {
@@ -1372,6 +1412,202 @@ export class CharacterRenderer {
     model.root.position.y += model.currentGroundingOffset;
   }
 
+  applyNumericPose(model, sample, presentation, deltaSeconds) {
+    const deltas = semanticPoseToLockedRigDeltas(sample.semantic, {
+      heroHeightUnits: model.rawHeightMetres
+    });
+    const selectedPoseState =
+      presentation?.selectedPoseState ??
+      sample.selectedPoseState ??
+      `${model.hero.toLowerCase()}_idle`;
+    const blendSeconds = Math.max(0, Number(presentation?.blendSeconds ?? 0.05));
+    if (!model.numericPoseActive || model.numericPoseState !== selectedPoseState) {
+      model.mixer.stopAllAction();
+      model.action = null;
+      model.numericBlend = {
+        elapsed: 0,
+        duration: blendSeconds,
+        rotations: new Map(
+          [...model.bones].map(([name, bone]) => [name, bone.quaternion.clone()])
+        ),
+        positions: new Map(
+          [...model.bones].map(([name, bone]) => [name, bone.position.clone()])
+        )
+      };
+      model.numericPoseState = selectedPoseState;
+      model.numericPoseActive = true;
+    }
+    model.actionName = sample.selectedPoseState ?? selectedPoseState;
+    const blend = model.numericBlend;
+    if (blend) blend.elapsed = Math.min(blend.duration, blend.elapsed + deltaSeconds);
+    const blendAlpha = !blend || blend.duration <= 0
+      ? 1
+      : THREE.MathUtils.smoothstep(blend.elapsed / blend.duration, 0, 1);
+    const targetQuaternion = new THREE.Quaternion();
+    const deltaQuaternion = new THREE.Quaternion();
+    const targetPosition = new THREE.Vector3();
+
+    for (const [boneName, bone] of model.bones) {
+      const bind = model.bindPose.get(boneName);
+      if (!bind) continue;
+      const rotation = deltas.rotations[boneName] ?? [0, 0, 0];
+      deltaQuaternion.setFromEuler(new THREE.Euler(
+        rotation[0],
+        rotation[1],
+        rotation[2],
+        'XYZ'
+      ));
+      targetQuaternion.copy(bind.quaternion).multiply(deltaQuaternion).normalize();
+      const position = deltas.positions[boneName] ?? [0, 0, 0];
+      targetPosition.set(
+        bind.position.x + position[0],
+        bind.position.y + position[1],
+        bind.position.z + position[2]
+      );
+      if (blendAlpha < 1 && blend) {
+        bone.quaternion
+          .copy(blend.rotations.get(boneName) ?? bind.quaternion)
+          .slerp(targetQuaternion, blendAlpha);
+        bone.position
+          .copy(blend.positions.get(boneName) ?? bind.position)
+          .lerp(targetPosition, blendAlpha);
+      } else {
+        bone.quaternion.copy(targetQuaternion);
+        bone.position.copy(targetPosition);
+      }
+    }
+    if (blendAlpha >= 1) model.numericBlend = null;
+  }
+
+  representativeFootPoint(model, side) {
+    const bones = model.footBonesBySide[side] ?? [];
+    if (!bones.length) return null;
+    const points = bones.map(bone => bone.getWorldPosition(new THREE.Vector3()));
+    return new THREE.Vector3(
+      points.reduce((total, point) => total + point.x, 0) / points.length,
+      Math.min(...points.map(point => point.y)),
+      points.reduce((total, point) => total + point.z, 0) / points.length
+    );
+  }
+
+  applyNumericFootContact(model, {
+    presentation,
+    grounded,
+    surfaceAngle = 0,
+    supportVelocityX = 0,
+    supportVelocityY = 0,
+    cameraX = 0,
+    cameraY = 0
+  }, deltaSeconds) {
+    const targetSlope = grounded
+      ? THREE.MathUtils.clamp(-surfaceAngle, -0.28, 0.28)
+      : 0;
+    const slopeBlend = 1 - Math.exp(-(grounded ? 12 : 8) * deltaSeconds);
+    model.currentSlope += (targetSlope - model.currentSlope) * slopeBlend;
+    model.root.rotation.z = model.currentSlope;
+    model.root.updateMatrixWorld(true);
+
+    const contacts = {
+      left: grounded && Boolean(presentation?.leftFootContact),
+      right: grounded && Boolean(presentation?.rightFootContact)
+    };
+    const axes = new Set(presentation?.contactAxes ?? []);
+    const corrections = [];
+    for (const side of ['left', 'right']) {
+      const state = model.footContactState[side];
+      const point = this.representativeFootPoint(model, side);
+      if (!point) continue;
+      const logical = {
+        x: point.x + cameraX,
+        y: point.y - cameraY
+      };
+      if (contacts[side]) {
+        if (!state.planted || !state.anchor) {
+          state.anchor = { ...logical };
+        } else {
+          state.anchor.x += supportVelocityX * GAME_PIXELS_PER_METRE * deltaSeconds;
+          state.anchor.y -= supportVelocityY * GAME_PIXELS_PER_METRE * deltaSeconds;
+        }
+        state.planted = true;
+        corrections.push({
+          x: axes.has('forward') ? state.anchor.x - logical.x : 0,
+          y: axes.has('vertical') ? state.anchor.y - logical.y : 0
+        });
+      } else {
+        state.planted = false;
+        state.anchor = null;
+      }
+    }
+
+    const maximumCorrection = model.heroHeightPixels * 0.12;
+    let targetX = corrections.length
+      ? corrections.reduce((total, value) => total + value.x, 0) / corrections.length
+      : 0;
+    let targetY = corrections.length
+      ? corrections.reduce((total, value) => total + value.y, 0) / corrections.length
+      : 0;
+    targetX = THREE.MathUtils.clamp(targetX, -maximumCorrection, maximumCorrection);
+    targetY = THREE.MathUtils.clamp(targetY, -maximumCorrection, maximumCorrection);
+    if (!corrections.length) {
+      const releaseSeconds = 2 / 60;
+      const release = Math.min(1, deltaSeconds / releaseSeconds);
+      model.currentForwardContactOffset +=
+        (targetX - model.currentForwardContactOffset) * release;
+      model.currentGroundingOffset +=
+        (targetY - model.currentGroundingOffset) * release;
+    } else {
+      model.currentForwardContactOffset = targetX;
+      model.currentGroundingOffset = targetY;
+    }
+    const baseY = model.root.position.y;
+    model.root.position.x += model.currentForwardContactOffset;
+    model.root.position.y += model.currentGroundingOffset;
+    model.root.updateMatrixWorld(true);
+
+    let maximumSlipPixels = 0;
+    for (const side of ['left', 'right']) {
+      const state = model.footContactState[side];
+      if (!state.planted || !state.anchor) continue;
+      const point = this.representativeFootPoint(model, side);
+      if (!point) continue;
+      maximumSlipPixels = Math.max(
+        maximumSlipPixels,
+        Math.hypot(
+          state.anchor.x - (point.x + cameraX),
+          state.anchor.y - (point.y - cameraY)
+        )
+      );
+    }
+    const lowestFootY = model.footBones.length
+      ? Math.min(...model.footBones.map(bone =>
+          bone.getWorldPosition(new THREE.Vector3()).y
+        ))
+      : baseY;
+    const desiredGroundY = baseY + model.bindFootOffset;
+    const penetrationPixels = Math.max(0, desiredGroundY - lowestFootY);
+    model.numericTelemetry = Object.freeze({
+      movementState: presentation?.movementState ?? null,
+      presentationSubphase: presentation?.presentationSubphase ?? 'neutral',
+      locomotionPhase: Number(presentation?.locomotionPhase ?? 0),
+      leftFootContact: contacts.left,
+      rightFootContact: contacts.right,
+      measuredFootSlipPercentHeight:
+        maximumSlipPixels / Math.max(1, model.heroHeightPixels) * 100,
+      verticalPenetrationPercentHeight:
+        penetrationPixels / Math.max(1, model.heroHeightPixels) * 100,
+      selectedPoseState:
+        presentation?.selectedPoseState ?? model.numericPoseState,
+      horizontalSpeed: Number(presentation?.horizontalSpeed ?? 0),
+      verticalSpeed: Number(presentation?.verticalSpeed ?? 0),
+      predictedGroundSeconds: Number(
+        presentation?.predictedGroundSeconds ?? Infinity
+      ),
+      blendSeconds: Number(presentation?.blendSeconds ?? 0),
+      facingFlipMarker: Boolean(presentation?.facingFlipMarker),
+      rigLimitedStatus: numericAnimationRigLimitedStatus()
+    });
+  }
+
   setAnimationDebugOverride(override) {
     this.animationDebugOverride = { ...override };
   }
@@ -1396,6 +1632,13 @@ export class CharacterRenderer {
       facing: Number(override.facing ?? model.currentFacing),
       skeletonRootWorld: { x: world.x, y: world.y, z: world.z }
     };
+  }
+
+  getLiveAnimationTelemetry(hero = null) {
+    const model = hero ? this.models.get(hero) : [...this.models.values()].find(
+      entry => entry.root.visible
+    );
+    return model?.numericTelemetry ?? null;
   }
 
   updateMobs(mobs, deltaSeconds) {
@@ -1525,7 +1768,11 @@ export class CharacterRenderer {
     previousMovementState = movementState,
     stateSeconds = 0,
     airborneSeconds = 0,
+    animationPresentation = null,
+    turnProgress = 0,
     surfaceAngle = 0,
+    supportVelocityX = 0,
+    supportVelocityY = 0,
     animationCue = null,
     cameraX = 0,
     cameraY = 0,
@@ -1614,27 +1861,80 @@ export class CharacterRenderer {
             grounded,
             animationCue
           });
-      this.play(model, intent, debug ? 0 : horizontalSpeed);
-      if (debug && model.action) {
-        model.action.paused = Boolean(debug.paused);
-        model.action.setLoop(debug.loop ? THREE.LoopRepeat : THREE.LoopOnce, debug.loop ? Infinity : 1);
-        model.action.clampWhenFinished = !debug.loop;
-        model.action.setEffectiveTimeScale(Number(debug.speed ?? 1));
-        if (debug.restart) {
-          model.action.reset().play();
-          debug.restart = false;
+      if (debug) {
+        model.numericPoseActive = false;
+        model.numericBlend = null;
+        this.play(model, intent, 0);
+        if (model.action) {
+          model.action.paused = Boolean(debug.paused);
+          model.action.setLoop(debug.loop ? THREE.LoopRepeat : THREE.LoopOnce, debug.loop ? Infinity : 1);
+          model.action.clampWhenFinished = !debug.loop;
+          model.action.setEffectiveTimeScale(Number(debug.speed ?? 1));
+          if (debug.restart) {
+            model.action.reset().play();
+            debug.restart = false;
+          }
+          if (debug.paused && Number.isFinite(debug.normalizedTime)) {
+            model.action.time = THREE.MathUtils.clamp(debug.normalizedTime, 0, 1) *
+              model.action.getClip().duration;
+          }
         }
-        if (debug.paused && Number.isFinite(debug.normalizedTime)) {
-          model.action.time = THREE.MathUtils.clamp(debug.normalizedTime, 0, 1) *
-            model.action.getClip().duration;
-        }
+        model.mixer.update(deltaSeconds);
+        this.applyGroundContact(model, {
+          grounded,
+          footLock: Boolean(intent.footLock),
+          surfaceAngle
+        }, deltaSeconds);
+      } else {
+        const cueState = {
+          'block-hit': 'ground-action',
+          attack: 'ground-action',
+          'power-up-collect': 'powerup-collect',
+          'power-transform': 'power-transform',
+          victory: 'victory',
+          'swap-out': 'swap-out',
+          'swap-in': 'swap-in'
+        }[animationCue?.type ?? animationCue];
+        const numericState = cueState ?? movementState;
+        const presentation = {
+          ...(animationPresentation ?? {}),
+          movementState: numericState,
+          presentationSubphase:
+            animationPresentation?.presentationSubphase ?? numericState,
+          selectedPoseState:
+            cueState ? intent.clipId : animationPresentation?.selectedPoseState,
+          horizontalSpeed,
+          verticalSpeed
+        };
+        const sample = sampleNumericCharacterPose({
+          hero: modelHero,
+          movementState: numericState,
+          stateSeconds: cueState
+            ? Math.max(0, Number(animationCue?.elapsedSeconds ?? 0))
+            : stateSeconds,
+          horizontalSpeed,
+          verticalSpeed,
+          locomotionPhase: presentation.locomotionPhase ?? 0,
+          predictedGroundSeconds: presentation.predictedGroundSeconds ?? Infinity,
+          brakeProgress: presentation.brakeProgress ?? 0,
+          turnProgress,
+          presentationSubphase: presentation.presentationSubphase
+        });
+        presentation.selectedPoseState = sample.selectedPoseState;
+        this.applyNumericPose(model, sample, presentation, deltaSeconds);
+        model.root.rotation.y =
+          model.currentYaw +
+          THREE.MathUtils.degToRad(sample.visualSpinDegrees * direction);
+        this.applyNumericFootContact(model, {
+          presentation,
+          grounded,
+          surfaceAngle,
+          supportVelocityX,
+          supportVelocityY,
+          cameraX,
+          cameraY
+        }, deltaSeconds);
       }
-      model.mixer.update(deltaSeconds);
-      this.applyGroundContact(model, {
-        grounded,
-        footLock: Boolean(intent.footLock),
-        surfaceAngle
-      }, deltaSeconds);
     }
     this.renderer.render(this.scene, this.camera);
   }

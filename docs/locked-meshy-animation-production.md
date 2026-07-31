@@ -8,24 +8,30 @@ Last verified: July 30, 2026
 | --- | --- |
 | Hargold locked visible mesh and matching skin/rig | `assets/exports/meshy/hargold_canonical_gameplay_rig.glb` |
 | Mebble locked visible mesh and matching skin/rig | `assets/exports/meshy/mebble_canonical_gameplay_rig.glb` |
-| Body clip definitions | `src/animation/locked-meshy-animation-library.js` |
-| State-to-clip selection and blends | `src/animation/character-animation-config.js` |
-| Runtime mixing, phase sync, contact correction | `src/character-renderer.js` |
+| Approved numeric motion contract | `data/character-animation-numeric-spec.json` |
+| Live semantic pose evaluation and rig-axis map | `src/animation/character-animation-numeric-runtime.js` |
+| Fixed body clips for isolated debug inspection | `src/animation/locked-meshy-animation-library.js` |
+| Debug clip selection and metadata | `src/animation/character-animation-config.js` |
+| Live pose application, foot locking, and telemetry | `src/character-renderer.js` |
 | Controller movement states and physics | `src/gameplay/movement/unified-character-controller.js` |
 | Machine-readable clip map | `data/animation-state-mapping.json` |
 | Verified rig limits | `data/locked-meshy-animation-capabilities.json` |
 | Live validation stations | `src/content/animation-validation-course.js` |
 
-The controller owns world translation. Root motion is disabled. The supplied
-walk/run clips remain embedded source references and are available in the
-animation debug panel, but live locomotion does not select them. Refined walk,
-run, and full-speed sprint cycles and all other body clips are additive
-local-space tracks authored against the exact local bind transforms of the
-locked 24-bone rigs.
+The controller owns world translation and collision. Root motion is disabled.
+Live gameplay evaluates the approved numeric contract into named semantic
+joint rotations, converts degrees to radians through one locked-rig axis/sign
+table, and applies the result additively to each rig's exact bind transforms.
+No third-party animation asset is inspected or pose-matched by this system.
 
-## Clip catalog
+The supplied walk/run clips and the fixed project-authored clip library remain
+available in the animation debug panel for isolated rig inspection. They are
+not selected by controller-driven live gameplay.
 
-Both heroes provide:
+## Live pose catalog
+
+Live semantic pose IDs use the existing catalog names so telemetry, validation,
+and effects remain easy to trace. Both heroes provide:
 
 - `idle`, `idle_secondary`;
 - `walk_start`, `walk_refined`, `walk_run_accel`, `run_refined`,
@@ -42,18 +48,20 @@ Both heroes provide:
 Hargold additionally provides `double_jump`. Mebble additionally provides
 `glide_open`, `glide_sustain`, and `glide_close`.
 
-These are runtime presentation clips, not new embedded takes inside the GLBs.
-The GLBs continue to contain only the supplied walk and run animations.
+These IDs do not imply embedded animation takes. Live poses are evaluated from
+controller state, velocity, persistent locomotion phase, action time, and
+predicted ground contact. The GLBs continue to contain only their supplied
+walk and run animations.
 
 ## Controller rules
 
 Holding a direction begins with the controller's lower speed tier and
 automatically accelerates through walk and run to maximum speed. There is no
 manual run or sprint button or buffered action. Releasing input decelerates;
-reversing at speed enters turn/skid presentation. Refined gait playback rates
-are calculated from actual horizontal velocity, walk/run/sprint phases are
-preserved across clip changes, and the full-speed tier has its own stride and
-body mechanics instead of accelerating the same run take.
+reversing at speed enters a planted turn/skid presentation. Gait phase advances
+by actual controller distance divided by the approved gait-cycle distance.
+Walk, run, and full-speed phases remain continuous across speed-tier changes,
+and full speed has its own stride and body mechanics.
 
 Jump, twirl, Hargold double jump, Mebble glide, stomp, approved universal
 ground slam, landings, damage, defeat, power reactions, victory, and swap
@@ -63,10 +71,51 @@ responsive.
 
 An airborne Down/S/SLAM press has a short deterministic intent buffer so a
 press immediately after takeoff is not lost before minimum clearance is
-reached. A valid slam runs startup, committed descent, terrain impact, and a
-separate recovery clip. Live impact events drive dust/ring effects, camera
-response, and nearby mob contact through each mob's existing world-specific
-stomp behavior. An invalid low descending press remains an ordinary fast fall.
+reached. A valid slam is feet-down throughout its six-frame startup,
+controller-driven descent, five-frame impact, and ten-frame recovery. It emits
+commit, impact, landing-contact, and recovery-cancel markers at the approved
+frames. Live impact events drive dust/ring effects, camera response, and nearby
+mob contact through each mob's existing world-specific stomp behavior. An
+invalid low descending press remains an ordinary fast fall.
+
+Hargold's double jump launches immediately at the approved speed and uses a
+distinct tuck, extension, and counter-twist pose. Mebble's glide has numeric
+open, sustained body-pose, and close timing; the current rig cannot open the
+cape independently, so the runtime does not claim cape deformation.
+
+## Contact and telemetry
+
+Walk, run, and full-speed gaits use explicit left/right contact and toe-off
+windows. Those contacts lock forward and vertical foot motion. Skid and slide
+lock vertical motion only. Contact releases use a two-frame inertial blend,
+and moving-platform velocity advances the stored anchor. The live debug panel
+reports:
+
+- movement state and presentation subphase;
+- selected pose ID and persistent locomotion phase;
+- left/right contact booleans;
+- measured foot slip and vertical penetration as percentages of hero height;
+- velocity, predicted time to ground, active blend duration, and facing-flip
+  marker;
+- controls that remain unavailable on the locked rigs.
+
+Validation thresholds are 1.5% of hero height for planted-foot slip, 0.5% for
+vertical penetration, 0.08 for phase error, and two render frames for visible
+state settling.
+
+## Controller-driven versus fixed timing
+
+| Motion | Timing source |
+| --- | --- |
+| Walk, run, full speed, crawl | controller distance and persistent phase |
+| Brake and skid hold | controller velocity; numeric entry/plant/exit poses |
+| Slide sustain | controller speed and slope |
+| Rise, apex, fall, landing preparation | vertical velocity and predicted ground contact |
+| Ground-slam descent | controller velocity; startup, impact, and recovery use fixed numeric frames |
+| Hargold double jump | fixed 19-frame pose sequence with controller launch on frame 0 |
+| Mebble glide | fixed 7-frame open and 6-frame close; sustained body pose is controller-driven |
+| Damage, power, victory, swap | short interruptible numeric one-shots |
+| Supplied and project-authored fixed clips | animation debug panel only |
 
 ## Validation
 
@@ -100,9 +149,11 @@ rather than an editor-only mannequin scene. It covers:
 9. Hargold blocks, block-hit reaction, and power-up;
 10. rapid gaps, air adjustment, landing-to-run, and defeat.
 
-Use `?debugMovement=1` for state/velocity telemetry and
-`?debugAnimation=1` for clip selection, pause, scrub, speed, loop, facing, and
-restart.
+Each validation station now includes deliberate input instructions. Use
+`?debugMovement=1` for controller telemetry and `?debugAnimation=1` for both
+live numeric telemetry and optional fixed-clip selection, pause, scrub, speed,
+loop, facing, and restart. When animation validation is enabled, the panel
+starts in live gameplay mode instead of taking control with a fixed clip.
 
 ## Source-rig boundary
 

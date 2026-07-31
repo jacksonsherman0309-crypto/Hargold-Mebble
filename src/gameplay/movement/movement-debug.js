@@ -1,4 +1,5 @@
 export function updateMovementTelemetry(state, input, contacts = {}) {
+  const presentation = state.animationPresentation ?? {};
   state.telemetry = Object.freeze({
     currentState: state.movementState,
     currentBranch: state.movementBranch,
@@ -26,6 +27,15 @@ export function updateMovementTelemetry(state, input, contacts = {}) {
     glideExhausted: state.glideExhausted,
     groundSlamPhase: state.groundSlamPhase,
     groundSlamBufferSeconds: state.groundSlamBufferSeconds,
+    presentationSubphase: presentation.presentationSubphase ?? 'neutral',
+    locomotionPhase: presentation.locomotionPhase ?? 0,
+    leftFootContact: Boolean(presentation.leftFootContact),
+    rightFootContact: Boolean(presentation.rightFootContact),
+    selectedPoseState: presentation.selectedPoseState ?? null,
+    predictedGroundSeconds: presentation.predictedGroundSeconds ?? Infinity,
+    animationBlendSeconds: presentation.blendSeconds ?? 0,
+    facingFlipMarker: Boolean(presentation.facingFlipMarker),
+    rigLimitedStatus: Object.freeze([...(presentation.rigLimitedStatus ?? [])]),
     contacts: Object.freeze({ ...contacts }),
     sensorSummary: Object.freeze({
       foot: state.sensors?.foot?.length ?? 0,

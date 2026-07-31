@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "verifiedDate": "2026-07-30",
   "productionTarget": "original-user-supplied-meshy-rigs",
   "visibleMeshReplacementAllowed": false,
@@ -82,9 +82,11 @@
     ]
   },
   "implementationPolicy": {
-    "projectAuthoredBodyClips": "additive local-space bone animation built from each locked rig's own bind transforms",
+    "numericAuthority": "data/character-animation-numeric-spec.json",
+    "liveSemanticPoseRuntime": "src/animation/character-animation-numeric-runtime.js",
+    "projectAuthoredBodyClips": "fixed additive local-space inspection clips built from each locked rig's own bind transforms",
     "suppliedWalkRunPolicy": "retained as source-reference and debug clips only; not selected by live locomotion",
-    "runtimeLocomotionPolicy": "project-authored additive walk, run, and sprint cycles on each unchanged locked Meshy rig",
+    "runtimeLocomotionPolicy": "distance-driven numeric semantic walk, run, and full-speed poses evaluated on each unchanged locked Meshy rig",
     "rejectedProceduralAssets": "quarantined and never loaded or retargeted by the runtime",
     "unsupportedControlPolicy": "document as an asset-authoring requirement; do not claim functional controls and do not replace the locked mesh"
   }

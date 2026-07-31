@@ -1,4 +1,8 @@
 import * as THREE from '../../vendor/three/three.module.js';
+import {
+  CHARACTER_ANIMATION_NUMERIC_SPEC,
+  LOCKED_RIG_BONES
+} from './character-animation-numeric-runtime.js';
 
 /*
  * Animation authored specifically for the locked 24-bone Meshy skins.
@@ -11,30 +15,8 @@ import * as THREE from '../../vendor/three/three.module.js';
  * here so gait design can be refined without replacing either character.
  */
 
-const B = Object.freeze({
-  hips: 'Hips',
-  spineLower: 'Spine02',
-  spineMiddle: 'Spine01',
-  chest: 'Spine',
-  neck: 'neck',
-  head: 'Head',
-  shoulderL: 'LeftShoulder',
-  upperArmL: 'LeftArm',
-  forearmL: 'LeftForeArm',
-  handL: 'LeftHand',
-  shoulderR: 'RightShoulder',
-  upperArmR: 'RightArm',
-  forearmR: 'RightForeArm',
-  handR: 'RightHand',
-  thighL: 'LeftUpLeg',
-  shinL: 'LeftLeg',
-  footL: 'LeftFoot',
-  toeL: 'LeftToeBase',
-  thighR: 'RightUpLeg',
-  shinR: 'RightLeg',
-  footR: 'RightFoot',
-  toeR: 'RightToeBase'
-});
+const B = LOCKED_RIG_BONES;
+const NUMERIC = CHARACTER_ANIMATION_NUMERIC_SPEC;
 
 const LOOP = Object.freeze({ loop: true });
 const ONCE = Object.freeze({ loop: false });
@@ -51,6 +33,8 @@ function motion(id, duration, frames, options = ONCE) {
     loop: options.loop,
     authoredSpeedMetresPerSecond: options.authoredSpeedMetresPerSecond ?? 0,
     footLock: options.footLock ?? false,
+    footLockAxes: Object.freeze([...(options.footLockAxes ?? [])]),
+    markers: Object.freeze([...(options.markers ?? [])]),
     source: 'project-authored-additive-locked-meshy-rig'
   });
 }
@@ -183,7 +167,8 @@ function refinedLocomotionMotions(hero) {
   const definitions = [
     {
       id: 'walk_refined',
-      duration: heavy ? 0.74 : 0.78,
+      gait: 'walk',
+      duration: NUMERIC.locomotion.cycles[hero].walk.seconds,
       speed: 2.55,
       stride: heavy ? 0.42 : 0.48,
       armDrive: heavy ? 0.48 : 0.55,
@@ -193,7 +178,8 @@ function refinedLocomotionMotions(hero) {
     },
     {
       id: 'run_refined',
-      duration: heavy ? 0.52 : 0.56,
+      gait: 'run',
+      duration: NUMERIC.locomotion.cycles[hero].run.seconds,
       speed: 4.8,
       stride: heavy ? 0.68 : 0.78,
       armDrive: heavy ? 0.82 : 0.9,
@@ -203,7 +189,8 @@ function refinedLocomotionMotions(hero) {
     },
     {
       id: 'sprint_refined',
-      duration: heavy ? 0.43 : 0.46,
+      gait: 'fullSpeed',
+      duration: NUMERIC.locomotion.cycles[hero].fullSpeed.seconds,
       speed: 7.15,
       stride: heavy ? 0.88 : 1.02,
       armDrive: heavy ? 1.05 : 1.12,
@@ -213,17 +200,20 @@ function refinedLocomotionMotions(hero) {
     }
   ];
 
-  return definitions.map(definition => motion(
-    `${prefix}_${definition.id}`,
-    definition.duration,
-    [
+  return definitions.map(definition => {
+    const markers = NUMERIC.locomotion.phaseMarkers[definition.gait];
+    const windows = NUMERIC.locomotion.footLockWindows[definition.gait];
+    return motion(
+      `${prefix}_${definition.id}`,
+      definition.duration,
+      [
       frame(
         0,
         gaitContactPose({ ...definition, heavy, leftLead: true }),
         { [B.hips]: [0, -definition.compression, 0] }
       ),
       frame(
-        0.24,
+        markers[2],
         gaitPassingPose({ ...definition, heavy, leftPassing: true }),
         { [B.hips]: [0, definition.lift, 0] }
       ),
@@ -233,7 +223,7 @@ function refinedLocomotionMotions(hero) {
         { [B.hips]: [0, -definition.compression, 0] }
       ),
       frame(
-        0.74,
+        markers[6],
         gaitPassingPose({ ...definition, heavy, leftPassing: false }),
         { [B.hips]: [0, definition.lift, 0] }
       ),
@@ -243,12 +233,17 @@ function refinedLocomotionMotions(hero) {
         { [B.hips]: [0, -definition.compression, 0] }
       )
     ],
-    {
-      ...LOOP,
-      footLock: true,
-      authoredSpeedMetresPerSecond: definition.speed
-    }
-  ));
+      {
+        ...LOOP,
+        footLock: true,
+        footLockAxes: windows.axes,
+        markers: NUMERIC.events.required.filter(marker =>
+          /foot-contact|toe-off/.test(marker)
+        ),
+        authoredSpeedMetresPerSecond: definition.speed
+      }
+    );
+  });
 }
 
 function sharedMotions(hero) {
@@ -862,11 +857,121 @@ function heroSpecificMotions(hero) {
   ];
 }
 
+function numericDurationFor(hero, motionId, fallback) {
+  const prefix = `${hero.toLowerCase()}_`;
+  const suffix = motionId.startsWith(prefix) ? motionId.slice(prefix.length) : motionId;
+  const fps = NUMERIC.timing.animationAuthoringFps;
+  const durations = {
+    idle: NUMERIC.actions.idle.primaryFrames / fps,
+    idle_secondary: NUMERIC.actions.idle.secondaryFrames / fps,
+    walk_start: NUMERIC.actions.moveStart[hero].frames / fps,
+    walk_run_accel:
+      (hero === 'Hargold'
+        ? NUMERIC.actions.walkToRun.HargoldFrames
+        : NUMERIC.actions.walkToRun.MebbleFrames) / fps,
+    turnaround:
+      (hero === 'Hargold'
+        ? NUMERIC.actions.turn.HargoldFrames
+        : NUMERIC.actions.turn.MebbleFrames) / fps,
+    skid:
+      (
+        NUMERIC.actions.skid.plantPeakFrame +
+        NUMERIC.actions.skid.pivotFrames[hero] +
+        NUMERIC.actions.skid.pushOffFrames[hero]
+      ) / fps,
+    crouch: NUMERIC.actions.crouch.entryFrames[hero] / fps,
+    crawl: NUMERIC.actions.crawl[hero].frames / fps,
+    slide: NUMERIC.actions.slide.entryFrames[hero] / fps,
+    jump_takeoff: NUMERIC.actions.jump.takeoffFrames[hero] / fps,
+    air_spin: NUMERIC.actions.twirl.frames / fps,
+    stomp_bounce: NUMERIC.actions.stompBounce.normal.frames / fps,
+    land_soft:
+      (hero === 'Hargold'
+        ? NUMERIC.actions.landing.soft.HargoldFrames
+        : NUMERIC.actions.landing.soft.MebbleFrames) / fps,
+    land_heavy:
+      (hero === 'Hargold'
+        ? NUMERIC.actions.landing.heavy.HargoldFrames
+        : NUMERIC.actions.landing.heavy.MebbleFrames) / fps,
+    ground_slam_start: NUMERIC.actions.groundSlam.startupFrames / fps,
+    ground_slam_fall: 12 / fps,
+    ground_slam_impact: NUMERIC.actions.groundSlam.impactFrames / fps,
+    ground_slam_recover: NUMERIC.actions.groundSlam.recoveryFrames / fps,
+    hurt: NUMERIC.actions.damage.frames / fps,
+    defeat: (hero === 'Hargold' ? 72 : 66) / fps,
+    double_jump: NUMERIC.actions.HargoldDoubleJump.frames / fps,
+    glide_open: NUMERIC.actions.MebbleGlide.openFrames / fps,
+    glide_sustain: NUMERIC.actions.MebbleGlide.sustainFrames / fps,
+    glide_close: NUMERIC.actions.MebbleGlide.closeFrames / fps
+  };
+  return durations[suffix] ?? fallback;
+}
+
+function numericMotionPolicy(hero, definition) {
+  const id = definition.id;
+  const suffix = id.replace(`${hero.toLowerCase()}_`, '');
+  const verticalOnly = ['skid', 'slide'].includes(suffix);
+  const parameterized = [
+    'walk_refined',
+    'run_refined',
+    'sprint_refined',
+    'run_decelerate',
+    'skid',
+    'crouch',
+    'crawl',
+    'slide',
+    'jump_rise',
+    'jump_apex',
+    'jump_fall',
+    'running_jump',
+    'air_adjust',
+    'ground_slam_fall',
+    'glide_sustain'
+  ].includes(suffix);
+  const markerBySuffix = {
+    run_decelerate: ['brake-plant'],
+    skid: ['skid-plant', 'facing-flip'],
+    slide: ['slide-enter'],
+    jump_takeoff: ['jump-launch'],
+    air_spin: ['twirl-start'],
+    stomp_bounce: ['stomp-contact', 'stomp-rebound'],
+    land_soft: ['landing-contact'],
+    land_heavy: ['landing-contact'],
+    ground_slam_start: ['ground-slam-commit'],
+    ground_slam_impact: ['ground-slam-impact'],
+    ground_slam_recover: ['recovery-cancel-open']
+  };
+  return Object.freeze({
+    ...definition,
+    duration: numericDurationFor(hero, id, definition.duration),
+    footLockAxes: Object.freeze(
+      verticalOnly
+        ? ['vertical']
+        : definition.footLock
+          ? definition.footLockAxes.length
+            ? [...definition.footLockAxes]
+            : ['vertical', 'forward']
+          : []
+    ),
+    markers: Object.freeze([
+      ...new Set([
+        ...definition.markers,
+        ...(markerBySuffix[suffix] ?? [])
+      ])
+    ]),
+    parameterization: parameterized ? 'controller-driven' : 'fixed-frames',
+    numericAuthority: 'data/character-animation-numeric-spec.json'
+  });
+}
+
 export function authoredLockedMeshyMotions(hero) {
   if (!['Hargold', 'Mebble'].includes(hero)) {
     throw new RangeError(`unknown locked Meshy hero: ${hero}`);
   }
-  return Object.freeze([...sharedMotions(hero), ...heroSpecificMotions(hero)]);
+  return Object.freeze(
+    [...sharedMotions(hero), ...heroSpecificMotions(hero)]
+      .map(definition => numericMotionPolicy(hero, definition))
+  );
 }
 
 function quaternionValues(bindQuaternion, rotation) {
@@ -932,6 +1037,10 @@ export function buildLockedMeshyAnimationClips(root, hero) {
     clip.userData = {
       loop: definition.loop,
       footLock: definition.footLock,
+      footLockAxes: definition.footLockAxes,
+      markers: definition.markers,
+      parameterization: definition.parameterization,
+      numericAuthority: definition.numericAuthority,
       authoredSpeedMetresPerSecond: definition.authoredSpeedMetresPerSecond,
       source: definition.source
     };

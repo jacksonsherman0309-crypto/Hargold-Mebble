@@ -6,7 +6,7 @@
  * copied from another game or binary.
  */
 export const MOVEMENT_TUNING = Object.freeze({
-  status: 'provisional-clean-room-project-tuning',
+  status: 'approved-original-numeric-animation-contract-aligned',
   simulationHz: 120,
   walkSpeed: 3.2,
   runSpeed: 5.7,
@@ -61,7 +61,7 @@ export const MOVEMENT_TUNING = Object.freeze({
   airTwirlGravityMultiplier: 0.32,
   airTwirlMaximumFallSpeed: 1.4,
   doubleJumpSpeed: 9.45,
-  glideOpeningSeconds: 0.12,
+  glideOpeningSeconds: 7 / 60,
   maximumGlideSeconds: 2.4,
   glideGravity: 5.6,
   glideMaximumFallSpeed: 2.9,
@@ -79,8 +79,8 @@ export const MOVEMENT_TUNING = Object.freeze({
   groundSlamImpactSeconds: 0.075,
   groundSlamRecoverySeconds: 0.16,
   hardLandingSpeed: 13.2,
-  softLandingRecoverySeconds: 0.04,
-  hardLandingRecoverySeconds: 0.13,
+  softLandingRecoverySeconds: 4 / 60,
+  hardLandingRecoverySeconds: 6 / 60,
   stompBounceSpeed: 8,
   strongStompBounceSpeed: 11,
   wallSlideMaximumSpeed: 3.4,

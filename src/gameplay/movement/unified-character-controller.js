@@ -1,5 +1,10 @@
 import { bodyAtFoot } from '../../runtime/collision/aabb.js';
 import { approach, clamp } from '../../runtime/math.js';
+import {
+  CHARACTER_ANIMATION_NUMERIC_SPEC,
+  createCharacterAnimationPresentationState,
+  updateCharacterAnimationPresentation
+} from '../../animation/character-animation-numeric-runtime.js';
 import { HERO_PROFILES, heroProfile } from './hero-profiles.js';
 import { updateMovementTelemetry } from './movement-debug.js';
 import { beginMovementStep, emitMovementEvent, movementEvents } from './movement-events.js';
@@ -20,6 +25,7 @@ import {
 import { MOVEMENT_TUNING } from './movement-tuning.js';
 
 const HERO_NAMES = Object.freeze(['Hargold', 'Mebble']);
+const ANIMATION_FPS = CHARACTER_ANIMATION_NUMERIC_SPEC.timing.animationAuthoringFps;
 
 function transition(state, nextState) {
   transitionMovementState(
@@ -69,8 +75,11 @@ export function createUnifiedCharacterState({
     coyoteSeconds: grounded ? tuning.coyoteSeconds : 0,
     jumpBufferSeconds: 0,
     jumpCutAllowed: false,
+    jumpTakeoffSeconds: 0,
     landingSpeed: 0,
     landingRecoverySeconds: 0,
+    brakeExitSeconds: 0,
+    brakeExitStarted: false,
     stance: 'standing',
     glide: 'closed',
     glideOpeningSeconds: 0,
@@ -88,6 +97,15 @@ export function createUnifiedCharacterState({
     groundSlamPrepareSeconds: 0,
     groundSlamImpactSeconds: 0,
     groundSlamRecoverySeconds: 0,
+    groundSlamCommitEmitted: false,
+    recoveryCancelOpenEmitted: false,
+    turnPresentationPhase: 'none',
+    turnPhaseSeconds: 0,
+    turnElapsedSeconds: 0,
+    turnRequestedDirection: 0,
+    turnFacingFlipped: false,
+    turnFromSkid: false,
+    facingFlipMarker: false,
     hurtLockSeconds: 0,
     invulnerabilitySeconds: 0,
     forcedState: null,
@@ -114,7 +132,8 @@ export function createUnifiedCharacterState({
     contacts: null,
     blockBreakStrength: 0,
     events: [],
-    telemetry: null
+    telemetry: null,
+    animationPresentation: createCharacterAnimationPresentationState(hero)
   };
   return initializeMovementStateLifecycle(state);
 }
@@ -149,10 +168,17 @@ function startGroundJump(state, profile, tuning) {
   state.coyoteSeconds = 0;
   state.jumpBufferSeconds = 0;
   state.jumpCutAllowed = true;
+  state.jumpTakeoffSeconds =
+    CHARACTER_ANIMATION_NUMERIC_SPEC.actions.jump.takeoffFrames[state.hero] /
+    ANIMATION_FPS;
   state.stance = 'standing';
   state.glide = 'closed';
   transition(state, MOVEMENT_STATES.JUMP_STARTUP);
   emitMovementEvent(state, 'jump-takeoff', {
+    runningRatio: runRatio,
+    verticalSpeed: state.velocityY
+  });
+  emitMovementEvent(state, 'jump-launch', {
     runningRatio: runRatio,
     verticalSpeed: state.velocityY
   });
@@ -167,6 +193,7 @@ function startTwirl(state, tuning) {
   }
   transition(state, MOVEMENT_STATES.TWIRL);
   emitMovementEvent(state, 'twirl-started', { durationSeconds: tuning.airTwirlSeconds });
+  emitMovementEvent(state, 'twirl-start', { durationSeconds: tuning.airTwirlSeconds });
 }
 
 function startDoubleJump(state, tuning) {
@@ -196,6 +223,8 @@ function startGroundSlam(state, tuning) {
   state.velocityY = 0;
   state.jumpCutAllowed = false;
   state.jumpBufferSeconds = 0;
+  state.groundSlamCommitEmitted = false;
+  state.recoveryCancelOpenEmitted = false;
   transition(state, MOVEMENT_STATES.GROUND_SLAM_STARTUP);
   emitMovementEvent(state, 'ground-slam-started');
 }
@@ -223,18 +252,97 @@ function beginGroundSlamImpact(state, tuning, surface = {}) {
   });
 }
 
+function beginPlantedTurn(state, direction, { fromSkid = false } = {}) {
+  if (!direction) return;
+  state.turnPresentationPhase = 'pivot';
+  state.turnPhaseSeconds = 0;
+  state.turnElapsedSeconds = 0;
+  state.turnRequestedDirection = direction;
+  state.turnFacingFlipped = false;
+  state.turnFromSkid = fromSkid;
+  state.facingFlipMarker = false;
+  state.velocityX = 0;
+  transition(state, MOVEMENT_STATES.TURN);
+}
+
+function updatePlantedTurn(state, direction, dt, tuning, terrain) {
+  if (state.turnPresentationPhase === 'none') return false;
+  if (!direction || direction !== state.turnRequestedDirection) {
+    state.turnPresentationPhase = 'none';
+    state.turnRequestedDirection = 0;
+    return false;
+  }
+
+  const turn = CHARACTER_ANIMATION_NUMERIC_SPEC.actions.turn;
+  const skid = CHARACTER_ANIMATION_NUMERIC_SPEC.actions.skid;
+  if (state.turnPresentationPhase === 'pivot') {
+    const frames = state.hero === 'Hargold'
+      ? (state.turnFromSkid ? skid.pivotFrames.Hargold : turn.HargoldFrames)
+      : (state.turnFromSkid ? skid.pivotFrames.Mebble : turn.MebbleFrames);
+    const duration = frames / ANIMATION_FPS;
+    state.turnElapsedSeconds = Math.min(duration, state.turnElapsedSeconds + dt);
+    state.turnPhaseSeconds = state.turnElapsedSeconds / Math.max(duration, 1e-6);
+    state.velocityX = approach(state.velocityX, 0, tuning.highSpeedSkidDeceleration, dt);
+    if (!state.turnFacingFlipped && state.turnPhaseSeconds >= 0.5) {
+      state.facing = state.turnRequestedDirection;
+      state.turnFacingFlipped = true;
+      state.facingFlipMarker = true;
+      emitMovementEvent(state, 'facing-flip', {
+        pivotProgress: 0.5,
+        facing: state.facing
+      });
+    }
+    transition(state, MOVEMENT_STATES.TURN);
+    if (state.turnElapsedSeconds >= duration) {
+      if (state.turnFromSkid) {
+        state.turnPresentationPhase = 'push-off';
+        state.turnElapsedSeconds = 0;
+        state.turnPhaseSeconds = 0;
+      } else {
+        state.turnPresentationPhase = 'none';
+        state.turnRequestedDirection = 0;
+      }
+    }
+    return true;
+  }
+
+  const pushFrames = state.hero === 'Hargold'
+    ? skid.pushOffFrames.Hargold
+    : skid.pushOffFrames.Mebble;
+  const pushDuration = pushFrames / ANIMATION_FPS;
+  state.turnElapsedSeconds = Math.min(pushDuration, state.turnElapsedSeconds + dt);
+  state.turnPhaseSeconds = state.turnElapsedSeconds / Math.max(pushDuration, 1e-6);
+  state.velocityX = approach(
+    state.velocityX,
+    state.turnRequestedDirection * tuning.walkSpeed * terrain.maximumSpeedMultiplier,
+    tuning.activeTurnAcceleration,
+    dt
+  );
+  transition(state, MOVEMENT_STATES.TURN);
+  if (state.turnElapsedSeconds >= pushDuration) {
+    state.turnPresentationPhase = 'none';
+    state.turnRequestedDirection = 0;
+    state.turnFromSkid = false;
+  }
+  return true;
+}
+
 function enterGroundedLocomotion(state, input, dt, tuning, canStand) {
   const direction = (input.right ? 1 : 0) - (input.left ? 1 : 0);
   const speed = Math.abs(state.velocityX);
   const terrain = terrainResponseFor(state.surfaceMaterial);
   state.terrainResponseId = terrain.id;
+  if (updatePlantedTurn(state, direction, dt, tuning, terrain)) return;
 
   if (input.downHeld || state.stance !== 'standing') {
     if (!input.downHeld && canStand()) {
       state.stance = 'standing';
     } else {
       state.stance = 'crouched';
-      if (speed >= tuning.slideMinimumSpeed) {
+      const continuingSlide =
+        state.movementState === MOVEMENT_STATES.DUCK_SLIDE &&
+        speed > tuning.slideExitSpeed;
+      if (speed >= tuning.slideMinimumSpeed || continuingSlide) {
         state.velocityX = approach(state.velocityX, 0, tuning.slideFriction, dt);
         transition(state, MOVEMENT_STATES.DUCK_SLIDE);
       } else if (direction !== 0) {
@@ -275,19 +383,38 @@ function enterGroundedLocomotion(state, input, dt, tuning, canStand) {
   if (direction === 0) {
     state.velocityX = approach(state.velocityX, terrain.conveyorVelocity, response.acceleration, dt);
     if (Math.abs(state.velocityX) < 1e-6) state.velocityX = 0;
-    if (state.velocityX === 0) transition(state, MOVEMENT_STATES.IDLE);
-    else if (speed >= tuning.sprintEntrySpeed) transition(state, MOVEMENT_STATES.BRAKE);
-    else transition(state, speed > tuning.walkSpeed * 0.92 ? MOVEMENT_STATES.RUN : MOVEMENT_STATES.WALK);
+    if (
+      state.velocityX === 0 &&
+      state.movementState === MOVEMENT_STATES.BRAKE &&
+      !state.brakeExitStarted
+    ) {
+      state.brakeExitSeconds =
+        CHARACTER_ANIMATION_NUMERIC_SPEC.actions.releaseBrake.exitFrames[state.hero] /
+        ANIMATION_FPS;
+      state.brakeExitStarted = true;
+    }
+    if (state.velocityX !== 0 || state.brakeExitSeconds > 0) {
+      transition(state, MOVEMENT_STATES.BRAKE);
+    } else {
+      state.brakeExitStarted = false;
+      transition(state, MOVEMENT_STATES.IDLE);
+    }
     return;
   }
+  state.brakeExitSeconds = 0;
+  state.brakeExitStarted = false;
 
   if (reversing && speed >= tuning.skidThreshold) {
     state.velocityX = approach(state.velocityX, 0, response.acceleration, dt);
     transition(state, MOVEMENT_STATES.SKID);
     if (Math.abs(state.velocityX) <= tuning.skidExitSpeed) {
-      state.facing = direction;
-      transition(state, MOVEMENT_STATES.TURN);
+      beginPlantedTurn(state, direction, { fromSkid: true });
     }
+    return;
+  }
+
+  if (reversing) {
+    beginPlantedTurn(state, direction, { fromSkid: false });
     return;
   }
 
@@ -439,17 +566,20 @@ function updateAirborne(state, input, dt, profile, tuning) {
   else if (state.glide === 'opening') transition(state, MOVEMENT_STATES.GLIDE_OPENING);
   else if (state.glide === 'sustained') transition(state, MOVEMENT_STATES.GLIDE);
   else if (state.fastFalling) transition(state, MOVEMENT_STATES.FAST_FALL);
+  else if (state.jumpTakeoffSeconds > 0) transition(state, MOVEMENT_STATES.JUMP_STARTUP);
   else if (state.velocityY < -tuning.apexVelocityWindow) transition(state, MOVEMENT_STATES.RISE);
   else if (state.velocityY <= tuning.apexVelocityWindow) transition(state, MOVEMENT_STATES.APEX);
   else transition(state, MOVEMENT_STATES.FALL);
 }
 
-function updateTimers(state, dt) {
+function updateTimers(state, dt, tuning) {
   const timerNames = [
     'airTwirlSeconds',
     'doubleJumpSeconds',
+    'jumpTakeoffSeconds',
     'glideOpeningSeconds',
     'landingRecoverySeconds',
+    'brakeExitSeconds',
     'hurtLockSeconds',
     'invulnerabilitySeconds',
     'dropThroughSeconds',
@@ -459,10 +589,26 @@ function updateTimers(state, dt) {
   if (state.dropThroughSeconds <= 0) state.dropThroughPlatformId = null;
   if (state.groundSlamPhase === 'startup') {
     state.groundSlamPrepareSeconds = Math.max(0, state.groundSlamPrepareSeconds - dt);
+    if (
+      !state.groundSlamCommitEmitted &&
+      state.groundSlamPrepareSeconds <= 1 / ANIMATION_FPS
+    ) {
+      state.groundSlamCommitEmitted = true;
+      emitMovementEvent(state, 'ground-slam-commit');
+    }
   } else if (state.groundSlamPhase === 'impact') {
     state.groundSlamImpactSeconds = Math.max(0, state.groundSlamImpactSeconds - dt);
   } else if (state.groundSlamPhase === 'recovery') {
     state.groundSlamRecoverySeconds = Math.max(0, state.groundSlamRecoverySeconds - dt);
+    const cancelSeconds =
+      CHARACTER_ANIMATION_NUMERIC_SPEC.actions.groundSlam.recoveryCancelFrame /
+      ANIMATION_FPS;
+    const elapsed = tuning.groundSlamRecoverySeconds -
+      state.groundSlamRecoverySeconds;
+    if (!state.recoveryCancelOpenEmitted && elapsed >= cancelSeconds) {
+      state.recoveryCancelOpenEmitted = true;
+      emitMovementEvent(state, 'recovery-cancel-open');
+    }
   }
 }
 
@@ -502,7 +648,12 @@ function updateForcedState(state, input, dt, tuning, groundHeightAt, minimumX, m
   if (state.groundSlamPhase === 'recovery' && state.groundSlamRecoverySeconds > 0) {
     state.velocityX = approach(state.velocityX, 0, tuning.releaseDeceleration, dt);
     transition(state, MOVEMENT_STATES.GROUND_SLAM_RECOVERY);
-    return true;
+    const recoveryCancelRequested =
+      state.recoveryCancelOpenEmitted &&
+      (input.left || input.right || input.jumpPressed);
+    if (!recoveryCancelRequested) return true;
+    state.groundSlamRecoverySeconds = 0;
+    state.groundSlamPhase = 'none';
   }
   if (state.groundSlamPhase === 'recovery') state.groundSlamPhase = 'none';
   if (state.landingRecoverySeconds > 0 && state.jumpBufferSeconds <= 0) {
@@ -575,12 +726,13 @@ export function stepUnifiedCharacterController(
   }
   const profile = heroProfile(state.hero, profiles);
   beginMovementStep(state);
+  state.facingFlipMarker = false;
   const previousVelocityX = state.velocityX;
   const previousVelocityY = state.velocityY;
   const previousFootY = state.footY;
   state.stateSeconds += deltaSeconds;
   state.doubleJumpUnlocked = Boolean(doubleJumpUnlocked);
-  updateTimers(state, deltaSeconds);
+  updateTimers(state, deltaSeconds, tuning);
   let contacts = refreshMovementContacts(state, {
     tuning,
     profiles,
@@ -653,6 +805,10 @@ export function stepUnifiedCharacterController(
     state.accelerationX = (state.velocityX - previousVelocityX) / deltaSeconds;
     state.accelerationY = (state.velocityY - previousVelocityY) / deltaSeconds;
     executeMovementState(state);
+    updateCharacterAnimationPresentation(state, deltaSeconds, {
+      groundHeightAt,
+      emit: (type, detail) => emitMovementEvent(state, type, detail)
+    });
     updateMovementTelemetry(state, input, contacts);
     return Object.freeze({ state, events: movementEvents(state), telemetry: state.telemetry });
   }
@@ -770,6 +926,10 @@ export function stepUnifiedCharacterController(
   state.accelerationX = (state.velocityX - previousVelocityX) / deltaSeconds;
   state.accelerationY = (state.velocityY - previousVelocityY) / deltaSeconds;
   executeMovementState(state);
+  updateCharacterAnimationPresentation(state, deltaSeconds, {
+    groundHeightAt,
+    emit: (type, detail) => emitMovementEvent(state, type, detail)
+  });
   updateMovementTelemetry(state, input, contacts);
   return Object.freeze({ state, events: movementEvents(state), telemetry: state.telemetry });
 }
@@ -810,6 +970,8 @@ export function trySwapUnifiedHero(
   state.groundSlamPhase = 'none';
   state.groundSlamBufferSeconds = 0;
   state.airTwirlSeconds = 0;
+  state.animationPresentation = createCharacterAnimationPresentationState(nextHero);
+  state.animationPresentation.lastFootX = state.footX;
   transition(state, MOVEMENT_STATES.SWAP_IN);
   emitMovementEvent(state, 'hero-swapped', { previousHero, nextHero });
   return Object.freeze({ accepted: true, reason: null, hero: nextHero, body: candidate });
@@ -878,7 +1040,13 @@ export function applyMovementBounce(
     state,
     kind === 'spring' ? MOVEMENT_STATES.SPRING_BOUNCE : MOVEMENT_STATES.STOMP_BOUNCE
   );
+  emitMovementEvent(state, 'stomp-contact', { kind, enhanced });
   emitMovementEvent(state, 'bounce', { kind, enhanced, verticalSpeed: state.velocityY });
+  emitMovementEvent(state, 'stomp-rebound', {
+    kind,
+    enhanced,
+    verticalSpeed: state.velocityY
+  });
   return state;
 }
 
@@ -899,6 +1067,10 @@ export function applyMovementLanding(
   state.velocityY = 0;
   state.grounded = true;
   state.supportPlatformId = platformId;
+  emitMovementEvent(state, 'landing-contact', {
+    landingSpeed,
+    platformId
+  });
   resetAirActions(state);
   if (slammed) {
     beginGroundSlamImpact(state, tuning, surface);

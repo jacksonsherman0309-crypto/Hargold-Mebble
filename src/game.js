@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js?v=locked-animation-2';
+import { CharacterRenderer } from './character-renderer.js?v=numeric-animation-1';
 import {
   MEADOW_WAKE_ENEMY_ACTORS,
   MEADOW_WAKE_LEVEL_DATA
@@ -15,7 +15,7 @@ import {
 import {
   ANIMATION_VALIDATION_STATIONS,
   animationValidationStation
-} from './content/animation-validation-course.js?v=locked-animation-1';
+} from './content/animation-validation-course.js?v=numeric-animation-1';
 import {
   attackMob,
   createMob,
@@ -53,13 +53,13 @@ import {
   setMovementForcedState,
   stepUnifiedCharacterController,
   trySwapUnifiedHero
-} from './gameplay/movement/unified-character-controller.js?v=unified-motion-2';
+} from './gameplay/movement/unified-character-controller.js?v=numeric-animation-1';
 import { leaveExternalSupport } from './gameplay/movement/movement-collision-resolver.js?v=unified-motion-2';
 import { clamp } from './runtime/math.js';
 import { FixedStepLoop } from './runtime/fixed-step.js';
 import { fatalHazardEvent } from './runtime/hazards/fatal-hazards.js';
 import { createLinearGround } from './runtime/terrain/linear-ground.js';
-import { AnimationDebugPanel } from './animation/animation-debug-panel.js?v=locked-animation-1';
+import { AnimationDebugPanel } from './animation/animation-debug-panel.js?v=numeric-animation-1';
 import { GAME_RULES } from './canonical-data.js';
 import {
   FULLY_UNLOCKED_LIVE_TEST_PROFILE,
@@ -85,6 +85,12 @@ const keys = new Set();
 const touch = {
   left: false,
   right: false,
+  jump: false,
+  slam: false,
+  action: false,
+  swap: false
+};
+const inputPressLatch = {
   jump: false,
   slam: false,
   action: false,
@@ -117,6 +123,8 @@ const characterRenderer = new CharacterRenderer({
   }
 });
 let animationDebugPanel = null;
+let simulationSeconds = 0;
+let recentMovementEvents = [];
 
 const terrain = createLinearGround(MEADOW_WAKE_TERRAIN_POINTS);
 const pits = MEADOW_WAKE_PITS;
@@ -153,7 +161,12 @@ if (fullyUnlockedTestMode && testModeBadge) {
 }
 
 function setAnimationCue(type, durationSeconds) {
-  animationCue = { type, remainingSeconds: durationSeconds };
+  animationCue = {
+    type,
+    durationSeconds,
+    remainingSeconds: durationSeconds,
+    elapsedSeconds: 0
+  };
 }
 
 function moveToAnimationValidationStation(station) {
@@ -164,6 +177,7 @@ function moveToAnimationValidationStation(station) {
     doubleJumpUnlocked: session.doubleJumpUnlocked
   });
   inputBuffer.reset();
+  recentMovementEvents = [];
   cameraX = player.footX * SCALE - W * 0.34;
   notice = `${station.label}: ${station.validates.join(', ')}.`;
   noticeSeconds = 4;
@@ -189,11 +203,13 @@ function createAnimationValidationPanel() {
   const detail = document.createElement('span');
   const update = () => {
     const station = animationValidationStation(select.value);
-    detail.textContent = station.validates.join(' · ');
+    detail.textContent =
+      `${station.instructions} Checks: ${station.validates.join(' · ')}`;
     moveToAnimationValidationStation(station);
   };
   select.addEventListener('change', update);
-  detail.textContent = initialValidationStation.validates.join(' · ');
+  detail.textContent =
+    `${initialValidationStation.instructions} Checks: ${initialValidationStation.validates.join(' · ')}`;
   panel.append(heading, select, detail);
   document.querySelector('.game-wrap')?.append(panel);
   return panel;
@@ -318,10 +334,13 @@ function rawInputSnapshot() {
         characterRenderer.isReady(player.hero) &&
         !characterRenderer.animationDebugOverride,
     jump: keys.has('Space') || keys.has('ArrowUp') || keys.has('KeyW') ||
-      touch.jump || gamepad.jump,
-    down: keys.has('ArrowDown') || keys.has('KeyS') || touch.slam || gamepad.down,
-    action: keys.has('KeyE') || touch.action || gamepad.action,
-    swap: keys.has('KeyQ') || touch.swap || gamepad.swap,
+      touch.jump || inputPressLatch.jump || gamepad.jump,
+    down: keys.has('ArrowDown') || keys.has('KeyS') || touch.slam ||
+      inputPressLatch.slam || gamepad.down,
+    action: keys.has('KeyE') || touch.action || inputPressLatch.action ||
+      gamepad.action,
+    swap: keys.has('KeyQ') || touch.swap || inputPressLatch.swap ||
+      gamepad.swap,
     pause: keys.has('Escape') || gamepad.pause
   };
 }
@@ -433,6 +452,7 @@ function restartCourse() {
   mobActivation = createCourseMobActivation();
   projectiles = [];
   inputBuffer.reset();
+  recentMovementEvents = [];
   notice = 'Course restarted with the Meadow Wake mob roster.';
   noticeSeconds = 2;
 }
@@ -508,6 +528,15 @@ function defeatForPlayer(mob) {
 
 function handleMovementEvents(events) {
   for (const event of events) {
+    if (!event.type.startsWith('state-')) {
+      recentMovementEvents.push(Object.freeze({
+        type: event.type,
+        atSeconds: simulationSeconds
+      }));
+      if (recentMovementEvents.length > 16) {
+        recentMovementEvents = recentMovementEvents.slice(-16);
+      }
+    }
     if (event.type !== 'ground-slam-impact') continue;
     const presentation = createGroundSlamImpactPresentation(event);
     characterRenderer.triggerGroundSlamImpact(presentation);
@@ -658,7 +687,9 @@ function updateCombat(input, previousPlayerFootY, dt) {
 
 function fixedUpdate(dt) {
   if (session.state !== 'playing') return;
+  simulationSeconds += dt;
   if (animationCue) {
+    animationCue.elapsedSeconds += dt;
     animationCue.remainingSeconds -= dt;
     if (animationCue.remainingSeconds <= 0) animationCue = null;
   }
@@ -974,11 +1005,20 @@ function drawOverlay() {
       `buffer ${debug.jumpBufferSeconds.toFixed(3)}  coyote ${debug.coyoteSeconds.toFixed(3)}  twirl ${debug.twirlAvailable}  double ${debug.doubleJumpAvailable}`,
       `glide ${debug.glideState} ${debug.glideSeconds.toFixed(2)}s  slam ${debug.groundSlamPhase}  intent ${debug.groundSlamBufferSeconds.toFixed(3)}s`
     ];
+    const presentation = player.animationPresentation;
+    if (presentation) {
+      lines.push(
+        `pose ${presentation.selectedPoseState}  sub ${presentation.presentationSubphase}  phase ${presentation.locomotionPhase.toFixed(3)}`,
+        `feet L:${presentation.leftFootContact} R:${presentation.rightFootContact}  ETA ${Number.isFinite(presentation.predictedGroundSeconds)
+          ? presentation.predictedGroundSeconds.toFixed(3)
+          : '—'}s  blend ${presentation.blendSeconds.toFixed(3)}s`
+      );
+    }
     ctx.fillStyle = 'rgba(5, 10, 8, .9)';
-    ctx.fillRect(18, H - 158, 720, 138);
+    ctx.fillRect(18, H - 204, 820, 184);
     ctx.fillStyle = '#d9f6cf';
     ctx.font = '600 14px ui-monospace, monospace';
-    lines.forEach((line, index) => ctx.fillText(line, 30, H - 132 + index * 23));
+    lines.forEach((line, index) => ctx.fillText(line, 30, H - 178 + index * 23));
   }
 }
 
@@ -992,6 +1032,9 @@ function frame(now) {
   const elapsed = Math.max(0, Math.min(0.1, (now - lastFrame) / 1000));
   lastFrame = now;
   inputBuffer.sample(rawInputSnapshot(), elapsed);
+  for (const action of Object.keys(inputPressLatch)) {
+    inputPressLatch[action] = false;
+  }
   loop.advance(elapsed, fixedUpdate);
   noticeSeconds = Math.max(0, noticeSeconds - elapsed);
   const sprintLookAhead = player.locomotion === 'sprint'
@@ -1024,11 +1067,15 @@ function frame(now) {
     previousMovementState: player.previousMovementState,
     stateSeconds: player.stateSeconds,
     airborneSeconds: player.airborneSeconds,
+    animationPresentation: player.animationPresentation,
+    turnProgress: player.turnPhaseSeconds ?? 0,
     glide: player.glide,
     horizontalSpeed: player.velocityX,
     verticalSpeed: player.velocityY,
     grounded: player.grounded,
     surfaceAngle: player.surfaceAngle ?? 0,
+    supportVelocityX: player.supportVelocityX ?? 0,
+    supportVelocityY: player.supportVelocityY ?? 0,
     animationCue,
     cameraX,
     cameraY,
@@ -1047,14 +1094,17 @@ if (animationDebugEnabled) {
   animationDebugPanel = new AnimationDebugPanel({
     renderer: characterRenderer,
     getGameplaySnapshot: () => ({
+      hero: player.hero,
       movementState: player.movementState,
       velocityX: player.velocityX,
       velocityY: player.velocityY,
-      grounded: player.grounded
+      grounded: player.grounded,
+      recentEvents: recentMovementEvents
     }),
     onHeroRequested: requestedHero => {
       if (requestedHero !== player.hero) trySwapUnifiedHero(player, { canOccupy });
-    }
+    },
+    startInGameplay: animationValidationEnabled
   });
 }
 
@@ -1063,6 +1113,12 @@ createAnimationValidationPanel();
 addEventListener('keydown', event => {
   if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space'].includes(event.code)) event.preventDefault();
   if (event.code === 'KeyR') restartCourse();
+  if (!event.repeat) {
+    if (['Space', 'ArrowUp', 'KeyW'].includes(event.code)) inputPressLatch.jump = true;
+    if (['ArrowDown', 'KeyS'].includes(event.code)) inputPressLatch.slam = true;
+    if (event.code === 'KeyE') inputPressLatch.action = true;
+    if (event.code === 'KeyQ') inputPressLatch.swap = true;
+  }
   keys.add(event.code);
 });
 addEventListener('keyup', event => keys.delete(event.code));
@@ -1082,6 +1138,7 @@ for (const button of document.querySelectorAll('[data-action]')) {
   button.addEventListener('pointerdown', event => {
     event.preventDefault();
     button.setPointerCapture(event.pointerId);
+    if (action in inputPressLatch) inputPressLatch[action] = true;
     set(true);
   });
   button.addEventListener('pointerup', () => set(false));

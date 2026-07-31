@@ -1,24 +1,32 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "controllerPolicy": {
     "movementAuthority": "deterministic fixed-step velocity controller",
+    "numericAuthority": "data/character-animation-numeric-spec.json",
+    "livePoseEvaluator": "src/animation/character-animation-numeric-runtime.js",
     "manualSprintAction": false,
     "locomotionSelection": "movement state plus measured horizontal and vertical velocity",
-    "walkMaximumBeforeBlendMetresPerSecond": 4.15,
-    "runMinimumMetresPerSecond": 4.15,
+    "walkSpeedMetresPerSecond": 3.2,
+    "runSpeedMetresPerSecond": 5.7,
+    "fullSpeedMetresPerSecond": 7.15,
+    "fullSpeedEntryMetresPerSecond": 4.65,
     "rootMotion": false,
     "locomotionPhaseSynchronization": true,
-    "footHeightCorrection": "grounded contact clips only",
+    "locomotionPhaseFormula": "positiveModulo(phase + abs(horizontalVelocity) * dt / cycleDistanceMetres, 1)",
+    "footContactCorrection": "phase-window contacts with forward-plus-vertical gait locking and vertical-only skid/slide locking",
     "terrainAdaptation": "bounded side-profile slope tilt",
     "interruptionPolicy": "gameplay state changes and explicit cues supersede presentation one-shots",
-    "missingClipPolicy": "fall back to the nearest locked-rig authored body action without replacing the approved mesh"
+    "missingClipPolicy": "fall back to the nearest numeric semantic body pose without replacing the approved mesh",
+    "maximumResponsiveBlendSeconds": 0.12,
+    "fixedClipPolicy": "debug and isolated rig inspection only"
   },
   "sources": {
     "suppliedMeshy": [
       "{hero}_walk",
       "{hero}_run"
     ],
-    "projectAuthoredLockedRig": "src/animation/locked-meshy-animation-library.js",
+    "numericSemanticPoseRuntime": "src/animation/character-animation-numeric-runtime.js",
+    "fixedDebugClipLibrary": "src/animation/locked-meshy-animation-library.js",
     "suppliedMeshyRuntimePolicy": "reference and debug only; the visible model and matching rig are locked, not the supplied gait animation",
     "rejectedProceduralCharacterActions": {
       "runtimeUse": false,

@@ -307,14 +307,16 @@ The movement layer should expose animation intent without hard-coding a particul
 
 ## 13. Rig-dependent integration status
 
-The locked original Meshy models now exist in the live runtime. Body animation
-selection, velocity-linked walk/run playback, phase synchronization, in-place
-root-motion policy, grounded foot-height correction, bounded slope adaptation,
+The locked original Meshy models now exist in the live runtime. The approved
+numeric contract in `data/character-animation-numeric-spec.json` drives a
+project-authored semantic-pose layer on the exact locked rigs. Distance-driven
+walk/run/full-speed phase, explicit left/right contact and toe-off windows,
+controller-driven air poses, feet-down ground slam, planted turn/skid timing,
+in-place root-motion policy, contact correction, bounded slope adaptation,
 and responsive transition blending are implemented.
 
 The following still require reviewed source-asset work:
 
-- authored per-clip left/right foot-contact markers;
 - collider-to-visible-body review in every hero state;
 - source-rig corrective shapes or bones for stressed joints;
 - facial and individual finger controls;

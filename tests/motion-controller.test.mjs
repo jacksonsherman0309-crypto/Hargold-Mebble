@@ -254,6 +254,6 @@ assert.equal(
   PROVISIONAL_HERO_PROFILES.Mebble.airControlMultiplier,
   'both heroes use identical shared horizontal air-control tuning'
 );
-assert.equal(TUNING.status, 'provisional-clean-room-project-tuning');
+assert.equal(TUNING.status, 'approved-original-numeric-animation-contract-aligned');
 
 console.log('Modular motion extraction checks passed.');

@@ -1,4 +1,8 @@
 import { authoredLockedMeshyMotions } from './locked-meshy-animation-library.js';
+import { CHARACTER_ANIMATION_NUMERIC_SPEC } from './character-animation-numeric-runtime.js';
+
+const NUMERIC = CHARACTER_ANIMATION_NUMERIC_SPEC;
+const ANIMATION_FPS = NUMERIC.timing.animationAuthoringFps;
 
 const SUPPLIED_CLIPS = Object.freeze({
   Hargold: Object.freeze([
@@ -50,6 +54,10 @@ function generatedClipMetadata(hero) {
     durationSeconds: clip.duration,
     loop: clip.loop,
     footLock: clip.footLock,
+    footLockAxes: clip.footLockAxes,
+    markers: clip.markers,
+    parameterization: clip.parameterization,
+    numericAuthority: clip.numericAuthority,
     authoredSpeedMetresPerSecond: clip.authoredSpeedMetresPerSecond,
     source: clip.source
   }));
@@ -141,7 +149,8 @@ function oneShot(clipId, {
     blendSeconds,
     footLock,
     playbackRate,
-    phaseSync: false
+    phaseSync: false,
+    controllerDriven: true
   });
 }
 
@@ -157,7 +166,8 @@ function looped(clipId, {
     blendSeconds,
     footLock,
     playbackRate,
-    phaseSync
+    phaseSync,
+    controllerDriven: true
   });
 }
 
@@ -187,122 +197,167 @@ export function animationIntentFor({
   switch (movementState) {
     case 'idle':
       if (stateSeconds >= 4.2 && stateSeconds % 7.2 < 2.9) {
-        return looped(`${prefix}_idle_secondary`, { footLock: true, blendSeconds: 0.16 });
+        return looped(`${prefix}_idle_secondary`, {
+          footLock: true,
+          blendSeconds: NUMERIC.blendSeconds.idleToWalk
+        });
       }
-      return looped(`${prefix}_idle`, { footLock: true, blendSeconds: 0.12 });
+      return looped(`${prefix}_idle`, {
+        footLock: true,
+        blendSeconds: NUMERIC.blendSeconds.idleToWalk
+      });
     case 'walk':
-      if (previousMovementState === 'idle' && stateSeconds < 0.24) {
-        return oneShot(`${prefix}_walk_start`, { footLock: true, blendSeconds: 0.045 });
+      if (
+        previousMovementState === 'idle' &&
+        stateSeconds < NUMERIC.actions.moveStart[hero].frames / ANIMATION_FPS
+      ) {
+        return oneShot(`${prefix}_walk_start`, {
+          footLock: true,
+          blendSeconds: NUMERIC.blendSeconds.idleToWalk
+        });
       }
       return looped(config.walk, {
         footLock: true,
         phaseSync: true,
-        blendSeconds: 0.11
+        blendSeconds: NUMERIC.blendSeconds.gaitToGait
       });
     case 'run':
       if (
         ['idle', 'walk'].includes(previousMovementState) &&
-        stateSeconds < 0.3
+        stateSeconds <
+          (hero === 'Hargold'
+            ? NUMERIC.actions.walkToRun.HargoldFrames
+            : NUMERIC.actions.walkToRun.MebbleFrames) / ANIMATION_FPS
       ) {
         return oneShot(`${prefix}_walk_run_accel`, {
           footLock: true,
-          blendSeconds: 0.055
+          blendSeconds: NUMERIC.blendSeconds.gaitToGait
         });
       }
       return looped(config.run, {
         footLock: true,
         phaseSync: true,
-        blendSeconds: 0.075
+        blendSeconds: NUMERIC.blendSeconds.gaitToGait
       });
     case 'sprint':
       return looped(config.sprint, {
         footLock: true,
         phaseSync: true,
-        blendSeconds: 0.065
+        blendSeconds: NUMERIC.blendSeconds.gaitToGait
       });
     case 'brake':
-      return oneShot(`${prefix}_run_decelerate`, { footLock: true, blendSeconds: 0.045 });
+      return oneShot(`${prefix}_run_decelerate`, {
+        footLock: true,
+        blendSeconds: NUMERIC.blendSeconds.brake
+      });
     case 'turn':
-      return oneShot(`${prefix}_turnaround`, { footLock: true, blendSeconds: 0.035 });
+      return oneShot(`${prefix}_turnaround`, {
+        footLock: true,
+        blendSeconds: NUMERIC.blendSeconds.turn
+      });
     case 'skid':
-      return oneShot(`${prefix}_skid`, { footLock: true, blendSeconds: 0.035 });
+      return oneShot(`${prefix}_skid`, {
+        footLock: true,
+        blendSeconds: NUMERIC.blendSeconds.skid
+      });
     case 'crouch':
-      return oneShot(`${prefix}_crouch`, { footLock: true, blendSeconds: 0.07 });
+      return oneShot(`${prefix}_crouch`, {
+        footLock: true,
+        blendSeconds: NUMERIC.blendSeconds.crouch
+      });
     case 'crawl':
-      return looped(`${prefix}_crawl`, { footLock: true, blendSeconds: 0.08 });
+      return looped(`${prefix}_crawl`, {
+        footLock: true,
+        blendSeconds: NUMERIC.blendSeconds.crouch,
+        phaseSync: true
+      });
     case 'duck-slide':
-      return oneShot(`${prefix}_slide`, { footLock: true, blendSeconds: 0.045 });
+      return oneShot(`${prefix}_slide`, {
+        footLock: true,
+        blendSeconds: NUMERIC.blendSeconds.slide
+      });
     case 'jump-startup':
       return oneShot(`${prefix}_jump_anticipation`, {
         footLock: true,
-        blendSeconds: 0.02
+        blendSeconds: NUMERIC.blendSeconds.jump
       });
     case 'rise':
-      if (airborneSeconds < 0.18) {
-        return oneShot(`${prefix}_jump_takeoff`, { blendSeconds: 0.02 });
-      }
       if (speed >= 4.1) {
-        return looped(`${prefix}_running_jump`, { blendSeconds: 0.045 });
+        return looped(`${prefix}_running_jump`, {
+          blendSeconds: NUMERIC.blendSeconds.airPose
+        });
       }
       return looped(`${prefix}_jump_rise`, {
-        blendSeconds: 0.045,
+        blendSeconds: NUMERIC.blendSeconds.airPose,
         playbackRate: Math.min(1.22, Math.max(0.82, Math.abs(verticalSpeed) / 8.5))
       });
     case 'apex':
-      return looped(`${prefix}_jump_apex`, { blendSeconds: 0.065 });
+      return looped(`${prefix}_jump_apex`, {
+        blendSeconds: NUMERIC.blendSeconds.airPose
+      });
     case 'fall':
     case 'fast-fall':
       return looped(
         speed >= 4.5 ? `${prefix}_air_adjust` : `${prefix}_jump_fall`,
         {
-          blendSeconds: 0.065,
+          blendSeconds: NUMERIC.blendSeconds.airPose,
           playbackRate: movementState === 'fast-fall' ? 1.2 : 1
         }
       );
     case 'twirl':
-      return oneShot(`${prefix}_air_spin`, { blendSeconds: 0.025 });
+      return oneShot(`${prefix}_air_spin`, { blendSeconds: NUMERIC.blendSeconds.turn });
     case 'double-jump':
       return oneShot(
         hero === 'Hargold' ? `${prefix}_double_jump` : `${prefix}_air_spin`,
-        { blendSeconds: 0.025 }
+        { blendSeconds: NUMERIC.blendSeconds.turn }
       );
     case 'glide-opening':
       return oneShot(
         hero === 'Mebble' ? `${prefix}_glide_open` : `${prefix}_jump_fall`,
-        { blendSeconds: 0.04 }
+        { blendSeconds: NUMERIC.blendSeconds.airPose }
       );
     case 'glide':
       return looped(
         hero === 'Mebble' ? `${prefix}_glide_sustain` : `${prefix}_jump_fall`,
-        { blendSeconds: 0.08 }
+        { blendSeconds: NUMERIC.blendSeconds.airPose }
       );
     case 'glide-closing':
       return oneShot(
         hero === 'Mebble' ? `${prefix}_glide_close` : `${prefix}_jump_fall`,
-        { blendSeconds: 0.045 }
+        { blendSeconds: NUMERIC.blendSeconds.airPose }
       );
     case 'stomp':
     case 'stomp-bounce':
     case 'spring-bounce':
-      return oneShot(`${prefix}_stomp_bounce`, { blendSeconds: 0.035 });
+      return oneShot(`${prefix}_stomp_bounce`, { blendSeconds: NUMERIC.blendSeconds.landing });
     case 'soft-land':
     case 'landing':
-      return oneShot(`${prefix}_land_soft`, { footLock: true, blendSeconds: 0.025 });
+      return oneShot(`${prefix}_land_soft`, {
+        footLock: true,
+        blendSeconds: NUMERIC.blendSeconds.landing
+      });
     case 'hard-land':
-      return oneShot(`${prefix}_land_heavy`, { footLock: true, blendSeconds: 0.025 });
+      return oneShot(`${prefix}_land_heavy`, {
+        footLock: true,
+        blendSeconds: NUMERIC.blendSeconds.landing
+      });
     case 'ground-slam-startup':
-      return oneShot(`${prefix}_ground_slam_start`, { blendSeconds: 0.02 });
+      return oneShot(`${prefix}_ground_slam_start`, {
+        blendSeconds: NUMERIC.blendSeconds.groundSlamStartup
+      });
     case 'ground-slam-fall':
-      return looped(`${prefix}_ground_slam_fall`, { blendSeconds: 0.035 });
+      return looped(`${prefix}_ground_slam_fall`, {
+        blendSeconds: NUMERIC.blendSeconds.groundSlamStartup
+      });
     case 'ground-slam-impact':
       return oneShot(`${prefix}_ground_slam_impact`, {
         footLock: true,
-        blendSeconds: 0.02
+        blendSeconds: NUMERIC.blendSeconds.groundSlamImpact
       });
     case 'ground-slam-recovery':
       return oneShot(`${prefix}_ground_slam_recover`, {
         footLock: true,
-        blendSeconds: 0.018
+        blendSeconds: NUMERIC.blendSeconds.groundSlamStartup
       });
     case 'wall-contact':
     case 'ledge-grab':

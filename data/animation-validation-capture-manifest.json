@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "generatedAt": "2026-07-30",
-  "captureSetStatus": "pre-refinement reference captures retained; refined gait and slam impact captures still need repository export",
+  "captureSetStatus": "numeric semantic runtime verified interactively; replacement repository captures remain pending",
   "level": "1-1 Meadow Wake",
   "validationCourse": {
     "module": "src/content/animation-validation-course.js",
-    "url": "?animationValidation=1&debugAnimation=1",
+    "url": "?fullyUnlocked=1&animationValidation=1&debugAnimation=1&debugMovement=1",
     "stationCount": 10,
     "browserSmokeStatus": "pass",
     "browserSmokeEvidence": [
@@ -13,7 +13,8 @@
       "both locked 3D character assets loaded",
       "41 Hargold and 43 Mebble runtime presentation clips listed",
       "validation station selector loaded with all ten stations",
-      "no startup module error after repair"
+      "validation panel started in live numeric gameplay mode",
+      "no startup module or console error"
     ]
   },
   "viewport": {
@@ -25,12 +26,21 @@
     "browserStatus": "pass",
     "consoleErrors": 0,
     "observed": [
-      "hargold_sprint_refined direct locked-rig playback",
-      "mebble_sprint_refined direct locked-rig playback",
-      "immediate jump-plus-slam input reached ground-slam-impact through the input buffer",
-      "ground-slam impact ring, dust, camera response, and recovery state rendered in live Meadow Wake gameplay"
+      "Hargold live controller reached sprint with hargold_sprint_refined numeric pose selected, left contact active, 0.000 percent-height measured slip, and 0.000 percent-height penetration at the sampled frame",
+      "Hargold jump input emitted jump-takeoff and jump-launch; the second jump emitted double-jump-started",
+      "simultaneous jump-plus-down input exercised the deterministic slam buffer and emitted ground-slam-started, ground-slam-commit, landing-contact, ground-slam-impact, and recovery-cancel-open",
+      "Mebble loaded on the unchanged locked rig and the sampled grounded wall-contact correction reported 0.000 percent-height slip and penetration",
+      "runtime telemetry exposed state, presentation subphase, selected pose, persistent phase, both foot contacts, velocity, predicted ground time, blend, facing marker, and rig-limited status"
     ],
-    "savedCaptureStatus": "pending replacement captures; observations were interactive browser validation only"
+    "renderRateValidation": "30, 60, and 120 Hz phase consistency passes in tests/character-animation-numeric-runtime.test.mjs; interactive browser observation used the 120 Hz fixed-step build",
+    "rigLimitedObserved": [
+      "facial controls unavailable",
+      "finger articulation unavailable",
+      "independent cape and scarf controls unavailable",
+      "hat, feather, glasses, belt, and backpack follow controls unavailable",
+      "pose-space correctives unavailable"
+    ],
+    "savedCaptureStatus": "pending replacement captures; current observations are interactive browser validation and automated numeric tests"
   },
   "captures": [
     {

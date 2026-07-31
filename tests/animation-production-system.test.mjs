@@ -11,6 +11,7 @@ import {
 } from '../src/animation/locked-meshy-animation-library.js';
 import {
   ANIMATION_VALIDATION_STATIONS,
+  ANIMATION_VALIDATION_MATRIX,
   animationValidationStation
 } from '../src/content/animation-validation-course.js';
 
@@ -118,7 +119,7 @@ assert.equal(animationIntentFor({
   airborneSeconds: 0.08,
   verticalSpeed: -8,
   grounded: false
-}).clipId, 'hargold_jump_takeoff');
+}).clipId, 'hargold_jump_rise');
 assert.equal(animationIntentFor({
   hero: 'Mebble',
   movementState: 'glide'
@@ -141,9 +142,15 @@ assert.ok(ANIMATION_VALIDATION_STATIONS.some(station => station.validates.includ
 assert.ok(ANIMATION_VALIDATION_STATIONS.every(
   station => station.spawnX >= 0 && station.spawnX <= 112
 ));
+assert.ok(ANIMATION_VALIDATION_STATIONS.every(station => station.instructions.length > 20));
+assert.deepEqual(ANIMATION_VALIDATION_MATRIX.renderFps, [30, 60, 120]);
+assert.equal(ANIMATION_VALIDATION_MATRIX.maximumFootSlipPercentHeight, 1.5);
 
 assert.match(rendererSource, /phaseSync/);
 assert.match(rendererSource, /applyGroundContact/);
+assert.match(rendererSource, /sampleNumericCharacterPose/);
+assert.match(rendererSource, /semanticPoseToLockedRigDeltas/);
+assert.match(rendererSource, /applyNumericFootContact/);
 assert.match(rendererSource, /bindFootOffset/);
 assert.match(rendererSource, /surfaceAngle/);
 assert.doesNotMatch(rendererSource, /hargold_character\.glb/);
