@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 1,
+  "status": "approved-authoritative-production-order",
+  "approvedDate": "2026-07-31",
+  "humanReadableAuthority": "docs/rig-first-character-production-gate-2026-07-31.md",
+  "supersedesConflictingWorkflowsFor": [
+    "finalAnimationPolishOnInterimRigs",
+    "finalAnimationApprovalBeforeProductionRigApproval",
+    "exhaustiveAnimationValidationBeforeProductionRigIntegration"
+  ],
+  "coreDecision": {
+    "productionBlenderRigsEstablishedFirst": true,
+    "finalAnimationProductionBlockedUntilRigGatesPass": true,
+    "current24BoneRigRole": [
+      "interimRuntimeBaseline",
+      "migrationSource",
+      "diagnosticAnimationRig",
+      "rollbackAsset"
+    ],
+    "current24BoneRigsAreFinalAnimationTarget": false,
+    "visibleCharacterIdentityRemainsLocked": true
+  },
+  "pausedUntilRigApproval": [
+    "finalKeyframePolish",
+    "finalCurvePolish",
+    "finalLocomotionApproval",
+    "finalGroundSlamApproval",
+    "finalCrouchWalkApproval",
+    "finalHargoldTwirlApproval",
+    "finalHargoldDoubleJumpApproval",
+    "finalMebbleGlideApproval",
+    "finalReactionAndVictoryApproval",
+    "fullAnimationLibraryProductionApproval"
+  ],
+  "interimAnimationAllowedUses": [
+    "controllerDiagnostics",
+    "stateMachineDiagnostics",
+    "timingExperiments",
+    "silhouetteBlocking",
+    "eventMarkerVerification",
+    "regressionComparison",
+    "migrationReference",
+    "gameplayStateReachabilityProof"
+  ],
+  "parallelWorkAllowed": [
+    "deterministicMovementPhysics",
+    "movementStateLogic",
+    "inputPriorityLogic",
+    "controllerTranslationAndCollision",
+    "numericTimingContracts",
+    "contactEffectAndEventSchemas",
+    "animationValidationTooling",
+    "semanticControlMapInterfaces",
+    "cameraLevelEnemyBlockSaveProgressionAndEnvironmentWork",
+    "assetPipelineAndExportAutomation",
+    "nonMisleadingStructuralTests"
+  ],
+  "productionStages": [
+    {
+      "id": 0,
+      "name": "preserveCurrentBaseline",
+      "required": [
+        "rollbackGLBs",
+        "assetHashes",
+        "scale",
+        "footOrigin",
+        "facing",
+        "sockets",
+        "materials",
+        "runtimeMap"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "createEditableBlenderProductionSources",
+      "required": [
+        "HargoldBlend",
+        "MebbleBlend",
+        "canonicalScale",
+        "cleanTransforms",
+        "correctFacing",
+        "stableFootOrigin",
+        "productionTopology",
+        "productionArmatureAndControls",
+        "versionAndExportMetadata"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "buildPurposefulProductionSkeletons",
+      "authority": "data/character-rig-direction-override-2026-07-31.json"
+    },
+    {
+      "id": 3,
+      "name": "skinTopologyAndCorrectiveDeformation",
+      "mustResolve": [
+        "shoulderCollapse",
+        "elbowPinch",
+        "kneePinch",
+        "wristSeparation",
+        "hipCollapse",
+        "candyWrapperTwist",
+        "HargoldLimbSilhouetteLoss",
+        "MebbleNeckPinchOrSeparation",
+        "bootContactShapeLoss",
+        "hardBodyRegionSeams"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "establishHandFaceAndAccessorySystems"
+    },
+    {
+      "id": 5,
+      "name": "staticAndPosedDeformationGate"
+    },
+    {
+      "id": 6,
+      "name": "candidateExportAndSemanticMapIntegration"
+    },
+    {
+      "id": 7,
+      "name": "runtimeParityGate"
+    },
+    {
+      "id": 8,
+      "name": "finalAnimationProduction",
+      "blockedUntilPreviousStagesPass": true
+    },
+    {
+      "id": 9,
+      "name": "exhaustiveLiveAnimationValidation",
+      "blockedUntilFinalAnimationProduction": true
+    }
+  ],
+  "rigApprovalGates": {
+    "identityAndIntegration": [
+      "approvedVisibleIdentityPreserved",
+      "canonicalScalePreserved",
+      "footOriginCorrect",
+      "facingCorrect",
+      "socketsCorrect",
+      "materialsAndAccessoriesIntact",
+      "sideScrollingOrientationPreserved"
+    ],
+    "controlCompleteness": [
+      "requiredSemanticBodyControlsPresent",
+      "heroSpecificSecondaryControlsPresent",
+      "handSystemPresent",
+      "faceSystemPresent",
+      "noApprovedActionDependsOnMissingControl",
+      "semanticMapMachineReadable"
+    ],
+    "deformationQuality": [
+      "requiredPoseSheetPasses",
+      "noMajorCollapsePinchSeparationOrTwist",
+      "HargoldLimbsRemainReadable",
+      "MebbleNeckHeadArmsAndCapeRemainCoherent",
+      "plantedBootsAndFootRollReadable"
+    ],
+    "exportAndRuntimeParity": [
+      "versionedGLBsLoad",
+      "noScaleOriginFacingMaterialSocketOrBoundsRegression",
+      "noControllerOrCollisionRegression",
+      "semanticMapComplete",
+      "rollbackTested"
+    ],
+    "mobileScaleAnimationReadiness": [
+      "silhouetteReadableAt100To150Pixels",
+      "frontAndRearLimbsSeparateInTrueSide",
+      "signatureActionPosesDistinguishable",
+      "faceHandAndAccessoryControlsVisiblyUseful"
+    ]
+  },
+  "requiredPoseGate": [
+    "neutral",
+    "walkContact",
+    "walkPassing",
+    "runContact",
+    "runAirborneExtension",
+    "fullSpeedExtension",
+    "accelerationFirstStep",
+    "releaseStop",
+    "plantedSkid",
+    "plantedTurn",
+    "crouch",
+    "crouchWalkContact",
+    "crouchWalkPassing",
+    "slide",
+    "jumpAnticipation",
+    "jumpRise",
+    "jumpApex",
+    "fallPreparation",
+    "softLanding",
+    "heavyLanding",
+    "groundSlamTuck",
+    "groundSlamSomersaultMidpoint",
+    "groundSlamCommittedDescent",
+    "groundSlamImpact",
+    "groundSlamRecovery",
+    "HargoldDoubleJump",
+    "HargoldTwirl",
+    "MebbleGlideOpen",
+    "MebbleGlideSustain",
+    "hurt",
+    "knockback",
+    "defeat",
+    "blockHit",
+    "carryOrGrab",
+    "victory"
+  ],
+  "finalAnimationRecommendedOrder": [
+    "idleAndLocomotionFoundation",
+    "accelerationBrakingSkidAndTurn",
+    "crouchCrouchWalkAndSlide",
+    "jumpFallLandingAndBounce",
+    "groundSlam",
+    "HargoldDoubleJumpAndTwirl",
+    "MebbleGlide",
+    "damageDefeatBlockHitCarryPowerSwapAndVictory",
+    "facialHandAndAccessoryPolish",
+    "transitionsAndFullLibraryValidation"
+  ],
+  "requiredDeliverablesBeforeFinalAnimation": [
+    "HargoldProductionBlend",
+    "MebbleProductionBlend",
+    "versionedCandidateGLBs",
+    "rollbackGLBsAndHashes",
+    "rigInventoryPerHero",
+    "deformControlHelperAndSocketCounts",
+    "semanticBoneControlMapJSON",
+    "skinWeightAndCorrectiveReport",
+    "facialControlInventory",
+    "handPoseInventory",
+    "accessoryControlInventory",
+    "staticAndPosedDeformationSheets",
+    "trueSideMobileSilhouetteSheets",
+    "runtimeParityReport",
+    "rollbackTestResult",
+    "rigGatePassFailMatrix"
+  ],
+  "completionRule": {
+    "armatureExistenceIsCompletion": false,
+    "successfulImportIsCompletion": false,
+    "successfulGLBExportIsCompletion": false,
+    "neutralPoseApprovalIsCompletion": false,
+    "recommendedBoneCountIsCompletion": false,
+    "structuralTestsAloneAreCompletion": false,
+    "allRigGatesRequired": true
+  }
+}
