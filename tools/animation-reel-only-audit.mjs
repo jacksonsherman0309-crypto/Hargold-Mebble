@@ -104,7 +104,7 @@ try {
     for (const clip of catalog[hero]) {
       ordinal += 1;
       await page.locator('#reel-only-label').evaluate((element, data) => {
-        element.textContent = `${data.ordinal}/84 · ${data.hero} · ${data.id}\n${data.label}\n${data.duration.toFixed(3)} s · ${data.loop ? 'loop' : 'one-shot'} · ${data.source}`;
+        element.textContent = `${data.ordinal}/84 · ${data.hero} · ${data.id}\n${data.label}\n${data.durationSeconds.toFixed(3)} s · ${data.loop ? 'loop' : 'one-shot'} · ${data.source}`;
       }, { ordinal, hero, ...clip });
       await clipSelect.selectOption(clip.id);
       await facingSelect.selectOption('1');
