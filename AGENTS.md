@@ -8,25 +8,27 @@ Codex must load the current canon, the world-specific archive policy, the exact 
 2. `docs/canonical-design-bible.md` — highest-level current design source of truth except where superseded by the newer campaign-count override.
 3. `docs/character-dimension-animation-spec.md` — approved fully 3D construction, three-quarter presentation, rig, animation, camera-readability, and validation contract.
 4. `docs/character-animation-numeric-spec.md` and `data/character-animation-numeric-spec.json` — approved original project-authored frame counts, joint-angle targets, contact phases, controller coupling, transitions, event markers, and animation tolerances. These files do not authorize use of any third-party animation asset.
-5. `docs/world-specific-archive-policy.md` — mandatory rule against flattening authored worlds and levels into a universal template.
-6. `docs/level-production-plan.md` — current campaign and level-construction requirements, subject to the campaign-count override.
-7. `docs/game-mechanics.md` — detailed gameplay mechanics.
-8. `docs/movement-and-collision-spec.md` — complete universal movement, collision, terrain, water, climbing, carrying, and deterministic-simulation contract.
-9. `src/campaign-level-count.js` — machine-readable authoritative level counts and campaign totals.
-10. `src/canonical-data.js` — machine-readable rules, campaign accounting, World 1 plans, and locked hero data; older nine-slot main-world values are legacy until remapped.
-11. `archive/physics/build-017-movement-spec.md` and `archive/physics/physics_completion_matrix.json` — archived full Build 017 physics contract.
-12. `archive/full-motion/hargold_mebble_full_motion_build_009_qa.json` — archived QA evidence for the earlier playable motion build.
-13. `docs/historical-build-handoff.md` — Build 025–030 handoff and production boundaries.
-14. `docs/archived-source-inventory.md` — earlier standalone artifacts and their transfer status.
-15. If `IMPORT_STATUS.txt` exists, read it, then inspect the complete package under the listed `archive/imported-packages/...` root.
-16. Read every exact world plan, course plan, encounter manifest, enemy definition, runtime file, and boss contract relevant to the requested task.
-17. Inspect the current implementation files relevant to the task.
+5. `docs/animation-motion-override-2026-07-31.md` and `data/animation-motion-override-2026-07-31.json` — newest authoritative ground-slam visual identity, Hargold-only air-twirl rule, and crouch-walk/squat-walk contract. These files override conflicting older animation and movement rules for those three actions.
+6. `docs/world-specific-archive-policy.md` — mandatory rule against flattening authored worlds and levels into a universal template.
+7. `docs/level-production-plan.md` — current campaign and level-construction requirements, subject to the campaign-count override.
+8. `docs/game-mechanics.md` — detailed gameplay mechanics.
+9. `docs/movement-and-collision-spec.md` — complete universal movement, collision, terrain, water, climbing, carrying, and deterministic-simulation contract.
+10. `src/campaign-level-count.js` — machine-readable authoritative level counts and campaign totals.
+11. `src/canonical-data.js` — machine-readable rules, campaign accounting, World 1 plans, and locked hero data; older nine-slot main-world values are legacy until remapped.
+12. `archive/physics/build-017-movement-spec.md` and `archive/physics/physics_completion_matrix.json` — archived full Build 017 physics contract.
+13. `archive/full-motion/hargold_mebble_full_motion_build_009_qa.json` — archived QA evidence for the earlier playable motion build.
+14. `docs/historical-build-handoff.md` — Build 025–030 handoff and production boundaries.
+15. `docs/archived-source-inventory.md` — earlier standalone artifacts and their transfer status.
+16. If `IMPORT_STATUS.txt` exists, read it, then inspect the complete package under the listed `archive/imported-packages/...` root.
+17. Read every exact world plan, course plan, encounter manifest, enemy definition, runtime file, and boss contract relevant to the requested task.
+18. Inspect the current implementation files relevant to the task.
 
 ## Authority and conflict rules
 
 - A newer explicit user instruction overrides an older rule.
 - Reflect newly approved rules in the relevant canonical documents and machine-readable source in the same change when applicable.
 - `docs/campaign-level-count-override.md` and `src/campaign-level-count.js` override all older nine-slot accounting for Worlds 1–7.
+- `docs/animation-motion-override-2026-07-31.md` and `data/animation-motion-override-2026-07-31.json` override conflicting older ground-slam, air-twirl, crawl, and crouch-walk rules.
 - Current canonical documents override conflicting historical names, world assignments, boss identities, and numerical values.
 - Preserve reusable historical code, course mechanics, enemy functionality, encounter scheduling, and boss logic when realigning old labels to current canon.
 - Existing placeholder prototype behavior is not authoritative when it conflicts with current canon or authored archived content.
@@ -58,13 +60,16 @@ Codex must load the current canon, the world-specific archive policy, the exact 
 - Preserve the strict linear side-scrolling gameplay plane and mobile-first landscape design.
 - Preserve the fully rendered 3D “2.75D” production target without adding free depth-lane movement.
 - Keep hearts/current health separate from lives.
-- Preserve the complete shared movement baseline: walking/running, skids, variable/running/triple jumps, coyote time, buffering, wall slides/jumps, crouch and slides, spin actions, fast fall, ground slam, stomp bounce, one-way platforms, swimming/diving, climbing, ropes, carrying/throwing, moving-platform transport, and safe hero swapping.
+- Preserve the complete shared movement baseline: walking/running, skids, variable/running/triple jumps, coyote time, buffering, wall slides/jumps, crouch and slides, fast fall, ground slam, stomp bounce, one-way platforms, swimming/diving, climbing, ropes, carrying/throwing, moving-platform transport, and safe hero swapping.
+- The air twirl is Hargold-only. Mebble must never enter the live twirl state; Mebble retains glide as the approved airborne specialty.
+- The movement state historically called `crawl` must be presented and animated as a crouching squat-walk, never as a hands-and-knees crawl and never as a slow standing walk.
+- Ground slam must use the approved air-brake, tuck, forward-somersault, committed low-hip descent, impact, and recovery sequence. A jump pose followed by a vertical drop is not acceptable.
 - Preserve universal wall jumps, approved hero additions, hero-gating rules, checkpoint/death behavior, 100-coin life rule, four-block roster, power-up rules, enemy rules, five-damage-event bosses, and authored teaching sequences.
 - Worlds 1–7 contain eight levels total each, including the secret level. Worlds 8–10 currently retain nine levels each. Current campaign accounting is 83 completion slots and 249 Compass Coin slots.
 - Do not silently delete or merge existing boss, fork, or secret-course content while remapping old World 1–7 nine-slot plans into the new eight-total structure.
 - Preserve the locked Hargold and Mebble appearance requirements.
 - Do not copy Nintendo code, art, characters, enemies, levels, maps, music, names, vocal performances, or protected identifiers.
-- Implement character motion from the approved original numeric animation contract; do not import, trace, inspect, frame-match, or retarget third-party animation clips.
+- Implement character motion from the approved original numeric animation contract and newest animation-motion override; do not import, trace, inspect, frame-match, or retarget third-party animation clips.
 - Add or update tests for every mechanic, data contract, save rule, progression rule, enemy behavior, boss counter, encounter rule, or level-plan invariant changed.
 - When code conflicts with current canon, fix or adapt the code rather than weakening the specification unless the user explicitly changes the design.
 
