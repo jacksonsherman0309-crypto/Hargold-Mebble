@@ -9,19 +9,20 @@ Codex must load the current canon, the world-specific archive policy, the exact 
 3. `docs/character-dimension-animation-spec.md` — approved fully 3D construction, three-quarter presentation, rig, animation, camera-readability, and validation contract.
 4. `docs/character-animation-numeric-spec.md` and `data/character-animation-numeric-spec.json` — approved original project-authored frame counts, joint-angle targets, contact phases, controller coupling, transitions, event markers, and animation tolerances. These files do not authorize use of any third-party animation asset.
 5. `docs/animation-motion-override-2026-07-31.md` and `data/animation-motion-override-2026-07-31.json` — newest authoritative ground-slam visual identity, Hargold-only air-twirl rule, and crouch-walk/squat-walk contract. These files override conflicting older animation and movement rules for those three actions.
-6. `docs/world-specific-archive-policy.md` — mandatory rule against flattening authored worlds and levels into a universal template.
-7. `docs/level-production-plan.md` — current campaign and level-construction requirements, subject to the campaign-count override.
-8. `docs/game-mechanics.md` — detailed gameplay mechanics.
-9. `docs/movement-and-collision-spec.md` — complete universal movement, collision, terrain, water, climbing, carrying, and deterministic-simulation contract.
-10. `src/campaign-level-count.js` — machine-readable authoritative level counts and campaign totals.
-11. `src/canonical-data.js` — machine-readable rules, campaign accounting, World 1 plans, and locked hero data; older nine-slot main-world values are legacy until remapped.
-12. `archive/physics/build-017-movement-spec.md` and `archive/physics/physics_completion_matrix.json` — archived full Build 017 physics contract.
-13. `archive/full-motion/hargold_mebble_full_motion_build_009_qa.json` — archived QA evidence for the earlier playable motion build.
-14. `docs/historical-build-handoff.md` — Build 025–030 handoff and production boundaries.
-15. `docs/archived-source-inventory.md` — earlier standalone artifacts and their transfer status.
-16. If `IMPORT_STATUS.txt` exists, read it, then inspect the complete package under the listed `archive/imported-packages/...` root.
-17. Read every exact world plan, course plan, encounter manifest, enemy definition, runtime file, and boss contract relevant to the requested task.
-18. Inspect the current implementation files relevant to the task.
+6. `docs/character-rig-direction-override-2026-07-31.md` and `data/character-rig-direction-override-2026-07-31.json` — newest authoritative production-rig direction. The current 24-bone Meshy rigs are interim runtime and migration baselines, not the final skeleton ceiling. Preserve visible identity while building the smallest purposeful original platformer control set that meets every action and deformation gate.
+7. `docs/world-specific-archive-policy.md` — mandatory rule against flattening authored worlds and levels into a universal template.
+8. `docs/level-production-plan.md` — current campaign and level-construction requirements, subject to the campaign-count override.
+9. `docs/game-mechanics.md` — detailed gameplay mechanics.
+10. `docs/movement-and-collision-spec.md` — complete universal movement, collision, terrain, water, climbing, carrying, and deterministic-simulation contract.
+11. `src/campaign-level-count.js` — machine-readable authoritative level counts and campaign totals.
+12. `src/canonical-data.js` — machine-readable rules, campaign accounting, World 1 plans, and locked hero data; older nine-slot main-world values are legacy until remapped.
+13. `archive/physics/build-017-movement-spec.md` and `archive/physics/physics_completion_matrix.json` — archived full Build 017 physics contract.
+14. `archive/full-motion/hargold_mebble_full_motion_build_009_qa.json` — archived QA evidence for the earlier playable motion build.
+15. `docs/historical-build-handoff.md` — Build 025–030 handoff and production boundaries.
+16. `docs/archived-source-inventory.md` — earlier standalone artifacts and their transfer status.
+17. If `IMPORT_STATUS.txt` exists, read it, then inspect the complete package under the listed `archive/imported-packages/...` root.
+18. Read every exact world plan, course plan, encounter manifest, enemy definition, runtime file, and boss contract relevant to the requested task.
+19. Inspect the current implementation files relevant to the task.
 
 ## Authority and conflict rules
 
@@ -29,6 +30,7 @@ Codex must load the current canon, the world-specific archive policy, the exact 
 - Reflect newly approved rules in the relevant canonical documents and machine-readable source in the same change when applicable.
 - `docs/campaign-level-count-override.md` and `src/campaign-level-count.js` override all older nine-slot accounting for Worlds 1–7.
 - `docs/animation-motion-override-2026-07-31.md` and `data/animation-motion-override-2026-07-31.json` override conflicting older ground-slam, air-twirl, crawl, and crouch-walk rules.
+- `docs/character-rig-direction-override-2026-07-31.md` and `data/character-rig-direction-override-2026-07-31.json` override conflicting instructions that lock the current generic 24-bone rigs as the final production skeletons. Visible character identity remains locked; production skeleton hierarchy, weights, deformation topology, facial controls, hand controls, and secondary controls may be rebuilt under the override.
 - Current canonical documents override conflicting historical names, world assignments, boss identities, and numerical values.
 - Preserve reusable historical code, course mechanics, enemy functionality, encounter scheduling, and boss logic when realigning old labels to current canon.
 - Existing placeholder prototype behavior is not authoritative when it conflicts with current canon or authored archived content.
@@ -67,10 +69,13 @@ Codex must load the current canon, the world-specific archive policy, the exact 
 - Preserve universal wall jumps, approved hero additions, hero-gating rules, checkpoint/death behavior, 100-coin life rule, four-block roster, power-up rules, enemy rules, five-damage-event bosses, and authored teaching sequences.
 - Worlds 1–7 contain eight levels total each, including the secret level. Worlds 8–10 currently retain nine levels each. Current campaign accounting is 83 completion slots and 249 Compass Coin slots.
 - Do not silently delete or merge existing boss, fork, or secret-course content while remapping old World 1–7 nine-slot plans into the new eight-total structure.
-- Preserve the locked Hargold and Mebble appearance requirements.
-- Do not copy Nintendo code, art, characters, enemies, levels, maps, music, names, vocal performances, or protected identifiers.
+- Preserve the locked Hargold and Mebble visible appearance requirements.
+- Treat the current 24-bone Meshy rigs as interim live-test and migration assets, not the final production skeleton limit. A production re-rig is permitted and expected when needed to meet the action, deformation, facial, hand, and secondary-motion standards.
+- Do not chase an external bone count or duplicate an external skeleton. Use the smallest purposeful original control set that cleanly supports the approved action list. Bone count is evidence, not the goal.
+- Preserve current assets as rollback baselines during rig migration. Do not switch the live runtime to replacement rigs until scale, foot origin, facing, sockets, semantic bone mapping, animation parity, deformation, browser validation, and regression tests pass.
+- Do not copy Nintendo code, art, characters, enemies, levels, maps, music, names, vocal performances, skeleton data, skin weights, joint coordinates, or protected identifiers.
 - Implement character motion from the approved original numeric animation contract and newest animation-motion override; do not import, trace, inspect, frame-match, or retarget third-party animation clips.
-- Add or update tests for every mechanic, data contract, save rule, progression rule, enemy behavior, boss counter, encounter rule, or level-plan invariant changed.
+- Add or update tests for every mechanic, data contract, save rule, progression rule, enemy behavior, boss counter, encounter rule, level-plan invariant, rig map, or animation behavior changed.
 - When code conflicts with current canon, fix or adapt the code rather than weakening the specification unless the user explicitly changes the design.
 
 ## Code and data requirements
@@ -78,9 +83,11 @@ Codex must load the current canon, the world-specific archive policy, the exact 
 - Put current campaign level counts in `src/campaign-level-count.js`; do not duplicate incompatible values.
 - Put other shared approved constants and campaign facts in `src/canonical-data.js`.
 - Use deterministic fixed-step simulation for production movement systems; `src/runtime/fixed-step.js` is the current reusable foundation.
+- Keep rig-dependent animation code behind a semantic bone/control map. Do not scatter new export bone names throughout gameplay and animation logic.
+- Put production-rig direction and inventory facts in the authoritative rig-direction and capability JSON files rather than duplicating incompatible values.
 - Keep implemented geometry, authored course data, and design-only coordinate-free scaffolds clearly distinguished.
 - Do not invent coordinates for historical coordinate-free level scaffolds and then present them as approved geometry.
-- Do not claim a level, model, animation, audio asset, Unity scene, enemy, boss, or system is complete unless the actual implementation is committed and verified.
+- Do not claim a level, model, rig, animation, audio asset, Unity scene, enemy, boss, or system is complete unless the actual implementation is committed and verified.
 - Planning documents, schemas, manifests, contracts, and passing structural tests are not substitutes for production assets or playable implementation.
 - Keep the runnable browser prototype functional while larger systems are developed.
 
@@ -92,7 +99,7 @@ Run at minimum:
 npm test
 ```
 
-Also run task-specific checks for gameplay, enemy behavior, boss counters, encounter schedules, rendering, level data, save migration, and mobile layout.
+Also run task-specific checks for gameplay, enemy behavior, boss counters, encounter schedules, rendering, rig mapping, deformation, level data, save migration, and mobile layout.
 
 ## Before completing any game-development task
 
@@ -100,7 +107,7 @@ Also run task-specific checks for gameplay, enemy behavior, boss counters, encou
 2. Read `IMPORT_STATUS.txt` when present and inventory the complete imported package.
 3. Read the exact world, course, enemy, encounter, and boss sources for the task.
 4. Inspect current code and data for conflicts.
-5. Distinguish current canon, reusable archived implementation, planning contracts, coordinate-free scaffolds, and genuinely playable code.
+5. Distinguish current canon, reusable archived implementation, planning contracts, coordinate-free scaffolds, interim rigs, and genuinely playable production code.
 6. Implement the requested behavior without breaking other locked or authored content.
 7. Update canonical docs/data when the user has approved a new rule.
 8. Add or update tests.
