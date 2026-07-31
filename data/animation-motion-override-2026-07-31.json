@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "status": "approved-authoritative-narrow-override",
+  "approvedDate": "2026-07-31",
+  "humanReadableAuthority": "docs/animation-motion-override-2026-07-31.md",
+  "supersedesConflictingRulesFor": [
+    "groundSlamVisualIdentity",
+    "airTwirlHeroAvailability",
+    "crawlVisualIdentity"
+  ],
+  "cleanRoom": {
+    "thirdPartyAnimationAssetsAllowed": false,
+    "thirdPartyCodeAllowed": false,
+    "thirdPartyFrameMatchingAllowed": false,
+    "highLevelActionGrammarOnly": true
+  },
+  "groundSlam": {
+    "identity": "air-brake-compact-tuck-forward-somersault-committed-low-hip-slam-impact-recovery",
+    "forbidPrimaryReuseOf": [
+      "jump_takeoff",
+      "jump_rise",
+      "jump_fall",
+      "land_heavy",
+      "simple_vertical_translation"
+    ],
+    "startup": {
+      "frames": 9,
+      "seconds": 0.15,
+      "addsUpwardVelocity": false,
+      "visualRotationAxis": "screen-normal-forward-somersault",
+      "visualRotationDegrees": 360,
+      "controllerRootRotates": false,
+      "airBrakeFrame": 0,
+      "tuckStartFrame": 1,
+      "tuckEventFrame": 2,
+      "maximumTuckFrame": 4,
+      "rotationCompleteFrame": 7,
+      "orientationEventFrame": 8,
+      "commitFrame": 9,
+      "poseByFrame": {
+        "1": {
+          "hipFlexionDeg": 35,
+          "kneeFlexionDeg": 68,
+          "armOutDeg": 28,
+          "torsoForwardLeanDeg": 8
+        },
+        "3": {
+          "hipFlexionDeg": 58,
+          "kneeFlexionDeg": 102,
+          "elbowFlexionDeg": 48,
+          "torsoForwardLeanDeg": 18
+        },
+        "4": {
+          "hipFlexionDeg": 72,
+          "kneeFlexionDeg": 116,
+          "anklePlantarflexionDeg": 18,
+          "armOutDeg": 42
+        }
+      }
+    },
+    "physics": {
+      "accelerationMetresPerSecondSquared": 90,
+      "initialCommittedSpeedMetresPerSecond": 18,
+      "maximumSpeedMetresPerSecond": 23,
+      "horizontalBrakeMetresPerSecondSquared": 16
+    },
+    "descent": {
+      "looping": false,
+      "rotationContinues": false,
+      "Hargold": {
+        "torsoForwardLeanDeg": 10,
+        "hipFlexionDeg": 46,
+        "kneeFlexionDeg": 88,
+        "anklePlantarflexionDeg": 18,
+        "bootsForwardUpPercentHeight": 15,
+        "pelvisVisualDropPercentHeight": 13,
+        "armOutDeg": 26,
+        "armBackDeg": 18,
+        "elbowFlexionDeg": 42,
+        "headDownCounterDeg": 8,
+        "footSeparationPercentHeight": 19
+      },
+      "Mebble": {
+        "torsoForwardLeanDeg": 8,
+        "hipFlexionDeg": 42,
+        "kneeFlexionDeg": 82,
+        "anklePlantarflexionDeg": 20,
+        "bootsForwardUpPercentHeight": 17,
+        "pelvisVisualDropPercentHeight": 15,
+        "armOutDeg": 30,
+        "armBackDeg": 16,
+        "elbowFlexionDeg": 38,
+        "headNeckDownCounterDeg": 12,
+        "footSeparationPercentHeight": 17
+      }
+    },
+    "impact": {
+      "frames": 6,
+      "maximumCompressionFrame": 2,
+      "holdThroughFrame": 3,
+      "reboundFrame": 4,
+      "Hargold": {
+        "torsoCompressionPercentHeight": 29,
+        "hipFlexionDeg": 82,
+        "kneeFlexionDeg": 116,
+        "ankleDorsiflexionDeg": 26,
+        "torsoForwardLeanDeg": 32,
+        "armBraceDeg": 56,
+        "headLagDeg": 9,
+        "recoveryFrames": 12,
+        "recoveryCancelFrame": 7,
+        "presentationStrength": "heavy"
+      },
+      "Mebble": {
+        "torsoCompressionPercentHeight": 23,
+        "hipFlexionDeg": 74,
+        "kneeFlexionDeg": 108,
+        "ankleDorsiflexionDeg": 23,
+        "torsoForwardLeanDeg": 27,
+        "armBraceDeg": 60,
+        "headNeckLagDeg": 14,
+        "recoveryFrames": 10,
+        "recoveryCancelFrame": 6,
+        "presentationStrength": "standard"
+      }
+    },
+    "events": [
+      "ground-slam-air-brake",
+      "ground-slam-tuck",
+      "ground-slam-orient",
+      "ground-slam-commit",
+      "landing-contact",
+      "ground-slam-impact",
+      "ground-slam-compression-peak",
+      "ground-slam-rebound",
+      "recovery-cancel-open"
+    ]
+  },
+  "airTwirl": {
+    "allowedHeroes": [
+      "Hargold"
+    ],
+    "MebbleLiveTwirlAllowed": false,
+    "resourcesSeparate": [
+      "doubleJumpUsed",
+      "airTwirlUsed"
+    ],
+    "HargoldInputPriority": {
+      "whenDoubleJumpUnlockedAndUnused": "first_extra_airborne_jump_press_double_jump",
+      "afterDoubleJumpConsumed": "next_eligible_airborne_jump_press_twirl",
+      "whenDoubleJumpUnavailable": "next_eligible_airborne_jump_press_twirl",
+      "maximumTwirlUsesPerAirSequence": 1,
+      "maximumDoubleJumpUsesPerAirSequence": 1
+    },
+    "MebbleInputPriority": {
+      "airborneJumpPress": "never_twirl",
+      "descendingJumpHold": "glide_open_or_sustain",
+      "jumpRelease": "glide_close"
+    },
+    "deprecatedDebugClipPolicy": "mebble_air_spin_may_remain_debug_only_but_must_not_be_live_reachable"
+  },
+  "crouchWalk": {
+    "legacyInternalStateName": "crawl",
+    "playerFacingName": "Crouch-Walk",
+    "visualIdentity": "crouching-squat-walk",
+    "handsOrKneesContactGround": false,
+    "airbornePhaseAllowed": false,
+    "minimumPlantedBoots": 1,
+    "maximumHeadHeightVariationPercentHeroHeight": 2.5,
+    "maximumPelvisBobPercentHeroHeight": 1.5,
+    "speedMetresPerSecond": 1.35,
+    "contactPhases": {
+      "leftContact": 0,
+      "leftPassing": 0.25,
+      "rightContact": 0.5,
+      "rightPassing": 0.75
+    },
+    "footLockWindows": {
+      "left": [
+        0.94,
+        0.16
+      ],
+      "right": [
+        0.44,
+        0.66
+      ],
+      "cyclic": true,
+      "axes": [
+        "vertical",
+        "forward"
+      ],
+      "releaseFrames": 2
+    },
+    "Hargold": {
+      "frames": 32,
+      "seconds": 0.533333,
+      "distanceMetres": 0.72,
+      "visibleHeightRatioRange": [
+        0.7,
+        0.72
+      ],
+      "pelvisDropPercentHeight": 15,
+      "torsoForwardLeanDeg": 12,
+      "supportHipFlexionDeg": 58,
+      "supportKneeFlexionDeg": 98,
+      "swingHipFlexionDeg": 64,
+      "swingKneeFlexionDeg": 112,
+      "ankleDorsiflexionDeg": 18,
+      "forwardBootTravelPercentHeight": 7,
+      "maximumToeClearancePercentHeight": 2.5,
+      "maximumHeelLiftPercentHeight": 3.5,
+      "maximumArmCounterSwingDeg": 10,
+      "elbowFlexionDeg": 56,
+      "entryFrames": 5,
+      "exitFrames": 5,
+      "reversalPivotFrames": 4
+    },
+    "Mebble": {
+      "frames": 36,
+      "seconds": 0.6,
+      "distanceMetres": 0.81,
+      "visibleHeightRatioRange": [
+        0.66,
+        0.68
+      ],
+      "pelvisDropPercentHeight": 18,
+      "torsoForwardLeanDeg": 15,
+      "supportHipFlexionDeg": 64,
+      "supportKneeFlexionDeg": 104,
+      "swingHipFlexionDeg": 70,
+      "swingKneeFlexionDeg": 118,
+      "ankleDorsiflexionDeg": 20,
+      "forwardBootTravelPercentHeight": 8.5,
+      "maximumToeClearancePercentHeight": 3,
+      "maximumHeelLiftPercentHeight": 4,
+      "maximumArmCounterSwingDeg": 12,
+      "elbowFlexionDeg": 52,
+      "neckBackwardCounterDeg": 8,
+      "entryFrames": 6,
+      "exitFrames": 6,
+      "reversalPivotFrames": 4
+    }
+  },
+  "validation": {
+    "renderFps": [
+      30,
+      60,
+      120
+    ],
+    "directions": [
+      "left",
+      "right"
+    ],
+    "maximumFootSlipPercentHeight": 1.5,
+    "groundSlamMustDifferFromJumpByFrame": 4,
+    "groundSlamRotationMustCompleteBeforeDescent": true,
+    "MebbleTwirlTransitionCountExpected": 0,
+    "crouchWalkMustRemainBelowVisibleHeightCeiling": true,
+    "crouchWalkBothFeetAirborneAllowed": false
+  }
+}
