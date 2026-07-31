@@ -1,0 +1,79 @@
+name: Measure Mario and Luigi rig joints on PR
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/measure-mario-luigi-rigs-pr.yml
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and inspect reference exports
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work/out work/zips work/models
+          curl -fL --retry 4 -A 'Mozilla/5.0' 'https://models.spriters-resource.com/media/assets/308/311076.zip?updated=1755502983' -o work/zips/wii_mario.zip
+          curl -fL --retry 4 -A 'Mozilla/5.0' 'https://models.spriters-resource.com/media/assets/282/285304.zip?updated=1755496746' -o work/zips/wii_luigi.zip
+          curl -fL --retry 4 -A 'Mozilla/5.0' 'https://models.spriters-resource.com/media/assets/330/332841.zip?updated=1755509015' -o work/zips/u_mario.zip
+          curl -fL --retry 4 -A 'Mozilla/5.0' 'https://models.spriters-resource.com/media/assets/326/329038.zip?updated=1755507876' -o work/zips/u_luigi.zip
+          for z in work/zips/*.zip; do n=$(basename "$z" .zip); mkdir -p "work/models/$n"; unzip -q "$z" -d "work/models/$n"; done
+          find work/models -type f -iname '*.zip' -print0 | while IFS= read -r -d '' z; do mkdir -p "${z%.zip}_expanded"; unzip -q "$z" -d "${z%.zip}_expanded"; done
+          python - <<'PY'
+          import json, re, xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          root = Path('work/models')
+          def local(tag): return tag.rsplit('}',1)[-1]
+          def parse(path):
+              doc = ET.parse(path).getroot()
+              arrays = {e.attrib.get('id'):(e.text or '').split() for e in doc.iter() if local(e.tag) in ('Name_array','IDREF_array') and e.attrib.get('id')}
+              names=[]
+              for j in doc.iter():
+                  if local(j.tag)!='joints': continue
+                  for i in j:
+                      if local(i.tag)=='input' and i.attrib.get('semantic')=='JOINT': names += arrays.get((i.attrib.get('source') or '').lstrip('#'),[])
+              nodes=[]
+              for n in doc.iter():
+                  if local(n.tag)=='node' and (n.attrib.get('type') or '').upper()=='JOINT': nodes.append(n.attrib.get('sid') or n.attrib.get('name') or n.attrib.get('id'))
+              return {'file':str(path),'skin':sorted(set(names)),'nodes':sorted(set(x for x in nodes if x))}
+
+          records=[]
+          for p in root.rglob('*'):
+              if p.is_file() and p.suffix.lower()=='.dae':
+                  try: records.append(parse(p))
+                  except Exception as e: records.append({'file':str(p),'error':repr(e),'skin':[],'nodes':[]})
+
+          groups={
+            'NSMBW Mario':['/Mario.dae'],
+            'NSMBW Luigi combined':['/Luigi_Hat.dae','/Luigi_NoHat.dae'],
+            'NSMBW Luigi split':['/Body.dae','/Head.dae','/Hat.dae'],
+            'NSMBU Mario':['/MB_model.dae','/MH_model.dae','/MC_model.dae'],
+            'NSMBU Luigi':['/LB_model.dae','/LH_model.dae','/LC_model.dae'],
+          }
+          summary={}
+          for label,suffixes in groups.items():
+              chosen=[r for r in records if any(r['file'].replace('\\','/').endswith(s) for s in suffixes)]
+              skin=set(); nodes=set()
+              for r in chosen: skin.update(r['skin']); nodes.update(r['nodes'])
+              summary[label]={'files':[r['file'] for r in chosen],'skinJointUnionCount':len(skin),'jointNodeUnionCount':len(nodes),'skinJointNames':sorted(skin),'jointNodeNames':sorted(nodes),'perFile':[{'file':r['file'],'skin':len(r['skin']),'nodes':len(r['nodes'])} for r in chosen]}
+          Path('work/out/counts.json').write_text(json.dumps({'summary':summary,'all':records},indent=2))
+          text=[]
+          for label,s in summary.items():
+              text.append(f"{label}: skin-union={s['skinJointUnionCount']}, joint-node-union={s['jointNodeUnionCount']}")
+              text += [f"  {x['file']}: skin={x['skin']} nodes={x['nodes']}" for x in s['perFile']]
+          Path('work/out/counts.txt').write_text('\n'.join(text))
+          print('\n'.join(text))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mario-luigi-rig-counts-pr
+          path: work/out
+          retention-days: 7
