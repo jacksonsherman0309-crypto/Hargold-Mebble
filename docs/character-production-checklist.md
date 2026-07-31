@@ -1,16 +1,35 @@
 # Character production checklist
 
-Last updated: July 30, 2026
+Last updated: July 31, 2026
 
 The machine-readable authority is
 `assets/blender/character-production-checklist.json`.
 
-The original Meshy Hargold and Mebble meshes and 24-bone rigs are locked. The
-animation pass may add clips, state-machine logic, contact correction,
-validation tooling, and future reviewed controls to those exact assets. It may
-not replace their visible meshes or select another base rig.
+The visible Meshy Hargold and Mebble identities remain locked. The current
+24-bone rigs are now interim runtime, migration, diagnostic, and rollback
+assets rather than the final authoring target. The authoritative production
+order is `docs/rig-first-character-production-gate-2026-07-31.md`.
 
-## Current gate: locked-rig animation refinement
+## Current gate: production Blender rigs first
+
+- [x] Stage 0 live GLBs preserved at byte-identical rollback paths
+- [x] Stage 0 hashes, meshes, skins, materials, bind height, facing, foot origin, sockets, and runtime paths recorded
+- [x] Stage 1 Hargold editable Blender source created
+- [x] Stage 1 Mebble editable Blender source created
+- [x] Canonical static bind surfaces floor-aligned at 1.82 m and 2.2932 m, scale `1,1,1`
+- [x] Imported Meshy actions removed from production authoring sources
+- [x] Original production-rig and semantic-control scaffolds created and clearly marked unskinned/not live
+- [ ] Stage 1 production topology approved
+- [ ] Stage 2 purposeful skeletons, constraints, and IK/FK approved
+- [ ] Stage 3 skinning, weights, and correctives approved
+- [ ] Stage 4 face, hand, and accessory systems approved
+- [ ] Stage 5 enlarged static/action pose gate passed
+- [ ] Stage 6 versioned candidate GLBs and semantic integration complete
+- [ ] Stage 7 runtime parity and rollback validation passed
+- [ ] Stage 8 final animation production allowed
+
+The earlier interim-runtime checklist remains useful only for regression and
+diagnostic coverage:
 
 - [x] Locked original Meshy models selected
 - [x] Rejected altered/procedural models quarantined

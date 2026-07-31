@@ -1,11 +1,22 @@
 {
-  "schemaVersion": 2,
-  "authority": "locked-original-meshy-animation-directive-2026-07-28",
+  "schemaVersion": 3,
+  "authority": "rig-first-character-production-gate-2026-07-31",
   "appliesTo": [
     "Hargold",
     "Mebble"
   ],
-  "animationPolishPolicy": "active-on-locked-original-meshy-models-and-rigs-supplied-clips-are-replaceable-with-source-capability-gates-explicit",
+  "animationPolishPolicy": "paused-as-final-production-until-production-rig-stages-0-through-7-pass",
+  "productionRigStages": {
+    "stage0BaselinePreservation": "pass",
+    "stage1EditableBlenderSources": "created-but-production-topology-and-armature-approval-pending",
+    "stage2PurposefulSkeletons": "not-approved",
+    "stage3SkinningTopologyCorrectives": "not-started",
+    "stage4HandsFaceAccessories": "not-started",
+    "stage5StaticAndPosedDeformationGate": "not-run",
+    "stage6CandidateExportAndSemanticIntegration": "not-run",
+    "stage7RuntimeParity": "not-run",
+    "stage8FinalAnimationProduction": "blocked"
+  },
   "milestones": [
     {
       "id": "silhouette",
@@ -20,17 +31,17 @@
     {
       "id": "skeleton",
       "label": "Skeleton approved",
-      "status": "approved"
+      "status": "interim-24-bone-runtime-skeleton-approved-for-rollback-only-production-skeleton-pending"
     },
     {
       "id": "connected-body",
       "label": "Connected body approved",
-      "status": "approved"
+      "status": "approved-visible-identity-baseline-production-deformation-topology-pending"
     },
     {
       "id": "joint-deformation",
       "label": "Joint deformation complete",
-      "status": "rig-limited-in-progress",
+      "status": "blocked-until-production-rig-skinning",
       "implementation": "locked-24-bone-meshy-skin-plus-runtime-contact-correction",
       "automatedStructuralGate": "locked-rig-and-bind-inventory-pass",
       "visualStressGate": "live-gameplay-review-required",
@@ -125,7 +136,7 @@
     {
       "id": "final-animation-polish",
       "label": "Final animation polish",
-      "status": "in-progress",
+      "status": "blocked-by-rig-first-gate",
       "runtimeLibrary": "src/animation/locked-meshy-animation-library.js",
       "runtimePresentationClipCounts": {
         "Hargold": 41,
@@ -145,7 +156,7 @@
     {
       "id": "gameplay-validation",
       "label": "Gameplay validation",
-      "status": "in-progress",
+      "status": "interim-runtime-diagnostics-only",
       "validationCourse": "src/content/animation-validation-course.js"
     },
     {

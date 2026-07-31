@@ -1,6 +1,11 @@
 # Locked Meshy animation production
 
-Last verified: July 30, 2026
+Last verified: July 31, 2026
+
+> Rig-first override: the runtime behavior below is retained as interim
+> controller, timing, migration, and rollback evidence. It is not the final
+> animation-authoring path. Final polish is blocked until Stages 0–7 in
+> `docs/rig-first-character-production-gate-2026-07-31.md` pass.
 
 ## Runtime authority
 

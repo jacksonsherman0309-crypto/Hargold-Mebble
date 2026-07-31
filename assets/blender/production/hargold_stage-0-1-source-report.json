@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "hero": "Hargold",
+  "status": "stage-0-complete-stage-1-authoring-source-created-gates-2-through-7-pending",
+  "baseline": {
+    "livePath": "assets/exports/meshy/hargold_canonical_gameplay_rig.glb",
+    "rollbackPath": "assets/exports/rollback/2026-07-31/hargold_interim_24bone.glb",
+    "sha256": "A045E299A3F63EC45765C36D436EEF8C53AFDEE4BB7BDC98FD0A23537ABBEBEC",
+    "bytes": 37367328,
+    "byteIdenticalRollback": true
+  },
+  "sourceImport": {
+    "meshObject": "Hargold_Approved_Mesh",
+    "meshData": "Hargold_Approved_Mesh",
+    "armatureObject": "Hargold_Canonical_Gameplay_Rig",
+    "armatureData": "Hargold_Canonical_Skin",
+    "deformBoneCount": 24,
+    "materialAssignments": [
+      "Material_1"
+    ],
+    "meshVertexCount": 223097,
+    "meshPolygonCount": 293376,
+    "morphTargetCount": 0,
+    "rawBoundsMetres": {
+      "minimum": [
+        -0.660378397,
+        -0.538062155,
+        1.77e-07
+      ],
+      "maximum": [
+        0.660378873,
+        0.538062036,
+        1.699999928
+      ],
+      "height": 1.699999752
+    },
+    "existingGameplaySockets": [],
+    "removedImportedActionNames": [
+      "hargold_run",
+      "hargold_walk"
+    ],
+    "importedAnimationsRetainedInProductionSource": false
+  },
+  "productionSource": {
+    "blendPath": "assets/blender/production/hargold_production_rig.blend",
+    "sha256": "80910890C07E2BB7F98772EA6DA67FD1EF26E22B020C1826532DBA3DFEC23E81",
+    "bytes": 55847228,
+    "canonicalHeightMetres": 1.82,
+    "canonicalNormalizationScale": 1.070588391695,
+    "lockedSurfaceBoundsMetres": {
+      "minimum": [
+        -0.706993699,
+        -0.57604301,
+        9e-09
+      ],
+      "maximum": [
+        0.706993699,
+        0.57604301,
+        1.820000172
+      ]
+    },
+    "lockedSurfaceObjectScale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "lockedSurfaceObjectLocation": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "nativeForward": "-Y",
+    "primaryReviewOrientation": "true-side",
+    "footOrigin": "world-origin-floor-z0",
+    "collections": [
+      "LOCKED_VISIBLE_IDENTITY",
+      "INTERIM_24_BONE_ROLLBACK_REFERENCE",
+      "PRODUCTION_RIG_STAGE_1",
+      "GAMEPLAY_SOCKETS_STAGE_1",
+      "REFERENCE_GUIDES"
+    ],
+    "rigObject": "Hargold_PRODUCTION_RIG_STAGE_1",
+    "rigStatus": "unskinned-stage-1-scaffold-not-approved",
+    "boneCounts": {
+      "deform": 23,
+      "control": 17,
+      "helper": 4,
+      "accessory": 10
+    },
+    "bones": {
+      "deform": [
+        "DEF_pelvis",
+        "DEF_spine_lower",
+        "DEF_spine_mid",
+        "DEF_chest",
+        "DEF_neck_base",
+        "DEF_head",
+        "DEF_jaw",
+        "DEF_clavicle.L",
+        "DEF_upper_arm.L",
+        "DEF_forearm.L",
+        "DEF_hand.L",
+        "DEF_thigh.L",
+        "DEF_shin.L",
+        "DEF_foot.L",
+        "DEF_toe.L",
+        "DEF_clavicle.R",
+        "DEF_upper_arm.R",
+        "DEF_forearm.R",
+        "DEF_hand.R",
+        "DEF_thigh.R",
+        "DEF_shin.R",
+        "DEF_foot.R",
+        "DEF_toe.R"
+      ],
+      "control": [
+        "CTRL_world",
+        "CTRL_motion",
+        "CTRL_hand_ik.L",
+        "CTRL_foot_ik.L",
+        "CTRL_elbow_pole.L",
+        "CTRL_knee_pole.L",
+        "CTRL_hand_ik.R",
+        "CTRL_foot_ik.R",
+        "CTRL_elbow_pole.R",
+        "CTRL_knee_pole.R",
+        "CTRL_pelvis",
+        "CTRL_chest",
+        "CTRL_head",
+        "CTRL_gaze",
+        "CTRL_hand_pose.L",
+        "CTRL_hand_pose.R",
+        "CTRL_face"
+      ],
+      "helper": [
+        "MCH_upper_arm_twist.L",
+        "MCH_thigh_twist.L",
+        "MCH_upper_arm_twist.R",
+        "MCH_thigh_twist.R"
+      ],
+      "accessory": [
+        "DEF_hat",
+        "DEF_feather_01",
+        "DEF_feather_02",
+        "DEF_scarf_root",
+        "DEF_scarf_tail.L",
+        "DEF_scarf_tail.R",
+        "DEF_backpack",
+        "DEF_belt",
+        "DEF_pouch",
+        "DEF_facial_hair"
+      ]
+    },
+    "sockets": [
+      {
+        "name": "SOCKET_root",
+        "semanticParent": "CTRL_world",
+        "locationMetres": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SOCKET_head",
+        "semanticParent": "DEF_head",
+        "locationMetres": [
+          0.0,
+          0.0,
+          1.7108
+        ]
+      },
+      {
+        "name": "SOCKET_hand.L",
+        "semanticParent": "DEF_hand.L",
+        "locationMetres": [
+          0.334152,
+          -0.1092,
+          0.455
+        ]
+      },
+      {
+        "name": "SOCKET_hand.R",
+        "semanticParent": "DEF_hand.R",
+        "locationMetres": [
+          -0.334152,
+          -0.1092,
+          0.455
+        ]
+      },
+      {
+        "name": "SOCKET_foot.L",
+        "semanticParent": "DEF_foot.L",
+        "locationMetres": [
+          0.239512,
+          -0.0091,
+          0.1001
+        ]
+      },
+      {
+        "name": "SOCKET_foot.R",
+        "semanticParent": "DEF_foot.R",
+        "locationMetres": [
+          -0.239512,
+          -0.0091,
+          0.1001
+        ]
+      },
+      {
+        "name": "SOCKET_back",
+        "semanticParent": "DEF_chest",
+        "locationMetres": [
+          0.0,
+          0.12,
+          1.1102
+        ]
+      },
+      {
+        "name": "SOCKET_effect",
+        "semanticParent": "DEF_pelvis",
+        "locationMetres": [
+          0.0,
+          0.0,
+          0.6552
+        ]
+      },
+      {
+        "name": "SOCKET_scarf",
+        "semanticParent": "DEF_scarf_root",
+        "locationMetres": [
+          0.0,
+          0.0,
+          1.2558
+        ]
+      }
+    ]
+  },
+  "gates": {
+    "stage0BaselinePreserved": true,
+    "stage1EditableBlendCreated": true,
+    "stage1CanonicalStaticSurfaceCreated": true,
+    "stage1ProductionTopologyApproved": false,
+    "stage1ProductionRigApproved": false,
+    "stage2PurposefulSkeletonApproved": false,
+    "stage3SkinAndCorrectivesApproved": false,
+    "stage4FaceHandAccessorySystemsApproved": false,
+    "stage5PoseGatePassed": false,
+    "stage6CandidateExportIntegrated": false,
+    "stage7RuntimeParityPassed": false,
+    "stage8FinalAnimationAllowed": false
+  }
+}

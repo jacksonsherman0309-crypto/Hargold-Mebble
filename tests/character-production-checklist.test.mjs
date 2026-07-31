@@ -11,25 +11,27 @@ const relativePath =
 const checklist = JSON.parse(
   fs.readFileSync(path.join(root, relativePath), 'utf8')
 );
+const rigGate = JSON.parse(
+  fs.readFileSync(
+    path.join(root, 'data/rig-first-character-production-gate-2026-07-31.json'),
+    'utf8'
+  )
+);
 const milestones = new Map(
   checklist.milestones.map((milestone) => [milestone.id, milestone])
 );
 
-assert.equal(checklist.schemaVersion, 2);
-assert.deepEqual(
-  GAME_RULES.characterPresentation.modelApprovalGate.approvedMilestones,
-  ['silhouette', 'proportions', 'skeleton', 'connected-body']
-);
-for (const milestone of
-  GAME_RULES.characterPresentation.modelApprovalGate.approvedMilestones) {
-  assert.equal(milestones.get(milestone)?.status, 'approved');
-}
-
-assert.equal(
-  GAME_RULES.characterPresentation.modelApprovalGate.activeMilestone,
-  'final-animation-polish'
-);
-assert.equal(milestones.get('joint-deformation')?.status, 'rig-limited-in-progress');
+assert.equal(checklist.schemaVersion, 3);
+assert.equal(checklist.authority, 'rig-first-character-production-gate-2026-07-31');
+assert.equal(rigGate.coreDecision.finalAnimationProductionBlockedUntilRigGatesPass, true);
+assert.equal(checklist.productionRigStages.stage0BaselinePreservation, 'pass');
+assert.match(checklist.productionRigStages.stage1EditableBlenderSources, /created/);
+assert.equal(checklist.productionRigStages.stage8FinalAnimationProduction, 'blocked');
+assert.equal(milestones.get('silhouette')?.status, 'approved');
+assert.equal(milestones.get('proportions')?.status, 'approved');
+assert.match(milestones.get('skeleton')?.status, /interim-24-bone-runtime/);
+assert.match(milestones.get('connected-body')?.status, /production-deformation-topology-pending/);
+assert.equal(milestones.get('joint-deformation')?.status, 'blocked-until-production-rig-skinning');
 assert.equal(
   milestones.get('joint-deformation')?.automatedStructuralGate,
   'locked-rig-and-bind-inventory-pass'
@@ -40,10 +42,9 @@ assert.equal(
 );
 assert.equal(
   milestones.get('final-animation-polish')?.status,
-  'in-progress'
+  'blocked-by-rig-first-gate'
 );
-assert.match(checklist.animationPolishPolicy, /active-on-locked-original-meshy-models-and-rigs/);
-assert.match(checklist.animationPolishPolicy, /supplied-clips-are-replaceable/);
+assert.match(checklist.animationPolishPolicy, /paused-as-final-production/);
 assert.equal(
   milestones.get('facial-topology')?.status,
   'blocked-by-locked-source-rig'

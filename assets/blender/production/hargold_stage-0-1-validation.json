@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "hero": "Hargold",
+  "pass": true,
+  "scope": "Stage 0 baseline preservation and Stage 1 authoring-source structure only",
+  "blend": "assets/blender/production/hargold_production_rig.blend",
+  "blendSha256": "80910890C07E2BB7F98772EA6DA67FD1EF26E22B020C1826532DBA3DFEC23E81",
+  "surface": {
+    "vertices": 223097,
+    "polygons": 293376,
+    "materials": [
+      "Material_1"
+    ],
+    "boundsMinimum": [
+      -0.706993699,
+      -0.57604301,
+      9e-09
+    ],
+    "boundsMaximum": [
+      0.706993699,
+      0.57604301,
+      1.820000172
+    ],
+    "heightMetres": 1.820000163
+  },
+  "rigCategoryCounts": {
+    "body-deform": 23,
+    "control": 17,
+    "helper": 4,
+    "accessory-deform": 10
+  },
+  "socketCount": 9,
+  "actionCount": 0,
+  "runtimeSwitchAuthorized": false,
+  "finalAnimationAllowed": false,
+  "remainingBlockedStages": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "errors": []
+}

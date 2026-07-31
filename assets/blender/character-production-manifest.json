@@ -1,8 +1,17 @@
 {
-  "schemaVersion": 5,
-  "status": "locked-original-meshy-rigs-active-animation-refinement",
-  "activeRuntimeStatus": "locked-original-meshy-body-animation-library-active",
-  "decisionDate": "2026-07-28",
+  "schemaVersion": 6,
+  "status": "locked-original-meshy-rigs-active-as-interim-rig-first-stage-0-complete-stage-1-sources-created",
+  "activeRuntimeStatus": "locked-original-meshy-body-animation-library-active-as-interim-24-bone-rollback-final-animation-paused",
+  "decisionDate": "2026-07-31",
+  "rigFirstProduction": {
+    "authority": "../../data/rig-first-character-production-gate-2026-07-31.json",
+    "stageReport": "../../data/production-character-rig-stage-0-1.json",
+    "semanticMapDraft": "../../data/production-character-rig-semantic-map.json",
+    "HargoldBlend": "production/hargold_production_rig.blend",
+    "MebbleBlend": "production/mebble_production_rig.blend",
+    "runtimeSwitchAuthorized": false,
+    "finalAnimationAllowed": false
+  },
   "dimensionalPresentation": {
     "classification": "2.75D",
     "gameplay": "strict-linear-side-scrolling-plane",

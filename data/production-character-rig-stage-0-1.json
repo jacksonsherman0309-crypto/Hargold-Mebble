@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "status": "stage-0-complete-stage-1-authoring-sources-created-production-rigs-not-established",
+  "date": "2026-07-31",
+  "authority": {
+    "productionOrder": "data/rig-first-character-production-gate-2026-07-31.json",
+    "rigDirection": "data/character-rig-direction-override-2026-07-31.json",
+    "visibleIdentity": [
+      "assets/references/Hargold locked production character sheet.png",
+      "assets/references/Mebble locked production character sheet.png"
+    ],
+    "scaleAndOrientation": "assets/blender/character-scale-orientation-profile.json"
+  },
+  "runtime": {
+    "defaultAssetsChanged": false,
+    "candidateAssetsEnabled": false,
+    "controllerOrAnimationCodeChanged": false,
+    "currentRuntimeAssets": {
+      "Hargold": "assets/exports/meshy/hargold_canonical_gameplay_rig.glb",
+      "Mebble": "assets/exports/meshy/mebble_canonical_gameplay_rig.glb"
+    },
+    "rollbackVerified": true
+  },
+  "heroes": {
+    "Hargold": {
+      "liveAndRollbackSha256": "A045E299A3F63EC45765C36D436EEF8C53AFDEE4BB7BDC98FD0A23537ABBEBEC",
+      "liveBytes": 37367328,
+      "rollback": "assets/exports/rollback/2026-07-31/hargold_interim_24bone.glb",
+      "blend": "assets/blender/production/hargold_production_rig.blend",
+      "blendSha256": "80910890C07E2BB7F98772EA6DA67FD1EF26E22B020C1826532DBA3DFEC23E81",
+      "canonicalHeightMetres": 1.82,
+      "sourceBindHeightMetres": 1.699999752,
+      "sourceNormalizationScale": 1.070588391695,
+      "footOrigin": "world-origin-floor-z0",
+      "nativeForward": "-Y",
+      "sourceMesh": "Hargold_Approved_Mesh",
+      "sourceSkin": "Hargold_Canonical_Skin",
+      "sourceMaterialAssignments": ["Material_1"],
+      "sourceGameplaySockets": [],
+      "productionScaffold": {
+        "bodyDeform": 23,
+        "accessoryDeform": 10,
+        "control": 17,
+        "helper": 4,
+        "total": 54,
+        "skinned": false,
+        "approved": false
+      },
+      "sourceReport": "assets/blender/production/hargold_stage-0-1-source-report.json",
+      "validation": "assets/blender/production/hargold_stage-0-1-validation.json"
+    },
+    "Mebble": {
+      "liveAndRollbackSha256": "392D8F9C12AD140AFA738AB118D3C3A63F9A40DA41DD8A061FE8A37F91DE3A3B",
+      "liveBytes": 37906996,
+      "rollback": "assets/exports/rollback/2026-07-31/mebble_interim_24bone.glb",
+      "blend": "assets/blender/production/mebble_production_rig.blend",
+      "blendSha256": "BD3352BA2DC98E81375A8D5D73D98CA5EA1A4184AD35D161E5CE26CD6F0D14BC",
+      "canonicalHeightMetres": 2.2932,
+      "sourceBindHeightMetres": 1.700000434,
+      "sourceNormalizationScale": 1.348940832347,
+      "footOrigin": "world-origin-floor-z0",
+      "nativeForward": "-Y",
+      "sourceMesh": "Mebble_Approved_Mesh",
+      "sourceSkin": "Mebble_Canonical_Skin",
+      "sourceMaterialAssignments": ["Material_1"],
+      "sourceGameplaySockets": [],
+      "productionScaffold": {
+        "bodyDeform": 25,
+        "accessoryDeform": 12,
+        "control": 17,
+        "helper": 4,
+        "total": 58,
+        "skinned": false,
+        "approved": false
+      },
+      "sourceReport": "assets/blender/production/mebble_stage-0-1-source-report.json",
+      "validation": "assets/blender/production/mebble_stage-0-1-validation.json"
+    }
+  },
+  "semanticMap": "data/production-character-rig-semantic-map.json",
+  "gateMatrix": {
+    "stage0BaselinePreserved": "pass",
+    "stage1EditableBlenderSourcesCreated": "pass",
+    "stage1CanonicalStaticSurfaceCreated": "pass",
+    "stage1ProductionTopologyApproved": "fail-not-yet-reviewed",
+    "stage1ProductionArmatureApproved": "fail-scaffold-is-unskinned",
+    "stage2PurposefulSkeletonApproved": "not-run",
+    "stage3SkinningAndCorrectivesApproved": "not-run",
+    "stage4HandFaceAccessorySystemsApproved": "not-run",
+    "stage5StaticAndPosedDeformationGate": "not-run",
+    "stage6CandidateExportAndSemanticIntegration": "not-run",
+    "stage7RuntimeParity": "not-run",
+    "stage8FinalAnimationProductionAllowed": false
+  }
+}

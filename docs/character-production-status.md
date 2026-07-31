@@ -1,6 +1,19 @@
 # Character production status
 
-Last verified: July 30, 2026
+Last verified: July 31, 2026
+
+## Rig-first production override
+
+Final animation polish on the current 24-bone rigs is paused. Those rigs remain
+the live rollback/controller-test baseline while the purpose-built Blender rigs
+are developed. Stage 0 is complete and Stage 1 authoring sources now exist at
+`assets/blender/production/hargold_production_rig.blend` and
+`assets/blender/production/mebble_production_rig.blend`.
+
+The new armatures are unskinned authoring scaffolds, not approved production
+rigs. No candidate GLB has replaced the runtime. See
+`docs/character-rig-stage-0-1-report.md` and the authoritative
+`docs/rig-first-character-production-gate-2026-07-31.md`.
 
 ## Locked production path
 
