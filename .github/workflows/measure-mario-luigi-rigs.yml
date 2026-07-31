@@ -1,0 +1,233 @@
+name: Measure Mario and Luigi reference rig joints
+
+on:
+  push:
+    branches:
+      - research/rig-bone-count-20260731
+    paths:
+      - .github/workflows/measure-mario-luigi-rigs.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download community model exports
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/rig-count/downloads /tmp/rig-count/extracted
+          curl -fL --retry 4 --retry-delay 2 -A 'Mozilla/5.0' \
+            'https://models.spriters-resource.com/media/assets/308/311076.zip?updated=1755502983' \
+            -o /tmp/rig-count/downloads/nsmbw_mario.zip
+          curl -fL --retry 4 --retry-delay 2 -A 'Mozilla/5.0' \
+            'https://models.spriters-resource.com/media/assets/282/285304.zip?updated=1755496746' \
+            -o /tmp/rig-count/downloads/nsmbw_luigi.zip
+          curl -fL --retry 4 --retry-delay 2 -A 'Mozilla/5.0' \
+            'https://models.spriters-resource.com/media/assets/330/332841.zip?updated=1755509015' \
+            -o /tmp/rig-count/downloads/nsmbu_mario.zip
+          curl -fL --retry 4 --retry-delay 2 -A 'Mozilla/5.0' \
+            'https://models.spriters-resource.com/media/assets/326/329038.zip?updated=1755507876' \
+            -o /tmp/rig-count/downloads/nsmbu_luigi.zip
+
+          for archive in /tmp/rig-count/downloads/*.zip; do
+            name="$(basename "$archive" .zip)"
+            mkdir -p "/tmp/rig-count/extracted/$name"
+            unzip -q "$archive" -d "/tmp/rig-count/extracted/$name"
+          done
+
+          # Luigi's Wii submission contains nested ZIPs. Expand all nested archives.
+          find /tmp/rig-count/extracted -type f -iname '*.zip' -print0 | while IFS= read -r -d '' nested; do
+            target="${nested%.zip}_expanded"
+            mkdir -p "$target"
+            unzip -q "$nested" -d "$target"
+          done
+
+      - name: Parse DAE skeletons and skin-joint arrays
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p rig-count-report
+          python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import os
+          import re
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          root = Path('/tmp/rig-count/extracted')
+          report_root = Path('rig-count-report')
+          report_root.mkdir(exist_ok=True)
+
+          def local(tag: str) -> str:
+              return tag.rsplit('}', 1)[-1]
+
+          def parse_dae(path: Path) -> dict:
+              tree = ET.parse(path)
+              doc = tree.getroot()
+
+              joint_nodes = []
+              all_nodes = []
+              for node in doc.iter():
+                  if local(node.tag) != 'node':
+                      continue
+                  entry = {
+                      'id': node.attrib.get('id'),
+                      'sid': node.attrib.get('sid'),
+                      'name': node.attrib.get('name'),
+                      'type': node.attrib.get('type'),
+                  }
+                  all_nodes.append(entry)
+                  if (node.attrib.get('type') or '').upper() == 'JOINT':
+                      joint_nodes.append(entry)
+
+              arrays = {}
+              for elem in doc.iter():
+                  if local(elem.tag) not in {'Name_array', 'IDREF_array'}:
+                      continue
+                  array_id = elem.attrib.get('id')
+                  if array_id:
+                      arrays[array_id] = (elem.text or '').split()
+
+              skin_joint_names = []
+              joint_sources = []
+              for joints in doc.iter():
+                  if local(joints.tag) != 'joints':
+                      continue
+                  for inp in joints:
+                      if local(inp.tag) != 'input' or inp.attrib.get('semantic') != 'JOINT':
+                          continue
+                      source = (inp.attrib.get('source') or '').lstrip('#')
+                      joint_sources.append(source)
+                      skin_joint_names.extend(arrays.get(source, []))
+
+              # Some exporters omit type=JOINT but still identify skeleton nodes by SID/name.
+              node_identifiers = []
+              for entry in joint_nodes:
+                  identifier = entry.get('sid') or entry.get('name') or entry.get('id')
+                  if identifier:
+                      node_identifiers.append(identifier)
+
+              return {
+                  'path': str(path.relative_to(root)),
+                  'sizeBytes': path.stat().st_size,
+                  'jointNodeCount': len(joint_nodes),
+                  'jointNodeNames': node_identifiers,
+                  'skinJointCount': len(skin_joint_names),
+                  'skinJointUniqueCount': len(set(skin_joint_names)),
+                  'skinJointNames': skin_joint_names,
+                  'jointArraySources': joint_sources,
+                  'allSceneNodeCount': len(all_nodes),
+              }
+
+          records = []
+          failures = []
+          for path in sorted(root.rglob('*')):
+              if path.is_file() and path.suffix.lower() == '.dae':
+                  try:
+                      records.append(parse_dae(path))
+                  except Exception as exc:
+                      failures.append({'path': str(path.relative_to(root)), 'error': repr(exc)})
+
+          groups = {
+              'NSMBW Mario normal': [
+                  r'nsmbw_mario/.*/Mario\.dae$',
+                  r'nsmbw_mario/Mario\.dae$',
+              ],
+              'NSMBW Luigi normal combined': [
+                  r'nsmbw_luigi/.*/Luigi_Hat\.dae$',
+                  r'nsmbw_luigi/.*/Luigi_NoHat\.dae$',
+              ],
+              'NSMBW Luigi normal split': [
+                  r'nsmbw_luigi/.*/Body\.dae$',
+                  r'nsmbw_luigi/.*/Head\.dae$',
+                  r'nsmbw_luigi/.*/Hat\.dae$',
+              ],
+              'NSMBU Mario normal modular': [
+                  r'nsmbu_mario/.*/MB_model\.dae$',
+                  r'nsmbu_mario/.*/MH_model\.dae$',
+                  r'nsmbu_mario/.*/MC_model\.dae$',
+              ],
+              'NSMBU Luigi normal modular': [
+                  r'nsmbu_luigi/.*/LB_model\.dae$',
+                  r'nsmbu_luigi/.*/LH_model\.dae$',
+                  r'nsmbu_luigi/.*/LC_model\.dae$',
+              ],
+          }
+
+          summaries = {}
+          for label, patterns in groups.items():
+              chosen = [
+                  record for record in records
+                  if any(re.search(pattern, record['path'], re.I) for pattern in patterns)
+              ]
+              joint_node_union = set()
+              skin_joint_union = set()
+              for record in chosen:
+                  joint_node_union.update(record['jointNodeNames'])
+                  skin_joint_union.update(record['skinJointNames'])
+              summaries[label] = {
+                  'files': [record['path'] for record in chosen],
+                  'perFile': [
+                      {
+                          'path': record['path'],
+                          'jointNodeCount': record['jointNodeCount'],
+                          'skinJointCount': record['skinJointCount'],
+                          'skinJointUniqueCount': record['skinJointUniqueCount'],
+                      }
+                      for record in chosen
+                  ],
+                  'distinctJointNodeNameCountAcrossFiles': len(joint_node_union),
+                  'distinctSkinJointNameCountAcrossFiles': len(skin_joint_union),
+                  'distinctJointNodeNamesAcrossFiles': sorted(joint_node_union),
+                  'distinctSkinJointNamesAcrossFiles': sorted(skin_joint_union),
+              }
+
+          payload = {
+              'method': {
+                  'jointNodeCount': 'Count of COLLADA scene nodes explicitly marked type=JOINT.',
+                  'skinJointCount': 'Count of names in the COLLADA skin controller JOINT source arrays; this is the best deform-bone count when present.',
+                  'combinedModularCount': 'Union of distinct joint names across the normal body/head/cap modules, avoiding duplicate names.',
+              },
+              'summaries': summaries,
+              'allDaeRecords': records,
+              'failures': failures,
+          }
+          (report_root / 'rig-counts.json').write_text(json.dumps(payload, indent=2), encoding='utf-8')
+
+          lines = []
+          for label, summary in summaries.items():
+              lines.append(label)
+              lines.append(f"  files: {', '.join(summary['files']) or 'NONE FOUND'}")
+              for item in summary['perFile']:
+                  lines.append(
+                      f"  {item['path']}: JOINT nodes={item['jointNodeCount']}, "
+                      f"skin joints={item['skinJointUniqueCount']}"
+                  )
+              lines.append(
+                  f"  union: JOINT-node names={summary['distinctJointNodeNameCountAcrossFiles']}, "
+                  f"skin-joint names={summary['distinctSkinJointNameCountAcrossFiles']}"
+              )
+              lines.append('')
+          if failures:
+              lines.append('Failures:')
+              lines.extend(f"  {item['path']}: {item['error']}" for item in failures)
+          text = '\n'.join(lines)
+          print(text)
+          (report_root / 'rig-counts.txt').write_text(text, encoding='utf-8')
+          PY
+
+      - name: Upload measured counts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mario-luigi-rig-counts
+          path: rig-count-report
+          retention-days: 7
