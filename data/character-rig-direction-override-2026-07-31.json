@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "status": "approved-authoritative-production-rig-direction",
+  "approvedDate": "2026-07-31",
+  "humanReadableAuthority": "docs/character-rig-direction-override-2026-07-31.md",
+  "supersedesConflictingRulesFor": [
+    "finalProductionSkeletonLock",
+    "productionRigBoneCountCeiling",
+    "current24BoneRigAsFinalAuthority"
+  ],
+  "externalReferenceBoundary": {
+    "exactExternalSkeletonMatchRequired": false,
+    "externalJointNamesAllowed": false,
+    "externalJointCoordinatesAllowed": false,
+    "externalSkinWeightsAllowed": false,
+    "externalAnimationDataAllowed": false,
+    "highLevelRiggingPhilosophyOnly": true
+  },
+  "locked": {
+    "visibleCharacterIdentity": true,
+    "approvedProportions": true,
+    "costumeAndMaterials": true,
+    "canonicalHeightAndScale": true,
+    "controllerOwnedWorldTranslation": true,
+    "normalGameplayRootMotion": false,
+    "approvedHeroAbilities": true
+  },
+  "productionChangesAllowed": {
+    "skeletonHierarchy": true,
+    "deformBoneCount": true,
+    "controlBoneCount": true,
+    "jointPlacementAndAxes": true,
+    "skinWeights": true,
+    "deformationRetopology": true,
+    "correctiveMorphTargets": true,
+    "facialControls": true,
+    "handPoseControls": true,
+    "secondaryMotionControls": true,
+    "runtimeSemanticBoneMap": true
+  },
+  "currentRig": {
+    "deformBonesPerHero": 24,
+    "role": "interim-live-runtime-baseline-and-migration-source",
+    "finalProductionAuthority": false,
+    "mustRemainAvailableForRollbackUntilMigrationPasses": true
+  },
+  "principle": {
+    "boneCountIsQualityTarget": false,
+    "preferredArchitecture": "smallest-purposeful-stylized-platformer-control-set",
+    "approvalBasis": [
+      "actionSilhouette",
+      "contactPlacement",
+      "deformationQuality",
+      "heroSpecificProportions",
+      "facialActing",
+      "handReadability",
+      "secondaryMotion",
+      "mobileScaleReadability"
+    ]
+  },
+  "sharedCore": {
+    "requiredSemanticControls": [
+      "worldRoot",
+      "motionOrCenterOfMass",
+      "pelvis",
+      "lowerSpine",
+      "middleSpine",
+      "chest",
+      "leftClavicle",
+      "rightClavicle",
+      "leftUpperArm",
+      "leftForearm",
+      "leftHand",
+      "rightUpperArm",
+      "rightForearm",
+      "rightHand",
+      "leftThigh",
+      "leftShin",
+      "leftFoot",
+      "leftToe",
+      "rightThigh",
+      "rightShin",
+      "rightFoot",
+      "rightToe",
+      "heroAppropriateNeckChain",
+      "head"
+    ],
+    "optionalWhenJustified": [
+      "jawOrFaceAnchor",
+      "upperArmTwistSupport",
+      "thighTwistSupport",
+      "shoulderCorrectives",
+      "hipCorrectives",
+      "kneeCorrectives",
+      "ankleCorrectives"
+    ]
+  },
+  "heroes": {
+    "Hargold": {
+      "bodyType": "short-broad-round-low-center-of-gravity",
+      "recommendedCoreDeformRange": [24, 30],
+      "recommendedSecondaryDeformRange": [6, 10],
+      "recommendedTotalDeformRange": [30, 40],
+      "countIsMandatoryQuota": false,
+      "requiredSpecialControls": [
+        "broadClavicleAndShoulderControl",
+        "limbAxesThatKeepHandsAndBootsOutsideTorsoSilhouette",
+        "stableWideHipKneeAndAnklePlacement",
+        "footRollAndToeOff",
+        "hatStabilization",
+        "featherChain",
+        "scarfOrCapeFollowThrough",
+        "backpackBeltAndPouchFollow",
+        "facialHairFollow"
+      ]
+    },
+    "Mebble": {
+      "bodyType": "tall-thin-long-limbed-long-necked",
+      "recommendedCoreDeformRange": [26, 32],
+      "recommendedSecondaryDeformRange": [10, 16],
+      "recommendedTotalDeformRange": [36, 48],
+      "countIsMandatoryQuota": false,
+      "minimumNeckControls": 3,
+      "recommendedCapeDeformRange": [5, 7],
+      "requiredSpecialControls": [
+        "neckBaseMiddleAndUpper",
+        "separateHeadControl",
+        "AdamsAppleCorrectiveOrControl",
+        "shoulderControlsClearOfVestAndCape",
+        "thinLimbBendAndTwistSupport",
+        "topHatStabilization",
+        "glassesStabilizationAndFollow",
+        "functionalCapeOpenTrailLiftSettleClose",
+        "beltAndPouchFollow"
+      ]
+    }
+  },
+  "hands": {
+    "fullRealisticFingerSkeletonRequired": false,
+    "rigidUnchangingMittenHandsAllowed": false,
+    "requiredReadableShapes": [
+      "relaxedOpen",
+      "runningCup",
+      "fist",
+      "landingBrace",
+      "skidBrace",
+      "blockHitOrStrike",
+      "grabOrCarry",
+      "victory"
+    ],
+    "allowedSolutions": [
+      "compactThumbAndFingerControls",
+      "handPoseMorphTargets",
+      "drivenCorrectiveShapes"
+    ]
+  },
+  "face": {
+    "largeFacialBoneCountRequired": false,
+    "morphTargetsPreferredWhenCleaner": true,
+    "minimumCapabilities": [
+      "eyeDirectionOrStableAim",
+      "blink",
+      "browRaise",
+      "browCompression",
+      "neutralMouth",
+      "openMouth",
+      "effortMouth",
+      "hurtExpression",
+      "surprisedExpression",
+      "victoryExpression",
+      "cheekOrJawCorrectionWhenNeeded"
+    ]
+  },
+  "deformationGates": [
+    "roundedShoulderVolumeUnderArmMotion",
+    "cleanElbowBend",
+    "readableAttachedWrists",
+    "stableHipsUnderCrouchSlideAndGroundSlam",
+    "nonInvertingKnees",
+    "functionalAnkleAndFootRoll",
+    "functionalToeOffAndContact",
+    "HargoldTorsoCompressionWithoutLimbLoss",
+    "MebbleNeckBendWithoutPinchOrHeadSeparation",
+    "secondaryAssetsDoNotClipFloatOrShake",
+    "noCandyWrapperTwisting",
+    "noHardAnatomicalSeams"
+  ],
+  "requiredPoseValidation": [
+    "neutral",
+    "walkContact",
+    "runContact",
+    "runExtension",
+    "fullSpeedExtension",
+    "accelerationFirstStep",
+    "releaseStop",
+    "plantedSkid",
+    "plantedTurn",
+    "crouch",
+    "crouchWalkContact",
+    "crouchWalkPassing",
+    "slide",
+    "jumpAnticipation",
+    "jumpRise",
+    "jumpApex",
+    "fallPreparation",
+    "softLanding",
+    "heavyLanding",
+    "groundSlamTuck",
+    "groundSlamCommittedDescent",
+    "groundSlamImpact",
+    "HargoldDoubleJump",
+    "HargoldTwirl",
+    "MebbleGlideOpen",
+    "MebbleGlideSustain",
+    "hurt",
+    "knockback",
+    "defeat",
+    "blockHit",
+    "carryOrGrab",
+    "victory"
+  ],
+  "migration": {
+    "preserveCurrentAssetsAsRollback": true,
+    "createEditableBlenderSources": true,
+    "preserveScaleFootOriginFacingAndSockets": true,
+    "createOldToNewSemanticMap": true,
+    "adaptRuntimeThroughSemanticMap": true,
+    "versionCandidateGlbExports": true,
+    "switchRuntimeOnlyAfterParityAndQualityPass": true
+  },
+  "requiredDeliverables": [
+    "HargoldBlenderSource",
+    "MebbleBlenderSource",
+    "versionedGlbExports",
+    "semanticBoneControlMapJson",
+    "rigInventory",
+    "skinWeightAndDeformationReport",
+    "facialControlInventory",
+    "handPoseInventory",
+    "secondaryMotionInventory",
+    "mobileScaleSilhouetteSheets",
+    "requiredActionPoseSheets",
+    "liveBrowserValidation",
+    "boneMapCompletenessTests",
+    "runtimeCompatibilityTests",
+    "remainingLimitationsList"
+  ]
+}
