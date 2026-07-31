@@ -1,8 +1,14 @@
 {
-  "schemaVersion": 2,
-  "verifiedDate": "2026-07-30",
-  "productionTarget": "original-user-supplied-meshy-rigs",
-  "visibleMeshReplacementAllowed": false,
+  "schemaVersion": 3,
+  "verifiedDate": "2026-07-31",
+  "currentRuntimeTarget": "original-user-supplied-meshy-rigs",
+  "currentRigRole": "interim-live-runtime-baseline-and-migration-source",
+  "finalProductionRigAuthority": false,
+  "authoritativeProductionRigDirection": "data/character-rig-direction-override-2026-07-31.json",
+  "visibleCharacterIdentityLocked": true,
+  "currentVisibleMeshReplacementAllowed": false,
+  "productionReRiggingAllowed": true,
+  "productionDeformationRetopologyAllowed": true,
   "runtimeRootMotion": false,
   "controllerOwnsWorldTranslation": true,
   "heroes": {
@@ -37,7 +43,7 @@
       "embeddedReferenceClipCount": 2
     }
   },
-  "supportedByLockedRig": [
+  "supportedByCurrentRig": [
     "hips",
     "spine",
     "neck",
@@ -51,7 +57,7 @@
     "feet",
     "toes"
   ],
-  "missingFromLockedRig": {
+  "missingFromCurrentRig": {
     "facial": [
       "eye-direction controls",
       "upper eyelid controls",
@@ -64,17 +70,17 @@
       "expression morph targets"
     ],
     "hands": [
-      "finger bones",
-      "individual finger controls",
-      "thumb articulation"
+      "finger or compact hand-shape controls",
+      "open fist brace grab and carry shapes",
+      "thumb articulation or equivalent morph control"
     ],
     "secondary": [
       "independent cape or scarf bones",
-      "cape-opening morph",
-      "hat controls",
+      "cape-opening morph or equivalent controls",
+      "hat stabilization controls",
       "hat-feather controls",
       "glasses controls",
-      "belt or backpack follow controls"
+      "belt pouch or backpack follow controls"
     ],
     "correctives": [
       "joint corrective morph targets",
@@ -83,11 +89,13 @@
   },
   "implementationPolicy": {
     "numericAuthority": "data/character-animation-numeric-spec.json",
+    "rigDirectionAuthority": "data/character-rig-direction-override-2026-07-31.json",
     "liveSemanticPoseRuntime": "src/animation/character-animation-numeric-runtime.js",
-    "projectAuthoredBodyClips": "fixed additive local-space inspection clips built from each locked rig's own bind transforms",
+    "projectAuthoredBodyClips": "fixed additive local-space inspection clips built from each current rig's own bind transforms",
     "suppliedWalkRunPolicy": "retained as source-reference and debug clips only; not selected by live locomotion",
-    "runtimeLocomotionPolicy": "distance-driven numeric semantic walk, run, and full-speed poses evaluated on each unchanged locked Meshy rig",
+    "currentRuntimeLocomotionPolicy": "distance-driven numeric semantic poses evaluated on the interim 24-bone rigs",
+    "productionMigrationPolicy": "build purpose-designed original platformer rigs while preserving visible identity, adapt the runtime through a semantic bone map, and switch only after parity and quality validation",
     "rejectedProceduralAssets": "quarantined and never loaded or retargeted by the runtime",
-    "unsupportedControlPolicy": "document as an asset-authoring requirement; do not claim functional controls and do not replace the locked mesh"
+    "unsupportedControlPolicy": "record current limitations honestly and build the missing controls into the production rigs rather than claiming the interim rigs are sufficient"
   }
 }
