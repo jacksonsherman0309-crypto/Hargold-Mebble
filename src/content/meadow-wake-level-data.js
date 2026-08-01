@@ -9,11 +9,11 @@ import {
   MEADOW_WAKE_SECTIONS,
   MEADOW_WAKE_TERRAIN_POINTS,
   MEADOW_WAKE_WORLD_END
-} from './meadow-wake-course.js?v=production-terrain-3';
+} from './meadow-wake-course.js?v=terrain-correction-1';
 import {
   MEADOW_WAKE_ROOM_FINISH_PROFILES,
   MEADOW_WAKE_TERRAIN_ANCHORS
-} from './meadow-wake-scenery.js?v=production-terrain-3';
+} from './meadow-wake-scenery.js?v=terrain-correction-1';
 import { createLevelDefinition } from '../gameplay/levels/level-schema.js';
 
 const MOB_PLACEMENTS = Object.freeze([

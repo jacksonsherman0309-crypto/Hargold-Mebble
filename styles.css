@@ -6,13 +6,13 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; min-height: 100%; background: radial-gradient(circle at top, #264b32, #0e1712 65%); }
-body { min-height: 100vh; display: grid; place-items: center; padding: 12px; overflow-x: hidden; }
+html, body { margin: 0; width: 100%; min-height: 100%; background: #0b1610; }
+body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
 button { font: inherit; }
 
-.shell { width: min(1400px, 100%); }
+.shell { width: 100vw; height: 100vh; height: 100dvh; }
 .hud, footer {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
@@ -43,10 +43,10 @@ footer { justify-content: center; border-radius: 0 0 18px 18px; }
 
 .game-wrap {
   position: relative;
-  aspect-ratio: 16 / 9;
+  width: 100%;
+  height: 100%;
   background: #87cde4;
   overflow: hidden;
-  border-inline: 1px solid rgba(255,255,255,.12);
 }
 #game {
   position: relative;
@@ -72,36 +72,91 @@ footer { justify-content: center; border-radius: 0 0 18px 18px; }
   display: flex;
   justify-content: space-between;
   align-items: end;
-  padding: clamp(10px, 2vw, 24px);
+  padding:
+    clamp(9px, 1.4vw, 18px)
+    max(clamp(10px, 1.5vw, 20px), env(safe-area-inset-right))
+    max(clamp(10px, 1.5vw, 18px), env(safe-area-inset-bottom))
+    max(clamp(10px, 1.5vw, 20px), env(safe-area-inset-left));
   pointer-events: none;
   z-index: 3;
+  opacity: .58;
+  transition: opacity 140ms ease;
 }
-.left-controls, .right-controls { display: flex; gap: 12px; align-items: end; }
+.controls:focus-within,
+.controls:has(button.active) { opacity: .92; }
+.left-controls, .right-controls { display: flex; gap: clamp(6px, .75vw, 10px); align-items: end; }
 .controls button {
   pointer-events: auto;
-  width: clamp(54px, 8vw, 82px);
-  height: clamp(54px, 8vw, 82px);
-  border: 2px solid rgba(255,255,255,.45);
+  width: clamp(48px, 4.2vw, 64px);
+  height: clamp(48px, 4.2vw, 64px);
+  border: 1.5px solid rgba(255,255,255,.48);
   border-radius: 50%;
-  background: rgba(16, 29, 20, .66);
+  background: rgba(12, 26, 18, .42);
   color: white;
   font-weight: 800;
-  box-shadow: 0 8px 22px rgba(0,0,0,.25);
+  font-size: clamp(.66rem, 1vw, .82rem);
+  text-shadow: 0 1px 3px rgba(0,0,0,.8);
+  box-shadow: 0 5px 16px rgba(0,0,0,.2), inset 0 0 0 1px rgba(255,255,255,.08);
   user-select: none;
   -webkit-user-select: none;
 }
 .controls button:active, .controls button.active { transform: translateY(2px); background: rgba(96, 137, 80, .9); }
-.controls .jump { width: clamp(70px, 10vw, 98px); height: clamp(70px, 10vw, 98px); }
+.controls .jump { width: clamp(64px, 5.3vw, 80px); height: clamp(64px, 5.3vw, 80px); }
 .controls [data-action="swap"],
-.controls .utility,
 .controls .slam,
 .controls .action {
-  border-radius: 18px;
-  font-size: clamp(.55rem, 1.25vw, .78rem);
+  width: clamp(42px, 3.4vw, 52px);
+  height: clamp(38px, 3.1vw, 48px);
+  border-radius: 14px;
+  font-size: clamp(.5rem, .72vw, .66rem);
 }
-.controls .utility { width: clamp(52px, 7vw, 72px); height: clamp(46px, 6vw, 62px); }
-.controls .slam { width: clamp(58px, 7vw, 76px); height: clamp(52px, 6.5vw, 68px); }
-.controls .action { width: clamp(62px, 8vw, 82px); height: clamp(58px, 7vw, 76px); }
+.controls .action { width: clamp(46px, 3.7vw, 56px); }
+
+.course-menu-button {
+  position: absolute;
+  z-index: 6;
+  top: max(10px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  color: #fff9df;
+  background: rgba(9, 25, 16, .48);
+  border: 1px solid rgba(255,255,255,.38);
+  border-radius: 50%;
+  box-shadow: 0 5px 16px rgba(0,0,0,.18);
+  opacity: .72;
+}
+.course-menu {
+  position: absolute;
+  z-index: 7;
+  top: max(58px, calc(env(safe-area-inset-top) + 48px));
+  right: max(12px, env(safe-area-inset-right));
+  width: min(220px, calc(100vw - 24px));
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  color: #fff9df;
+  background: rgba(8, 22, 14, .94);
+  border: 1px solid rgba(210, 235, 184, .36);
+  border-radius: 14px;
+  box-shadow: 0 14px 34px rgba(0,0,0,.34);
+}
+.course-menu[hidden] { display: none; }
+.course-menu span { font-size: .75rem; opacity: .72; }
+.course-menu button {
+  min-height: 38px;
+  color: inherit;
+  background: #315337;
+  border: 1px solid #66825f;
+  border-radius: 9px;
+}
+
+.debug-presentation body { display: grid; place-items: center; padding: 12px; overflow: auto; }
+.debug-presentation .shell { width: min(1400px, 100%); height: auto; }
+.debug-presentation .hud,
+.debug-presentation footer { display: flex; }
+.debug-presentation .game-wrap { aspect-ratio: 16 / 9; height: auto; border-inline: 1px solid rgba(255,255,255,.12); }
 
 .animation-debug-panel {
   position: absolute;
@@ -178,38 +233,39 @@ footer { justify-content: center; border-radius: 0 0 18px 18px; }
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .controls { opacity: .62; }
+  .controls { opacity: .38; }
+  .controls:hover { opacity: .82; }
 }
 
 @media (max-width: 700px) {
-  body { padding: 0; place-items: start center; }
-  .hud { border-radius: 0; font-size: .8rem; }
-  footer { display: none; }
-  .game-wrap { width: 100vw; }
+  .debug-presentation body { padding: 0; place-items: start center; }
+  .debug-presentation .hud { border-radius: 0; font-size: .8rem; }
+  .debug-presentation footer { display: none; }
+  .debug-presentation .game-wrap { width: 100vw; }
   .left-controls, .right-controls { gap: 6px; }
-  .controls { padding: 7px; }
+  .controls { padding: 7px max(8px, env(safe-area-inset-right)) max(7px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); }
   .animation-debug-panel { width: min(300px, 72vw); }
   .animation-validation-panel { width: min(300px, 72vw); }
 }
 
 @media (orientation: landscape) and (max-height: 600px) {
-  body { padding: 0; display: block; overflow: hidden; }
-  .shell {
+  .debug-presentation body { padding: 0; display: block; overflow: hidden; }
+  .debug-presentation .shell {
     width: 100vw;
     height: 100dvh;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
   }
-  .hud { min-height: 56px; border-radius: 0; padding-block: 6px; }
-  .game-wrap { width: 100vw; height: 100%; aspect-ratio: auto; border: 0; }
-  footer { display: none; }
+  .debug-presentation .hud { min-height: 56px; border-radius: 0; padding-block: 6px; }
+  .debug-presentation .game-wrap { width: 100vw; height: 100%; aspect-ratio: auto; border: 0; }
+  .debug-presentation footer { display: none; }
   .controls { padding: 6px max(8px, env(safe-area-inset-right)) max(7px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); }
   .left-controls, .right-controls { gap: clamp(4px, 1vw, 9px); }
-  .controls button { width: clamp(46px, 8vh, 62px); height: clamp(46px, 8vh, 62px); }
-  .controls .jump { width: clamp(58px, 11vh, 76px); height: clamp(58px, 11vh, 76px); }
-  .controls .utility { width: clamp(50px, 9vh, 66px); height: clamp(42px, 7vh, 54px); }
-  .controls .slam { width: clamp(52px, 9vh, 66px); height: clamp(46px, 8vh, 58px); }
-  .controls .action { width: clamp(56px, 10vh, 72px); height: clamp(50px, 9vh, 64px); }
+  .controls button { width: clamp(42px, 9vh, 56px); height: clamp(42px, 9vh, 56px); }
+  .controls .jump { width: clamp(56px, 13vh, 72px); height: clamp(56px, 13vh, 72px); }
+  .controls [data-action="swap"],
+  .controls .slam,
+  .controls .action { width: clamp(38px, 8vh, 48px); height: clamp(34px, 7vh, 44px); }
   .animation-validation-panel {
     top: 64px;
     left: 8px;

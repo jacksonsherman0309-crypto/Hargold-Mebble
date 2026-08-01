@@ -67,9 +67,12 @@ secrets, and landmark foundations instead of forming a generated overlay.
 ## Material classes
 
 The required material classes are grass, exposed dirt, compact loam, damp soil,
-embedded stone, ruin stone, moss, and worn path. Terrain uses continuous
-world-space UV progression across room modules, modeled relief, vertex color
-variation, and a separate turf overhang to avoid a stretched slab appearance.
+embedded stone, ruin stone, moss, and worn path. Each Meadow Wake module now
+also carries an explicit sampled lower-contour profile, edge-inset contract,
+and regional texture scale. The detailed face tapers into a recessed irregular
+subsoil mass; the latter fills the lower view without making every detailed
+bank one full-height texture curtain. Terrain uses modeled relief, vertex color
+variation, per-region UV offsets, and a separate turf overhang.
 The active original albedo is
 `assets/textures/world-1/meadow-wake/meadow-soil-stone-albedo-v3.png`; it was
 generated specifically for this project as a neutral, tileable stylized
@@ -102,14 +105,28 @@ ranges for camera culling with a narrow anticipation margin. Wind response is
 shader-driven on shared foliage materials, and existing water, wheel, mist,
 and cascade motion remains lightweight and collision-independent.
 
+Normal play fills the browser viewport. The development header, status strip,
+and keyboard footer are available only through debug presentation queries.
+At the 1536×864 validation viewport, the old 1400×788 framed playfield became a
+1536×864 playfield. Primary movement controls changed from 82 pixels to 64
+pixels, Jump from 98 pixels to 80 pixels, and Restart moved from the primary
+72×62 cluster into the deliberate course menu. Safe-area padding remains part
+of the touch layout.
+
 ## Current implementation status
 
 All twelve rooms use the independent relief system and an explicit
 Blender-authored finish profile. The playable course, mechanics, routes, block
 phrases, collectibles, checkpoint, and goal are preserved.
 
-The terrain architecture and all-room first finish are implemented. Final
-target-device lighting approval, mesh LODs, compressed textures, final UV
-review, and replacement of remaining scenery runtime proxies are still
-production work. The course must not be labeled terrain-complete until those
-items and visual review at the start, middle, and goal are approved.
+The terrain architecture, authored lower silhouettes, all-room first finish,
+production viewport, compact HUD, and corrected touch hierarchy are
+implemented. The opening lodge now includes a modeled draped canopy, visible
+foundations, joinery, ropes, fasteners, entry steps, and depth-bearing openings.
+
+The current original runtime-modeled scenery is no longer classified as a
+temporary proxy, but it is not a claim of final DCC-authored asset quality.
+Target-device lighting approval, mesh LODs, compressed textures, final UV
+review, several purpose-built landmark mesh replacements, and a final visual
+review at the start, middle, and goal remain production work. The course is not
+terrain-complete yet.

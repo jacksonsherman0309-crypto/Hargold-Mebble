@@ -85,6 +85,14 @@ function sampleRange(from, to, spacing) {
   return values;
 }
 
+function sampleAuthoredProfile(profile, ratio, fallback = 1) {
+  if (!Array.isArray(profile) || profile.length < 2) return fallback;
+  const clamped = THREE.MathUtils.clamp(ratio, 0, 1);
+  const scaled = clamped * (profile.length - 1);
+  const index = Math.min(profile.length - 2, Math.floor(scaled));
+  return THREE.MathUtils.lerp(profile[index], profile[index + 1], scaled - index);
+}
+
 function terrainPalette(variant) {
   return VARIANT_TINTS[variant] ?? VARIANT_TINTS['meadow-loam'];
 }
@@ -119,6 +127,9 @@ export function createVerdantTerrainBodyGeometry({
   depth = 192,
   seed = 0,
   variant = 'meadow-loam',
+  lowerProfile = null,
+  lowerInset = [0.12, 0.12],
+  textureScale = 7.6,
   horizontalSpacing = 0.28,
   verticalBands = 7
 }) {
@@ -135,10 +146,11 @@ export function createVerdantTerrainBodyGeometry({
     const spanRatio = (x - from) / Math.max(0.001, to - from);
     const authoredFade = Math.sin(spanRatio * Math.PI);
     const top = sceneHeight / 2 - heightAt(x) * VERDANT_VALE_SCALE;
+    const authoredDepth = sampleAuthoredProfile(lowerProfile, spanRatio, 0.76);
     const lowerIrregularity =
       Math.sin(x * 1.23 + seed * 0.19) * 15
       + Math.sin(x * 0.43 + seed * 0.07) * 11;
-    const localDepth = faceDepth + lowerIrregularity;
+    const localDepth = faceDepth * authoredDepth + lowerIrregularity;
 
     for (let row = 0; row <= rowCount; row += 1) {
       const depthRatio = row / rowCount;
@@ -158,13 +170,23 @@ export function createVerdantTerrainBodyGeometry({
         (noise * 9 + moduleDetail * 13 + broadPocket)
         * palette.relief
         * Math.sin(Math.max(0.05, depthRatio) * Math.PI);
+      const lowerEdgeEase = depthRatio * depthRatio * (3 - 2 * depthRatio);
+      const leftInfluence = Math.max(0, 1 - spanRatio / 0.24);
+      const rightInfluence = Math.max(0, 1 - (1 - spanRatio) / 0.24);
+      const xInset = (
+        (lowerInset[0] ?? 0.12) * leftInfluence
+        - (lowerInset[1] ?? 0.12) * rightInfluence
+      ) * VERDANT_VALE_SCALE * lowerEdgeEase;
       const y =
         top
         - localDepth * depthRatio
         - erosion
         + Math.sin(depthRatio * Math.PI * 2 + x * 0.29) * 2.4;
-      vertices.push(x * VERDANT_VALE_SCALE, y, front + relief);
-      uvs.push(x / 5.6, (top - y) / 330);
+      vertices.push(x * VERDANT_VALE_SCALE + xInset, y, front + relief);
+      uvs.push(
+        (x + seed * 0.071) / (textureScale * 0.58),
+        (top - y + seed * 1.7) / 245
+      );
       const color = terrainColor(palette, depthRatio, noise + moduleDetail);
       colors.push(color.r, color.g, color.b);
     }
@@ -197,7 +219,78 @@ export function createVerdantTerrainBodyGeometry({
     terrainRepresentation: 'visible-relief-mesh',
     collisionBearing: false,
     variant,
+    authoredLowerProfile: [...(lowerProfile ?? [])],
+    lowerInset: [...lowerInset],
     materialClasses: [...palette.materialClasses]
+  };
+  return geometry;
+}
+
+/**
+ * Recessed, low-frequency earth mass behind the detailed landform faces. It
+ * keeps the bottom of the viewport grounded without extending every detailed
+ * face into one continuous texture curtain. This is visible art only.
+ */
+export function createVerdantSubsoilBackdropGeometry({
+  from,
+  to,
+  heightAt,
+  sceneHeight,
+  seed = 0,
+  depth = 154,
+  upperDrop = 72,
+  lowerDepth = 690,
+  horizontalSpacing = 0.7
+}) {
+  const samples = sampleRange(from, to, horizontalSpacing);
+  const front = depth / 2;
+  const vertices = [];
+  const colors = [];
+  const uvs = [];
+  const upperColor = new THREE.Color(0x6e6559);
+  const lowerColor = new THREE.Color(0x3f4941);
+
+  for (let index = 0; index < samples.length; index += 1) {
+    const x = samples[index];
+    const ratio = (x - from) / Math.max(0.001, to - from);
+    const surfaceY = sceneHeight / 2 - heightAt(x) * VERDANT_VALE_SCALE;
+    const shoulder = upperDrop
+      + Math.sin(x * 0.51 + seed * 0.09) * 34
+      + Math.sin(ratio * Math.PI) * 26;
+    const base = lowerDepth
+      + Math.sin(x * 0.23 + seed) * 44
+      + Math.sin(ratio * Math.PI * 2.4) * 28;
+    for (let row = 0; row <= 3; row += 1) {
+      const depthRatio = row / 3;
+      const y = surfaceY - THREE.MathUtils.lerp(shoulder, base, depthRatio);
+      const relief = absoluteRelief(x, depthRatio) * 5.5;
+      vertices.push(x * VERDANT_VALE_SCALE, y, front + relief);
+      uvs.push((x + seed * 0.13) / 10.5, depthRatio * 1.8);
+      const color = upperColor.clone().lerp(lowerColor, depthRatio);
+      color.multiplyScalar(0.92 + wave(seed + index * 5 + row * 7) * 0.1);
+      colors.push(color.r, color.g, color.b);
+    }
+  }
+
+  const indices = [];
+  for (let column = 0; column < samples.length - 1; column += 1) {
+    for (let row = 0; row < 3; row += 1) {
+      const a = column * 4 + row;
+      const b = (column + 1) * 4 + row;
+      indices.push(a, a + 1, b, b, a + 1, b + 1);
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  geometry.userData = {
+    terrainRepresentation: 'recessed-visible-subsoil-mass',
+    collisionBearing: false
   };
   return geometry;
 }

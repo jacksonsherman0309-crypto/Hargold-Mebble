@@ -9,9 +9,9 @@ import {
   MEADOW_WAKE_WORLD_END,
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins
-} from './content/meadow-wake-course.js?v=production-terrain-3';
+} from './content/meadow-wake-course.js?v=terrain-correction-1';
 import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=production-terrain-4';
-import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=production-terrain-10';
+import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=terrain-correction-1';
 import { GAME_RULES } from './canonical-data.js';
 import {
   animationIntentFor,
@@ -65,7 +65,7 @@ export class CharacterRenderer {
     this.camera.lookAt(0, 0, 0);
     // Keep the authored ground route in the dominant lower-middle field of view.
     // The distant vista remains readable, but no longer consumes most of the frame.
-    this.camera.zoom = 1.04;
+    this.camera.zoom = 1.18;
     this.camera.updateProjectionMatrix();
 
     this.renderer = new THREE.WebGLRenderer({

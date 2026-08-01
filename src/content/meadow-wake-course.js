@@ -96,6 +96,41 @@ export const MEADOW_WAKE_GAMEPLAY_ROOMS = Object.freeze([
   Object.freeze({ id: 'three-gap-vista', range: Object.freeze([111, 124]), landmark: 'goal-stone-gate', terrainLanguage: 'fractured overlook islands', gameplayPhrase: 'three graduated jumps framed by the goal ruin' })
 ]);
 
+/*
+ * Course-specific visible-landform profiles. Values are authored normalized
+ * face depths sampled from left to right, not collision coordinates and not a
+ * procedural terrain recipe. Their uneven lower contours let each Meadow Wake
+ * room read as a bank, shelf, terrace, or overlook instead of a rectangular
+ * strip while the deterministic ground profile above remains unchanged.
+ */
+export const MEADOW_WAKE_AUTHORED_TERRAIN_SHAPES = Object.freeze({
+  'trailhead-packed-loam': Object.freeze({ lowerProfile: Object.freeze([0.58, 0.66, 0.54, 0.72, 0.61, 0.56]), lowerInset: Object.freeze([0.18, 0.08]), textureScale: 7.4 }),
+  'trailhead-root-edge': Object.freeze({ lowerProfile: Object.freeze([0.63, 0.82, 0.71, 0.92, 0.68, 0.57]), lowerInset: Object.freeze([0.08, 0.24]), textureScale: 6.7 }),
+  'elder-root-rise': Object.freeze({ lowerProfile: Object.freeze([0.7, 0.9, 0.78, 0.64, 0.84, 0.73]), lowerInset: Object.freeze([0.2, 0.12]), textureScale: 7.9 }),
+  'elder-root-hollow': Object.freeze({ lowerProfile: Object.freeze([0.74, 0.62, 0.88, 0.96, 0.69, 0.76]), lowerInset: Object.freeze([0.12, 0.28]), textureScale: 8.4 }),
+  'mason-shelf-low': Object.freeze({ lowerProfile: Object.freeze([0.57, 0.74, 0.86, 0.66, 0.59, 0.72]), lowerInset: Object.freeze([0.26, 0.1]), textureScale: 6.9 }),
+  'mason-shelf-rise': Object.freeze({ lowerProfile: Object.freeze([0.68, 0.92, 0.79, 0.96, 0.72, 0.64]), lowerInset: Object.freeze([0.08, 0.2]), textureScale: 7.7 }),
+  'quarry-foundation-a': Object.freeze({ lowerProfile: Object.freeze([0.86, 0.72, 0.94, 0.81, 0.98, 0.76]), lowerInset: Object.freeze([0.12, 0.06]), textureScale: 8.1 }),
+  'quarry-foundation-b': Object.freeze({ lowerProfile: Object.freeze([0.8, 0.97, 0.73, 0.9, 0.68, 0.75]), lowerInset: Object.freeze([0.06, 0.18]), textureScale: 7.3 }),
+  'timberyard-retaining-a': Object.freeze({ lowerProfile: Object.freeze([0.62, 0.78, 0.69, 0.86, 0.73, 0.66]), lowerInset: Object.freeze([0.2, 0.08]), textureScale: 8.6 }),
+  'timberyard-retaining-b': Object.freeze({ lowerProfile: Object.freeze([0.7, 0.88, 0.76, 0.94, 0.79, 0.61]), lowerInset: Object.freeze([0.08, 0.22]), textureScale: 7.6 }),
+  'stump-hollow-bank': Object.freeze({ lowerProfile: Object.freeze([0.7, 0.58, 0.91, 0.8, 0.98, 0.72]), lowerInset: Object.freeze([0.2, 0.16]), textureScale: 8.2 }),
+  'creek-eroded-approach': Object.freeze({ lowerProfile: Object.freeze([0.83, 0.96, 0.71, 0.88, 0.61, 0.49]), lowerInset: Object.freeze([0.1, 0.34]), textureScale: 6.5 }),
+  'creek-pocket-exit': Object.freeze({ lowerProfile: Object.freeze([0.46, 0.7, 0.88, 0.62, 0.5]), lowerInset: Object.freeze([0.34, 0.3]), textureScale: 7.1 }),
+  'bridge-overlook': Object.freeze({ lowerProfile: Object.freeze([0.5, 0.68, 0.84, 0.76, 0.62, 0.7]), lowerInset: Object.freeze([0.3, 0.14]), textureScale: 8.8 }),
+  'mill-meadow-bank': Object.freeze({ lowerProfile: Object.freeze([0.56, 0.7, 0.62, 0.78, 0.66, 0.59]), lowerInset: Object.freeze([0.14, 0.08]), textureScale: 7.2 }),
+  'mill-race-bank': Object.freeze({ lowerProfile: Object.freeze([0.64, 0.82, 0.95, 0.7, 0.88, 0.6]), lowerInset: Object.freeze([0.08, 0.22]), textureScale: 8.3 }),
+  'root-terrace-low': Object.freeze({ lowerProfile: Object.freeze([0.62, 0.76, 0.9, 0.68, 0.82, 0.7]), lowerInset: Object.freeze([0.22, 0.08]), textureScale: 7.8 }),
+  'root-terrace-high': Object.freeze({ lowerProfile: Object.freeze([0.72, 0.94, 0.8, 0.98, 0.74, 0.65]), lowerInset: Object.freeze([0.08, 0.2]), textureScale: 8.6 }),
+  'lookout-foundation-a': Object.freeze({ lowerProfile: Object.freeze([0.82, 0.68, 0.94, 0.79, 0.9, 0.72]), lowerInset: Object.freeze([0.14, 0.08]), textureScale: 7.4 }),
+  'lookout-foundation-b': Object.freeze({ lowerProfile: Object.freeze([0.74, 0.92, 0.7, 0.86, 0.64, 0.58]), lowerInset: Object.freeze([0.08, 0.26]), textureScale: 8.1 }),
+  'flowering-run-bank-a': Object.freeze({ lowerProfile: Object.freeze([0.54, 0.68, 0.61, 0.76, 0.66, 0.57]), lowerInset: Object.freeze([0.2, 0.08]), textureScale: 6.8 }),
+  'flowering-run-bank-b': Object.freeze({ lowerProfile: Object.freeze([0.6, 0.78, 0.7, 0.84, 0.58, 0.47]), lowerInset: Object.freeze([0.08, 0.32]), textureScale: 7.5 }),
+  'panorama-island-a': Object.freeze({ lowerProfile: Object.freeze([0.48, 0.72, 0.88, 0.7, 0.52]), lowerInset: Object.freeze([0.32, 0.3]), textureScale: 8.9 }),
+  'panorama-island-b': Object.freeze({ lowerProfile: Object.freeze([0.46, 0.68, 0.9, 0.74, 0.49]), lowerInset: Object.freeze([0.34, 0.32]), textureScale: 7.2 }),
+  'goal-overlook': Object.freeze({ lowerProfile: Object.freeze([0.48, 0.7, 0.82, 0.66, 0.56]), lowerInset: Object.freeze([0.3, 0.16]), textureScale: 8.4 })
+});
+
 const terrainModule = (id, from, to, variant, extra = {}) => Object.freeze({
   id,
   from,
@@ -106,6 +141,7 @@ const terrainModule = (id, from, to, variant, extra = {}) => Object.freeze({
   ))?.id,
   visibleRepresentation: 'verdant-vale-relief-mesh',
   collisionRepresentation: 'meadow-wake-ground-profile',
+  ...MEADOW_WAKE_AUTHORED_TERRAIN_SHAPES[id],
   ...extra
 });
 

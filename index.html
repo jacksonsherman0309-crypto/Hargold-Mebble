@@ -5,11 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#17281d">
   <title>Hargold &amp; Mebble — Meadow Wake 3D</title>
-  <link rel="stylesheet" href="styles.css">
+  <script>
+    const presentationParameters = new URLSearchParams(location.search);
+    if (
+      presentationParameters.has('debugPresentation')
+      || presentationParameters.has('debugMovement')
+      || presentationParameters.has('debugAnimation')
+      || presentationParameters.has('animationValidation')
+    ) document.documentElement.classList.add('debug-presentation');
+  </script>
+  <link rel="stylesheet" href="styles.css?v=terrain-correction-1">
 </head>
 <body>
   <main class="shell">
-    <header class="hud">
+    <header class="hud" aria-label="Development status">
       <div><strong>Meadow Wake · World 1-1</strong><span>Twelve handcrafted outdoor rooms · layered 3D Verdant Vale</span></div>
       <div class="runtime-status">
         <span id="test-mode-badge" hidden>FULLY UNLOCKED TEST</span>
@@ -17,25 +26,33 @@
       </div>
     </header>
 
-    <section class="game-wrap" aria-label="Playable game prototype">
+    <section class="game-wrap" aria-label="Playable Meadow Wake course">
       <canvas id="game" width="1280" height="720"></canvas>
+
+      <button id="course-menu-button" class="course-menu-button" aria-label="Open course menu" aria-expanded="false">☰</button>
+      <div id="course-menu" class="course-menu" hidden>
+        <strong>Meadow Wake</strong>
+        <span>Course options</span>
+        <button data-action="restart">Restart course</button>
+        <button data-action="resume">Resume</button>
+      </div>
+
       <div class="controls" aria-label="Touch controls">
         <div class="left-controls">
-          <button data-action="left" aria-label="Move left">◀</button>
-          <button data-action="right" aria-label="Move right">▶</button>
+          <button class="primary-control" data-action="left" aria-label="Move left">◀</button>
+          <button class="primary-control" data-action="right" aria-label="Move right">▶</button>
         </div>
         <div class="right-controls">
-          <button class="utility" data-action="restart" aria-label="Restart course">RESTART</button>
-          <button data-action="swap" aria-label="Swap hero">SWAP</button>
-          <button class="slam" data-action="slam" aria-label="Ground slam while airborne">SLAM</button>
-          <button class="action" data-action="action" aria-label="Attack or interact">ACTION</button>
-          <button class="jump" data-action="jump" aria-label="Jump, air twirl, double jump, or Mebble glide">JUMP</button>
+          <button class="secondary-control" data-action="swap" aria-label="Swap hero">SWAP</button>
+          <button class="secondary-control slam" data-action="slam" aria-label="Ground slam while airborne">SLAM</button>
+          <button class="secondary-control action" data-action="action" aria-label="Attack or interact">ACTION</button>
+          <button class="primary-control jump" data-action="jump" aria-label="Jump, air twirl, double jump, or Mebble glide">JUMP</button>
         </div>
       </div>
     </section>
 
     <footer>
-      Move and accelerate: A/D or arrows · Jump / twirl / glide: Space/W/↑ · Ground slam or fast fall: S/↓ · Attack: E · Swap: Q · Restart: R
+      Move: A/D or arrows · Jump / twirl / glide: Space/W/↑ · Ground slam or fast fall: S/↓ · Attack: E · Swap: Q · Restart: R
     </footer>
   </main>
   <script>
@@ -51,6 +68,6 @@
       if (status) status.textContent = `ASSET ERROR · ${detail}`;
     });
   </script>
-  <script type="module" src="src/game.js?v=verdant-terrain-12" onerror="document.querySelector('#status').textContent='STARTUP ERROR · game module failed to load'"></script>
+  <script type="module" src="src/game.js?v=terrain-correction-1" onerror="document.querySelector('#status').textContent='STARTUP ERROR · game module failed to load'"></script>
 </body>
 </html>

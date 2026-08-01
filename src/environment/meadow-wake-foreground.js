@@ -6,19 +6,20 @@ import {
   MEADOW_WAKE_SCENERY_BEATS,
   MEADOW_WAKE_SCENERY_PROPS,
   MEADOW_WAKE_TERRAIN_ANCHORS
-} from '../content/meadow-wake-scenery.js?v=production-terrain-3';
+} from '../content/meadow-wake-scenery.js?v=terrain-correction-1';
 import {
   MEADOW_WAKE_GAMEPLAY_ROOMS,
   MEADOW_WAKE_LANDFORM_FEATURES,
   MEADOW_WAKE_PITS,
   MEADOW_WAKE_TERRAIN_POINTS
-} from '../content/meadow-wake-course.js?v=production-terrain-3';
+} from '../content/meadow-wake-course.js?v=terrain-correction-1';
 import {
   countTerrainRenderCost,
   createTerrainCollisionDebugGroup,
   createVerdantGrassOverhangGeometry,
+  createVerdantSubsoilBackdropGeometry,
   createVerdantTerrainBodyGeometry
-} from './verdant-vale-terrain-kit.js?v=production-terrain-5';
+} from './verdant-vale-terrain-kit.js?v=terrain-correction-1';
 
 const SCALE = 70;
 const TAU = Math.PI * 2;
@@ -116,6 +117,65 @@ function taperedPanelGeometry(bottomWidth, topWidth, height, depth) {
     curveSegments: 4
   });
   geometry.translate(0, -height / 2, -depth / 2);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function sculptedShoulderGeometry(width, height, depth, seed = 0) {
+  const topNoise = (offset, amount) => (variation(seed + offset) - 0.5) * amount;
+  const shape = new THREE.Shape();
+  shape.moveTo(-width * 0.49, topNoise(1, 6));
+  shape.lineTo(-width * 0.2, topNoise(2, 8));
+  shape.lineTo(width * 0.12, topNoise(3, 7));
+  shape.lineTo(width * 0.48, topNoise(4, 6));
+  shape.lineTo(width * (0.43 + topNoise(5, 0.04)), -height * 0.32);
+  shape.lineTo(width * (0.35 + topNoise(6, 0.05)), -height * 0.72);
+  shape.lineTo(width * (0.18 + topNoise(7, 0.05)), -height * 0.98);
+  shape.lineTo(-width * (0.16 + topNoise(8, 0.05)), -height * 0.92);
+  shape.lineTo(-width * (0.38 + topNoise(9, 0.04)), -height * 0.66);
+  shape.lineTo(-width * (0.45 + topNoise(10, 0.03)), -height * 0.27);
+  shape.closePath();
+  const geometry = new THREE.ExtrudeGeometry(shape, {
+    depth,
+    bevelEnabled: true,
+    bevelSegments: 2,
+    bevelSize: 4,
+    bevelThickness: 3,
+    curveSegments: 3,
+    steps: 1
+  });
+  geometry.translate(0, 0, -depth / 2);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function drapedCanopyGeometry(width, rise, depth, segments = 10) {
+  const vertices = [];
+  const uvs = [];
+  const indices = [];
+  for (let depthIndex = 0; depthIndex <= segments; depthIndex += 1) {
+    const depthRatio = depthIndex / segments;
+    const z = -depth / 2 + depth * depthRatio;
+    const endSag = Math.sin(depthRatio * Math.PI) * 6;
+    for (let sideIndex = 0; sideIndex <= segments; sideIndex += 1) {
+      const sideRatio = sideIndex / segments;
+      const x = -width / 2 + width * sideRatio;
+      const ridge = 1 - Math.abs(sideRatio * 2 - 1);
+      const clothFold = Math.sin(sideRatio * Math.PI * 6 + depthRatio * 2.4) * 2.4;
+      const y = ridge * rise - endSag + clothFold * (0.3 + ridge * 0.7);
+      vertices.push(x, y, z);
+      uvs.push(sideRatio, depthRatio);
+      if (sideIndex < segments && depthIndex < segments) {
+        const a = depthIndex * (segments + 1) + sideIndex;
+        const b = a + segments + 1;
+        indices.push(a, b, a + 1, a + 1, b, b + 1);
+      }
+    }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
   geometry.computeVertexNormals();
   return geometry;
 }
@@ -276,6 +336,14 @@ export class MeadowWakeForegroundArt {
       metalness: 0,
       vertexColors: true
     });
+    this.recessedSubsoilMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: 0x202b24,
+      emissiveIntensity: 0.28,
+      roughness: 1,
+      metalness: 0,
+      vertexColors: true
+    });
 
     this.installSubtleWind(this.leafDark, 0.46, 1.28);
     this.installSubtleWind(this.leafLight, 0.62, 1.48);
@@ -407,6 +475,10 @@ export class MeadowWakeForegroundArt {
     this.terrainBodyMaterial.bumpMap = this.materials.soil.bumpMap;
     this.terrainBodyMaterial.bumpScale = 0.46;
     this.terrainBodyMaterial.needsUpdate = true;
+    this.recessedSubsoilMaterial.map = this.materials.soil.map;
+    this.recessedSubsoilMaterial.bumpMap = this.materials.soil.bumpMap;
+    this.recessedSubsoilMaterial.bumpScale = 0.24;
+    this.recessedSubsoilMaterial.needsUpdate = true;
   }
 
   addBox(root, name, width, height, depth, material, position = [0, 0, 0], radius = 2.5) {
@@ -710,16 +782,16 @@ export class MeadowWakeForegroundArt {
         const shoulder = this.addMesh(
           feature,
           'continuous-sculpted-landform-shoulder',
-          taperedPanelGeometry(
-            width * 0.58,
-            width * (definition.type.includes('root') ? 0.34 : 0.4),
-            drop * 0.44,
-            82
+          sculptedShoulderGeometry(
+            width * 0.62,
+            drop * 0.54,
+            82,
+            definition.x
           ),
           definition.type.includes('ruin') || definition.type === 'rock-shelf'
             ? this.soilClay
             : this.soilDark,
-          [0, -drop * 0.25, -58]
+          [0, -8, -58]
         );
         shoulder.receiveShadow = true;
         const livingEdge = this.addBox(
@@ -743,17 +815,18 @@ export class MeadowWakeForegroundArt {
           this.addBox(feature, 'timberyard-earth-retaining-post', 12, drop * 0.92, 18, this.darkWood, [x, -drop * 0.46, 0], 4);
         }
         for (let row = 0; row < 4; row += 1) {
-          const plank = this.addBox(
-            feature,
-            'timberyard-earth-retaining-plank',
-            width * 0.9,
-            16,
-            14,
-            row % 2 ? this.lightWood : this.materials.wood,
-            [0, -25 - row * drop * 0.22, 3],
-            4
-          );
-          plank.rotation.z = row % 2 ? -0.018 : 0.024;
+          for (const side of [-1, 1]) {
+            const logLength = width * (0.43 + (row + side + 2) % 2 * 0.035);
+            const plank = this.addMesh(
+              feature,
+              'timberyard-earth-retaining-handhewn-log',
+              new THREE.CylinderGeometry(7, 9, logLength, 12, 2),
+              row % 2 ? this.lightWood : this.materials.wood,
+              [side * width * 0.205, -25 - row * drop * 0.22, 3]
+            );
+            plank.rotation.z = Math.PI / 2 + (row % 2 ? -0.018 : 0.024);
+            plank.rotation.y = side * 0.02;
+          }
         }
       } else if (definition.type === 'bridge-abutment') {
         for (const side of [-1, 1]) {
@@ -1009,11 +1082,29 @@ export class MeadowWakeForegroundArt {
       terrainRoot.add(moduleRoot);
       this.terrainModuleRoots.push(moduleRoot);
 
+      const recessedMass = this.addMesh(
+        moduleRoot,
+        'recessed-irregular-subsoil-mass',
+        createVerdantSubsoilBackdropGeometry({
+          ...visualDefinition,
+          heightAt,
+          sceneHeight: this.height,
+          depth: 154
+        }),
+        this.recessedSubsoilMaterial
+      );
+      recessedMass.receiveShadow = true;
+      recessedMass.castShadow = false;
+
       const face = this.addMesh(
         moduleRoot,
         'modeled-verdant-vale-earth-relief',
         createVerdantTerrainBodyGeometry({
           ...visualDefinition,
+          lowerInset: [
+            visualDefinition.cliffLeft ? visualDefinition.lowerInset[0] : 0,
+            visualDefinition.cliffRight ? visualDefinition.lowerInset[1] : 0
+          ],
           heightAt,
           sceneHeight: this.height,
           depth: 192
@@ -1223,7 +1314,13 @@ export class MeadowWakeForegroundArt {
     let cap = null;
 
     if (definition.visual === 'turf-ledge' || definition.visual === 'root-ledge') {
-      core = this.addBox(root, 'sculpted-soil-ledger', width * 0.92, height + 28, 126, soil, [0, -12, 0], 9);
+      core = this.addMesh(
+        root,
+        'sculpted-soil-ledger',
+        sculptedShoulderGeometry(width * 0.96, height + 58, 126, definition.x),
+        soil,
+        [0, height / 2 + 2, 0]
+      );
       cap = this.addBox(root, 'overhanging-living-turf', width + 8, 11, 136, turf, [0, height / 2 + 4, 0], 5);
       const stoneCount = Math.max(3, Math.round(width / 28));
       for (let index = 0; index < stoneCount; index += 1) {
@@ -1306,20 +1403,33 @@ export class MeadowWakeForegroundArt {
     } else if (['camp-deck', 'timber-lift', 'timber-slat'].includes(definition.visual)) {
       const plankCount = definition.visual === 'timber-slat'
         ? Math.max(3, Math.round(width / 20))
-        : Math.max(4, Math.round(width / 30));
+        : Math.max(6, Math.round(width / 22));
       const plankWidth = width / plankCount;
       for (let index = 0; index < plankCount; index += 1) {
-        const plank = this.addBox(
-          root,
-          `${definition.visual}-bevelled-plank`,
-          plankWidth - 2.6,
-          height,
-          112,
-          index % 3 === 0 ? this.lightWood : wood,
-          [-width / 2 + plankWidth * (index + 0.5), (index % 2) * 1.1, 0],
-          2.8
-        );
-        plank.rotation.z = (variation(index + definition.x) - 0.5) * 0.025;
+        const x = -width / 2 + plankWidth * (index + 0.5);
+        let plank;
+        if (definition.visual === 'camp-deck') {
+          plank = this.addMesh(
+            root,
+            'camp-deck-rounded-handhewn-log',
+            new THREE.CylinderGeometry(height * 0.43, height * 0.52, plankWidth - 2.4, 10, 2),
+            index % 3 === 0 ? this.barkLight : this.bark,
+            [x, (index % 2) * 1.1, (index % 3 - 1) * 2]
+          );
+          plank.rotation.z = Math.PI / 2 + (variation(index + definition.x) - 0.5) * 0.035;
+        } else {
+          plank = this.addBox(
+            root,
+            `${definition.visual}-bevelled-plank`,
+            plankWidth - 2.6,
+            height,
+            112,
+            index % 3 === 0 ? this.lightWood : wood,
+            [x, (index % 2) * 1.1, 0],
+            2.8
+          );
+          plank.rotation.z = (variation(index + definition.x) - 0.5) * 0.025;
+        }
       }
       this.addBox(root, 'timber-underbeam', width * 0.88, 8, 126, this.darkWood, [0, -height * 0.68, -2], 2);
       if (definition.visual !== 'timber-slat') {
@@ -1343,6 +1453,18 @@ export class MeadowWakeForegroundArt {
             [side * width * 0.38, -height * 0.35, 59]
           );
           lashing.rotation.y = Math.PI / 2;
+        }
+        if (definition.visual === 'camp-deck') {
+          for (const side of [-1, 1]) {
+            const deckBinding = this.addMesh(
+              root,
+              'camp-deck-load-rope-binding',
+              new THREE.TorusGeometry(height * 0.64, 1.8, 6, 18),
+              this.rope,
+              [side * width * 0.36, 1, 59]
+            );
+            deckBinding.rotation.y = Math.PI / 2;
+          }
         }
       }
       if (definition.visual === 'timber-lift') {
@@ -1488,7 +1610,13 @@ export class MeadowWakeForegroundArt {
     } else {
       const creekStone = definition.visual === 'creek-stone';
       const bodyMaterial = creekStone ? this.sharedColorMaterial(0x53635c) : stone;
-      core = this.addBox(root, 'hand-laid-ruin-core', width * 0.94, height + 12, 124, bodyMaterial, [0, -4, 0], 8);
+      core = this.addMesh(
+        root,
+        'hand-laid-ruin-core',
+        sculptedShoulderGeometry(width * 0.96, height + 42, 124, definition.x),
+        bodyMaterial,
+        [0, height / 2 + 1, 0]
+      );
       const stoneCount = Math.max(3, Math.round(width / 25));
       for (let index = 0; index < stoneCount; index += 1) {
         const rock = this.addMesh(
@@ -1774,8 +1902,19 @@ export class MeadowWakeForegroundArt {
     const turf = this.materials.turf;
     const type = definition.type;
 
-    if (type === 'camp-lodge') {
+      if (type === 'camp-lodge') {
       this.addContactShadow(root, 195, { y: 2, z: 126, opacity: 0.14 });
+      for (const [index, x] of [-78, -38, 4, 48, 84].entries()) {
+        const footing = this.addMesh(
+          root,
+          'lodge-fieldstone-foundation',
+          new THREE.DodecahedronGeometry(16 + index % 2 * 3, 0),
+          index % 3 ? this.fieldstone : this.fieldstoneAccent,
+          [x, 8 + index % 2 * 2, 8]
+        );
+        footing.scale.set(1.35, 0.65, 0.9);
+        footing.rotation.z = (index - 2) * 0.035;
+      }
       this.addBox(root, 'lodge-raised-deck', 198, 18, 118, this.darkWood, [0, 12, 0], 4);
       for (const x of [-80, -27, 27, 80]) {
         this.addBox(root, 'lodge-deck-plank', 47, 12, 124, x % 54 ? wood : this.lightWood, [x, 23, 0], 3);
@@ -1788,13 +1927,22 @@ export class MeadowWakeForegroundArt {
       this.addBox(root, 'lodge-ridge-beam', 18, 32, 168, this.darkWood, [0, 220, -8], 4);
       const lodgeRoof = this.addMesh(
         root,
-        'lodge-tailored-canvas-roof',
-        new THREE.ConeGeometry(142, 74, 4, 2, false),
+        'lodge-tailored-draped-canvas-roof',
+        drapedCanopyGeometry(232, 78, 148, 12),
         this.canvas,
-        [0, 190, -2]
+        [0, 157, -2]
       );
-      lodgeRoof.rotation.y = Math.PI / 4;
-      lodgeRoof.scale.z = 0.68;
+      lodgeRoof.rotation.x = -0.02;
+      lodgeRoof.castShadow = false;
+      const roofVolume = this.addMesh(
+        root,
+        'lodge-tailored-canvas-roof-volume',
+        new THREE.ConeGeometry(142, 74, 4, 3, false),
+        this.canvas,
+        [0, 190, -8]
+      );
+      roofVolume.rotation.y = Math.PI / 4;
+      roofVolume.scale.z = 0.72;
       this.addBox(root, 'lodge-canvas-eave-trim', 204, 8, 118, this.canvasLight, [0, 154, 0], 3);
       this.addBox(root, 'lodge-dark-entry', 58, 108, 8, this.sharedColorMaterial(0x132118), [-4, 78, 59], 7);
       const leftFlap = this.addMesh(
@@ -1833,6 +1981,30 @@ export class MeadowWakeForegroundArt {
           new THREE.Vector3(x, 184, 55),
           new THREE.Vector3(x * 1.55, 154, 60)
         ], 1.15);
+      }
+      for (const x of [-86, 86]) {
+        for (const y of [29, 153]) {
+          const peg = this.addMesh(
+            root,
+            'lodge-forged-joint-fastener',
+            new THREE.CylinderGeometry(3.6, 3.6, 20, 10),
+            this.iron,
+            [x, y, 65]
+          );
+          peg.rotation.x = Math.PI / 2;
+        }
+      }
+      for (let step = 0; step < 3; step += 1) {
+        this.addBox(
+          root,
+          'lodge-grounded-entry-step',
+          66 - step * 8,
+          9,
+          50 + step * 12,
+          step % 2 ? this.lightWood : wood,
+          [0, 4 + step * 7, 62 + step * 13],
+          3
+        );
       }
       this.addLeafCluster(root, -126, 32, 20, 0.72, 4);
       this.addLeafCluster(root, 132, 26, 18, 0.62, 8);
@@ -2591,6 +2763,7 @@ export class MeadowWakeForegroundArt {
         matrices
       );
     }
+
   }
 
   buildAuthoredScenery(heightAt) {
@@ -2793,10 +2966,10 @@ export class MeadowWakeForegroundArt {
     }
 
     const cameraWorldX = (cameraX + this.width / 2) / SCALE;
-    // The orthographic view exposes roughly eleven metres on either side at
-    // the production zoom. One extra metre preserves entrance anticipation
-    // while preventing distant rooms from consuming mobile draw calls.
-    const visibleRange = [cameraWorldX - 12.5, cameraWorldX + 12.5];
+    // The corrected production zoom exposes roughly eight metres on either
+    // side. A three-metre apron preserves route anticipation without drawing
+    // distant authored rooms on mobile hardware.
+    const visibleRange = [cameraWorldX - 11.25, cameraWorldX + 11.25];
     const rangeIsVisible = range => (
       range[1] >= visibleRange[0] && range[0] <= visibleRange[1]
     );

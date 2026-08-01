@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "course": "1-1 Meadow Wake",
+  "mode": "query-only fully-unlocked deterministic route QA",
+  "runs": [
+    {
+      "hero": "Hargold",
+      "result": "course-complete",
+      "finalFootX": 123.279,
+      "checkpointReached": true,
+      "livesRemaining": 99,
+      "standardCoinsCollected": 52,
+      "compassCoinsCollectedOnMainRoute": 0
+    },
+    {
+      "hero": "Mebble",
+      "result": "course-complete",
+      "finalFootX": 123.266,
+      "checkpointReached": true,
+      "livesRemaining": 99,
+      "standardCoinsCollected": 54,
+      "compassCoinsCollectedOnMainRoute": 2
+    }
+  ],
+  "compassCoinSolutions": [
+    {
+      "id": "1-1-C1",
+      "solution": "fallen-log-upper-arc",
+      "anchor": "fallen-log-launch"
+    },
+    {
+      "id": "1-1-C2",
+      "solution": "shellback-breakable-upper-route",
+      "anchor": "shellback-upper-route-b"
+    },
+    {
+      "id": "1-1-C3",
+      "solution": "interrupted-low-trail-creek-shelf",
+      "anchor": "concealed-creek-shelf"
+    }
+  ],
+  "qualification": "Autoplay validates the complete main route, checkpoint, ordinary terrain, block-side clearance, and final gaps for each hero. Named optional Compass Coin solutions are structurally validated by course-data and movement-envelope tests; autoplay is not a 100-percent collectible playthrough."
+}

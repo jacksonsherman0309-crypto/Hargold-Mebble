@@ -9,7 +9,7 @@ import {
   MEADOW_WAKE_BLOCK_DEFINITIONS,
   MEADOW_WAKE_GAMEPLAY_ROOMS,
   MEADOW_WAKE_PLATFORMS
-} from './meadow-wake-course.js?v=production-terrain-3';
+} from './meadow-wake-course.js?v=terrain-correction-1';
 
 const prop = (id, type, x, scale = 1, extra = {}) => Object.freeze({
   id,
@@ -17,7 +17,8 @@ const prop = (id, type, x, scale = 1, extra = {}) => Object.freeze({
   x,
   scale,
   layer: 'playfield-back',
-  assetStatus: 'authored-runtime-proxy',
+  assetStatus: 'authored-original-runtime-mesh',
+  temporaryProxy: false,
   anchorRequired: true,
   ...extra
 });
@@ -221,7 +222,7 @@ export const MEADOW_WAKE_TERRAIN_ANCHORS = Object.freeze([
       x: definition.x,
       binding: 'visible-terrain-surface',
       remainsSeparateEntity: true,
-      temporaryProxy: definition.assetStatus !== 'final-production-mesh',
+      temporaryProxy: definition.temporaryProxy,
       linkedPlatformIds: landmark ? [...landmark.linkedPlatformIds] : []
     });
   })

@@ -9,6 +9,7 @@ import {
 } from '../src/campaign-level-count.js';
 import { VERDANT_VALE_TERRAIN_STANDARD } from '../src/canonical-data.js';
 import {
+  MEADOW_WAKE_AUTHORED_TERRAIN_SHAPES,
   MEADOW_WAKE_BLOCK_DEFINITIONS,
   MEADOW_WAKE_BLOCK_PHRASES,
   MEADOW_WAKE_COMPASS_COIN_DEFINITIONS,
@@ -71,6 +72,13 @@ assert.ok(MEADOW_WAKE_TERRAIN_MODULES.every(module => module.roomId));
 assert.ok(MEADOW_WAKE_TERRAIN_MODULES.every(module => (
   module.visibleRepresentation === 'verdant-vale-relief-mesh'
   && module.collisionRepresentation === 'meadow-wake-ground-profile'
+)));
+assert.equal(Object.keys(MEADOW_WAKE_AUTHORED_TERRAIN_SHAPES).length, MEADOW_WAKE_TERRAIN_MODULES.length);
+assert.ok(MEADOW_WAKE_TERRAIN_MODULES.every(module => (
+  module.lowerProfile.length >= 5
+  && new Set(module.lowerProfile).size >= 4
+  && module.lowerInset.length === 2
+  && module.textureScale >= 6.5
 )));
 assert.equal(MEADOW_WAKE_TERRAIN_MODULES[0].from, 0);
 assert.ok(MEADOW_WAKE_TERRAIN_MODULES[0].visualFrom < 0);
@@ -177,12 +185,13 @@ assert.match(foregroundSource, /setDebugMode/);
 assert.match(foregroundSource, /residentTerrain/);
 assert.match(foregroundSource, /AUTHORED_WORN_TRAIL_SEGMENTS/);
 assert.match(foregroundSource, /batchStrategy: 'authored-room'/);
-assert.match(foregroundSource, /visibleRange = \[cameraWorldX - 12\.5/);
+assert.match(foregroundSource, /visibleRange = \[cameraWorldX - 11\.25/);
 assert.match(foregroundSource, /this\.windShaders/);
-assert.match(rendererSource, /camera\.zoom = 1\.04/);
-assert.match(gameSource, /cameraSurfaceY \* SCALE - H \* 0\.49/);
+assert.match(rendererSource, /camera\.zoom = 1\.18/);
+assert.match(gameSource, /cameraSurfaceY \* SCALE - H \* 0\.66/);
 assert.match(terrainKitSource, /createVerdantTerrainBodyGeometry/);
 assert.match(terrainKitSource, /createVerdantGrassOverhangGeometry/);
+assert.match(terrainKitSource, /createVerdantSubsoilBackdropGeometry/);
 assert.match(terrainKitSource, /createTerrainCollisionDebugGroup/);
 assert.doesNotMatch(foregroundSource, /terrainFaceGeometry/);
 assert.doesNotMatch(htmlSource, /data-action="sprint"/);

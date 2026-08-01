@@ -1,8 +1,8 @@
-import { CharacterRenderer } from './character-renderer.js?v=verdant-terrain-12';
+import { CharacterRenderer } from './character-renderer.js?v=terrain-correction-1';
 import {
   MEADOW_WAKE_ENEMY_ACTORS,
   MEADOW_WAKE_LEVEL_DATA
-} from './content/meadow-wake-level-data.js?v=production-terrain-3';
+} from './content/meadow-wake-level-data.js?v=terrain-correction-1';
 import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
 import {
   MEADOW_WAKE_PITS,
@@ -11,7 +11,7 @@ import {
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins,
   createMeadowWakePlatforms
-} from './content/meadow-wake-course.js?v=production-terrain-3';
+} from './content/meadow-wake-course.js?v=terrain-correction-1';
 import {
   ANIMATION_VALIDATION_STATIONS,
   animationValidationStation
@@ -77,6 +77,8 @@ const canvas = document.querySelector('#game');
 const ctx = canvas.getContext('2d');
 const status = document.querySelector('#status');
 const testModeBadge = document.querySelector('#test-mode-badge');
+const courseMenuButton = document.querySelector('#course-menu-button');
+const courseMenu = document.querySelector('#course-menu');
 const W = canvas.width;
 const H = canvas.height;
 const SCALE = 70;
@@ -104,6 +106,14 @@ const movementDebugEnabled = runtimeParameters.has('debugMovement');
 const animationDebugEnabled = runtimeParameters.has('debugAnimation');
 const animationDebugDrive = runtimeParameters.get('debugDrive');
 const animationValidationEnabled = runtimeParameters.has('animationValidation');
+const routeQaEnabled = runtimeParameters.has('qaRoute');
+const routeQaAutoplayHero = ['Hargold', 'Mebble'].includes(runtimeParameters.get('qaRoute'))
+  ? runtimeParameters.get('qaRoute')
+  : null;
+const presentationDebugEnabled = runtimeParameters.has('debugPresentation')
+  || movementDebugEnabled
+  || animationDebugEnabled
+  || animationValidationEnabled;
 const initialValidationStation = animationValidationStation(
   runtimeParameters.get('station')
 );
@@ -336,23 +346,36 @@ function readGamepadSnapshot() {
 
 function rawInputSnapshot() {
   const gamepad = readGamepadSnapshot();
+  const routeQaObstacleAhead = routeQaAutoplayHero && (
+    blocks.some(block => (
+      !block.broken
+      && (!block.hidden || block.revealed)
+      && block.x - player.footX > 0.45
+      && block.x - player.footX < 2.15
+    ))
+    || pits.some(pit => pit.from - player.footX > 0.4 && pit.from - player.footX < 2)
+  );
+  const routeQaJumpPulse = routeQaAutoplayHero
+    ? (simulationSeconds + 0.18) % 1.16 < 0.3
+      || (routeQaObstacleAhead && simulationSeconds % 0.7 < 0.34)
+    : false;
   return {
     left: keys.has('ArrowLeft') || keys.has('KeyA') || touch.left || gamepad.left ||
       animationDebugDrive === 'left' &&
         characterRenderer.isReady(player.hero) &&
         !characterRenderer.animationDebugOverride,
-    right: keys.has('ArrowRight') || keys.has('KeyD') || touch.right || gamepad.right ||
+    right: Boolean(routeQaAutoplayHero) || keys.has('ArrowRight') || keys.has('KeyD') || touch.right || gamepad.right ||
       animationDebugDrive === 'right' &&
         characterRenderer.isReady(player.hero) &&
         !characterRenderer.animationDebugOverride,
     jump: keys.has('Space') || keys.has('ArrowUp') || keys.has('KeyW') ||
-      touch.jump || inputPressLatch.jump || gamepad.jump,
+      touch.jump || inputPressLatch.jump || gamepad.jump || routeQaJumpPulse,
     down: keys.has('ArrowDown') || keys.has('KeyS') || touch.slam ||
       inputPressLatch.slam || gamepad.down,
     action: keys.has('KeyE') || touch.action || inputPressLatch.action ||
       gamepad.action,
     swap: keys.has('KeyQ') || touch.swap || inputPressLatch.swap ||
-      gamepad.swap,
+      gamepad.swap || (routeQaAutoplayHero === 'Mebble' && simulationSeconds < 0.11),
     pause: keys.has('Escape') || gamepad.pause
   };
 }
@@ -968,33 +991,44 @@ function drawPlayer() {
 
 function drawOverlay() {
   const hearts = '♥'.repeat(session.healthLayers).padEnd(3, '♡');
-  ctx.fillStyle = 'rgba(7, 20, 12, .78)';
-  ctx.fillRect(18, 18, 480, 76);
+  ctx.save();
+  ctx.fillStyle = 'rgba(7, 20, 12, .62)';
+  ctx.beginPath();
+  ctx.roundRect(16, 14, 344, 56, 13);
+  ctx.fill();
   ctx.fillStyle = '#f7f0d2';
-  ctx.font = '800 20px system-ui';
-  ctx.fillText(`${player.hero}  ${hearts}  Lives ${session.lives}`, 34, 48);
+  ctx.font = '800 17px system-ui';
+  ctx.fillText(`${player.hero}  ${hearts}  ×${session.lives}`, 29, 39);
   ctx.fillStyle = '#f4cf53';
-  ctx.font = '700 16px system-ui';
-  ctx.fillText(`Coins ${session.standardCoins}/100  ·  Compass ${session.compass}/3  ·  Mobs ${session.enemiesDefeated}/${mobs.length}`, 34, 76);
-  ctx.fillStyle = 'rgba(7, 20, 12, .78)';
-  ctx.fillRect(W - 330, 18, 312, 58);
+  ctx.font = '700 12px system-ui';
+  ctx.fillText(`Coins ${session.standardCoins}/100  ·  Compass ${session.compass}/3  ·  Mobs ${session.enemiesDefeated}/${mobs.length}`, 29, 59);
+
+  ctx.fillStyle = 'rgba(7, 20, 12, .56)';
+  ctx.beginPath();
+  ctx.roundRect(W / 2 - 118, 14, 236, presentationDebugEnabled ? 54 : 42, 13);
+  ctx.fill();
   ctx.fillStyle = '#fff6d8';
-  ctx.textAlign = 'right';
-  ctx.font = '800 18px system-ui';
-  ctx.fillText(`${COURSE_ID} ${COURSE_NAME}`, W - 34, 44);
-  ctx.fillStyle = '#b8dd90';
-  ctx.font = '700 13px system-ui';
-  ctx.fillText('Verdant Vale roster: Critter + Shellback', W - 34, 66);
+  ctx.textAlign = 'center';
+  ctx.font = '800 16px system-ui';
+  ctx.fillText(`${COURSE_ID} ${COURSE_NAME}`, W / 2, 40);
+  if (presentationDebugEnabled) {
+    ctx.fillStyle = '#b8dd90';
+    ctx.font = '700 11px system-ui';
+    ctx.fillText(`Debug roster: ${COURSE_ROSTER.join(' + ')}`, W / 2, 58);
+  }
   ctx.textAlign = 'left';
+  ctx.restore();
 
   if (noticeSeconds > 0) {
-    ctx.font = '700 16px system-ui';
-    const width = Math.min(700, ctx.measureText(notice).width + 44);
-    ctx.fillStyle = 'rgba(7, 20, 12, .78)';
-    ctx.fillRect((W - width) / 2, 108, width, 42);
+    ctx.font = '700 13px system-ui';
+    const width = Math.min(620, ctx.measureText(notice).width + 36);
+    ctx.fillStyle = 'rgba(7, 20, 12, .58)';
+    ctx.beginPath();
+    ctx.roundRect((W - width) / 2, 82, width, 34, 11);
+    ctx.fill();
     ctx.fillStyle = '#fff6d8';
     ctx.textAlign = 'center';
-    ctx.fillText(notice, W / 2, 135);
+    ctx.fillText(notice, W / 2, 104);
     ctx.textAlign = 'left';
   }
   if (session.state === 'game-over' || session.state === 'complete') {
@@ -1005,7 +1039,7 @@ function drawOverlay() {
     ctx.font = '900 48px system-ui';
     ctx.fillText(session.state === 'game-over' ? 'GAME OVER' : 'COURSE COMPLETE', W / 2, H / 2 - 15);
     ctx.font = '700 20px system-ui';
-    ctx.fillText('Press R or tap RESTART to begin again', W / 2, H / 2 + 30);
+    ctx.fillText('Press R or open the course menu to restart', W / 2, H / 2 + 30);
     ctx.textAlign = 'left';
   }
   if (movementDebugEnabled && player.telemetry) {
@@ -1049,26 +1083,39 @@ function frame(now) {
   }
   loop.advance(elapsed, fixedUpdate);
   noticeSeconds = Math.max(0, noticeSeconds - elapsed);
-  const sprintLookAhead = player.locomotion === 'sprint'
-    ? clamp(player.velocityX * 24, -150, 150)
-    : 0;
+  const movementLookAhead = clamp(player.velocityX * 18, -125, 125);
   const targetCamera = Math.max(
     -W * 0.22,
-    player.footX * SCALE - W * 0.34 + sprintLookAhead
+    player.footX * SCALE - W * 0.34 + movementLookAhead
   );
   cameraX += (targetCamera - cameraX) * Math.min(1, elapsed * 5);
   const cameraSurfaceY = terrain.heightAt(clamp(player.footX, 0, WORLD_END));
   // Frame Meadow Wake around its playable landform instead of the empty sky.
   // Airborne follow still reveals jump destinations without turning the course
   // into a vertically roaming camera.
-  const terrainFraming = cameraSurfaceY * SCALE - H * 0.49;
+  const terrainFraming = cameraSurfaceY * SCALE - H * 0.66;
   const airborneFollow = clamp(
     (player.footY - cameraSurfaceY) * SCALE * 0.15,
     -30,
     16
   );
-  const targetCameraY = clamp(terrainFraming + airborneFollow, -12, 116);
+  const targetCameraY = clamp(terrainFraming + airborneFollow, -54, 126);
   cameraY += (targetCameraY - cameraY) * Math.min(1, elapsed * 3.6);
+  if (routeQaEnabled) {
+    window.__HM_ROUTE_QA__ = Object.freeze({
+      hero: player.hero,
+      footX: Number(player.footX.toFixed(3)),
+      footY: Number(player.footY.toFixed(3)),
+      movementState: player.movementState,
+      grounded: player.grounded,
+      sessionState: session.state,
+      lives: session.lives,
+      checkpointReached: checkpoint.reached,
+      coins: session.standardCoins,
+      compassCoins: session.compass
+    });
+    document.documentElement.dataset.routeQa = JSON.stringify(window.__HM_ROUTE_QA__);
+  }
   const modeStatus = fullyUnlockedTestMode ? 'FULLY UNLOCKED TEST · ' : '';
   status.textContent = `${modeStatus}${session.state === 'playing' ? 'PLAYING' : session.state.toUpperCase()} · 120 Hz · ${characterLoadStatus}`;
   draw();
@@ -1125,9 +1172,23 @@ if (animationDebugEnabled) {
 
 createAnimationValidationPanel();
 
+function setCourseMenuOpen(open) {
+  if (!courseMenu || !courseMenuButton) return;
+  courseMenu.hidden = !open;
+  courseMenuButton.setAttribute('aria-expanded', String(open));
+}
+
+courseMenuButton?.addEventListener('click', () => {
+  setCourseMenuOpen(courseMenu?.hidden ?? true);
+});
+
 addEventListener('keydown', event => {
   if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space'].includes(event.code)) event.preventDefault();
-  if (event.code === 'KeyR') restartCourse();
+  if (event.code === 'KeyR') {
+    restartCourse();
+    setCourseMenuOpen(false);
+  }
+  if (event.code === 'Escape') setCourseMenuOpen(courseMenu?.hidden ?? true);
   if (!event.repeat) {
     if (['Space', 'ArrowUp', 'KeyW'].includes(event.code)) inputPressLatch.jump = true;
     if (['ArrowDown', 'KeyS'].includes(event.code)) inputPressLatch.slam = true;
@@ -1147,7 +1208,12 @@ for (const button of document.querySelectorAll('[data-action]')) {
   const action = button.dataset.action;
   const set = value => {
     button.classList.toggle('active', value);
-    if (action === 'restart' && value) restartCourse();
+    if (action === 'restart' && value) {
+      restartCourse();
+      setCourseMenuOpen(false);
+    } else if (action === 'resume' && value) {
+      setCourseMenuOpen(false);
+    }
     else if (action in touch) touch[action] = value;
   };
   button.addEventListener('pointerdown', event => {

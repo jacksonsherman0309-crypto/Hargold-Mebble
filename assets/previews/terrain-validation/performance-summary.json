@@ -1,18 +1,20 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "course": "1-1 Meadow Wake",
   "measurement": {
     "environment": "Codex in-app browser at 1536x864",
     "position": "opening room, artPreview=2",
     "method": "renderer steady-state telemetry after production assets report ready",
     "targetDeviceCertified": false,
+    "runtimeWorldOneAssetBytes": 22875222,
     "notes": [
       "Frame timing is a development comparison and includes the complete visible hero runtime.",
+      "Maximum frame time includes loading spikes and is not steady-state frame pacing.",
       "Estimated texture bytes are uncompressed estimates, not download or GPU-compressed sizes.",
       "Resident terrain category counts cover the authored course and are not camera-visible counts."
     ]
   },
-  "baseline": {
+  "originalBaseline": {
     "frameTimingMs": 23.183,
     "maximumFrameMs": 100,
     "drawCalls": 961,
@@ -22,7 +24,7 @@
     "residentTextureCount": 13,
     "estimatedVisibleTextureBytes": 246055509
   },
-  "current": {
+  "previousDeployment": {
     "frameTimingMs": 16.977,
     "maximumFrameMs": 100,
     "drawCalls": 717,
@@ -30,12 +32,22 @@
     "activeMaterialCount": 1333,
     "residentGeometryCount": 699,
     "residentTextureCount": 13,
+    "estimatedVisibleTextureBytes": 246055509
+  },
+  "current": {
+    "frameTimingMs": 14.741,
+    "maximumFrameMs": 100,
+    "drawCalls": 659,
+    "visibleTriangles": 474538,
+    "activeMaterialCount": 1334,
+    "residentGeometryCount": 670,
+    "residentTextureCount": 13,
     "estimatedVisibleTextureBytes": 246055509,
     "terrain": {
       "residentTerrain": {
-        "meshCount": 615,
-        "triangleCount": 83440,
-        "materialCount": 26
+        "meshCount": 644,
+        "triangleCount": 84546,
+        "materialCount": 27
       },
       "residentTerrainDressing": {
         "meshCount": 85,
@@ -43,8 +55,8 @@
         "materialCount": 10
       },
       "residentScenery": {
-        "meshCount": 1119,
-        "triangleCount": 197708,
+        "meshCount": 1121,
+        "triangleCount": 199292,
         "materialCount": 207
       },
       "collisionDebug": {
@@ -54,23 +66,23 @@
       }
     }
   },
-  "comparison": {
-    "drawCallChange": -244,
-    "drawCallPercent": -25.4,
-    "visibleTriangleChange": 13444,
-    "visibleTrianglePercent": 2.9,
-    "materialChange": -82,
-    "materialPercent": -5.8,
-    "residentGeometryChange": -242,
-    "residentGeometryPercent": -25.7,
-    "frameTimingChangeMs": -6.206,
-    "frameTimingPercent": -26.8
+  "comparisonToPreviousDeployment": {
+    "drawCallChange": -58,
+    "drawCallPercent": -8.1,
+    "visibleTriangleChange": -5338,
+    "visibleTrianglePercent": -1.1,
+    "materialChange": 1,
+    "materialPercent": 0.1,
+    "residentGeometryChange": -29,
+    "residentGeometryPercent": -4.1,
+    "frameTimingChangeMs": -2.236,
+    "frameTimingPercent": -13.2,
+    "runtimeWorldOneAssetByteChange": 0
   },
   "remainingOptimizationWork": [
-    "replace remaining authored runtime scenery proxies with final production meshes",
-    "add reviewed lower LODs",
+    "author reviewed lower LODs for the dense room landmarks",
     "compress and transcode production textures",
     "validate room culling and frame pacing on target mobile hardware",
-    "profile dense middle rooms after final landmark meshes replace the runtime proxies"
+    "profile the timberyard, watermill, and lookout rooms on target devices"
   ]
 }

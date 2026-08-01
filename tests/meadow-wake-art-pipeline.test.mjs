@@ -66,7 +66,7 @@ assert.match(renderer, /environmentArt\.update\(cameraX, cameraY, deltaSeconds\)
 assert.match(renderer, /MEADOW_WAKE_TERRAIN_MODULES/);
 assert.match(renderer, /buildTerrainModules/);
 assert.doesNotMatch(renderer, /terrainStrip\('authored-continuous-terrain'/);
-assert.match(renderer, /camera\.zoom = 1\.04/);
+assert.match(renderer, /camera\.zoom = 1\.18/);
 assert.match(environmentRenderer, /backgroundFar\.position\.x = -cameraX \* 0\.018/);
 assert.match(environmentRenderer, /backgroundMid\.position\.x = -cameraX \* 0\.11/);
 assert.match(environmentRenderer, /waterfallRibbonGeometry/);
@@ -166,7 +166,7 @@ assert.match(motionValidator, /finalApprovalEligible/);
 
 const liveHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 assert.doesNotMatch(liveHtml, /data-action="sprint"/);
-assert.match(liveHtml, /verdant-terrain-12/);
+assert.match(liveHtml, /terrain-correction-1/);
 assert.match(renderer, /canonical_gameplay_rig\.glb/);
 
 console.log(`Meadow Wake art pipeline checks passed from ${root}`);
