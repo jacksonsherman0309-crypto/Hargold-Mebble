@@ -1,5 +1,5 @@
 import * as THREE from '../../vendor/three/three.module.js';
-import { MEADOW_WAKE_MIDGROUND_LANDMARKS } from '../content/meadow-wake-scenery.js?v=meadow-rooms-6';
+import { MEADOW_WAKE_MIDGROUND_LANDMARKS } from '../content/meadow-wake-scenery.js?v=production-terrain-3';
 
 const TEXTURE_URLS = Object.freeze({
   farValley: new URL(
@@ -11,7 +11,7 @@ const TEXTURE_URLS = Object.freeze({
     import.meta.url
   ).href,
   soil: new URL(
-    '../../assets/textures/world-1/meadow-wake/meadow-soil-stone-albedo-v2.png',
+    '../../assets/textures/world-1/meadow-wake/meadow-soil-stone-albedo-v3.png',
     import.meta.url
   ).href,
   turf: new URL(

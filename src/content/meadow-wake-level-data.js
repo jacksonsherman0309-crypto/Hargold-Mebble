@@ -9,7 +9,11 @@ import {
   MEADOW_WAKE_SECTIONS,
   MEADOW_WAKE_TERRAIN_POINTS,
   MEADOW_WAKE_WORLD_END
-} from './meadow-wake-course.js';
+} from './meadow-wake-course.js?v=production-terrain-3';
+import {
+  MEADOW_WAKE_ROOM_FINISH_PROFILES,
+  MEADOW_WAKE_TERRAIN_ANCHORS
+} from './meadow-wake-scenery.js?v=production-terrain-3';
 import { createLevelDefinition } from '../gameplay/levels/level-schema.js';
 
 const MOB_PLACEMENTS = Object.freeze([
@@ -169,8 +173,14 @@ export const MEADOW_WAKE_LEVEL_DATA = createLevelDefinition({
   strictSideScrollingPlane: true,
   bounds: Object.freeze({ minX: 0, maxX: MEADOW_WAKE_WORLD_END, minY: -20, maxY: 20 }),
   terrainGeometry: Object.freeze({
+    representation: 'simplified-gameplay-collision-only',
+    visibleTerrainCollisionEnabled: false,
     groundSurfaces: Object.freeze([
-      Object.freeze({ id: 'meadow-wake-ground-profile', points: MEADOW_WAKE_TERRAIN_POINTS })
+      Object.freeze({
+        id: 'meadow-wake-ground-profile',
+        representation: 'deterministic-collision-profile',
+        points: MEADOW_WAKE_TERRAIN_POINTS
+      })
     ]),
     slopes: MEADOW_WAKE_TERRAIN_POINTS,
     cliffs: MEADOW_WAKE_PITS,
@@ -179,7 +189,9 @@ export const MEADOW_WAKE_LEVEL_DATA = createLevelDefinition({
       id: pit.id,
       type: 'pit',
       from: pit.from,
-      to: pit.to
+      to: pit.to,
+      representation: 'dedicated-fatal-hazard-volume',
+      artGeometryReference: null
     }))),
     materialRegions: Object.freeze([
       Object.freeze({ id: 'meadow-loam', from: 0, to: MEADOW_WAKE_WORLD_END, material: 'dirt' }),
@@ -194,7 +206,17 @@ export const MEADOW_WAKE_LEVEL_DATA = createLevelDefinition({
     ]),
     backgroundSet: 'verdant-vale-meadow-wake',
     lighting: 'warm-daylight',
-    visualRooms: MEADOW_WAKE_GAMEPLAY_ROOMS
+    visualRooms: MEADOW_WAKE_GAMEPLAY_ROOMS,
+    terrainSystem: Object.freeze({
+      id: 'verdant-vale-authored-terrain-kit',
+      representation: 'independent-visible-3d-relief',
+      collisionBearing: false,
+      generatedCourseLayout: false,
+      blenderSource: 'assets/blender/world-1/verdant_vale_terrain_kit.blend',
+      runtimeAsset: 'assets/exports/world-1/verdant_vale_terrain_kit.glb',
+      roomFinishProfiles: MEADOW_WAKE_ROOM_FINISH_PROFILES,
+      terrainAnchors: MEADOW_WAKE_TERRAIN_ANCHORS
+    })
   }),
   gameplayAreas: GAMEPLAY_AREAS,
   actors: ACTORS,

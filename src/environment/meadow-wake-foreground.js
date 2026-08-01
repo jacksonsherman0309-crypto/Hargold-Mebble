@@ -1,15 +1,46 @@
 import * as THREE from '../../vendor/three/three.module.js';
+import { mergeGeometries } from '../../vendor/three/utils/BufferGeometryUtils.js';
 import {
   MEADOW_WAKE_GAMEPLAY_LANDMARKS,
+  MEADOW_WAKE_ROOM_FINISH_PROFILES,
   MEADOW_WAKE_SCENERY_BEATS,
-  MEADOW_WAKE_SCENERY_PROPS
-} from '../content/meadow-wake-scenery.js?v=meadow-rooms-6';
+  MEADOW_WAKE_SCENERY_PROPS,
+  MEADOW_WAKE_TERRAIN_ANCHORS
+} from '../content/meadow-wake-scenery.js?v=production-terrain-3';
 import {
-  MEADOW_WAKE_LANDFORM_FEATURES
-} from '../content/meadow-wake-course.js?v=meadow-rooms-6';
+  MEADOW_WAKE_GAMEPLAY_ROOMS,
+  MEADOW_WAKE_LANDFORM_FEATURES,
+  MEADOW_WAKE_PITS,
+  MEADOW_WAKE_TERRAIN_POINTS
+} from '../content/meadow-wake-course.js?v=production-terrain-3';
+import {
+  countTerrainRenderCost,
+  createTerrainCollisionDebugGroup,
+  createVerdantGrassOverhangGeometry,
+  createVerdantTerrainBodyGeometry
+} from './verdant-vale-terrain-kit.js?v=production-terrain-5';
 
 const SCALE = 70;
 const TAU = Math.PI * 2;
+
+// Hand-painted worn-path runs for each authored room. These are deliberately
+// discontinuous around ravines, hidden pockets, and landmark foundations so
+// they reinforce Meadow Wake's route instead of reading as a universal strip.
+const AUTHORED_WORN_TRAIL_SEGMENTS = Object.freeze([
+  ['trailhead-camp', 0.55, 3.9], ['trailhead-camp', 7.7, 10.25],
+  ['elder-root-walk', 10.85, 14.15], ['elder-root-walk', 18.55, 20.25],
+  ['mason-shelf', 20.75, 24.35], ['mason-shelf', 27.45, 29.8],
+  ['shellback-quarry', 30.2, 33.1], ['shellback-quarry', 38.0, 40.8],
+  ['timberyard-clearing', 41.15, 44.25], ['timberyard-clearing', 48.85, 51.3],
+  ['stump-creek-hollow', 51.75, 55.45], ['stump-creek-hollow', 56.75, 59.95],
+  ['lantern-bridge', 63.25, 65.05], ['lantern-bridge', 69.0, 72.35],
+  ['mill-meadow', 72.65, 76.85], ['mill-meadow', 80.15, 83.35],
+  ['root-terrace', 83.65, 86.95], ['root-terrace', 89.95, 93.35],
+  ['lookout-ruins', 93.65, 96.75], ['lookout-ruins', 100.3, 103.3],
+  ['flowering-run', 103.6, 106.2], ['flowering-run', 107.75, 110.65],
+  ['three-gap-vista', 111.95, 115.25], ['three-gap-vista', 116.8, 119.95],
+  ['three-gap-vista', 121.8, 123.85]
+].map(([roomId, from, to]) => Object.freeze({ roomId, from, to })));
 
 const TERRAIN_RELIEF_SITES = Object.freeze([
   [1.1, 0.42, 1.05], [3.2, 0.78, 0.78], [5.85, 0.48, 0.94],
@@ -89,61 +120,6 @@ function taperedPanelGeometry(bottomWidth, topWidth, height, depth) {
   return geometry;
 }
 
-function terrainFaceGeometry({
-  from,
-  to,
-  heightAt,
-  sceneHeight,
-  faceDepth,
-  depth = 192,
-  seed = 0,
-  cap = false
-}) {
-  const front = depth / 2;
-  const back = -depth / 2;
-  const samples = [];
-  for (let x = from; x < to; x += 0.24) samples.push(x);
-  samples.push(to);
-  const vertices = [];
-  const uvs = [];
-
-  for (const x of samples) {
-    const ratio = (x - from) / Math.max(0.001, to - from);
-    const edgeFade = Math.sin(ratio * Math.PI);
-    const surfaceVariation =
-      (Math.sin(x * 2.41 + seed) * 0.9 + Math.sin(x * 5.17 + seed * 0.3) * 0.36)
-      * edgeFade;
-    const top = sceneHeight / 2 - heightAt(x) * SCALE + surfaceVariation;
-    const bottom = cap
-      ? top - 20 - (Math.sin(x * 4.3 + seed) + 1) * 2.2
-      : Math.min(-526, top - faceDepth - Math.sin(x * 1.63 + seed) * 16);
-    vertices.push(x * SCALE, top + (cap ? 10 : 0), front, x * SCALE, bottom, front);
-    vertices.push(x * SCALE, top + (cap ? 10 : 0), back, x * SCALE, bottom, back);
-    const u = (x - from) / 1.55;
-    const vSpan = cap ? 1 : Math.max(1.2, (top - bottom) / 176);
-    uvs.push(u, vSpan, u, 0, u, vSpan, u, 0);
-  }
-
-  const indices = [];
-  for (let index = 0; index < samples.length - 1; index += 1) {
-    const a = index * 4;
-    const b = a + 4;
-    indices.push(
-      a, a + 1, b, b, a + 1, b + 1,
-      a + 2, b + 2, a + 3, b + 2, b + 3, a + 3,
-      a, b, a + 2, b, b + 2, a + 2,
-      a + 1, a + 3, b + 1, b + 1, a + 3, b + 3
-    );
-  }
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
 export class MeadowWakeForegroundArt {
   constructor({ world, height, width, materials, materialFactory }) {
     this.world = world;
@@ -154,6 +130,23 @@ export class MeadowWakeForegroundArt {
     this.animated = [];
     this.sectionGroups = [];
     this.elapsed = 0;
+    this.terrainVisualRoot = null;
+    this.terrainDressingRoot = null;
+    this.sceneryRoot = null;
+    this.terrainDebugRoot = null;
+    this.productionTerrainKitRoot = null;
+    this.terrainHeightAt = null;
+    this.terrainModuleRoots = [];
+    this.landformRoots = [];
+    this.roomDressingRoots = [];
+    this.trailBandRoots = [];
+    this.sceneryPropRoots = [];
+    this.sceneryBatchRoots = [];
+    this.roomFinishRoots = [];
+    this.windShaders = [];
+    this.finishMaterialVariants = new Map();
+    this.debugMode = 'visible';
+    this.sharedColorMaterials = new Map();
 
     this.canvas = new THREE.MeshStandardMaterial({
       color: 0x456f3d,
@@ -217,6 +210,24 @@ export class MeadowWakeForegroundArt {
       roughness: 0.96,
       metalness: 0
     });
+    this.fieldstone = new THREE.MeshStandardMaterial({
+      color: 0x65675b,
+      roughness: 0.98,
+      metalness: 0
+    });
+    this.fieldstoneAccent = new THREE.MeshStandardMaterial({
+      color: 0x68685a,
+      roughness: 0.97,
+      metalness: 0
+    });
+    this.wornPath = new THREE.MeshStandardMaterial({
+      color: 0xb7895d,
+      emissive: 0x2d1b0f,
+      emissiveIntensity: 0.12,
+      roughness: 1,
+      metalness: 0,
+      side: THREE.DoubleSide
+    });
     this.mossEdge = new THREE.MeshStandardMaterial({
       color: 0x4e8138,
       roughness: 0.96,
@@ -257,6 +268,62 @@ export class MeadowWakeForegroundArt {
       roughness: 0.25,
       metalness: 0
     });
+    this.terrainBodyMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: 0x4a3024,
+      emissiveIntensity: 0.42,
+      roughness: 0.94,
+      metalness: 0,
+      vertexColors: true
+    });
+
+    this.installSubtleWind(this.leafDark, 0.46, 1.28);
+    this.installSubtleWind(this.leafLight, 0.62, 1.48);
+    this.installSubtleWind(this.mossEdge, 0.24, 1.06);
+  }
+
+  installSubtleWind(material, amplitude, speed) {
+    material.onBeforeCompile = shader => {
+      shader.uniforms.hmWindTime = { value: 0 };
+      shader.uniforms.hmWindAmplitude = { value: amplitude };
+      shader.uniforms.hmWindSpeed = { value: speed };
+      shader.vertexShader = `
+        uniform float hmWindTime;
+        uniform float hmWindAmplitude;
+        uniform float hmWindSpeed;
+      ${shader.vertexShader}`.replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
+        float hmWindWeight = smoothstep(-2.0, 26.0, position.y);
+        float hmWindWave = sin(
+          hmWindTime * hmWindSpeed + position.x * 0.055 + position.z * 0.037
+        );
+        transformed.x += hmWindWave * hmWindAmplitude * hmWindWeight;`
+      );
+      this.windShaders.push(shader);
+    };
+    material.customProgramCacheKey = () => `meadow-wake-wind-${amplitude}-${speed}`;
+    material.needsUpdate = true;
+  }
+
+  terrainFinishMaterial(source) {
+    if (!source) return source;
+    if (this.finishMaterialVariants.has(source.uuid)) {
+      return this.finishMaterialVariants.get(source.uuid);
+    }
+    const material = source.clone();
+    const name = source.name ?? '';
+    if (/FieldstoneLight|RuinStoneLight/.test(name)) {
+      material.color.multiplyScalar(0.58);
+    } else if (/Fieldstone|RuinStone/.test(name)) {
+      material.color.multiplyScalar(0.72);
+    } else if (/Root|CampTimber/.test(name)) {
+      material.color.multiplyScalar(0.86);
+    }
+    material.roughness = Math.max(0.9, material.roughness ?? 0.9);
+    material.needsUpdate = true;
+    this.finishMaterialVariants.set(source.uuid, material);
+    return material;
   }
 
   addMesh(root, name, geometry, material, position = [0, 0, 0]) {
@@ -267,6 +334,13 @@ export class MeadowWakeForegroundArt {
     mesh.receiveShadow = true;
     root.add(mesh);
     return mesh;
+  }
+
+  sharedColorMaterial(color) {
+    if (!this.sharedColorMaterials.has(color)) {
+      this.sharedColorMaterials.set(color, this.materialFactory(color));
+    }
+    return this.sharedColorMaterials.get(color);
   }
 
   applySurfaceTextures({ timber, ruinStone, canvas, bark }) {
@@ -298,6 +372,16 @@ export class MeadowWakeForegroundArt {
     this.materials.stone.bumpScale = 0.6;
     this.materials.stone.color.setHex(0xb8b8ad);
     this.materials.stone.needsUpdate = true;
+    this.fieldstone.map = ruinStone;
+    this.fieldstone.bumpMap = ruinStone;
+    this.fieldstone.bumpScale = 0.56;
+    this.fieldstone.color.setHex(0x89887a);
+    this.fieldstone.needsUpdate = true;
+    this.fieldstoneAccent.map = ruinStone;
+    this.fieldstoneAccent.bumpMap = ruinStone;
+    this.fieldstoneAccent.bumpScale = 0.5;
+    this.fieldstoneAccent.color.setHex(0xa19e8e);
+    this.fieldstoneAccent.needsUpdate = true;
     for (const [material, tint, bumpScale] of [
       [this.soilClay, 0xb39883, 0.5],
       [this.soilDark, 0x927969, 0.52],
@@ -309,11 +393,20 @@ export class MeadowWakeForegroundArt {
       material.color.setHex(tint);
       material.needsUpdate = true;
     }
+    this.wornPath.map = this.materials.soil.map;
+    this.wornPath.bumpMap = this.materials.soil.bumpMap;
+    this.wornPath.bumpScale = 0.3;
+    this.wornPath.needsUpdate = true;
     this.mossEdge.map = this.materials.turf.map;
     this.mossEdge.bumpMap = this.materials.turf.bumpMap;
     this.mossEdge.bumpScale = 0.36;
     this.mossEdge.color.setHex(0x89a97c);
     this.mossEdge.needsUpdate = true;
+    this.terrainBodyMaterial.map = this.materials.soil.map;
+    this.terrainBodyMaterial.emissiveMap = this.materials.soil.map;
+    this.terrainBodyMaterial.bumpMap = this.materials.soil.bumpMap;
+    this.terrainBodyMaterial.bumpScale = 0.46;
+    this.terrainBodyMaterial.needsUpdate = true;
   }
 
   addBox(root, name, width, height, depth, material, position = [0, 0, 0], radius = 2.5) {
@@ -394,11 +487,11 @@ export class MeadowWakeForegroundArt {
       root,
       'wildflower-centre',
       new THREE.SphereGeometry(1.5 * scale, 8, 6),
-      this.materialFactory(0xe5a936),
+      this.sharedColorMaterial(0xe5a936),
       [x, y + 12.5 * scale, z + 0.5]
     );
     centre.castShadow = false;
-    const petalMaterial = this.materialFactory(color);
+    const petalMaterial = this.sharedColorMaterial(color);
     for (let index = 0; index < 5; index += 1) {
       const angle = index / 5 * TAU;
       const petal = this.addMesh(
@@ -503,7 +596,7 @@ export class MeadowWakeForegroundArt {
         root,
         'fractured-readable-cliff-edge',
         new THREE.DodecahedronGeometry(13 + variation(definition.seed + index) * 9, 0),
-        index % 3 ? this.materials.stone : this.soilDark,
+        index % 3 ? this.fieldstone : this.soilDark,
         [
           x * SCALE + direction * (7 + index % 2 * 6),
           surfaceY - 18 - index * 28,
@@ -576,7 +669,7 @@ export class MeadowWakeForegroundArt {
         transition,
         'terrain-transition-boulder',
         new THREE.DodecahedronGeometry(14 + variation(definition.seed + index) * 7, 0),
-        this.materials.stone,
+        this.fieldstone,
         [(index % 2 ? 1 : -1) * (8 + index * 4), -18 - index * 23, index % 3]
       );
       rock.scale.set(1.3, 0.72, 0.62);
@@ -589,6 +682,7 @@ export class MeadowWakeForegroundArt {
     const root = new THREE.Group();
     root.name = 'MeadowWake_HandcraftedLandformFeatures';
     parent.add(root);
+    this.landformRoots = [];
 
     for (const definition of definitions) {
       const feature = new THREE.Group();
@@ -599,10 +693,48 @@ export class MeadowWakeForegroundArt {
       feature.position.set(definition.x * SCALE, surfaceY, 112);
       feature.userData = {
         roomId: definition.roomId,
+        authoredRange: [
+          definition.x - definition.width * 0.55,
+          definition.x + definition.width * 0.55
+        ],
         linkedPlatforms: [...definition.linkedPlatforms],
         authored: true
       };
       root.add(feature);
+      this.landformRoots.push(feature);
+
+      // A continuous sculpted shoulder sits behind the detail pieces. This is
+      // the visual mass that makes roots, ruins, platforms, and bridges appear
+      // to emerge from the same hillside rather than float in front of it.
+      if (!['bridge-abutment', 'mill-race'].includes(definition.type)) {
+        const shoulder = this.addMesh(
+          feature,
+          'continuous-sculpted-landform-shoulder',
+          taperedPanelGeometry(
+            width * 0.58,
+            width * (definition.type.includes('root') ? 0.34 : 0.4),
+            drop * 0.44,
+            82
+          ),
+          definition.type.includes('ruin') || definition.type === 'rock-shelf'
+            ? this.soilClay
+            : this.soilDark,
+          [0, -drop * 0.25, -58]
+        );
+        shoulder.receiveShadow = true;
+        const livingEdge = this.addBox(
+          feature,
+          'landform-living-grass-transition',
+          width * 0.6,
+          8,
+          94,
+          this.materials.turf,
+          [0, -2, -46],
+          5
+        );
+        livingEdge.castShadow = true;
+        livingEdge.receiveShadow = true;
+      }
 
       if (definition.type === 'timber-retaining') {
         const postCount = 4;
@@ -634,7 +766,7 @@ export class MeadowWakeForegroundArt {
                 abutment,
                 'bridge-load-bearing-fieldstone',
                 new THREE.DodecahedronGeometry(18 + (row + column) % 2 * 4, 0),
-                this.materials.stone,
+                this.fieldstone,
                 [(column - 0.5) * 34, -16 - row * 29, 0]
               );
               stone.scale.set(1.15, 0.72, 0.68);
@@ -649,7 +781,7 @@ export class MeadowWakeForegroundArt {
                 feature,
                 'mill-race-handlaid-channel-stone',
                 new THREE.DodecahedronGeometry(17 + (row + column) % 2 * 4, 0),
-                this.materials.stone,
+                this.fieldstone,
                 [
                   side * width * 0.34 + (column - 0.5) * 28,
                   -22 - row * 31,
@@ -685,7 +817,7 @@ export class MeadowWakeForegroundArt {
             feature,
             definition.type.includes('root') ? 'root-bank-supporting-boulder' : 'landform-supporting-boulder',
             new THREE.DodecahedronGeometry(12 + variation(definition.x + index) * 9, 0),
-            this.materials.stone,
+            this.fieldstone,
             [
               -width * 0.43 + ratio * width * 0.86 + (row % 2) * 8,
               -18 - row * Math.min(42, drop / Math.max(2, stoneRows)),
@@ -713,7 +845,7 @@ export class MeadowWakeForegroundArt {
               feature,
               'goal-overlook-fractured-edge',
               new THREE.DodecahedronGeometry(15 + index % 3 * 4, 0),
-              index % 3 ? this.materials.stone : this.soilDark,
+              index % 3 ? this.fieldstone : this.soilDark,
               [-width * 0.42 + index % 2 * 9, -24 - index * 27, 5]
             );
             edgeRock.scale.set(1.22, 0.76, 0.64);
@@ -725,88 +857,192 @@ export class MeadowWakeForegroundArt {
     return root;
   }
 
+  addInstancedModuleRelief(moduleRoot, definition, heightAt) {
+    const span = definition.to - definition.from;
+    const stoneCount = Math.max(3, Math.round(span * 0.62));
+    const stoneGeometry = new THREE.DodecahedronGeometry(1, 0);
+    const stones = new THREE.InstancedMesh(
+      stoneGeometry,
+      this.fieldstone,
+      stoneCount
+    );
+    stones.name = 'instanced-embedded-rounded-fieldstone';
+    stones.castShadow = true;
+    stones.receiveShadow = true;
+    stones.userData = {
+      roomId: definition.roomId,
+      terrainDressing: true,
+      collisionBearing: false
+    };
+    const matrix = new THREE.Matrix4();
+    const position = new THREE.Vector3();
+    const quaternion = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
+    const rotation = new THREE.Euler();
+    for (let index = 0; index < stoneCount; index += 1) {
+      const ratio = (index + 0.55) / stoneCount;
+      const x = definition.from + span * ratio;
+      const surfaceY = this.height / 2 - heightAt(x) * SCALE;
+      const drop = 46 + variation(definition.seed * 3 + index) * 230;
+      const size = 8 + variation(definition.seed + index * 5) * 10;
+      position.set(x * SCALE, surfaceY - drop, 108 + index % 3 * 2);
+      rotation.set(
+        (variation(definition.seed + index * 17) - 0.5) * 0.24,
+        (variation(definition.seed + index * 23) - 0.5) * 0.4,
+        (variation(definition.seed + index * 11) - 0.5) * 0.58
+      );
+      quaternion.setFromEuler(rotation);
+      scale.set(size * 1.35, size * (0.7 + index % 2 * 0.12), size * 0.52);
+      matrix.compose(position, quaternion, scale);
+      stones.setMatrixAt(index, matrix);
+    }
+    stones.instanceMatrix.needsUpdate = true;
+    moduleRoot.add(stones);
+
+    const rootCount = definition.variant.includes('root') ? 3 : 1;
+    const rootGeometry = new THREE.CylinderGeometry(0.55, 1, 1, 8, 2);
+    const roots = new THREE.InstancedMesh(rootGeometry, this.bark, rootCount);
+    roots.name = 'instanced-embedded-branching-earth-root';
+    roots.castShadow = true;
+    roots.receiveShadow = true;
+    roots.userData = {
+      roomId: definition.roomId,
+      terrainDressing: true,
+      collisionBearing: false
+    };
+    for (let index = 0; index < rootCount; index += 1) {
+      const ratio = (index + 1) / (rootCount + 1);
+      const x = definition.from + span * ratio;
+      const surfaceY = this.height / 2 - heightAt(x) * SCALE;
+      const length = 44 + index * 10;
+      position.set(x * SCALE, surfaceY - 60 - index * 24, 113);
+      rotation.set(
+        (variation(definition.seed + index * 29) - 0.5) * 0.16,
+        (variation(definition.seed + index * 31) - 0.5) * 0.24,
+        (index % 2 ? 1 : -1) * (0.22 + variation(definition.seed + index) * 0.28)
+      );
+      quaternion.setFromEuler(rotation);
+      scale.set(4.4 + index % 2, length, 4.1);
+      matrix.compose(position, quaternion, scale);
+      roots.setMatrixAt(index, matrix);
+    }
+    roots.instanceMatrix.needsUpdate = true;
+    moduleRoot.add(roots);
+  }
+
+  buildWornTrailBands(heightAt, parent) {
+    const root = new THREE.Group();
+    root.name = 'MeadowWake_AuthoredCarvedTrailBands';
+    root.userData = {
+      collisionBearing: false,
+      generatedCourseLayout: false,
+      purpose: 'readable-main-ground-route'
+    };
+    parent.add(root);
+    this.trailBandRoots = [];
+
+    for (const segment of AUTHORED_WORN_TRAIL_SEGMENTS) {
+      const span = segment.to - segment.from;
+      const sampleCount = Math.max(4, Math.ceil(span / 0.42));
+      const positions = [];
+      const indices = [];
+      for (let index = 0; index < sampleCount; index += 1) {
+        const ratio = index / Math.max(1, sampleCount - 1);
+        const x = segment.from + span * ratio;
+        const surfaceY = this.height / 2 - heightAt(x) * SCALE;
+        const wear = 5.5 + Math.sin(ratio * Math.PI) * 2.5;
+        positions.push(x * SCALE, surfaceY - 1.5, 132);
+        positions.push(x * SCALE, surfaceY - wear, 133);
+        if (index < sampleCount - 1) {
+          const offset = index * 2;
+          indices.push(offset, offset + 1, offset + 2, offset + 1, offset + 3, offset + 2);
+        }
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setIndex(indices);
+      geometry.computeVertexNormals();
+      const trail = this.addMesh(
+        root,
+        `${segment.roomId}_weathered-carved-trail`,
+        geometry,
+        this.wornPath
+      );
+      trail.castShadow = false;
+      trail.userData = {
+        roomId: segment.roomId,
+        authoredRange: [segment.from, segment.to],
+        collisionBearing: false
+      };
+      this.trailBandRoots.push(trail);
+    }
+    return root;
+  }
+
   buildTerrainModules({ definitions, heightAt }) {
     const terrainRoot = new THREE.Group();
     terrainRoot.name = 'MeadowWake_AuthoredModularTerrainSystem';
+    terrainRoot.userData = {
+      terrainRepresentation: 'independent-visible-geometry',
+      collisionBearing: false,
+      courseGenerated: false
+    };
     this.world.add(terrainRoot);
+    this.terrainVisualRoot = terrainRoot;
+    this.terrainHeightAt = heightAt;
+    this.terrainModuleRoots = [];
 
     for (const definition of definitions) {
+      const visualDefinition = {
+        ...definition,
+        from: definition.visualFrom ?? definition.from,
+        to: definition.visualTo ?? definition.to
+      };
       const moduleRoot = new THREE.Group();
       moduleRoot.name = `${definition.id}_${definition.variant}_authored-terrain-module`;
       moduleRoot.userData = {
         course: '1-1',
-        authoredRange: [definition.from, definition.to],
+        authoredRange: [visualDefinition.from, visualDefinition.to],
+        gameplayRange: [definition.from, definition.to],
         collisionSource: 'MEADOW_WAKE_TERRAIN_POINTS'
       };
       terrainRoot.add(moduleRoot);
+      this.terrainModuleRoots.push(moduleRoot);
 
       const face = this.addMesh(
         moduleRoot,
-        'irregular-layered-earth-face',
-        terrainFaceGeometry({
-          ...definition,
+        'modeled-verdant-vale-earth-relief',
+        createVerdantTerrainBodyGeometry({
+          ...visualDefinition,
           heightAt,
           sceneHeight: this.height,
           depth: 192
         }),
-        this.terrainMaterialFor(definition.variant)
+        this.terrainBodyMaterial
       );
       face.receiveShadow = true;
 
       const cap = this.addMesh(
         moduleRoot,
         'modeled-grass-overhang-cap',
-        terrainFaceGeometry({
-          ...definition,
+        createVerdantGrassOverhangGeometry({
+          ...visualDefinition,
           heightAt,
           sceneHeight: this.height,
-          faceDepth: 24,
-          depth: 204,
-          cap: true
+          depth: 204
         }),
         definition.variant === 'flowered-bank' ? this.mossEdge : this.materials.turf
       );
       cap.castShadow = true;
       cap.receiveShadow = true;
 
-      this.addTerrainStrata(moduleRoot, definition, heightAt);
-      const span = definition.to - definition.from;
-      const stoneCount = Math.max(4, Math.round(span * 1.15));
-      for (let index = 0; index < stoneCount; index += 1) {
-        const ratio = (index + 0.55) / stoneCount;
-        const x = definition.from + span * ratio;
-        const surfaceY = this.height / 2 - heightAt(x) * SCALE;
-        const depth = 46 + variation(definition.seed * 3 + index) * 230;
-        const rock = this.addMesh(
-          moduleRoot,
-          'embedded-rounded-fieldstone',
-          new THREE.DodecahedronGeometry(8 + variation(definition.seed + index * 5) * 10, 0),
-          this.materials.stone,
-          [x * SCALE, surfaceY - depth, 101 + index % 3]
-        );
-        rock.scale.set(1.35, 0.7 + index % 2 * 0.12, 0.52);
-        rock.rotation.z = (variation(definition.seed + index * 11) - 0.5) * 0.58;
-      }
+      this.addTerrainStrata(moduleRoot, visualDefinition, heightAt);
+      this.addInstancedModuleRelief(moduleRoot, visualDefinition, heightAt);
 
-      const rootCount = definition.variant.includes('root') ? 4 : 2;
-      for (let index = 0; index < rootCount; index += 1) {
-        const ratio = (index + 1) / (rootCount + 1);
-        const x = definition.from + span * ratio;
-        const surfaceY = this.height / 2 - heightAt(x) * SCALE;
-        const rootDrop = this.addMesh(
-          moduleRoot,
-          'embedded-branching-earth-root',
-          new THREE.CylinderGeometry(1.8, 4.2, 42 + index * 11, 8),
-          index % 2 ? this.darkWood : this.bark,
-          [x * SCALE, surfaceY - 58 - index * 26, 105]
-        );
-        rootDrop.rotation.z = (index % 2 ? 1 : -1) * (0.22 + variation(definition.seed + index) * 0.28);
-      }
-
-      if (definition.cliffLeft) this.addCliffEdge(moduleRoot, definition, 'left', heightAt);
-      if (definition.cliffRight) this.addCliffEdge(moduleRoot, definition, 'right', heightAt);
+      if (visualDefinition.cliffLeft) this.addCliffEdge(moduleRoot, visualDefinition, 'left', heightAt);
+      if (visualDefinition.cliffRight) this.addCliffEdge(moduleRoot, visualDefinition, 'right', heightAt);
       if (definition.transitionLeft) {
-        this.addTerrainTransition(moduleRoot, definition, definition.transitionLeft, heightAt);
+        this.addTerrainTransition(moduleRoot, visualDefinition, definition.transitionLeft, heightAt);
       }
     }
 
@@ -815,7 +1051,67 @@ export class MeadowWakeForegroundArt {
       heightAt,
       parent: terrainRoot
     });
+    this.buildWornTrailBands(heightAt, terrainRoot);
+    this.terrainDebugRoot = createTerrainCollisionDebugGroup({
+      points: MEADOW_WAKE_TERRAIN_POINTS,
+      pits: MEADOW_WAKE_PITS,
+      anchors: MEADOW_WAKE_TERRAIN_ANCHORS,
+      heightAt,
+      sceneHeight: this.height
+    });
+    this.world.add(this.terrainDebugRoot);
     return terrainRoot;
+  }
+
+  installProductionTerrainKit(kitScene) {
+    if (!kitScene || !this.terrainVisualRoot || !this.terrainHeightAt) return null;
+    this.productionTerrainKitRoot?.removeFromParent();
+
+    const root = new THREE.Group();
+    root.name = 'MeadowWake_BlenderAuthoredRoomFinishKit';
+    root.userData = {
+      course: '1-1',
+      terrainRepresentation: 'blender-authored-visible-finish',
+      collisionBearing: false,
+      generatedCourseLayout: false,
+      sourceAsset: 'verdant_vale_terrain_kit.glb'
+    };
+    this.terrainVisualRoot.add(root);
+    this.productionTerrainKitRoot = root;
+    this.roomFinishRoots = [];
+
+    for (const profile of MEADOW_WAKE_ROOM_FINISH_PROFILES) {
+      const source = kitScene.getObjectByName(profile.component);
+      if (!source) continue;
+      const instance = source.clone(true);
+      instance.name = `${profile.roomId}_${profile.component}_room-finish`;
+      instance.position.set(
+        profile.x * SCALE,
+        this.height / 2 - this.terrainHeightAt(profile.x) * SCALE + 2,
+        profile.depth
+      );
+      instance.scale.setScalar(SCALE * profile.scale);
+      if (profile.facing < 0) instance.rotation.y = Math.PI;
+      instance.userData = {
+        roomId: profile.roomId,
+        component: profile.component,
+        terrainRepresentation: 'blender-authored-visible-finish',
+        collisionBearing: false,
+        assetStatus: 'production-intent-original-kit'
+      };
+      instance.traverse(object => {
+        if (!object.isMesh) return;
+        object.material = Array.isArray(object.material)
+          ? object.material.map(material => this.terrainFinishMaterial(material))
+          : this.terrainFinishMaterial(object.material);
+        object.castShadow = true;
+        object.receiveShadow = true;
+        object.frustumCulled = true;
+      });
+      root.add(instance);
+      this.roomFinishRoots.push(instance);
+    }
+    return root;
   }
 
   addPlatformSupport(root, definition, width, height) {
@@ -870,8 +1166,8 @@ export class MeadowWakeForegroundArt {
       ? Math.max(2, Math.round(width / 38))
       : Math.max(2, Math.round(width / 48));
     const supportMaterial = definition.supportStyle === 'ruin'
-      ? this.materials.stone
-      : this.materialFactory(0x53635c);
+      ? this.fieldstone
+      : this.sharedColorMaterial(0x53635c);
 
     for (let row = 0; row < rowCount; row += 1) {
       for (let column = 0; column < columnCount; column += 1) {
@@ -921,7 +1217,7 @@ export class MeadowWakeForegroundArt {
     const height = Math.max(12, definition.height * SCALE);
     const turf = this.materials.turf;
     const soil = this.materials.soil;
-    const stone = this.materials.stone;
+    const stone = this.fieldstone;
     const wood = this.materials.wood;
     let core = null;
     let cap = null;
@@ -1191,7 +1487,7 @@ export class MeadowWakeForegroundArt {
       this.addContactShadow(root, width, { y: -trunkHeight / 2, z: 82, opacity: 0.11 });
     } else {
       const creekStone = definition.visual === 'creek-stone';
-      const bodyMaterial = creekStone ? this.materialFactory(0x53635c) : stone;
+      const bodyMaterial = creekStone ? this.sharedColorMaterial(0x53635c) : stone;
       core = this.addBox(root, 'hand-laid-ruin-core', width * 0.94, height + 12, 124, bodyMaterial, [0, -4, 0], 8);
       const stoneCount = Math.max(3, Math.round(width / 25));
       for (let index = 0; index < stoneCount; index += 1) {
@@ -1215,7 +1511,7 @@ export class MeadowWakeForegroundArt {
         width + 3,
         creekStone ? 7 : 9,
         132,
-        creekStone ? this.materialFactory(0x718879) : turf,
+        creekStone ? this.sharedColorMaterial(0x718879) : turf,
         [0, height / 2 + 3, 0],
         4
       );
@@ -1326,7 +1622,7 @@ export class MeadowWakeForegroundArt {
       root,
       `${name}-mossy-stone-footing`,
       new THREE.DodecahedronGeometry(17, 1),
-      this.materials.stone,
+      this.fieldstone,
       [0, 10, 0]
     );
     footing.scale.set(1.2, 0.68, 0.9);
@@ -1411,7 +1707,7 @@ export class MeadowWakeForegroundArt {
           root,
           'authored-rounded-ruin-stone',
           new THREE.DodecahedronGeometry(16 + variation(seed + row * 9 + column) * 4, 0),
-          this.materials.stone,
+          this.fieldstone,
           [
             -width / 2 + (column + 0.5) * width / columns + (row % 2) * 4,
             14 + row * height / rows,
@@ -1458,7 +1754,7 @@ export class MeadowWakeForegroundArt {
     return lantern;
   }
 
-  buildProp(definition, heightAt) {
+  buildProp(definition, heightAt, parent = this.world) {
     const root = new THREE.Group();
     root.name = `${definition.id}_${definition.type}_authored-scenery`;
     root.position.set(
@@ -1471,10 +1767,10 @@ export class MeadowWakeForegroundArt {
     else if (/camp-lodge|camp-tent|checkpoint-shelter|camp-scaffold|camp-watchtower/.test(definition.type)) {
       root.rotation.y = -THREE.MathUtils.degToRad(6);
     }
-    this.world.add(root);
+    parent.add(root);
 
     const wood = this.materials.wood;
-    const stone = this.materials.stone;
+    const stone = this.fieldstone;
     const turf = this.materials.turf;
     const type = definition.type;
 
@@ -1500,7 +1796,7 @@ export class MeadowWakeForegroundArt {
       lodgeRoof.rotation.y = Math.PI / 4;
       lodgeRoof.scale.z = 0.68;
       this.addBox(root, 'lodge-canvas-eave-trim', 204, 8, 118, this.canvasLight, [0, 154, 0], 3);
-      this.addBox(root, 'lodge-dark-entry', 58, 108, 8, this.materialFactory(0x132118), [-4, 78, 59], 7);
+      this.addBox(root, 'lodge-dark-entry', 58, 108, 8, this.sharedColorMaterial(0x132118), [-4, 78, 59], 7);
       const leftFlap = this.addMesh(
         root,
         'lodge-tailored-canvas-flap',
@@ -1715,7 +2011,7 @@ export class MeadowWakeForegroundArt {
       this.addLeafCluster(root, 28, 198, -22, 1.02, definition.x + 3);
       this.addLeafCluster(root, 52, 160, -14, 0.74, definition.x + 5);
       for (const x of [-42, -12, 24, 48]) {
-        const rock = this.addMesh(root, 'pine-rooted-shelf-boulder', new THREE.DodecahedronGeometry(22, 0), this.materials.stone, [x, 14 + Math.abs(x) * 0.08, 2]);
+        const rock = this.addMesh(root, 'pine-rooted-shelf-boulder', new THREE.DodecahedronGeometry(22, 0), this.fieldstone, [x, 14 + Math.abs(x) * 0.08, 2]);
         rock.scale.set(1.3, 0.68, 0.72);
       }
       this.addContactShadow(root, 124, { opacity: 0.1 });
@@ -1740,7 +2036,7 @@ export class MeadowWakeForegroundArt {
         root,
         'giant-stump-dark-hollow',
         new THREE.CircleGeometry(24, 24),
-        this.materialFactory(0x17140f),
+        this.sharedColorMaterial(0x17140f),
         [18, 68, 53]
       );
       hollow.scale.set(0.72, 1, 1);
@@ -1801,9 +2097,9 @@ export class MeadowWakeForegroundArt {
       stump.rotation.z = 0.04;
       const top = this.addMesh(root, 'story-stump-rings', new THREE.CylinderGeometry(27, 27, 4, 22), this.lightWood, [0, 58, 0]);
       for (const [index, x] of [-28, -14, 24, 35].entries()) {
-        const stem = this.addMesh(root, 'tiny-mushroom-stem', new THREE.CylinderGeometry(2.4, 3.2, 12 + index * 2, 8), this.materialFactory(0xe6d2a7), [x, 8 + index, 18]);
+        const stem = this.addMesh(root, 'tiny-mushroom-stem', new THREE.CylinderGeometry(2.4, 3.2, 12 + index * 2, 8), this.sharedColorMaterial(0xe6d2a7), [x, 8 + index, 18]);
         stem.castShadow = false;
-        const cap = this.addMesh(root, 'tiny-mushroom-cap', new THREE.SphereGeometry(6 + index % 2 * 2, 12, 8), this.materialFactory(index % 2 ? 0xe09842 : 0xb65b36), [x, 15 + index * 2, 18]);
+        const cap = this.addMesh(root, 'tiny-mushroom-cap', new THREE.SphereGeometry(6 + index % 2 * 2, 12, 8), this.sharedColorMaterial(index % 2 ? 0xe09842 : 0xb65b36), [x, 15 + index * 2, 18]);
         cap.scale.y = 0.48;
       }
       top.receiveShadow = true;
@@ -1826,21 +2122,78 @@ export class MeadowWakeForegroundArt {
       }
       this.addContactShadow(root, type === 'ruin-tower' ? 86 : 124, { opacity: 0.1 });
     } else if (type === 'broken-arch' || type === 'goal-gate') {
-      const height = type === 'goal-gate' ? 164 : 118;
+      const isGoal = type === 'goal-gate';
+      const height = isGoal ? 112 : 118;
+      const pillarOffset = isGoal ? 58 : 48;
       for (const side of [-1, 1]) {
         const pillar = new THREE.Group();
-        pillar.position.x = side * 48;
+        pillar.position.x = side * pillarOffset;
         root.add(pillar);
-        this.addStoneStack(pillar, { width: 42, height, seed: definition.x + side, moss: true });
+        if (isGoal) {
+          for (let row = 0; row < 4; row += 1) {
+            const pierStone = this.addBox(
+              pillar,
+              'goal-gate-handlaid-pier-stone',
+              45 - row % 2 * 3,
+              25,
+              56,
+              row % 3 ? this.fieldstone : this.fieldstoneAccent,
+              [row % 2 ? side * 2.5 : 0, 15 + row * 27, row % 2 * 2],
+              5
+            );
+            pierStone.rotation.z = side * (row % 2 ? 0.018 : -0.012);
+          }
+          this.addBox(
+            pillar,
+            'goal-gate-pier-moss-crown',
+            51,
+            8,
+            60,
+            turf,
+            [0, height + 4, 1],
+            4
+          );
+        } else {
+          this.addStoneStack(pillar, {
+            width: 42,
+            height,
+            seed: definition.x + side,
+            moss: true
+          });
+        }
       }
-      this.addBox(root, 'arch-weathered-lintel', 132, 28, 52, stone, [0, height + 4, 0], 6);
-      this.addBox(root, 'arch-moss-crown', 126, 8, 56, turf, [0, height + 22, 0], 4);
-      if (type === 'goal-gate') {
-        this.addBox(root, 'goal-hanging-banner', 38, 68, 5, this.canvas, [0, height - 34, 32], 5);
-        const badge = this.addMesh(root, 'goal-leaf-emblem', new THREE.SphereGeometry(9, 18, 10), this.canvasLight, [0, height - 30, 37]);
+      if (isGoal) {
+        for (let index = 0; index < 11; index += 1) {
+          const angle = index / 10 * Math.PI;
+          const archStone = this.addMesh(
+            root,
+            'goal-gate-handset-arch-stone',
+            chamferedBoxGeometry(25, 18, 55, 4),
+            index % 3 ? this.fieldstone : this.fieldstoneAccent,
+            [
+              Math.cos(angle) * 59,
+              height + Math.sin(angle) * 55,
+              5 + index % 2 * 2
+            ]
+          );
+          archStone.rotation.z = angle - Math.PI / 2;
+        }
+        const archMoss = this.addMesh(
+          root,
+          'goal-gate-living-moss-arch',
+          new THREE.TorusGeometry(60, 5.5, 7, 36, Math.PI),
+          turf,
+          [0, height + 3, -2]
+        );
+        archMoss.rotation.z = 0;
+        this.addBox(root, 'goal-hanging-banner', 30, 50, 5, this.canvas, [0, height + 10, 34], 5);
+        const badge = this.addMesh(root, 'goal-leaf-emblem', new THREE.SphereGeometry(8, 18, 10), this.canvasLight, [0, height + 13, 39]);
         badge.scale.set(0.6, 1.2, 0.22);
         badge.rotation.z = -0.48;
         this.animated.push({ object: root.getObjectByName('goal-hanging-banner'), baseRotation: 0, phase: definition.x, amplitude: 0.008 });
+      } else {
+        this.addBox(root, 'arch-weathered-lintel', 132, 28, 52, stone, [0, height + 4, 0], 6);
+        this.addBox(root, 'arch-moss-crown', 126, 8, 56, turf, [0, height + 22, 0], 4);
       }
       this.addContactShadow(root, 148, { opacity: 0.11 });
     } else if (type === 'camp-tent' || type === 'checkpoint-shelter') {
@@ -1944,7 +2297,7 @@ export class MeadowWakeForegroundArt {
         baseY: cascade.position.y
       });
       for (let index = 0; index < 5; index += 1) {
-        const foam = this.addMesh(root, 'cascade-foam', new THREE.SphereGeometry(7 + index % 2 * 3, 12, 8), this.materialFactory(0xcdf2e7), [-24 + index * 12, 4 + index % 2 * 2, 42]);
+        const foam = this.addMesh(root, 'cascade-foam', new THREE.SphereGeometry(7 + index % 2 * 3, 12, 8), this.sharedColorMaterial(0xcdf2e7), [-24 + index * 12, 4 + index % 2 * 2, 42]);
         foam.scale.set(1.4, 0.42, 0.5);
         foam.material.transparent = true;
         foam.material.opacity = 0.62;
@@ -1955,12 +2308,58 @@ export class MeadowWakeForegroundArt {
           this.addBox(root, 'watermill-timber-upright', 15, 168, 20, this.darkWood, [x, 84, -12], 5);
         }
         this.addBox(root, 'watermill-work-deck', 168, 16, 92, this.materials.wood, [-14, 108, -10], 4);
+        const millCanopy = this.addMesh(
+          root,
+          'watermill-tailored-canvas-canopy',
+          new THREE.ConeGeometry(116, 66, 4, 2, false),
+          this.canvas,
+          [-14, 181, -24]
+        );
+        millCanopy.rotation.y = Math.PI / 4;
+        millCanopy.scale.z = 0.68;
+        const millWall = this.addMesh(
+          root,
+          'watermill-tapered-canvas-work-wall',
+          taperedPanelGeometry(116, 86, 82, 7),
+          this.canvasLight,
+          [-14, 138, -38]
+        );
+        millWall.receiveShadow = true;
+        this.addBox(root, 'watermill-open-work-window', 54, 40, 8, this.sharedColorMaterial(0x1e3021), [-14, 143, 42], 7);
         const roofLeft = this.addBox(root, 'watermill-canvas-roof', 116, 10, 108, this.canvas, [-44, 184, -12], 4);
         const roofRight = this.addBox(root, 'watermill-canvas-roof', 116, 10, 108, this.canvasLight, [28, 184, -12], 4);
         roofLeft.rotation.z = 0.38;
         roofRight.rotation.z = -0.38;
         this.addBox(root, 'watermill-race-chute', 132, 16, 58, this.lightWood, [34, 58, -4], 4).rotation.z = -0.14;
         this.addLantern(root, -42, 130, 42, 0.72);
+        const millStream = this.addBox(
+          root,
+          'watermill-shallow-animated-mill-race',
+          184,
+          8,
+          74,
+          this.water,
+          [34, 7, 18],
+          5
+        );
+        this.animated.push({
+          object: millStream,
+          phase: definition.x + 0.8,
+          water: true,
+          baseY: millStream.position.y
+        });
+        for (let index = 0; index < 7; index += 1) {
+          const foam = this.addMesh(
+            root,
+            'watermill-race-foam-cluster',
+            new THREE.SphereGeometry(5 + index % 3, 10, 7),
+            this.sharedColorMaterial(0xcceee0),
+            [-48 + index * 24, 12 + index % 2 * 2, 58]
+          );
+          foam.scale.set(1.5, 0.36, 0.62);
+          foam.material.transparent = true;
+          foam.material.opacity = 0.54;
+        }
       }
       const wheel = new THREE.Group();
       wheel.name = 'working-camp-waterwheel';
@@ -2005,51 +2404,219 @@ export class MeadowWakeForegroundArt {
   decorateTerrain({ heightAt, inPit }) {
     const nearGroup = new THREE.Group();
     nearGroup.name = 'MeadowWake_AuthoredTerrainRelief';
+    nearGroup.userData = {
+      terrainRepresentation: 'visible-dressing',
+      collisionBearing: false,
+      instancedForMobile: true
+    };
     this.world.add(nearGroup);
+    this.terrainDressingRoot = nearGroup;
+    const roomGroups = new Map();
+    this.roomDressingRoots = MEADOW_WAKE_GAMEPLAY_ROOMS.map(room => {
+      const group = new THREE.Group();
+      group.name = `${room.id}_instanced-terrain-dressing`;
+      group.userData = {
+        roomId: room.id,
+        authoredRange: [...room.range],
+        terrainRepresentation: 'room-batched-instanced-dressing'
+      };
+      nearGroup.add(group);
+      roomGroups.set(room.id, group);
+      return group;
+    });
 
+    const roomAtX = x => MEADOW_WAKE_GAMEPLAY_ROOMS.find(room => (
+      x >= room.range[0] && x <= room.range[1]
+    )) ?? MEADOW_WAKE_GAMEPLAY_ROOMS.at(-1);
+
+    const matrixFor = (position, rotation, scale) => {
+      const matrix = new THREE.Matrix4();
+      matrix.compose(
+        new THREE.Vector3(...position),
+        new THREE.Quaternion().setFromEuler(new THREE.Euler(...rotation)),
+        new THREE.Vector3(...scale)
+      );
+      return matrix;
+    };
+    const addInstances = (name, geometry, material, matrices, shadows = false) => {
+      if (!matrices.length) return [];
+      const batches = new Map();
+      for (const matrix of matrices) {
+        const room = roomAtX(matrix.elements[12] / SCALE);
+        if (!batches.has(room.id)) batches.set(room.id, []);
+        batches.get(room.id).push(matrix);
+      }
+      const meshes = [];
+      for (const [roomId, roomMatrices] of batches) {
+        const mesh = new THREE.InstancedMesh(
+          geometry,
+          material,
+          roomMatrices.length
+        );
+        mesh.name = `${roomId}_${name}`;
+        mesh.castShadow = shadows;
+        mesh.receiveShadow = shadows;
+        mesh.userData = {
+          roomId,
+          terrainDressing: true,
+          collisionBearing: false,
+          batchStrategy: 'authored-room'
+        };
+        roomMatrices.forEach((matrix, index) => mesh.setMatrixAt(index, matrix));
+        mesh.instanceMatrix.needsUpdate = true;
+        roomGroups.get(roomId).add(mesh);
+        meshes.push(mesh);
+      }
+      return meshes;
+    };
+
+    const reliefStoneMatrices = [];
+    const reliefRootMatrices = [];
     for (const [x, drop, size] of TERRAIN_RELIEF_SITES) {
       if (inPit(x)) continue;
       const top = this.height / 2 - heightAt(x) * SCALE;
-      const rock = this.addMesh(
-        nearGroup,
-        'authored-terrain-relief-stone',
-        new THREE.DodecahedronGeometry(12 * size, 0),
-        this.materials.stone,
-        [x * SCALE, top - drop * SCALE, 88]
-      );
-      rock.scale.set(1.36, 0.72, 0.54);
-      rock.rotation.z = (variation(x) - 0.5) * 0.46;
+      reliefStoneMatrices.push(matrixFor(
+        [x * SCALE, top - drop * SCALE, 112],
+        [0, (variation(x * 5) - 0.5) * 0.36, (variation(x) - 0.5) * 0.46],
+        [16.32 * size, 8.64 * size, 6.48 * size]
+      ));
       if (Math.round(x * 10) % 3 === 0) {
-        const root = this.addMesh(
-          nearGroup,
-          'authored-earth-face-root',
-          new THREE.CylinderGeometry(2.1, 3.8, 34 * size, 7),
-          this.bark,
-          [x * SCALE + 11, top - drop * SCALE - 20, 92]
-        );
-        root.rotation.z = variation(x * 2) > 0.5 ? 0.32 : -0.28;
+        reliefRootMatrices.push(matrixFor(
+          [x * SCALE + 11, top - drop * SCALE - 20, 116],
+          [0, 0, variation(x * 2) > 0.5 ? 0.32 : -0.28],
+          [3.6 * size, 34 * size, 3.2 * size]
+        ));
       }
     }
+    addInstances(
+      'instanced-authored-terrain-relief-stone',
+      new THREE.DodecahedronGeometry(1, 0),
+      this.fieldstone,
+      reliefStoneMatrices,
+      true
+    );
+    addInstances(
+      'instanced-authored-earth-face-root',
+      new THREE.CylinderGeometry(0.58, 1, 1, 7, 2),
+      this.bark,
+      reliefRootMatrices,
+      true
+    );
 
+    const grassDarkMatrices = [];
+    const grassLightMatrices = [];
+    const flowerStemMatrices = [];
+    const flowerCentreMatrices = [];
+    const petalMatricesByColor = new Map(FLOWER_COLORS.map(color => [color, []]));
     for (let index = 0; index < TURF_FRINGE_SITES.length; index += 1) {
       const x = TURF_FRINGE_SITES[index];
       if (inPit(x)) continue;
       const top = this.height / 2 - heightAt(x) * SCALE;
-      const cluster = new THREE.Group();
-      cluster.name = 'authored-turf-edge-cluster';
-      cluster.position.set(x * SCALE, top + 4, 92 + index % 3 * 3);
-      nearGroup.add(cluster);
-      this.addGrassFringe(cluster, 34 + index % 4 * 5, 0, 0, index + x, 6);
-      if (index % 3 === 0) {
-        this.addFlower(cluster, 4, 0, 5, FLOWER_COLORS[index % FLOWER_COLORS.length], 0.65 + index % 2 * 0.1);
+      const width = 34 + index % 4 * 5;
+      const bladeCount = Math.max(4, Math.round(width / 6));
+      for (let bladeIndex = 0; bladeIndex < bladeCount; bladeIndex += 1) {
+        const ratio = (bladeIndex + 0.5) / bladeCount;
+        const bladeHeight = 8 + variation((index + x) * 7 + bladeIndex) * 10;
+        const radius = 1.6 + variation(bladeIndex + index + x) * 1.3;
+        const bladeMatrix = matrixFor(
+          [
+            x * SCALE - width / 2 + ratio * width,
+            top + 4 + bladeHeight * 0.48,
+            118 + index % 3 * 3 + bladeIndex % 3 * 2
+          ],
+          [0, 0, (variation((index + x) * 13 + bladeIndex) - 0.5) * 0.42],
+          [radius, bladeHeight, radius]
+        );
+        (bladeIndex % 3 ? grassDarkMatrices : grassLightMatrices).push(bladeMatrix);
       }
+      if (index % 3 === 0) {
+        const flowerScale = 0.65 + index % 2 * 0.1;
+        const flowerX = x * SCALE + 4;
+        const flowerY = top + 4;
+        const flowerZ = 126 + index % 3 * 3;
+        flowerStemMatrices.push(matrixFor(
+          [flowerX, flowerY + 6 * flowerScale, flowerZ],
+          [0, 0, 0],
+          [0.8, 12 * flowerScale, 0.8]
+        ));
+        flowerCentreMatrices.push(matrixFor(
+          [flowerX, flowerY + 12.5 * flowerScale, flowerZ + 0.5],
+          [0, 0, 0],
+          [1.5 * flowerScale, 1.5 * flowerScale, 0.75 * flowerScale]
+        ));
+        const color = FLOWER_COLORS[index % FLOWER_COLORS.length];
+        for (let petalIndex = 0; petalIndex < 5; petalIndex += 1) {
+          const angle = petalIndex / 5 * TAU;
+          petalMatricesByColor.get(color).push(matrixFor(
+            [
+              flowerX + Math.cos(angle) * 2.1 * flowerScale,
+              flowerY + 12.5 * flowerScale + Math.sin(angle) * 2.1 * flowerScale,
+              flowerZ
+            ],
+            [0, 0, angle],
+            [2.2 * flowerScale, 1.2 * flowerScale, 0.75 * flowerScale]
+          ));
+        }
+      }
+    }
+    addInstances(
+      'instanced-sculpted-dark-turf-fringe',
+      new THREE.ConeGeometry(1, 1, 5),
+      this.leafDark,
+      grassDarkMatrices
+    );
+    addInstances(
+      'instanced-sculpted-light-turf-fringe',
+      new THREE.ConeGeometry(1, 1, 5),
+      this.leafLight,
+      grassLightMatrices
+    );
+    addInstances(
+      'instanced-wildflower-stems',
+      new THREE.CylinderGeometry(0.55, 0.85, 1, 6),
+      this.leafDark,
+      flowerStemMatrices
+    );
+    addInstances(
+      'instanced-wildflower-centres',
+      new THREE.SphereGeometry(1, 8, 6),
+      this.sharedColorMaterial(0xe5a936),
+      flowerCentreMatrices
+    );
+    for (const [color, matrices] of petalMatricesByColor) {
+      addInstances(
+        `instanced-wildflower-petals-${color.toString(16)}`,
+        new THREE.SphereGeometry(1, 8, 6),
+        this.sharedColorMaterial(color),
+        matrices
+      );
     }
   }
 
   buildAuthoredScenery(heightAt) {
+    const sceneryRoot = new THREE.Group();
+    sceneryRoot.name = 'MeadowWake_AuthoredForegroundScenery';
+    sceneryRoot.userData = {
+      terrainRepresentation: 'room-specific-scenery',
+      collisionBearing: false,
+      generatedCourseLayout: false
+    };
+    this.world.add(sceneryRoot);
+    this.sceneryRoot = sceneryRoot;
+    this.sceneryPropRoots = [];
     const propRoots = new Map();
     for (const definition of MEADOW_WAKE_SCENERY_PROPS) {
-      propRoots.set(definition.id, this.buildProp(definition, heightAt));
+      const root = this.buildProp(definition, heightAt, sceneryRoot);
+      const room = MEADOW_WAKE_GAMEPLAY_ROOMS.find(entry => (
+        definition.x >= entry.range[0] && definition.x <= entry.range[1]
+      )) ?? MEADOW_WAKE_GAMEPLAY_ROOMS.at(-1);
+      root.userData = {
+        ...root.userData,
+        roomId: room.id,
+        authoredRange: [definition.x - 1.8, definition.x + 1.8]
+      };
+      propRoots.set(definition.id, root);
+      this.sceneryPropRoots.push(root);
     }
     for (const landmark of MEADOW_WAKE_GAMEPLAY_LANDMARKS) {
       const root = propRoots.get(landmark.propId);
@@ -2062,14 +2629,152 @@ export class MeadowWakeForegroundArt {
         linkedPlatformIds: [...landmark.linkedPlatformIds]
       };
     }
+    this.consolidateStaticRoomScenery(sceneryRoot);
     this.sectionGroups = MEADOW_WAKE_SCENERY_BEATS.map(beat => ({
       id: beat.id,
       range: beat.range
     }));
   }
 
+  consolidateStaticRoomScenery(sceneryRoot) {
+    sceneryRoot.updateWorldMatrix(true, true);
+    const animatedObjects = new Set(this.animated.map(entry => entry.object));
+    const excludedMaterials = new Set([
+      this.leafDark,
+      this.leafLight,
+      this.mossEdge,
+      this.water,
+      this.lanternGlass
+    ]);
+    const isAnimatedHierarchy = mesh => {
+      let current = mesh;
+      while (current && current !== sceneryRoot) {
+        if (animatedObjects.has(current)) return true;
+        current = current.parent;
+      }
+      return false;
+    };
+    const rootInverse = new THREE.Matrix4()
+      .copy(sceneryRoot.matrixWorld)
+      .invert();
+    const roomBatches = new Map();
+
+    for (const propRoot of this.sceneryPropRoots) {
+      const roomId = propRoot.userData.roomId;
+      propRoot.traverse(object => {
+        if (!object.isMesh || Array.isArray(object.material)) return;
+        if (object.material.transparent || excludedMaterials.has(object.material)) return;
+        if (isAnimatedHierarchy(object)) return;
+        const geometry = object.geometry.index
+          ? object.geometry.toNonIndexed()
+          : object.geometry.clone();
+        if (!geometry.getAttribute('normal')) geometry.computeVertexNormals();
+        if (!geometry.getAttribute('uv')) {
+          geometry.setAttribute(
+            'uv',
+            new THREE.Float32BufferAttribute(
+              geometry.getAttribute('position').count * 2,
+              2
+            )
+          );
+        }
+        for (const attribute of Object.keys(geometry.attributes)) {
+          if (!['position', 'normal', 'uv'].includes(attribute)) {
+            geometry.deleteAttribute(attribute);
+          }
+        }
+        const localMatrix = rootInverse.clone().multiply(object.matrixWorld);
+        geometry.applyMatrix4(localMatrix);
+        const key = `${roomId}:${object.material.uuid}`;
+        if (!roomBatches.has(key)) {
+          roomBatches.set(key, {
+            roomId,
+            material: object.material,
+            geometries: [],
+            sources: []
+          });
+        }
+        const batch = roomBatches.get(key);
+        batch.geometries.push(geometry);
+        batch.sources.push(object);
+      });
+    }
+
+    const batchRootsByRoom = new Map();
+    for (const room of MEADOW_WAKE_GAMEPLAY_ROOMS) {
+      const root = new THREE.Group();
+      root.name = `${room.id}_consolidated-static-environment`;
+      root.userData = {
+        roomId: room.id,
+        authoredRange: [...room.range],
+        batchStrategy: 'static-shared-material-per-authored-room'
+      };
+      sceneryRoot.add(root);
+      batchRootsByRoom.set(room.id, root);
+      this.sceneryBatchRoots.push(root);
+    }
+
+    for (const batch of roomBatches.values()) {
+      if (batch.geometries.length < 2) continue;
+      const merged = mergeGeometries(batch.geometries, false);
+      if (!merged) continue;
+      for (const source of batch.sources) source.removeFromParent();
+      const mesh = new THREE.Mesh(merged, batch.material);
+      mesh.name = `${batch.roomId}_static-environment-material-batch`;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.userData = {
+        roomId: batch.roomId,
+        collisionBearing: false,
+        sourceMeshCount: batch.sources.length,
+        batchStrategy: 'static-shared-material-per-authored-room'
+      };
+      batchRootsByRoom.get(batch.roomId).add(mesh);
+    }
+  }
+
+  setDebugMode(mode = 'visible') {
+    const approvedMode = ['visible', 'collision', 'overlay', 'anchors'].includes(mode)
+      ? mode
+      : 'visible';
+    this.debugMode = approvedMode;
+    if (this.terrainVisualRoot) {
+      this.terrainVisualRoot.visible = approvedMode !== 'collision';
+    }
+    if (this.terrainDressingRoot) {
+      this.terrainDressingRoot.visible = approvedMode !== 'collision';
+    }
+    if (this.sceneryRoot) {
+      this.sceneryRoot.visible = approvedMode !== 'collision';
+    }
+    if (this.terrainDebugRoot) {
+      this.terrainDebugRoot.visible = approvedMode !== 'visible';
+      for (const child of this.terrainDebugRoot.children) {
+        if (approvedMode === 'anchors') {
+          child.visible = child.name === 'terrain-prop-and-gameplay-anchors';
+        } else {
+          child.visible = true;
+        }
+      }
+    }
+  }
+
+  getRenderCost() {
+    return {
+      debugMode: this.debugMode,
+      activeCompositionGroups: this.activeCompositionGroups ?? 0,
+      residentTerrain: countTerrainRenderCost(this.terrainVisualRoot),
+      residentTerrainDressing: countTerrainRenderCost(this.terrainDressingRoot),
+      residentScenery: countTerrainRenderCost(this.sceneryRoot),
+      collisionDebug: countTerrainRenderCost(this.terrainDebugRoot)
+    };
+  }
+
   update(cameraX, deltaSeconds) {
     this.elapsed += Math.min(deltaSeconds, 0.05);
+    for (const shader of this.windShaders) {
+      shader.uniforms.hmWindTime.value = this.elapsed;
+    }
     for (const entry of this.animated) {
       if (entry.pulse) {
         const pulse = 0.92 + Math.sin(this.elapsed * 3.1 + entry.phase) * 0.08;
@@ -2088,11 +2793,45 @@ export class MeadowWakeForegroundArt {
     }
 
     const cameraWorldX = (cameraX + this.width / 2) / SCALE;
-    for (const child of this.world.children) {
-      const propX = child.position.x / SCALE;
-      if (!/_authored-scenery$/.test(child.name)) continue;
-      child.visible = Math.abs(propX - cameraWorldX) < 18;
+    // The orthographic view exposes roughly eleven metres on either side at
+    // the production zoom. One extra metre preserves entrance anticipation
+    // while preventing distant rooms from consuming mobile draw calls.
+    const visibleRange = [cameraWorldX - 12.5, cameraWorldX + 12.5];
+    const rangeIsVisible = range => (
+      range[1] >= visibleRange[0] && range[0] <= visibleRange[1]
+    );
+    let activeCompositionGroups = 0;
+
+    for (const root of this.terrainModuleRoots) {
+      root.visible = rangeIsVisible(root.userData.authoredRange);
+      if (root.visible) activeCompositionGroups += 1;
     }
+    for (const root of this.landformRoots) {
+      root.visible = rangeIsVisible(root.userData.authoredRange);
+      if (root.visible) activeCompositionGroups += 1;
+    }
+    for (const root of this.roomDressingRoots) {
+      root.visible = rangeIsVisible(root.userData.authoredRange);
+      if (root.visible) activeCompositionGroups += 1;
+    }
+    for (const root of this.trailBandRoots) {
+      root.visible = rangeIsVisible(root.userData.authoredRange);
+      if (root.visible) activeCompositionGroups += 1;
+    }
+    for (const root of this.sceneryPropRoots) {
+      root.visible = rangeIsVisible(root.userData.authoredRange);
+      if (root.visible) activeCompositionGroups += 1;
+    }
+    for (const root of this.sceneryBatchRoots) {
+      root.visible = rangeIsVisible(root.userData.authoredRange);
+      if (root.visible) activeCompositionGroups += 1;
+    }
+    for (const root of this.roomFinishRoots) {
+      const room = MEADOW_WAKE_GAMEPLAY_ROOMS.find(entry => entry.id === root.userData.roomId);
+      root.visible = room ? rangeIsVisible(room.range) : true;
+      if (root.visible) activeCompositionGroups += 1;
+    }
+    this.activeCompositionGroups = activeCompositionGroups;
   }
 }
 

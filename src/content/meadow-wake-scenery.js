@@ -5,12 +5,20 @@
  * scatter generator and must not be reused as a universal world template.
  */
 
+import {
+  MEADOW_WAKE_BLOCK_DEFINITIONS,
+  MEADOW_WAKE_GAMEPLAY_ROOMS,
+  MEADOW_WAKE_PLATFORMS
+} from './meadow-wake-course.js?v=production-terrain-3';
+
 const prop = (id, type, x, scale = 1, extra = {}) => Object.freeze({
   id,
   type,
   x,
   scale,
   layer: 'playfield-back',
+  assetStatus: 'authored-runtime-proxy',
+  anchorRequired: true,
   ...extra
 });
 
@@ -20,7 +28,7 @@ export const MEADOW_WAKE_SCENERY_BEATS = Object.freeze([
     range: Object.freeze([0, 15.9]),
     palette: 'warm-camp-clearing',
     props: Object.freeze([
-      prop('opening-lodge', 'camp-lodge', -0.15, 1.28, { depth: -8, heroLandmark: true }),
+      prop('opening-lodge', 'camp-lodge', -0.15, 0.98, { depth: -34, heroLandmark: true }),
       prop('opening-wayfinder', 'trail-sign', 0.35, 0.68, { facing: 1, depth: 34 }),
       prop('opening-lantern', 'lantern-post', 3.8, 0.78, { depth: 28 }),
       prop('opening-crates', 'crate-stack', 5.15, 0.62, { depth: 18 }),
@@ -142,6 +150,26 @@ export const MEADOW_WAKE_GAMEPLAY_LANDMARKS = Object.freeze([
   Object.freeze({ roomId: 'three-gap-vista', propId: 'goal-stone-gate', silhouette: 'mossed stone goal gate', traversal: 'the final log resolves onto its stable overlook', linkedPlatformIds: Object.freeze(['final-gap-three-log']) })
 ]);
 
+/*
+ * Blender-authored visible-terrain finish pieces. These placements bind the
+ * original Verdant Vale kit to Meadow Wake's existing rooms; they never
+ * supply collision or generate course layout.
+ */
+export const MEADOW_WAKE_ROOM_FINISH_PROFILES = Object.freeze([
+  Object.freeze({ roomId: 'trailhead-camp', component: 'TerrainKit_CompactedEdge', x: 3.75, scale: 1.02, depth: 116, facing: 1 }),
+  Object.freeze({ roomId: 'elder-root-walk', component: 'TerrainKit_RootBank', x: 16.95, scale: 1.18, depth: 118, facing: 1 }),
+  Object.freeze({ roomId: 'mason-shelf', component: 'TerrainKit_CompactedEdge', x: 26.3, scale: 1.12, depth: 114, facing: -1 }),
+  Object.freeze({ roomId: 'shellback-quarry', component: 'TerrainKit_RuinFoundation', x: 34.15, scale: 1.06, depth: 115, facing: 1 }),
+  Object.freeze({ roomId: 'timberyard-clearing', component: 'TerrainKit_CampFoundation', x: 46.75, scale: 1.14, depth: 116, facing: 1 }),
+  Object.freeze({ roomId: 'stump-creek-hollow', component: 'TerrainKit_RootBank', x: 56.9, scale: 1.22, depth: 117, facing: -1 }),
+  Object.freeze({ roomId: 'lantern-bridge', component: 'TerrainKit_BridgeAbutment', x: 64.9, scale: 1.04, depth: 116, facing: 1 }),
+  Object.freeze({ roomId: 'mill-meadow', component: 'TerrainKit_MillRace', x: 79.55, scale: 1.15, depth: 116, facing: 1 }),
+  Object.freeze({ roomId: 'root-terrace', component: 'TerrainKit_RootBank', x: 88.25, scale: 1.28, depth: 117, facing: 1 }),
+  Object.freeze({ roomId: 'lookout-ruins', component: 'TerrainKit_RuinFoundation', x: 97.2, scale: 1.16, depth: 116, facing: -1 }),
+  Object.freeze({ roomId: 'flowering-run', component: 'TerrainKit_OverlookEdge', x: 106.7, scale: 1.16, depth: 117, facing: 1 }),
+  Object.freeze({ roomId: 'three-gap-vista', component: 'TerrainKit_OverlookEdge', x: 122.1, scale: 1.22, depth: 117, facing: -1 })
+]);
+
 export const MEADOW_WAKE_MIDGROUND_LANDMARKS = Object.freeze([
   Object.freeze({ id: 'camp-smoke-column', type: 'smoke', x: 2.4, parallax: 0.38, scale: 1.05 }),
   Object.freeze({ id: 'log-hollow-tree-line', type: 'tree-line', x: 18.5, parallax: 0.42, scale: 1 }),
@@ -150,6 +178,53 @@ export const MEADOW_WAKE_MIDGROUND_LANDMARKS = Object.freeze([
   Object.freeze({ id: 'bridge-waterfall', type: 'waterfall', x: 67, parallax: 0.5, scale: 1.1 }),
   Object.freeze({ id: 'creek-ruin-ridge', type: 'ruin-silhouette', x: 88, parallax: 0.46, scale: 1.12 }),
   Object.freeze({ id: 'goal-waterfall', type: 'waterfall', x: 113, parallax: 0.52, scale: 0.92 })
+]);
+
+function roomIdAtX(x) {
+  return MEADOW_WAKE_GAMEPLAY_ROOMS.find(room => (
+    x >= room.range[0] && x <= room.range[1]
+  ))?.id ?? MEADOW_WAKE_GAMEPLAY_ROOMS.at(-1).id;
+}
+
+const landmarkByProp = new Map(
+  MEADOW_WAKE_GAMEPLAY_LANDMARKS.map(landmark => [landmark.propId, landmark])
+);
+
+export const MEADOW_WAKE_TERRAIN_ANCHORS = Object.freeze([
+  ...MEADOW_WAKE_BLOCK_DEFINITIONS.map(definition => Object.freeze({
+    id: `terrain-anchor:block:${definition.id}`,
+    kind: 'interactive-block',
+    targetId: definition.id,
+    roomId: roomIdAtX(definition.x),
+    x: definition.x,
+    binding: 'collision-ground-relative',
+    remainsSeparateEntity: true,
+    temporaryProxy: false
+  })),
+  ...MEADOW_WAKE_PLATFORMS.map(definition => Object.freeze({
+    id: `terrain-anchor:platform:${definition.id}`,
+    kind: definition.motion ? 'moving-mechanism' : 'authored-platform',
+    targetId: definition.id,
+    roomId: definition.roomId,
+    x: definition.x,
+    binding: definition.motion ? 'independent-rail' : 'collision-ground-relative',
+    remainsSeparateEntity: true,
+    temporaryProxy: false
+  })),
+  ...MEADOW_WAKE_SCENERY_PROPS.map(definition => {
+    const landmark = landmarkByProp.get(definition.id);
+    return Object.freeze({
+      id: `terrain-anchor:${landmark ? 'landmark' : 'prop'}:${definition.id}`,
+      kind: landmark ? 'room-landmark' : 'environment-prop',
+      targetId: definition.id,
+      roomId: landmark?.roomId ?? roomIdAtX(definition.x),
+      x: definition.x,
+      binding: 'visible-terrain-surface',
+      remainsSeparateEntity: true,
+      temporaryProxy: definition.assetStatus !== 'final-production-mesh',
+      linkedPlatformIds: landmark ? [...landmark.linkedPlatformIds] : []
+    });
+  })
 ]);
 
 export function meadowWakeSceneryCoverage() {

@@ -1,4 +1,36 @@
-export const CANON_VERSION = '2026-07-30-locked-model-numeric-motion-1';
+export const CANON_VERSION = '2026-07-31-meadow-wake-ground-dominant-composition-3';
+
+export const VERDANT_VALE_TERRAIN_STANDARD = Object.freeze({
+  version: '2026-07-30-meadow-wake-production-benchmark-2',
+  referenceAsset: 'assets/references/terrain/meadow-wake-terrain-quality-reference.jpeg',
+  referenceScope: 'terrain-environment-depth-material-finish-and-side-scrolling-composition-only',
+  originalAuthoredArtworkRequired: true,
+  individuallyAuthoredCourseLayoutsRequired: true,
+  visibleCollisionSeparationRequired: true,
+  collisionSource: 'authored-simplified-profile',
+  visibleSource: 'room-specific-3d-relief-meshes-plus-blender-authored-room-finishes',
+  productionDocument: 'docs/terrain-production-standard.md',
+  blenderSource: 'assets/blender/world-1/verdant_vale_terrain_kit.blend',
+  runtimeAsset: 'assets/exports/world-1/verdant_vale_terrain_kit.glb',
+  terrainAlbedoAsset: 'assets/textures/world-1/meadow-wake/meadow-soil-stone-albedo-v3.png',
+  materialClasses: Object.freeze([
+    'grass',
+    'exposed-dirt',
+    'compact-loam',
+    'damp-soil',
+    'embedded-stone',
+    'ruin-stone',
+    'moss',
+    'worn-path'
+  ]),
+  mobileRuntime: Object.freeze({
+    roomBasedCulling: true,
+    sharedMaterials: true,
+    instancedSmallDressing: true,
+    simpleCollisionMeshes: true,
+    distanceSimplificationWhereUseful: true
+  })
+});
 
 export const GAME_RULES = Object.freeze({
   platform: {
@@ -310,8 +342,13 @@ export const GAME_RULES = Object.freeze({
     preserveApprovedWorldOneBackgroundDirection: true,
     environmentPresentation: Object.freeze({
       minimumVisualBenchmark: 'approved-Meadow-Wake-reference-image',
+      terrainProductionStandard: VERDANT_VALE_TERRAIN_STANDARD.version,
+      terrainQualityReference: VERDANT_VALE_TERRAIN_STANDARD.referenceAsset,
       preserveLightingAtmosphereDepthAndPalette: true,
       collisionBearingForegroundMustBeFullyModeled: true,
+      visibleTerrainIndependentFromCollision: true,
+      collisionTerrainUsesAuthoredSimplifiedProfile: true,
+      terrainMaterialClasses: VERDANT_VALE_TERRAIN_STANDARD.materialClasses,
       layeredParallaxBands: Object.freeze([
         'playable-foreground',
         'authored-midground',
@@ -422,11 +459,11 @@ const WORLD_ONE_LEVELS = [
     enemies: ['Camp Critter', 'Shellback'],
     foregroundDirective: Object.freeze({
       targetSupportedTerrainRatio: 0.85,
-      connectedGroundProgressionRatio: Object.freeze({ minimum: 0.65, maximum: 0.75 }),
+      connectedGroundProgressionRatio: Object.freeze({ minimum: 0.76, maximum: 0.84 }),
       authoredRouteComposition: Object.freeze({
-        connectedGround: 0.7,
-        optionalElevated: 0.2,
-        dedicatedPlatformSequences: 0.1
+        connectedGround: 0.8,
+        optionalElevated: 0.15,
+        dedicatedPlatformSequences: 0.05
       }),
       authoredCourseLength: 124,
       preserveExistingValleyArtDirection: true,

@@ -385,13 +385,13 @@ Block interaction follows the locked original Meadow Wake feedback hierarchy:
 - Handcraft the playable foreground around movement decisions. Alternate rolling hills, ledges, bridges, vertical climbs, ruins, camps, clearings, elevated routes, and secrets rather than relying on broad uninterrupted ground.
 - Standard courses should target approximately 80–90% supported terrain and 10–20% memorable pit spans. This is a course-level pacing ratio, not a command to distribute pits evenly.
 - Meadow Wake's current approved re-authoring is more conservative than that
-  general pit range: approximately 65–75% of ordinary forward play follows
+  general pit range: approximately 76–84% of ordinary forward play follows
   connected ground, optional and contained sequences use authored structures,
   and true gaps are grouped into a concealed creek pocket, one framed rope
   ravine, and the graduated exit panorama. This opening course must not scatter
   pits or floating platforms uniformly across its length.
-- Its authored World 1 route-composition target is 70% connected-ground play,
-  20% optional elevated play, and 10% dedicated platform sequences. These are
+- Its authored World 1 route-composition target is 80% connected-ground play,
+  15% optional elevated play, and 5% dedicated platform sequences. These are
   pacing targets for the complete route, not a procedural per-screen formula.
 - Terrain and mechanisms should provide substantial obstacle variety: narrow ledges, moving/falling/rotating platforms, lifts, seesaws, bridges, breakable formations, and optional routes.
 - Use dense coin lines, arcs, vertical stacks, interrupted clues, and concealed rewards to teach jumps, guide momentum, and signpost route choices.
@@ -399,6 +399,7 @@ Block interaction follows the locked original Meadow Wake feedback hierarchy:
 - Divide long outdoor courses into authored gameplay rooms even when scenery remains visually continuous. Meadow Wake uses twelve named outdoor rooms nested inside its seven archived beats and nine traversal phases.
 - Give each Meadow Wake room one dominant original hero landmark readable for roughly eight to ten seconds of play. The landmark must orient progression and connect to at least one collision-bearing route element rather than functioning only as distant decoration.
 - Terrain-room transitions must change landform language through embankments, boulder shelves, root networks, eroded creek banks, timber retaining walls, ruin foundations, and fractured overlooks. Texture swaps over the same strip silhouette are not sufficient.
+- `docs/terrain-production-standard.md` is the current implementation contract for Meadow Wake's collision/visible separation, stored quality reference, material classes, twelve-room finish matrix, debug modes, and honest completion boundary.
 - Every Meadow Wake block belongs to a named teaching, route, recovery, gating, secret, or reward phrase. Scattered blocks with no communicated action or payoff are not approved course composition.
 - Teach a mechanic safely, test it, then combine it with previous mechanics.
 - Use approximately seven encounter/camera beats as a planning scaffold where appropriate, but do not force identical pacing on every level.

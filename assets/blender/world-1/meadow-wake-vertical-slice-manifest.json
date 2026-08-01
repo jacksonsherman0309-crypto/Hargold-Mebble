@@ -28,7 +28,9 @@
       "volumetric differentiated platform families",
       "original modeled coin and Compass Coin presentation",
       "authored distant landmarks, smoke, mist, and waterfall ribbons",
-      "terrain-aware side-view camera framing"
+      "terrain-aware side-view camera framing",
+      "independent visible relief and deterministic collision debug views",
+      "Blender-authored Verdant Vale room-finish terrain kit bound across all twelve rooms"
     ],
     "remaining": [
       "final sculpt and topology review",
@@ -63,12 +65,21 @@
     "meadowLedge": {
       "source": "meadow_ledge.blend",
       "runtime": "../../exports/world-1/meadow_ledge.glb"
+    },
+    "verdantValeTerrainKit": {
+      "source": "verdant_vale_terrain_kit.blend",
+      "runtime": "../../exports/world-1/verdant_vale_terrain_kit.glb"
     }
+  },
+  "terrainQualityReference": {
+    "path": "../../references/terrain/meadow-wake-terrain-quality-reference.jpeg",
+    "scope": "quality benchmark only: terrain depth, material finish, atmosphere, and side-view composition",
+    "sourceAsset": false
   },
   "environmentTextures": {
     "farValley": "../../textures/world-1/meadow-wake/verdant-vale-background-v1.png",
     "forestRidge": "../../textures/world-1/meadow-wake/meadow-midground-ridge-v1.png",
-    "soilAlbedo": "../../textures/world-1/meadow-wake/meadow-soil-stone-albedo-v2.png",
+    "soilAlbedo": "../../textures/world-1/meadow-wake/meadow-soil-stone-albedo-v3.png",
     "turfAlbedo": "../../textures/world-1/meadow-wake/meadow-turf-albedo-v1.png",
     "timberAlbedo": "../../textures/world-1/meadow-wake/meadow-camp-timber-albedo-v1.png",
     "ruinStoneAlbedo": "../../textures/world-1/meadow-wake/meadow-ruin-stone-albedo-v1.png",

@@ -101,11 +101,21 @@ const terrainModule = (id, from, to, variant, extra = {}) => Object.freeze({
   from,
   to,
   variant,
+  roomId: MEADOW_WAKE_GAMEPLAY_ROOMS.find(room => (
+    (from + to) / 2 >= room.range[0] && (from + to) / 2 <= room.range[1]
+  ))?.id,
+  visibleRepresentation: 'verdant-vale-relief-mesh',
+  collisionRepresentation: 'meadow-wake-ground-profile',
   ...extra
 });
 
 export const MEADOW_WAKE_TERRAIN_MODULES = Object.freeze([
-  terrainModule('trailhead-packed-loam', 0, 5.4, 'compacted-clay', { seed: 3, faceDepth: 462 }),
+  terrainModule('trailhead-packed-loam', 0, 5.4, 'compacted-clay', {
+    seed: 3,
+    faceDepth: 462,
+    visualFrom: -1.7,
+    purpose: 'non-collision visual apron grounds the opening lodge'
+  }),
   terrainModule('trailhead-root-edge', 5.4, 10.5, 'root-bound', { seed: 11, faceDepth: 438, transitionRight: 'root' }),
   terrainModule('elder-root-rise', 10.5, 15, 'root-hollow', { seed: 19, faceDepth: 476, transitionLeft: 'root' }),
   terrainModule('elder-root-hollow', 15, 20.5, 'root-hollow', { seed: 29, faceDepth: 522, transitionRight: 'boulder' }),
@@ -129,7 +139,13 @@ export const MEADOW_WAKE_TERRAIN_MODULES = Object.freeze([
   terrainModule('flowering-run-bank-b', 107.5, 110.8, 'flowered-bank', { seed: 179, faceDepth: 474, cliffRight: true }),
   terrainModule('panorama-island-a', 111.9, 115.4, 'flowered-bank', { seed: 191, faceDepth: 465, cliffLeft: true, cliffRight: true }),
   terrainModule('panorama-island-b', 116.75, 120.1, 'stone-seam', { seed: 199, faceDepth: 485, cliffLeft: true, cliffRight: true }),
-  terrainModule('goal-overlook', 121.75, 124, 'flowered-bank', { seed: 211, faceDepth: 470, cliffLeft: true })
+  terrainModule('goal-overlook', 121.75, 124, 'flowered-bank', {
+    seed: 211,
+    faceDepth: 470,
+    cliffLeft: true,
+    visualTo: 125.35,
+    purpose: 'non-collision visual shoulder completes the stable goal overlook'
+  })
 ]);
 
 const landform = (id, type, roomId, x, width, extra = {}) => Object.freeze({

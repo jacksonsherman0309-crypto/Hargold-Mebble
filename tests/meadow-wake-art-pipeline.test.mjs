@@ -17,6 +17,7 @@ const approvedCharacterTarget = new URL(
 );
 const {
   MEADOW_WAKE_GAMEPLAY_LANDMARKS,
+  MEADOW_WAKE_ROOM_FINISH_PROFILES,
   MEADOW_WAKE_SCENERY_BEATS,
   MEADOW_WAKE_SCENERY_PROPS,
   MEADOW_WAKE_MIDGROUND_LANDMARKS,
@@ -49,6 +50,8 @@ assert.match(renderer, /shellback\.glb/);
 assert.match(renderer, /breakable_block\.glb/);
 assert.match(renderer, /hargold_block\.glb/);
 assert.match(renderer, /meadow_ledge\.glb/);
+assert.match(renderer, /verdant_vale_terrain_kit\.glb/);
+assert.match(renderer, /installProductionTerrainKit/);
 assert.match(renderer, /buildMeadowBlockVisual/);
 assert.match(renderer, /chamferedBlockGeometry/);
 assert.match(renderer, /hand-set-breakable-stone/);
@@ -63,7 +66,7 @@ assert.match(renderer, /environmentArt\.update\(cameraX, cameraY, deltaSeconds\)
 assert.match(renderer, /MEADOW_WAKE_TERRAIN_MODULES/);
 assert.match(renderer, /buildTerrainModules/);
 assert.doesNotMatch(renderer, /terrainStrip\('authored-continuous-terrain'/);
-assert.match(renderer, /camera\.zoom = 0\.9/);
+assert.match(renderer, /camera\.zoom = 1\.04/);
 assert.match(environmentRenderer, /backgroundFar\.position\.x = -cameraX \* 0\.018/);
 assert.match(environmentRenderer, /backgroundMid\.position\.x = -cameraX \* 0\.11/);
 assert.match(environmentRenderer, /waterfallRibbonGeometry/);
@@ -75,15 +78,25 @@ assert.match(foregroundRenderer, /buildCourseMarker/);
 assert.match(foregroundRenderer, /rope-bridge-handcut-plank/);
 assert.match(foregroundRenderer, /animated-creek-cascade/);
 assert.match(foregroundRenderer, /reinforced-gate/);
-assert.match(foregroundRenderer, /terrainFaceGeometry/);
+assert.match(foregroundRenderer, /createVerdantTerrainBodyGeometry/);
 assert.match(foregroundRenderer, /MeadowWake_AuthoredModularTerrainSystem/);
 assert.match(foregroundRenderer, /MeadowWake_HandcraftedLandformFeatures/);
-assert.match(foregroundRenderer, /irregular-layered-earth-face/);
+assert.match(foregroundRenderer, /modeled-verdant-vale-earth-relief/);
 assert.match(foregroundRenderer, /modeled-grass-overhang-cap/);
 assert.match(foregroundRenderer, /authored-clay-and-loam-strata/);
 assert.match(foregroundRenderer, /fractured-readable-cliff-edge/);
+assert.match(foregroundRenderer, /MeadowWake_AuthoredCarvedTrailBands/);
+assert.match(foregroundRenderer, /room-batched-instanced-dressing/);
+assert.match(foregroundRenderer, /continuous-sculpted-landform-shoulder/);
+assert.match(foregroundRenderer, /hmWindTime/);
+assert.match(foregroundRenderer, /activeCompositionGroups/);
+assert.match(foregroundRenderer, /consolidateStaticRoomScenery/);
+assert.match(foregroundRenderer, /static-shared-material-per-authored-room/);
+assert.match(foregroundRenderer, /watermill-shallow-animated-mill-race/);
+assert.match(foregroundRenderer, /goal-gate-handlaid-pier-stone/);
 assert.equal(MEADOW_WAKE_SCENERY_BEATS.length, 7);
 assert.equal(MEADOW_WAKE_GAMEPLAY_LANDMARKS.length, 12);
+assert.equal(MEADOW_WAKE_ROOM_FINISH_PROFILES.length, 12);
 assert.equal(meadowWakeSceneryCoverage().length, 7);
 assert.ok(MEADOW_WAKE_SCENERY_PROPS.length >= 40);
 assert.ok(MEADOW_WAKE_MIDGROUND_LANDMARKS.length >= 7);
@@ -153,7 +166,7 @@ assert.match(motionValidator, /finalApprovalEligible/);
 
 const liveHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 assert.doesNotMatch(liveHtml, /data-action="sprint"/);
-assert.match(liveHtml, /numeric-animation-1/);
+assert.match(liveHtml, /verdant-terrain-12/);
 assert.match(renderer, /canonical_gameplay_rig\.glb/);
 
 console.log(`Meadow Wake art pipeline checks passed from ${root}`);

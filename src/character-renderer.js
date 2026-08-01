@@ -9,9 +9,9 @@ import {
   MEADOW_WAKE_WORLD_END,
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins
-} from './content/meadow-wake-course.js?v=meadow-rooms-6';
-import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=meadow-rooms-6';
-import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=meadow-rooms-6';
+} from './content/meadow-wake-course.js?v=production-terrain-3';
+import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=production-terrain-4';
+import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=production-terrain-10';
 import { GAME_RULES } from './canonical-data.js';
 import {
   animationIntentFor,
@@ -63,7 +63,9 @@ export class CharacterRenderer {
     );
     this.camera.position.set(0, 0, 900);
     this.camera.lookAt(0, 0, 0);
-    this.camera.zoom = 0.9;
+    // Keep the authored ground route in the dominant lower-middle field of view.
+    // The distant vista remains readable, but no longer consumes most of the frame.
+    this.camera.zoom = 1.04;
     this.camera.updateProjectionMatrix();
 
     this.renderer = new THREE.WebGLRenderer({
@@ -116,6 +118,13 @@ export class CharacterRenderer {
     this.platformSlots = [];
     this.mobMeshes = new Map();
     this.projectileMeshes = new Map();
+    this.renderTelemetry = {
+      frameCount: 0,
+      sampleSeconds: 0,
+      averageFrameMs: 0,
+      maximumFrameMs: 0,
+      latest: null
+    };
     this.loader = new GLTFLoader();
     this.environmentArt = new MeadowWakeEnvironmentArt({
       scene: this.scene,
@@ -146,7 +155,10 @@ export class CharacterRenderer {
         this.loadMeadowWakeAssets(),
         this.loadEnvironmentTextures()
       ]
-    ).then(() => this.onProgress(this.statusText()));
+    ).then(() => {
+      this.resetRenderTelemetry();
+      this.onProgress(this.statusText());
+    });
   }
 
   material(color) {
@@ -984,6 +996,9 @@ export class CharacterRenderer {
       definitions: MEADOW_WAKE_TERRAIN_MODULES,
       heightAt
     });
+    this.foregroundArt.setDebugMode(
+      new URLSearchParams(window.location.search).get('debugTerrain') ?? 'visible'
+    );
     this.foregroundArt.decorateTerrain({ heightAt, inPit });
     this.foregroundArt.buildAuthoredScenery(heightAt);
     for (const definition of MEADOW_WAKE_PLATFORMS) this.buildPlatformVisual(definition);
@@ -1101,13 +1116,22 @@ export class CharacterRenderer {
   async loadMeadowWakeAssets() {
     this.onProgress('Loading Meadow Wake production-intent assets...');
     try {
-      const [environmentGltf, critterGltf, shellbackGltf, breakableGltf, hargoldBlockGltf, ledgeGltf] = await Promise.all([
+      const [
+        environmentGltf,
+        critterGltf,
+        shellbackGltf,
+        breakableGltf,
+        hargoldBlockGltf,
+        ledgeGltf,
+        terrainKitGltf
+      ] = await Promise.all([
         this.loader.loadAsync(new URL('../assets/exports/world-1/meadow_wake_opening_environment.glb', import.meta.url).href),
         this.loader.loadAsync(new URL('../assets/exports/world-1/camp_critter.glb', import.meta.url).href),
         this.loader.loadAsync(new URL('../assets/exports/world-1/shellback.glb', import.meta.url).href),
         this.loader.loadAsync(new URL('../assets/exports/world-1/breakable_block.glb', import.meta.url).href),
         this.loader.loadAsync(new URL('../assets/exports/world-1/hargold_block.glb', import.meta.url).href),
-        this.loader.loadAsync(new URL('../assets/exports/world-1/meadow_ledge.glb', import.meta.url).href)
+        this.loader.loadAsync(new URL('../assets/exports/world-1/meadow_ledge.glb', import.meta.url).href),
+        this.loader.loadAsync(new URL('../assets/exports/world-1/verdant_vale_terrain_kit.glb?v=2', import.meta.url).href)
       ]);
       const environment = this.prepareImportedAsset(environmentGltf.scene);
       environment.name = 'MeadowWake_AuthoredOpeningEnvironment';
@@ -1176,6 +1200,9 @@ export class CharacterRenderer {
         slot.root.add(ledge);
         slot.imported = ledge;
       }
+      this.foregroundArt.installProductionTerrainKit(
+        this.prepareImportedAsset(terrainKitGltf.scene)
+      );
       this.courseAssetsReady = true;
       this.onProgress(this.statusText());
     } catch (error) {
@@ -1754,6 +1781,80 @@ export class CharacterRenderer {
     }
   }
 
+  captureRenderTelemetry(deltaSeconds) {
+    const frameMs = Math.max(0, deltaSeconds * 1000);
+    this.renderTelemetry.frameCount += 1;
+    this.renderTelemetry.sampleSeconds += Math.max(0, deltaSeconds);
+    this.renderTelemetry.averageFrameMs +=
+      (frameMs - this.renderTelemetry.averageFrameMs)
+      / this.renderTelemetry.frameCount;
+    this.renderTelemetry.maximumFrameMs = Math.max(
+      this.renderTelemetry.maximumFrameMs,
+      frameMs
+    );
+
+    const materials = new Set();
+    const textures = new Set();
+    this.scene.traverse(object => {
+      if (!object.visible || !object.isMesh) return;
+      const objectMaterials = Array.isArray(object.material)
+        ? object.material
+        : [object.material];
+      for (const material of objectMaterials) {
+        if (!material) continue;
+        materials.add(material);
+        for (const key of [
+          'map',
+          'normalMap',
+          'roughnessMap',
+          'metalnessMap',
+          'aoMap',
+          'emissiveMap',
+          'alphaMap'
+        ]) {
+          if (material[key]) textures.add(material[key]);
+        }
+      }
+    });
+
+    let estimatedTextureBytes = 0;
+    for (const texture of textures) {
+      const source = texture.image ?? texture.source?.data;
+      const width = Number(source?.videoWidth ?? source?.naturalWidth ?? source?.width ?? 0);
+      const height = Number(source?.videoHeight ?? source?.naturalHeight ?? source?.height ?? 0);
+      if (width > 0 && height > 0) {
+        estimatedTextureBytes += width * height * 4 * 4 / 3;
+      }
+    }
+
+    const render = this.renderer.info.render;
+    const memory = this.renderer.info.memory;
+    this.renderTelemetry.latest = Object.freeze({
+      frameTimingMs: Number(this.renderTelemetry.averageFrameMs.toFixed(3)),
+      maximumFrameMs: Number(this.renderTelemetry.maximumFrameMs.toFixed(3)),
+      sampleSeconds: Number(this.renderTelemetry.sampleSeconds.toFixed(3)),
+      drawCalls: render.calls,
+      visibleTriangles: render.triangles,
+      visibleLines: render.lines,
+      activeMaterialCount: materials.size,
+      residentGeometryCount: memory.geometries,
+      residentTextureCount: memory.textures,
+      estimatedVisibleTextureBytes: Math.round(estimatedTextureBytes),
+      terrain: this.foregroundArt.getRenderCost()
+    });
+    window.__HM_TERRAIN_METRICS__ = this.renderTelemetry.latest;
+    document.documentElement.dataset.terrainMetrics =
+      JSON.stringify(this.renderTelemetry.latest);
+  }
+
+  resetRenderTelemetry() {
+    this.renderTelemetry.frameCount = 0;
+    this.renderTelemetry.sampleSeconds = 0;
+    this.renderTelemetry.averageFrameMs = 0;
+    this.renderTelemetry.maximumFrameMs = 0;
+    this.renderTelemetry.latest = null;
+  }
+
   render({
     hero,
     screenX,
@@ -1937,5 +2038,6 @@ export class CharacterRenderer {
       }
     }
     this.renderer.render(this.scene, this.camera);
+    this.captureRenderTelemetry(deltaSeconds);
   }
 }

@@ -189,14 +189,14 @@ assert.equal(getLevel('1-1').foregroundDirective.targetSupportedTerrainRatio, 0.
 assert.equal(getLevel('1-1').foregroundDirective.authoredVisualBeatCount, 7);
 assert.deepEqual(
   getLevel('1-1').foregroundDirective.connectedGroundProgressionRatio,
-  { minimum: 0.65, maximum: 0.75 }
+  { minimum: 0.76, maximum: 0.84 }
 );
 assert.deepEqual(
   getLevel('1-1').foregroundDirective.authoredRouteComposition,
   {
-    connectedGround: 0.7,
-    optionalElevated: 0.2,
-    dedicatedPlatformSequences: 0.1
+    connectedGround: 0.8,
+    optionalElevated: 0.15,
+    dedicatedPlatformSequences: 0.05
   }
 );
 assert.ok(

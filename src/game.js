@@ -1,8 +1,8 @@
-import { CharacterRenderer } from './character-renderer.js?v=numeric-animation-1';
+import { CharacterRenderer } from './character-renderer.js?v=verdant-terrain-12';
 import {
   MEADOW_WAKE_ENEMY_ACTORS,
   MEADOW_WAKE_LEVEL_DATA
-} from './content/meadow-wake-level-data.js?v=level-foundation-1';
+} from './content/meadow-wake-level-data.js?v=production-terrain-3';
 import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
 import {
   MEADOW_WAKE_PITS,
@@ -11,7 +11,7 @@ import {
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins,
   createMeadowWakePlatforms
-} from './content/meadow-wake-course.js?v=meadow-rooms-6';
+} from './content/meadow-wake-course.js?v=production-terrain-3';
 import {
   ANIMATION_VALIDATION_STATIONS,
   animationValidationStation
@@ -108,8 +108,20 @@ const initialValidationStation = animationValidationStation(
   runtimeParameters.get('station')
 );
 const requestedArtPreviewX = Number(runtimeParameters.get('artPreview'));
+const safePreviewX = requestedX => {
+  const clampedX = clamp(requestedX, 1.8, WORLD_END - 1);
+  const containingPit = MEADOW_WAKE_PITS.find(pit => (
+    clampedX > pit.from && clampedX < pit.to
+  ));
+  if (!containingPit) return clampedX;
+  const leftShelf = Math.max(1.8, containingPit.from - 0.28);
+  const rightShelf = Math.min(WORLD_END - 1, containingPit.to + 0.28);
+  return Math.abs(clampedX - leftShelf) <= Math.abs(rightShelf - clampedX)
+    ? leftShelf
+    : rightShelf;
+};
 const initialCourseX = Number.isFinite(requestedArtPreviewX)
-  ? clamp(requestedArtPreviewX, 1.8, WORLD_END - 1)
+  ? safePreviewX(requestedArtPreviewX)
   : animationValidationEnabled
     ? initialValidationStation.spawnX
     : 1.8;
@@ -1046,13 +1058,16 @@ function frame(now) {
   );
   cameraX += (targetCamera - cameraX) * Math.min(1, elapsed * 5);
   const cameraSurfaceY = terrain.heightAt(clamp(player.footX, 0, WORLD_END));
-  const terrainFraming = cameraSurfaceY * SCALE - H * 0.77;
+  // Frame Meadow Wake around its playable landform instead of the empty sky.
+  // Airborne follow still reveals jump destinations without turning the course
+  // into a vertically roaming camera.
+  const terrainFraming = cameraSurfaceY * SCALE - H * 0.49;
   const airborneFollow = clamp(
     (player.footY - cameraSurfaceY) * SCALE * 0.15,
     -30,
     16
   );
-  const targetCameraY = clamp(terrainFraming + airborneFollow, -78, 28);
+  const targetCameraY = clamp(terrainFraming + airborneFollow, -12, 116);
   cameraY += (targetCameraY - cameraY) * Math.min(1, elapsed * 3.6);
   const modeStatus = fullyUnlockedTestMode ? 'FULLY UNLOCKED TEST · ' : '';
   status.textContent = `${modeStatus}${session.state === 'playing' ? 'PLAYING' : session.state.toUpperCase()} · 120 Hz · ${characterLoadStatus}`;

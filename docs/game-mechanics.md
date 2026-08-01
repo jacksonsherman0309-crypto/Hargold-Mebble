@@ -271,11 +271,11 @@ The 100-coin reward must correctly award extra lives and obey the 99-life cap.
 - Avoid empty walking stretches.
 - Normal courses target approximately 80–90% supported terrain and 10–20% meaningful pit spans, with exact placement authored per course.
 - Meadow Wake specifically uses a ground-first introduction: approximately
-  65–75% of ordinary forward play stays on connected ground, while its few
+  76–84% of ordinary forward play stays on connected ground, while its few
   true-gap events are grouped and clearly framed rather than repeated across
   every screen.
-- The authored target mix is 70% connected-ground play, 20% optional elevated
-  play, and 10% dedicated platform sequences. The percentages describe course
+- The authored target mix is 80% connected-ground play, 15% optional elevated
+  play, and 5% dedicated platform sequences. The percentages describe course
   pacing and do not authorize generated or evenly repeated layouts.
 - Foreground flow alternates hills, layered ledges, bridges, vertical climbs, ruins, camps, clearings, and elevated or concealed routes.
 - Moving, falling, rotating, lift, and seesaw platforms are collision-bearing mechanisms, not decorative motion.

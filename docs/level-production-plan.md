@@ -29,6 +29,7 @@ Every production level must satisfy these rules unless an explicit newer instruc
 - Strict linear side-scrolling gameplay plane.
 - Fully rendered 3D “2.75D” presentation target.
 - Use the approved Meadow Wake gameplay reference as the minimum quality floor for environment density, terrain volume, materials, lighting, parallax, and side-view composition while keeping all production assets and layouts original.
+- Apply the visible/collision separation, material classes, authored room-finish matrix, debug modes, and completion boundary in `docs/terrain-production-standard.md`.
 - Apply the quality floor across the complete authored course. No section may fall back to generic boxes, repetitive procedural dressing, flat playable cards, or visibly unfinished background/foreground treatment.
 - Average completion target near two minutes at a moderately quick pace, excluding unusually large finales.
 - Required route remains completable by Hargold.
@@ -142,11 +143,11 @@ Construction direction:
   those seven beats: camp departure, first natural obstacle, first encounter,
   gentle elevation, one controlled gap sequence, an open running meadow, one
   compact platform challenge, a combination challenge, and the exit approach.
-- Keep approximately 65–75% of ordinary forward progression on connected
+- Keep approximately 76–84% of ordinary forward progression on connected
   ground. Elevated platforms supplement that route and each must have a named
   teaching, reward, shortcut, secret, or timing purpose.
-- Tune the finished World 1-1 route toward 70% connected-ground play, 20%
-  optional elevated play, and 10% dedicated platform sequences while
+- Tune the finished World 1-1 route toward 80% connected-ground play, 15%
+  optional elevated play, and 5% dedicated platform sequences while
   preserving the individually authored room and beat flow.
 - Group true gaps into authored events rather than distributing them evenly:
   the concealed creek pocket with its recovery shelf, the framed rope-bridge

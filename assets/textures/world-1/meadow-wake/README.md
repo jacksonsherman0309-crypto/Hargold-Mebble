@@ -8,7 +8,7 @@ Meadow Wake course; they do not generate or replace course geometry.
 - `verdant-vale-background-v1.png` — far valley, cliffs, waterfalls, creek,
   sky, and atmospheric depth.
 - `meadow-midground-ridge-v1.png` — transparent forest-ridge parallax layer.
-- `meadow-soil-stone-albedo-v2.png` — authored terrain-face albedo with
+- `meadow-soil-stone-albedo-v3.png` — active authored terrain-face albedo with
   gameplay-scale fieldstones and roots.
 - `meadow-turf-albedo-v1.png` — terrain-top and ledge turf albedo.
 - `meadow-camp-timber-albedo-v1.png` — hand-finished camp timber and plank
@@ -38,17 +38,15 @@ Far valley:
 
 Terrain face:
 
-> Create one original seamless square albedo texture for the vertical side face
-> of a premium stylized 3D-cartoon meadow platform in a polished side-scrolling
-> platformer. Dark warm chocolate-brown compact soil with clear broad patches,
-> scattered large rounded moss-dark fieldstones and slate fragments, a few thick
-> exposed roots, tiny restrained moss flecks. Stones should be chunky and clearly
-> readable from gameplay distance, roughly 8–15% of the texture width each; use
-> sparse deliberate placement, not dense gravel or noisy pebbles. Rich
-> hand-authored sculpted look, clean family-friendly game art, soft even flat
-> lighting suitable as a PBR base-color texture, tileable on all four edges. No
-> grass top strip, no characters, no interface, no text, no logos, no copied
-> franchise assets.
+> Seamless square albedo texture for an original real-time 3D side-scrolling
+> platformer terrain mesh: a highly polished Verdant Vale earth face with
+> compact warm brown loam, rounded embedded slate and fieldstones, subtle
+> branching roots, tiny moss pockets, and gently layered erosion strata.
+> Hand-painted high-end stylized 3D game material with clean family-friendly
+> craftsmanship, orthographic straight-on framing, uniform detail density, and
+> seamless edges. Neutral ambient material lighting with no cast shadows.
+> Entirely original Hargold & Mebble asset; no characters, blocks, coins,
+> symbols, text, watermark, interface, or recognizable existing-game asset.
 
 Turf:
 
