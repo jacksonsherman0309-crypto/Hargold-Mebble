@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "status": "stage-3-in-progress-visual-deformation-gate-failed",
+  "date": "2026-08-01",
+  "authority": {
+    "productionOrder": "data/rig-first-character-production-gate-2026-07-31.json",
+    "rigDirection": "data/character-rig-direction-override-2026-07-31.json",
+    "stage2Evidence": "data/production-character-rig-stage-2.json"
+  },
+  "tooling": {
+    "blender": "5.2.0 LTS",
+    "diagnosticFinalizer": "tools/blender/finalize_production_rig_stage_3.py",
+    "statusMarker": "tools/blender/mark_stage3_in_progress.py",
+    "validator": "tools/blender/validate_production_rig_stage_3.py",
+    "sheetComposer": "tools/compose_character_rig_stage_3_sheet.py"
+  },
+  "heroes": {
+    "Hargold": {
+      "source": "assets/blender/production/hargold_production_rig.blend",
+      "sha256": "29CD6A65F78DA8C4B67C2C85DC5AF9B55F6BAF931F1EED3A513C2A71F11F5C16",
+      "bytes": 78280917,
+      "inventory": "assets/blender/production/hargold_stage-3-deformation-inventory.json",
+      "validation": "assets/blender/production/hargold_stage-3-diagnostic-validation.json",
+      "stressSheet": "assets/previews/rig-stage-3/hargold-deformation-stress.png",
+      "vertices": 223097,
+      "connectedSurfaceIslands": 13791,
+      "topologyCorrectedIslands": 1733,
+      "neutralBindMaxDisplacementMetres": 5.997601687162551e-7,
+      "counts": {
+        "bodyDeform": 50,
+        "accessoryDeform": 10,
+        "animatorControls": 76,
+        "helpers": 24,
+        "drivenCorrectives": 13,
+        "stressPoses": 14
+      }
+    },
+    "Mebble": {
+      "source": "assets/blender/production/mebble_production_rig.blend",
+      "sha256": "76C2BBAE63359FF42E91ADC29DA3E9EC2405A821F71FF114AA8660DEEA37275E",
+      "bytes": 77499016,
+      "inventory": "assets/blender/production/mebble_stage-3-deformation-inventory.json",
+      "validation": "assets/blender/production/mebble_stage-3-diagnostic-validation.json",
+      "stressSheet": "assets/previews/rig-stage-3/mebble-deformation-stress.png",
+      "vertices": 183495,
+      "connectedSurfaceIslands": 5290,
+      "topologyCorrectedIslands": 464,
+      "neutralBindMaxDisplacementMetres": 1.194628053832827e-6,
+      "counts": {
+        "bodyDeform": 52,
+        "accessoryDeform": 16,
+        "animatorControls": 78,
+        "helpers": 24,
+        "drivenCorrectives": 13,
+        "stressPoses": 14
+      }
+    }
+  },
+  "implemented": {
+    "lockedBasePositionsTopologyMaterialsAndUvsPreserved": true,
+    "purposefulTwistDeformersAddedPerHero": 6,
+    "maximumSkinInfluences": 2,
+    "weightsNormalized": true,
+    "preserveVolumeArmatureModifier": true,
+    "correctiveSmoothModifier": true,
+    "drivenJointCorrectives": true,
+    "bindPivotStructuralCorrectionRecorded": true,
+    "animationActionsAuthored": false,
+    "runtimeAssetsChanged": false
+  },
+  "gateResult": {
+    "stage0BaselinePreservation": "pass-reused",
+    "stage1EditableSources": "pass-reused-with-documented-pivot-structural-correction",
+    "stage2ControlArchitecture": "pass-reused",
+    "stage3StructuralImplementation": "pass",
+    "stage3VisualDeformationQuality": "fail",
+    "stage3Overall": "in-progress",
+    "stage4HandFaceAccessoryDeformation": "blocked",
+    "stage5StaticAndPosedApproval": "blocked",
+    "candidateExport": "blocked",
+    "runtimeSwitchAuthorized": false,
+    "finalAnimationAllowed": false
+  },
+  "remainingStage3Work": [
+    "manually weight-paint shoulders, armpits, torso, hips, knees, ankles, and wrists in Blender",
+    "consolidate or locally retopologize disconnected layered surface islands that open under articulation",
+    "separate and weight Hargold rear garments and backpack without holes or arm capture",
+    "separate and weight Mebble vest and cape attachment without torso holes",
+    "rerun the actual-mesh stress sheet and approve every pose before Stage 4"
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "hero": "Hargold",
+  "status": "stage-3-structure-valid-visual-gate-failed",
+  "blenderVersion": "5.2.0 LTS",
+  "checks": [
+    {
+      "name": "authoritative-blend-open",
+      "pass": true,
+      "detail": "C:\\Users\\jacks\\OneDrive\\Desktop\\Hargold-Mebble\\assets\\blender\\production\\hargold_production_rig.blend"
+    },
+    {
+      "name": "production-rig-present",
+      "pass": true,
+      "detail": "Hargold_PRODUCTION_RIG_STAGE_3"
+    },
+    {
+      "name": "locked-surface-present",
+      "pass": true,
+      "detail": "Hargold_LOCKED_VISIBLE_SURFACE_STAGE_1"
+    },
+    {
+      "name": "stage1-and-stage2-remain-passed",
+      "pass": true,
+      "detail": {
+        "stage1": true,
+        "stage2": true
+      }
+    },
+    {
+      "name": "stage3-started-not-passed",
+      "pass": true,
+      "detail": {
+        "started": true,
+        "pass": false
+      }
+    },
+    {
+      "name": "later-gates-blocked",
+      "pass": true,
+      "detail": "Stage 4/5/export/runtime false"
+    },
+    {
+      "name": "final-animation-blocked",
+      "pass": true,
+      "detail": {
+        "blocked": true,
+        "actions": 0
+      }
+    },
+    {
+      "name": "locked-base-fingerprint",
+      "pass": true,
+      "detail": "positions/topology/materials/UV unchanged"
+    },
+    {
+      "name": "production-armature-modifier",
+      "pass": true,
+      "detail": "PRODUCTION_SKIN"
+    },
+    {
+      "name": "corrective-smooth-modifier",
+      "pass": true,
+      "detail": "PRODUCTION_CORRECTIVE_SMOOTH"
+    },
+    {
+      "name": "twist-deformers",
+      "pass": true,
+      "detail": [
+        "DEF_forearm_twist.L",
+        "DEF_forearm_twist.R",
+        "DEF_thigh_twist.L",
+        "DEF_thigh_twist.R",
+        "DEF_upper_arm_twist.L",
+        "DEF_upper_arm_twist.R"
+      ]
+    },
+    {
+      "name": "corrective-shape-count",
+      "pass": true,
+      "detail": 13
+    },
+    {
+      "name": "corrective-drivers",
+      "pass": true,
+      "detail": 13
+    },
+    {
+      "name": "all-vertices-production-weighted",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "mobile-influence-limit",
+      "pass": true,
+      "detail": 2
+    },
+    {
+      "name": "normalized-production-weights",
+      "pass": true,
+      "detail": 1.4901161193847656e-08
+    },
+    {
+      "name": "stress-evidence-complete",
+      "pass": true,
+      "detail": 14
+    },
+    {
+      "name": "visual-gate-honestly-failed",
+      "pass": true,
+      "detail": [
+        "manual shoulder, armpit, torso, hip, and knee weight painting is required",
+        "disconnected garment islands open visible holes under stress poses",
+        "Stage 4, Stage 5, candidate export, runtime switch, and final animation remain blocked"
+      ]
+    }
+  ],
+  "errors": [],
+  "stage3GatePass": false,
+  "blockedReasons": [
+    "manual shoulder, armpit, torso, hip, and knee weight painting is required",
+    "disconnected garment islands open visible holes under stress poses",
+    "Stage 4, Stage 5, candidate export, runtime switch, and final animation remain blocked"
+  ],
+  "structuralChecksPass": true,
+  "summary": {
+    "checks": 18,
+    "passed": 18,
+    "failed": 0
+  }
+}
