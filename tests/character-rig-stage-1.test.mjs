@@ -8,6 +8,7 @@ import path from 'node:path';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = relative => JSON.parse(readFileSync(path.join(ROOT, relative), 'utf8'));
 const stage = readJson('data/production-character-rig-stage-1.json');
+const stage2 = readJson('data/production-character-rig-stage-2.json');
 const semantic = readJson('data/production-character-rig-semantic-map.json');
 
 async function sha256(relative) {
@@ -17,7 +18,7 @@ async function sha256(relative) {
   return digest.digest('hex').toUpperCase();
 }
 
-test('Stage 1 authoritative Blender sources are hashed and remain offline', async () => {
+test('Stage 1 evidence remains coherent after the authorized Stage 2 upgrade', async () => {
   assert.equal(stage.status, 'stage-1-pass-ready-for-stage-2-no-skinning');
   assert.equal(stage.gateResult.stage1SourceIntegrity, 'pass');
   assert.equal(stage.gateResult.stage2PurposefulSkeletonAndControlArchitecture, 'not-started');
@@ -25,9 +26,11 @@ test('Stage 1 authoritative Blender sources are hashed and remain offline', asyn
   assert.equal(stage.gateResult.runtimeSwitchAuthorized, false);
   assert.equal(stage.gateResult.finalAnimationAllowed, false);
   for (const [hero, record] of Object.entries(stage.heroes)) {
-    assert.ok(existsSync(path.join(ROOT, record.source)), `${hero} Blender source is missing`);
-    assert.equal(await sha256(record.source), record.sha256);
-    assert.equal(statSync(path.join(ROOT, record.source)).size, record.bytes);
+    const inventory = readJson(record.inventory);
+    assert.equal(inventory.sourceFile.sha256, record.sha256);
+    assert.equal(inventory.sourceFile.bytes, record.bytes);
+    assert.ok(existsSync(path.join(ROOT, stage2.heroes[hero].source)), `${hero} Stage 2 Blender source is missing`);
+    assert.equal(await sha256(stage2.heroes[hero].source), stage2.heroes[hero].sha256);
     assert.equal(record.objectScale.join(','), '1,1,1');
     assert.equal(record.floorZ, 0);
     assert.equal(record.stage1Pass, true);
@@ -85,16 +88,17 @@ test('Stage 1 uses the canonical organization and deliberate coordinate conventi
   assert.equal(stage.coordinateConvention.negativeScaleMirroring, false);
 });
 
-test('semantic naming plan covers new spine, controls, accessories, and sockets without becoming live', () => {
-  assert.equal(semantic.status, 'stage-1-semantic-plan-complete-not-active-in-runtime');
+test('current semantic map supersedes the Stage 1 plan without becoming live', () => {
+  assert.equal(semantic.schemaVersion, 2);
+  assert.equal(semantic.status, 'stage-2-complete-not-active-in-runtime-stage-3-blocked');
   assert.equal(semantic.runtimeUsesThisMap, false);
-  assert.equal(semantic.sharedSemanticControls.upperSpine, 'DEF_spine_upper');
-  assert.equal(semantic.sharedSemanticControls.leftFootRoll, 'CTRL_foot_roll.L');
-  assert.equal(semantic.heroSpecificSemanticControls.Hargold.scarfControl, 'CTRL_scarf');
-  assert.equal(semantic.heroSpecificSemanticControls.Mebble.capeControl, 'CTRL_cape');
-  assert.equal(semantic.semanticSockets.groundSlamImpact, 'SOCKET_ground_slam_impact');
-  assert.equal(semantic.semanticSockets.HargoldScarfOrigin, 'SOCKET_scarf_origin');
-  assert.equal(semantic.semanticSockets.MebbleCapeOrigin, 'SOCKET_cape_origin');
+  assert.equal(semantic.shared.upperSpine, 'CTRL_spine_upper');
+  assert.equal(semantic.heroes.Hargold.feet.L.control, 'CTRL_foot_ik.L');
+  assert.equal(semantic.heroes.Hargold.accessories.DEF_scarf_root.control, 'CTRL_scarf');
+  assert.equal(semantic.heroes.Mebble.actions.mebbleGlide.control, 'CTRL_cape');
+  assert.equal(semantic.heroes.Hargold.sockets.groundSlamImpact, 'SOCKET_ground_slam_impact');
+  assert.equal(semantic.heroes.Hargold.sockets.scarfOrigin, 'SOCKET_scarf_origin');
+  assert.equal(semantic.heroes.Mebble.sockets.capeOrigin, 'SOCKET_cape_origin');
 });
 
 test('static pose sheets are real validation artifacts, not animation actions', () => {

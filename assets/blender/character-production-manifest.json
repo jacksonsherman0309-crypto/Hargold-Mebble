@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 7,
-  "status": "locked-original-meshy-rigs-active-as-interim-rig-first-stage-0-and-stage-1-pass-stage-2-pending",
+  "schemaVersion": 8,
+  "status": "locked-original-meshy-rigs-active-as-interim-stage-2-production-rigs-pass-unskinned-stage-3-blocked",
   "activeRuntimeStatus": "locked-original-meshy-body-animation-library-active-as-interim-24-bone-rollback-final-animation-paused",
   "decisionDate": "2026-07-31",
   "rigFirstProduction": {
     "authority": "../../data/rig-first-character-production-gate-2026-07-31.json",
-    "stageReport": "../../data/production-character-rig-stage-1.json",
+    "stageReport": "../../data/production-character-rig-stage-2.json",
     "stage0Evidence": "../../data/production-character-rig-stage-0-1.json",
     "semanticMapPlan": "../../data/production-character-rig-semantic-map.json",
     "HargoldBlend": "production/hargold_production_rig.blend",
@@ -18,7 +18,13 @@
     "stage2Started": false,
     "stage3Started": false,
     "runtimeSwitchAuthorized": false,
-    "finalAnimationAllowed": false
+    "finalAnimationAllowed": false,
+    "HargoldStage2Inventory": "production/hargold_stage-2-rig-inventory.json",
+    "MebbleStage2Inventory": "production/mebble_stage-2-rig-inventory.json",
+    "HargoldStage2PoseSheet": "../previews/rig-stage-2/hargold-control-pose-review.png",
+    "MebbleStage2PoseSheet": "../previews/rig-stage-2/mebble-control-pose-review.png",
+    "stage2Pass": true,
+    "stage3Authorized": false
   },
   "dimensionalPresentation": {
     "classification": "2.75D",

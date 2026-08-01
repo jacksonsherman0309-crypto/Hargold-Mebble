@@ -7,17 +7,18 @@ These files follow the rig-first production path approved on July 31, 2026:
 
 Each Blender source contains the exact locked Meshy bind surface baked to the
 canonical metre height at object scale `1,1,1`, an immutable hidden copy of the
-interim 24-bone source, a separate original Stage 1 production-rig scaffold,
-12 semantic socket interfaces, reference guides, static scaffold-pose evidence,
+interim 24-bone source, a separate original production authoring rig,
+17 semantic socket interfaces, reference guides, control-pose evidence,
 and export/version metadata.
 
-Stage 1 passes its source-integrity, coordinate, hierarchy, bone-roll,
-classification, socket, and static rigid-envelope pose checks. The scaffolds
-are intentionally **not skinned and not runtime assets**. They are not approved
-production rigs yet. Stages 2-7—purposeful skeleton controls, constraints,
-skinning, correctives, face/hands/accessories, deforming pose review, candidate
-export, semantic integration, and runtime parity—must pass before the live GLBs
-may change or final animation production may resume.
+Stage 1 and Stage 2 pass. The files now contain the final unskinned deform
+hierarchies, animator controls, IK/FK mechanisms and switches, snapping,
+heel/ball/toe foot systems, hand-pose controls, facial interfaces, explicit
+accessory controls and machine-readable sockets. They remain intentionally
+**not skinned and not runtime assets**. Stages 3-7—skinning, correctives,
+deforming pose review, candidate export, semantic integration, and runtime
+parity—must pass before the live GLBs may change or final animation production
+may resume.
 
 Rebuild the original Stage 0/1 source foundation with Blender 5.2 LTS:
 
@@ -39,3 +40,12 @@ The complete Stage 1 evidence is summarized in
 `data/production-character-rig-stage-1.json`. The per-hero inventories beside
 the `.blend` files contain every bone, parent, rest transform, local axis, roll
 convention, socket, and static pose result.
+
+Stage 2 is summarized in `data/production-character-rig-stage-2.json` and
+`docs/character-rig-stage-2-report.md`. Validate it with:
+
+```powershell
+& 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background assets/blender/production/hargold_production_rig.blend --python tools/blender/validate_production_rig_stage_2.py -- --hero Hargold
+& 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background assets/blender/production/mebble_production_rig.blend --python tools/blender/validate_production_rig_stage_2.py -- --hero Mebble
+node tests/character-rig-stage-2.test.mjs
+```

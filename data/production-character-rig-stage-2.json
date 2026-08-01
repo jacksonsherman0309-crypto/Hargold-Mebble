@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "status": "stage-2-pass-unskinned-stage-3-not-authorized-final-animation-blocked",
+  "date": "2026-08-01",
+  "authority": {
+    "productionOrder": "data/rig-first-character-production-gate-2026-07-31.json",
+    "rigDirection": "data/character-rig-direction-override-2026-07-31.json",
+    "motionOverride": "data/animation-motion-override-2026-07-31.json",
+    "stage1Evidence": "data/production-character-rig-stage-1.json",
+    "semanticMap": "data/production-character-rig-semantic-map.json"
+  },
+  "tooling": {
+    "blender": "5.2.0 LTS",
+    "finalizer": "tools/blender/finalize_production_rig_stage_2.py",
+    "snapTool": "tools/blender/production_rig_stage_2_snap.py",
+    "validator": "tools/blender/validate_production_rig_stage_2.py",
+    "registryBuilder": "tools/build_character_rig_stage_2_registry.py"
+  },
+  "heroes": {
+    "Hargold": {
+      "source": "assets/blender/production/hargold_production_rig.blend",
+      "sha256": "B79765AF02E00AF9FCC4CE2DF541A05B2D4F794EC2FC1E5F445EF77E5EFFEE0C",
+      "bytes": 55959381,
+      "inventory": "assets/blender/production/hargold_stage-2-rig-inventory.json",
+      "validation": "assets/blender/production/hargold_stage-2-validation.json",
+      "poseSheet": "assets/previews/rig-stage-2/hargold-control-pose-review.png",
+      "counts": {
+        "bodyDeform": 44,
+        "accessoryDeform": 10,
+        "animatorControls": 76,
+        "helpers": 24,
+        "sockets": 17,
+        "controlTestPoses": 34
+      },
+      "unskinned": true,
+      "actions": 0,
+      "stage2Pass": true,
+      "validationSummary": {
+        "checks": 44,
+        "passed": 44,
+        "failed": 0
+      }
+    },
+    "Mebble": {
+      "source": "assets/blender/production/mebble_production_rig.blend",
+      "sha256": "B4C277F19FBA17BAFDB73E00397EE3AB9FFBA39265F143245ED085D142092BB0",
+      "bytes": 55278017,
+      "inventory": "assets/blender/production/mebble_stage-2-rig-inventory.json",
+      "validation": "assets/blender/production/mebble_stage-2-validation.json",
+      "poseSheet": "assets/previews/rig-stage-2/mebble-control-pose-review.png",
+      "counts": {
+        "bodyDeform": 46,
+        "accessoryDeform": 16,
+        "animatorControls": 78,
+        "helpers": 24,
+        "sockets": 17,
+        "controlTestPoses": 35
+      },
+      "unskinned": true,
+      "actions": 0,
+      "stage2Pass": true,
+      "validationSummary": {
+        "checks": 45,
+        "passed": 45,
+        "failed": 0
+      }
+    }
+  },
+  "gateResult": {
+    "stage0BaselinePreservation": "pass-reused",
+    "stage1EditableSourcesAndScaffolds": "pass-reused",
+    "stage2FinalDeformHierarchy": "pass",
+    "stage2AnimatorControls": "pass",
+    "stage2IkFkAndSnapping": "pass",
+    "stage2FootRoll": "pass",
+    "stage2HandsFaceAccessories": "pass",
+    "stage2SocketsAndSemanticMap": "pass",
+    "stage3SkinningTopologyCorrectives": "not-started-not-authorized",
+    "runtimeSwitchAuthorized": false,
+    "finalAnimationAllowed": false
+  }
+}

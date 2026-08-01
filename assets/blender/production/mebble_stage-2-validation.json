@@ -1,0 +1,439 @@
+{
+  "schemaVersion": 2,
+  "hero": "Mebble",
+  "status": "stage-2-pass",
+  "blenderVersion": "5.2.0 LTS",
+  "checks": [
+    {
+      "name": "authoritative-blend-open",
+      "pass": true,
+      "detail": "C:\\Users\\jacks\\OneDrive\\Desktop\\Hargold-Mebble\\assets\\blender\\production\\mebble_production_rig.blend"
+    },
+    {
+      "name": "stage2-rig-present",
+      "pass": true,
+      "detail": "Mebble_PRODUCTION_RIG_STAGE_2"
+    },
+    {
+      "name": "locked-surface-present",
+      "pass": true,
+      "detail": "Mebble_LOCKED_VISIBLE_SURFACE_STAGE_1"
+    },
+    {
+      "name": "locked-source-hash",
+      "pass": true,
+      "detail": "392D8F9C12AD140AFA738AB118D3C3A63F9A40DA41DD8A061FE8A37F91DE3A3B"
+    },
+    {
+      "name": "stage1-remains-passed",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "stage2-marked-passed",
+      "pass": true,
+      "detail": "stage-2-pass-ready-for-stage-3-authorization"
+    },
+    {
+      "name": "stage3-not-started",
+      "pass": true,
+      "detail": {
+        "stage3": false,
+        "skinning": false
+      }
+    },
+    {
+      "name": "final-animation-blocked",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "runtime-switch-blocked",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "mesh-unskinned-no-modifiers",
+      "pass": true,
+      "detail": {
+        "modifiers": [],
+        "parent": null
+      }
+    },
+    {
+      "name": "locked-surface-fingerprint",
+      "pass": true,
+      "detail": "unchanged-from-stage2-inventory"
+    },
+    {
+      "name": "positive-unit-object-scale",
+      "pass": true,
+      "detail": {
+        "surface": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "rig": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "name": "required-deform-bones",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "required-animator-controls",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "required-mechanisms",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "minimum-body-deform-count",
+      "pass": true,
+      "detail": {
+        "actual": 46,
+        "minimum": 46
+      }
+    },
+    {
+      "name": "minimum-accessory-deform-count",
+      "pass": true,
+      "detail": {
+        "actual": 16,
+        "minimum": 16
+      }
+    },
+    {
+      "name": "minimum-control-count",
+      "pass": true,
+      "detail": {
+        "actual": 78,
+        "minimum": 78
+      }
+    },
+    {
+      "name": "minimum-helper-count",
+      "pass": true,
+      "detail": {
+        "actual": 24,
+        "minimum": 24
+      }
+    },
+    {
+      "name": "unique-bone-identifiers",
+      "pass": true,
+      "detail": 164
+    },
+    {
+      "name": "valid-parent-relationships",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "deforms-not-parented-to-controls",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "export-deforms-exclude-controls",
+      "pass": true,
+      "detail": "animator/helper use_deform false"
+    },
+    {
+      "name": "no-negative-control-scale",
+      "pass": true,
+      "detail": "all non-negative"
+    },
+    {
+      "name": "arm-L-ik-chain",
+      "pass": true,
+      "detail": {
+        "target": "CTRL_hand_ik.L",
+        "pole": "CTRL_elbow_pole.L"
+      }
+    },
+    {
+      "name": "arm-L-ikfk-range",
+      "pass": true,
+      "detail": 0.0
+    },
+    {
+      "name": "leg-L-ik-chain",
+      "pass": true,
+      "detail": {
+        "target": "MCH_foot_target.L",
+        "pole": "CTRL_knee_pole.L"
+      }
+    },
+    {
+      "name": "leg-L-ikfk-range",
+      "pass": true,
+      "detail": 0.0
+    },
+    {
+      "name": "arm-R-ik-chain",
+      "pass": true,
+      "detail": {
+        "target": "CTRL_hand_ik.R",
+        "pole": "CTRL_elbow_pole.R"
+      }
+    },
+    {
+      "name": "arm-R-ikfk-range",
+      "pass": true,
+      "detail": 0.0
+    },
+    {
+      "name": "leg-R-ik-chain",
+      "pass": true,
+      "detail": {
+        "target": "MCH_foot_target.R",
+        "pole": "CTRL_knee_pole.R"
+      }
+    },
+    {
+      "name": "leg-R-ikfk-range",
+      "pass": true,
+      "detail": 0.0
+    },
+    {
+      "name": "ikfk-snapping-tolerance",
+      "pass": true,
+      "detail": [
+        {
+          "limb": "arm",
+          "side": "L",
+          "destination": "IK",
+          "endEffectorErrorMetres": 0.0
+        },
+        {
+          "limb": "arm",
+          "side": "L",
+          "destination": "FK",
+          "endEffectorErrorMetres": 6.664001874625056e-08
+        },
+        {
+          "limb": "leg",
+          "side": "L",
+          "destination": "IK",
+          "endEffectorErrorMetres": 1.4901161193847656e-08
+        },
+        {
+          "limb": "leg",
+          "side": "L",
+          "destination": "FK",
+          "endEffectorErrorMetres": 2.1077736202036155e-08
+        },
+        {
+          "limb": "arm",
+          "side": "R",
+          "destination": "IK",
+          "endEffectorErrorMetres": 0.0
+        },
+        {
+          "limb": "arm",
+          "side": "R",
+          "destination": "FK",
+          "endEffectorErrorMetres": 6.664001874625056e-08
+        },
+        {
+          "limb": "leg",
+          "side": "R",
+          "destination": "IK",
+          "endEffectorErrorMetres": 1.4901161193847656e-08
+        },
+        {
+          "limb": "leg",
+          "side": "R",
+          "destination": "FK",
+          "endEffectorErrorMetres": 1.4901185553248475e-08
+        }
+      ]
+    },
+    {
+      "name": "foot-roll-driver-functional",
+      "pass": true,
+      "detail": 0.6108652353286743
+    },
+    {
+      "name": "hand-pose-blending-functional",
+      "pass": true,
+      "detail": 1.350000023841858
+    },
+    {
+      "name": "facial-interface-complete",
+      "pass": true,
+      "detail": [
+        "eyeAimHorizontal",
+        "eyeAimVertical",
+        "blink",
+        "browRaise",
+        "browCompression",
+        "mouthNeutral",
+        "mouthOpen",
+        "effortGrit",
+        "hurt",
+        "surprise",
+        "victory",
+        "cheekCorrection",
+        "jawCorrection",
+        "headStabilization"
+      ]
+    },
+    {
+      "name": "all-hand-shapes-defined",
+      "pass": true,
+      "detail": [
+        "relaxedOpen",
+        "runningCup",
+        "fist",
+        "landingBrace",
+        "skidBrace",
+        "strike",
+        "grab",
+        "carry",
+        "victory"
+      ]
+    },
+    {
+      "name": "socket-semantic-set",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "mebble-cape-interface-complete",
+      "pass": true,
+      "detail": [
+        "closedRest",
+        "locomotionTrail",
+        "jumpLift",
+        "glideOpening",
+        "glideFullyOpen",
+        "glideSustainCurvature",
+        "directionalRoll",
+        "glideClosing",
+        "landingSettle"
+      ]
+    },
+    {
+      "name": "no-hargold-twirl-on-mebble",
+      "pass": true,
+      "detail": "twirl absent"
+    },
+    {
+      "name": "no-hargold-double-jump-on-mebble",
+      "pass": true,
+      "detail": "double jump absent"
+    },
+    {
+      "name": "semantic-map-version",
+      "pass": true,
+      "detail": 2
+    },
+    {
+      "name": "semantic-map-hero-entry",
+      "pass": true,
+      "detail": "assets/blender/production/mebble_production_rig.blend"
+    },
+    {
+      "name": "semantic-map-resolves-completely",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "control-pose-suite",
+      "pass": true,
+      "detail": {
+        "poses": 35
+      }
+    }
+  ],
+  "errors": [],
+  "ikFk": [
+    {
+      "limb": "arm",
+      "side": "L",
+      "valid": true
+    },
+    {
+      "limb": "leg",
+      "side": "L",
+      "valid": true
+    },
+    {
+      "limb": "arm",
+      "side": "R",
+      "valid": true
+    },
+    {
+      "limb": "leg",
+      "side": "R",
+      "valid": true
+    }
+  ],
+  "snapResults": [
+    {
+      "limb": "arm",
+      "side": "L",
+      "destination": "IK",
+      "endEffectorErrorMetres": 0.0
+    },
+    {
+      "limb": "arm",
+      "side": "L",
+      "destination": "FK",
+      "endEffectorErrorMetres": 6.664001874625056e-08
+    },
+    {
+      "limb": "leg",
+      "side": "L",
+      "destination": "IK",
+      "endEffectorErrorMetres": 1.4901161193847656e-08
+    },
+    {
+      "limb": "leg",
+      "side": "L",
+      "destination": "FK",
+      "endEffectorErrorMetres": 2.1077736202036155e-08
+    },
+    {
+      "limb": "arm",
+      "side": "R",
+      "destination": "IK",
+      "endEffectorErrorMetres": 0.0
+    },
+    {
+      "limb": "arm",
+      "side": "R",
+      "destination": "FK",
+      "endEffectorErrorMetres": 6.664001874625056e-08
+    },
+    {
+      "limb": "leg",
+      "side": "R",
+      "destination": "IK",
+      "endEffectorErrorMetres": 1.4901161193847656e-08
+    },
+    {
+      "limb": "leg",
+      "side": "R",
+      "destination": "FK",
+      "endEffectorErrorMetres": 1.4901185553248475e-08
+    }
+  ],
+  "pass": true,
+  "summary": {
+    "checks": 45,
+    "passed": 45,
+    "failed": 0
+  }
+}

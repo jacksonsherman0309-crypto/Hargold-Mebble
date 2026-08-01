@@ -1,6 +1,6 @@
 # Character production checklist
 
-Last updated: July 31, 2026
+Last updated: August 1, 2026
 
 The machine-readable authority is
 `assets/blender/character-production-checklist.json`.
@@ -22,7 +22,9 @@ order is `docs/rig-first-character-production-gate-2026-07-31.md`.
 - [x] Stage 1 source collections, coordinate convention, transforms, facing, floor origin, and export metadata verified
 - [x] Stage 1 hierarchy, deliberate bone roll, deform/control/helper/accessory classification, and 12 semantic sockets verified
 - [x] Stage 1 ten-pose rigid-envelope scaffold review passed for both heroes
-- [ ] Stage 2 purposeful skeletons, constraints, and IK/FK approved
+- [x] Stage 2 final deform hierarchy, animator controls, IK/FK and snapping approved while unskinned
+- [x] Stage 2 heel/ball/toe foot-roll mechanisms and gameplay-contact interfaces verified
+- [x] Stage 2 compact hand, facial semantic, accessory override and 17-socket architectures verified
 - [ ] Stage 3 production topology corrections approved after Stage 2 skeleton completion
 - [ ] Stage 3 skinning, weights, and correctives approved
 - [ ] Stage 4 face, hand, and accessory systems approved
@@ -55,10 +57,10 @@ diagnostic coverage:
 - [ ] LOD generation and mobile profiling
 - [ ] Export-ready production approval
 
-The facial, finger, production accessory, and corrective boxes cannot be
-checked from Stage 1 scaffolds or the present runtime GLBs. Stage 2-4 must
-create and validate those systems; documentation and rigid pose proxies are
-not substitutes for working controls and deformation.
+The hand, face and accessory *control interfaces* now pass Stage 2. Their final
+mesh deformation, corrective shapes, clipping behavior and visible quality
+remain unchecked because Stage 3 has not begun. Documentation and rigid
+control-pose evidence are not substitutes for working skinned deformation.
 
 No unchecked item may be reported as complete without a saved source asset,
 runtime integration where applicable, automated validation where practical,

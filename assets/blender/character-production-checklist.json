@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "authority": "rig-first-character-production-gate-2026-07-31",
   "appliesTo": [
     "Hargold",
@@ -9,8 +9,8 @@
   "productionRigStages": {
     "stage0BaselinePreservation": "pass",
     "stage1EditableBlenderSources": "pass-source-integrity-coordinate-hierarchy-roll-sockets-and-static-scaffold-poses",
-    "stage2PurposefulSkeletons": "not-approved",
-    "stage3SkinningTopologyCorrectives": "not-started",
+    "stage2PurposefulSkeletons": "pass-unskinned-final-deform-control-ikfk-foot-hand-face-accessory-and-socket-architecture",
+    "stage3SkinningTopologyCorrectives": "blocked-pending-explicit-authorization-after-stage2",
     "stage4HandsFaceAccessories": "not-started",
     "stage5StaticAndPosedDeformationGate": "not-run",
     "stage6CandidateExportAndSemanticIntegration": "not-run",
@@ -31,7 +31,7 @@
     {
       "id": "skeleton",
       "label": "Skeleton approved",
-      "status": "stage1-scaffold-audited-interim-24-bone-runtime-preserved-stage2-production-skeleton-pending"
+      "status": "stage2-production-skeleton-and-control-architecture-pass-unskinned"
     },
     {
       "id": "connected-body",
@@ -41,7 +41,7 @@
     {
       "id": "joint-deformation",
       "label": "Joint deformation complete",
-      "status": "scheduled-stage-3-after-stage-2-purposeful-skeleton",
+      "status": "blocked-stage3-not-authorized",
       "implementation": "locked-24-bone-meshy-skin-plus-runtime-contact-correction",
       "automatedStructuralGate": "locked-rig-and-bind-inventory-pass",
       "visualStressGate": "live-gameplay-review-required",
@@ -75,7 +75,7 @@
     {
       "id": "facial-topology",
       "label": "Facial topology complete",
-      "status": "scheduled-stage-4-after-stage-3-skinning",
+      "status": "control-interface-complete-final-shape-and-deformation-stage3",
       "requiredLoops": [
         "eyelids",
         "eyebrows",
@@ -90,7 +90,7 @@
     {
       "id": "hand-topology",
       "label": "Hand topology complete",
-      "status": "scheduled-stage-4-after-stage-3-skinning",
+      "status": "compact-control-interface-complete-final-deformation-stage3",
       "requirements": [
         "thumb saddle",
         "finger knuckles",
@@ -101,7 +101,7 @@
     {
       "id": "clothing-integration",
       "label": "Clothing integration complete",
-      "status": "stage1-accessory-scaffolds-present-production-controls-scheduled-stage-4",
+      "status": "accessory-control-policy-complete-final-deformation-stage3",
       "requirements": [
         "cape attachment",
         "suspenders",

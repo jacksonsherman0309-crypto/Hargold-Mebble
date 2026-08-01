@@ -1,94 +1,1058 @@
 {
-  "schemaVersion": 1,
-  "status": "stage-1-semantic-plan-complete-not-active-in-runtime",
+  "schemaVersion": 2,
+  "status": "stage-2-complete-not-active-in-runtime-stage-3-blocked",
   "runtimeUsesThisMap": false,
   "rawExportNamesAllowedInGameplayLogic": false,
-  "productionSources": {
-    "Hargold": "assets/blender/production/hargold_production_rig.blend",
-    "Mebble": "assets/blender/production/mebble_production_rig.blend"
+  "controllerOwnsWorldTranslation": true,
+  "normalGameplayRootMotion": false,
+  "coordinateConvention": {
+    "units": "metres",
+    "worldUp": "+Z",
+    "nativeForward": "-Y",
+    "trueSideCameraAxis": "+X looking toward origin",
+    "negativeScaleMirroring": false
   },
-  "sharedSemanticControls": {
+  "shared": {
     "worldRoot": "CTRL_world",
-    "motionOrCenterOfMass": "CTRL_motion",
-    "pelvis": "DEF_pelvis",
-    "lowerSpine": "DEF_spine_lower",
-    "middleSpine": "DEF_spine_mid",
-    "upperSpine": "DEF_spine_upper",
-    "chest": "DEF_chest",
-    "leftClavicle": "DEF_clavicle.L",
-    "rightClavicle": "DEF_clavicle.R",
-    "leftUpperArm": "DEF_upper_arm.L",
-    "leftForearm": "DEF_forearm.L",
-    "leftHand": "DEF_hand.L",
-    "rightUpperArm": "DEF_upper_arm.R",
-    "rightForearm": "DEF_forearm.R",
-    "rightHand": "DEF_hand.R",
-    "leftThigh": "DEF_thigh.L",
-    "leftShin": "DEF_shin.L",
-    "leftFoot": "DEF_foot.L",
-    "leftToe": "DEF_toe.L",
-    "rightThigh": "DEF_thigh.R",
-    "rightShin": "DEF_shin.R",
-    "rightFoot": "DEF_foot.R",
-    "rightToe": "DEF_toe.R",
-    "leftHandIk": "CTRL_hand_ik.L",
-    "rightHandIk": "CTRL_hand_ik.R",
-    "leftFootIk": "CTRL_foot_ik.L",
-    "rightFootIk": "CTRL_foot_ik.R",
-    "leftFootRoll": "CTRL_foot_roll.L",
-    "rightFootRoll": "CTRL_foot_roll.R",
-    "leftToeRoll": "CTRL_toe_roll.L",
-    "rightToeRoll": "CTRL_toe_roll.R",
-    "head": "DEF_head",
-    "jaw": "DEF_jaw",
-    "gaze": "CTRL_gaze",
-    "face": "CTRL_face",
-    "leftHandPose": "CTRL_hand_pose.L",
-    "rightHandPose": "CTRL_hand_pose.R"
+    "gameplayMotionReference": "CTRL_motion",
+    "visualPresentation": "CTRL_presentation",
+    "centerOfMass": "CTRL_com",
+    "pelvis": "CTRL_pelvis",
+    "lowerSpine": "CTRL_spine_lower",
+    "middleSpine": "CTRL_spine_mid",
+    "upperSpine": "CTRL_spine_upper",
+    "chest": "CTRL_chest",
+    "head": "CTRL_head",
+    "headAim": "CTRL_gaze",
+    "faceInterface": "CTRL_face",
+    "groundSlamPresentation": "CTRL_ground_slam_presentation"
   },
-  "heroSpecificSemanticControls": {
+  "heroes": {
     "Hargold": {
-      "neckChain": ["DEF_neck_base"],
-      "hat": "DEF_hat",
-      "hatControl": "CTRL_hat",
-      "featherChain": ["DEF_feather_01", "DEF_feather_02"],
-      "featherControl": "CTRL_feather",
-      "scarfChain": ["DEF_scarf_root", "DEF_scarf_tail.L", "DEF_scarf_tail.R"],
-      "scarfControl": "CTRL_scarf",
-      "backpack": "DEF_backpack",
-      "backpackControl": "CTRL_backpack",
-      "belt": "DEF_belt",
-      "pouch": "DEF_pouch",
-      "facialHair": "DEF_facial_hair"
+      "source": "assets/blender/production/hargold_production_rig.blend",
+      "sourceSha256": "B79765AF02E00AF9FCC4CE2DF541A05B2D4F794EC2FC1E5F445EF77E5EFFEE0C",
+      "allExportDeforms": [
+        "DEF_backpack",
+        "DEF_belt",
+        "DEF_brow.L",
+        "DEF_brow.R",
+        "DEF_cheek.L",
+        "DEF_cheek.R",
+        "DEF_chest",
+        "DEF_clavicle.L",
+        "DEF_clavicle.R",
+        "DEF_eye.L",
+        "DEF_eye.R",
+        "DEF_facial_hair",
+        "DEF_feather_01",
+        "DEF_feather_02",
+        "DEF_fingers_main.L",
+        "DEF_fingers_main.R",
+        "DEF_fingers_outer.L",
+        "DEF_fingers_outer.R",
+        "DEF_foot.L",
+        "DEF_foot.R",
+        "DEF_forearm.L",
+        "DEF_forearm.R",
+        "DEF_hand.L",
+        "DEF_hand.R",
+        "DEF_hat",
+        "DEF_head",
+        "DEF_jaw",
+        "DEF_lower_lid.L",
+        "DEF_lower_lid.R",
+        "DEF_lower_lip",
+        "DEF_mouth_corner.L",
+        "DEF_mouth_corner.R",
+        "DEF_neck_base",
+        "DEF_pelvis",
+        "DEF_pouch",
+        "DEF_scarf_root",
+        "DEF_scarf_tail.L",
+        "DEF_scarf_tail.R",
+        "DEF_shin.L",
+        "DEF_shin.R",
+        "DEF_spine_lower",
+        "DEF_spine_mid",
+        "DEF_spine_upper",
+        "DEF_thigh.L",
+        "DEF_thigh.R",
+        "DEF_thumb.L",
+        "DEF_thumb.R",
+        "DEF_toe.L",
+        "DEF_toe.R",
+        "DEF_upper_arm.L",
+        "DEF_upper_arm.R",
+        "DEF_upper_lid.L",
+        "DEF_upper_lid.R",
+        "DEF_upper_lip"
+      ],
+      "allAnimatorControls": [
+        "CTRL_backpack",
+        "CTRL_belt",
+        "CTRL_brow.L",
+        "CTRL_brow.R",
+        "CTRL_cheek.L",
+        "CTRL_cheek.R",
+        "CTRL_chest",
+        "CTRL_clavicle.L",
+        "CTRL_clavicle.R",
+        "CTRL_com",
+        "CTRL_double_jump_presentation",
+        "CTRL_elbow_pole.L",
+        "CTRL_elbow_pole.R",
+        "CTRL_eye.L",
+        "CTRL_eye.R",
+        "CTRL_face",
+        "CTRL_facial_hair",
+        "CTRL_feather",
+        "CTRL_fingers_main.L",
+        "CTRL_fingers_main.R",
+        "CTRL_fingers_outer.L",
+        "CTRL_fingers_outer.R",
+        "CTRL_fk_foot.L",
+        "CTRL_fk_foot.R",
+        "CTRL_fk_forearm.L",
+        "CTRL_fk_forearm.R",
+        "CTRL_fk_hand.L",
+        "CTRL_fk_hand.R",
+        "CTRL_fk_shin.L",
+        "CTRL_fk_shin.R",
+        "CTRL_fk_thigh.L",
+        "CTRL_fk_thigh.R",
+        "CTRL_fk_toe.L",
+        "CTRL_fk_toe.R",
+        "CTRL_fk_upper_arm.L",
+        "CTRL_fk_upper_arm.R",
+        "CTRL_foot_ik.L",
+        "CTRL_foot_ik.R",
+        "CTRL_foot_roll.L",
+        "CTRL_foot_roll.R",
+        "CTRL_gaze",
+        "CTRL_ground_slam_presentation",
+        "CTRL_hand_ik.L",
+        "CTRL_hand_ik.R",
+        "CTRL_hand_pose.L",
+        "CTRL_hand_pose.R",
+        "CTRL_hat",
+        "CTRL_head",
+        "CTRL_jaw",
+        "CTRL_knee_pole.L",
+        "CTRL_knee_pole.R",
+        "CTRL_lower_lid.L",
+        "CTRL_lower_lid.R",
+        "CTRL_lower_lip",
+        "CTRL_motion",
+        "CTRL_mouth_corner.L",
+        "CTRL_mouth_corner.R",
+        "CTRL_neck_base",
+        "CTRL_pelvis",
+        "CTRL_pouch",
+        "CTRL_presentation",
+        "CTRL_scarf",
+        "CTRL_scarf_tail.L",
+        "CTRL_scarf_tail.R",
+        "CTRL_spine_lower",
+        "CTRL_spine_mid",
+        "CTRL_spine_upper",
+        "CTRL_thumb.L",
+        "CTRL_thumb.R",
+        "CTRL_toe_roll.L",
+        "CTRL_toe_roll.R",
+        "CTRL_twirl_presentation",
+        "CTRL_upper_lid.L",
+        "CTRL_upper_lid.R",
+        "CTRL_upper_lip",
+        "CTRL_world"
+      ],
+      "allHelpers": [
+        "MCH_ball_pivot.L",
+        "MCH_ball_pivot.R",
+        "MCH_bank_pivot.L",
+        "MCH_bank_pivot.R",
+        "MCH_foot_target.L",
+        "MCH_foot_target.R",
+        "MCH_forearm_twist.L",
+        "MCH_forearm_twist.R",
+        "MCH_heel_pivot.L",
+        "MCH_heel_pivot.R",
+        "MCH_ik_forearm.L",
+        "MCH_ik_forearm.R",
+        "MCH_ik_shin.L",
+        "MCH_ik_shin.R",
+        "MCH_ik_thigh.L",
+        "MCH_ik_thigh.R",
+        "MCH_ik_upper_arm.L",
+        "MCH_ik_upper_arm.R",
+        "MCH_thigh_twist.L",
+        "MCH_thigh_twist.R",
+        "MCH_toe_pivot.L",
+        "MCH_toe_pivot.R",
+        "MCH_upper_arm_twist.L",
+        "MCH_upper_arm_twist.R"
+      ],
+      "ikFk": {
+        "arms": {
+          "L": {
+            "switchProperty": "arm_ik_fk_L",
+            "range": [
+              0,
+              1
+            ],
+            "fk": [
+              "CTRL_fk_upper_arm.L",
+              "CTRL_fk_forearm.L",
+              "CTRL_fk_hand.L"
+            ],
+            "ikTarget": "CTRL_hand_ik.L",
+            "pole": "CTRL_elbow_pole.L",
+            "mechanism": [
+              "MCH_ik_upper_arm.L",
+              "MCH_ik_forearm.L"
+            ],
+            "stretch": false
+          },
+          "R": {
+            "switchProperty": "arm_ik_fk_R",
+            "range": [
+              0,
+              1
+            ],
+            "fk": [
+              "CTRL_fk_upper_arm.R",
+              "CTRL_fk_forearm.R",
+              "CTRL_fk_hand.R"
+            ],
+            "ikTarget": "CTRL_hand_ik.R",
+            "pole": "CTRL_elbow_pole.R",
+            "mechanism": [
+              "MCH_ik_upper_arm.R",
+              "MCH_ik_forearm.R"
+            ],
+            "stretch": false
+          }
+        },
+        "legs": {
+          "L": {
+            "switchProperty": "leg_ik_fk_L",
+            "range": [
+              0,
+              1
+            ],
+            "fk": [
+              "CTRL_fk_thigh.L",
+              "CTRL_fk_shin.L",
+              "CTRL_fk_foot.L",
+              "CTRL_fk_toe.L"
+            ],
+            "ikTarget": "CTRL_foot_ik.L",
+            "pole": "CTRL_knee_pole.L",
+            "footMechanism": [
+              "MCH_heel_pivot.L",
+              "MCH_bank_pivot.L",
+              "MCH_ball_pivot.L",
+              "MCH_toe_pivot.L",
+              "MCH_foot_target.L"
+            ],
+            "stretch": false
+          },
+          "R": {
+            "switchProperty": "leg_ik_fk_R",
+            "range": [
+              0,
+              1
+            ],
+            "fk": [
+              "CTRL_fk_thigh.R",
+              "CTRL_fk_shin.R",
+              "CTRL_fk_foot.R",
+              "CTRL_fk_toe.R"
+            ],
+            "ikTarget": "CTRL_foot_ik.R",
+            "pole": "CTRL_knee_pole.R",
+            "footMechanism": [
+              "MCH_heel_pivot.R",
+              "MCH_bank_pivot.R",
+              "MCH_ball_pivot.R",
+              "MCH_toe_pivot.R",
+              "MCH_foot_target.R"
+            ],
+            "stretch": false
+          }
+        },
+        "snapTool": "tools/blender/production_rig_stage_2_snap.py",
+        "poseToleranceMetres": 0.0001
+      },
+      "feet": {
+        "L": {
+          "control": "CTRL_foot_ik.L",
+          "properties": [
+            "footRoll",
+            "heelLift",
+            "ballRoll",
+            "toeRoll",
+            "bank",
+            "dorsiflexion",
+            "plantarflexion",
+            "skidOrientation",
+            "crouchPlacement",
+            "slidePlacement",
+            "landingCompression",
+            "groundSlamContact"
+          ]
+        },
+        "R": {
+          "control": "CTRL_foot_ik.R",
+          "properties": [
+            "footRoll",
+            "heelLift",
+            "ballRoll",
+            "toeRoll",
+            "bank",
+            "dorsiflexion",
+            "plantarflexion",
+            "skidOrientation",
+            "crouchPlacement",
+            "slidePlacement",
+            "landingCompression",
+            "groundSlamContact"
+          ]
+        }
+      },
+      "hands": {
+        "L": {
+          "selector": "CTRL_hand_pose.L",
+          "poses": [
+            "relaxedOpen",
+            "runningCup",
+            "fist",
+            "landingBrace",
+            "skidBrace",
+            "strike",
+            "grab",
+            "carry",
+            "victory"
+          ],
+          "compactControls": [
+            "CTRL_thumb.L",
+            "CTRL_fingers_main.L",
+            "CTRL_fingers_outer.L"
+          ],
+          "blendable": true
+        },
+        "R": {
+          "selector": "CTRL_hand_pose.R",
+          "poses": [
+            "relaxedOpen",
+            "runningCup",
+            "fist",
+            "landingBrace",
+            "skidBrace",
+            "strike",
+            "grab",
+            "carry",
+            "victory"
+          ],
+          "compactControls": [
+            "CTRL_thumb.R",
+            "CTRL_fingers_main.R",
+            "CTRL_fingers_outer.R"
+          ],
+          "blendable": true
+        }
+      },
+      "face": {
+        "interface": "CTRL_face",
+        "properties": [
+          "eyeAimHorizontal",
+          "eyeAimVertical",
+          "blink",
+          "browRaise",
+          "browCompression",
+          "mouthNeutral",
+          "mouthOpen",
+          "effortGrit",
+          "hurt",
+          "surprise",
+          "victory",
+          "cheekCorrection",
+          "jawCorrection",
+          "headStabilization"
+        ],
+        "controls": [
+          "CTRL_brow.L",
+          "CTRL_brow.R",
+          "CTRL_cheek.L",
+          "CTRL_cheek.R",
+          "CTRL_eye.L",
+          "CTRL_eye.R",
+          "CTRL_face",
+          "CTRL_gaze",
+          "CTRL_jaw",
+          "CTRL_lower_lid.L",
+          "CTRL_lower_lid.R",
+          "CTRL_lower_lip",
+          "CTRL_mouth_corner.L",
+          "CTRL_mouth_corner.R",
+          "CTRL_upper_lid.L",
+          "CTRL_upper_lid.R",
+          "CTRL_upper_lip"
+        ],
+        "finalShapeSculptingDeferredToStage3": true
+      },
+      "accessories": {
+        "DEF_hat": {
+          "control": "CTRL_hat",
+          "parentSpace": "head",
+          "followDefault": 1.0,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_feather_01": {
+          "control": "CTRL_feather",
+          "parentSpace": "hat",
+          "followDefault": 0.82,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_scarf_root": {
+          "control": "CTRL_scarf",
+          "parentSpace": "chest",
+          "followDefault": 0.86,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_scarf_tail.L": {
+          "control": "CTRL_scarf_tail.L",
+          "parentSpace": "scarfRoot",
+          "followDefault": 0.72,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_scarf_tail.R": {
+          "control": "CTRL_scarf_tail.R",
+          "parentSpace": "scarfRoot",
+          "followDefault": 0.72,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_backpack": {
+          "control": "CTRL_backpack",
+          "parentSpace": "chest",
+          "followDefault": 0.94,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_belt": {
+          "control": "CTRL_belt",
+          "parentSpace": "pelvis",
+          "followDefault": 0.98,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_pouch": {
+          "control": "CTRL_pouch",
+          "parentSpace": "belt",
+          "followDefault": 0.82,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_facial_hair": {
+          "control": "CTRL_facial_hair",
+          "parentSpace": "jawAndCheekInterface",
+          "followDefault": 0.96,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        }
+      },
+      "sockets": {
+        "backOrBackpack": "SOCKET_back",
+        "carryAttachment": "SOCKET_carry",
+        "characterRoot": "SOCKET_character_root",
+        "effectOrigin": "SOCKET_effect_origin",
+        "leftFoot": "SOCKET_foot.L",
+        "rightFoot": "SOCKET_foot.R",
+        "gameplayCenter": "SOCKET_gameplay_center",
+        "groundSlamImpact": "SOCKET_ground_slam_impact",
+        "leftHand": "SOCKET_hand.L",
+        "rightHand": "SOCKET_hand.R",
+        "hat": "SOCKET_hat",
+        "head": "SOCKET_head",
+        "heldItemLeft": "SOCKET_held_item.L",
+        "heldItemRight": "SOCKET_held_item.R",
+        "interactionOrigin": "SOCKET_interaction",
+        "powerUpOrigin": "SOCKET_power_up",
+        "scarfOrigin": "SOCKET_scarf_origin"
+      },
+      "actions": {
+        "groundSlamPresentation": "CTRL_ground_slam_presentation",
+        "hargoldTwirl": "CTRL_twirl_presentation",
+        "hargoldDoubleJump": "CTRL_double_jump_presentation"
+      }
     },
     "Mebble": {
-      "neckChain": ["DEF_neck_base", "DEF_neck_mid", "DEF_neck_upper"],
-      "hat": "DEF_hat",
-      "hatControl": "CTRL_hat",
-      "glasses": "DEF_glasses",
-      "glassesControl": "CTRL_glasses",
-      "adamsApple": "DEF_adams_apple",
-      "neckShapeControl": "CTRL_neck_shape",
-      "capeChain": ["DEF_cape_root", "DEF_cape_01", "DEF_cape_02", "DEF_cape_03", "DEF_cape_04", "DEF_cape_05", "DEF_cape_06"],
-      "capeControl": "CTRL_cape",
-      "belt": "DEF_belt",
-      "pouch": "DEF_pouch"
+      "source": "assets/blender/production/mebble_production_rig.blend",
+      "sourceSha256": "B4C277F19FBA17BAFDB73E00397EE3AB9FFBA39265F143245ED085D142092BB0",
+      "allExportDeforms": [
+        "DEF_adams_apple",
+        "DEF_belt",
+        "DEF_brow.L",
+        "DEF_brow.R",
+        "DEF_cape_01",
+        "DEF_cape_02",
+        "DEF_cape_03",
+        "DEF_cape_04",
+        "DEF_cape_05",
+        "DEF_cape_06",
+        "DEF_cape_root",
+        "DEF_cape_wing.L",
+        "DEF_cape_wing.R",
+        "DEF_cape_yoke.L",
+        "DEF_cape_yoke.R",
+        "DEF_cheek.L",
+        "DEF_cheek.R",
+        "DEF_chest",
+        "DEF_clavicle.L",
+        "DEF_clavicle.R",
+        "DEF_eye.L",
+        "DEF_eye.R",
+        "DEF_fingers_main.L",
+        "DEF_fingers_main.R",
+        "DEF_fingers_outer.L",
+        "DEF_fingers_outer.R",
+        "DEF_foot.L",
+        "DEF_foot.R",
+        "DEF_forearm.L",
+        "DEF_forearm.R",
+        "DEF_glasses",
+        "DEF_hand.L",
+        "DEF_hand.R",
+        "DEF_hat",
+        "DEF_head",
+        "DEF_jaw",
+        "DEF_lower_lid.L",
+        "DEF_lower_lid.R",
+        "DEF_lower_lip",
+        "DEF_mouth_corner.L",
+        "DEF_mouth_corner.R",
+        "DEF_neck_base",
+        "DEF_neck_mid",
+        "DEF_neck_upper",
+        "DEF_pelvis",
+        "DEF_pouch",
+        "DEF_shin.L",
+        "DEF_shin.R",
+        "DEF_spine_lower",
+        "DEF_spine_mid",
+        "DEF_spine_upper",
+        "DEF_thigh.L",
+        "DEF_thigh.R",
+        "DEF_thumb.L",
+        "DEF_thumb.R",
+        "DEF_toe.L",
+        "DEF_toe.R",
+        "DEF_upper_arm.L",
+        "DEF_upper_arm.R",
+        "DEF_upper_lid.L",
+        "DEF_upper_lid.R",
+        "DEF_upper_lip"
+      ],
+      "allAnimatorControls": [
+        "CTRL_adams_apple",
+        "CTRL_belt",
+        "CTRL_brow.L",
+        "CTRL_brow.R",
+        "CTRL_cape",
+        "CTRL_cape_wing.L",
+        "CTRL_cape_wing.R",
+        "CTRL_cape_yoke.L",
+        "CTRL_cape_yoke.R",
+        "CTRL_cheek.L",
+        "CTRL_cheek.R",
+        "CTRL_chest",
+        "CTRL_clavicle.L",
+        "CTRL_clavicle.R",
+        "CTRL_com",
+        "CTRL_elbow_pole.L",
+        "CTRL_elbow_pole.R",
+        "CTRL_eye.L",
+        "CTRL_eye.R",
+        "CTRL_face",
+        "CTRL_fingers_main.L",
+        "CTRL_fingers_main.R",
+        "CTRL_fingers_outer.L",
+        "CTRL_fingers_outer.R",
+        "CTRL_fk_foot.L",
+        "CTRL_fk_foot.R",
+        "CTRL_fk_forearm.L",
+        "CTRL_fk_forearm.R",
+        "CTRL_fk_hand.L",
+        "CTRL_fk_hand.R",
+        "CTRL_fk_shin.L",
+        "CTRL_fk_shin.R",
+        "CTRL_fk_thigh.L",
+        "CTRL_fk_thigh.R",
+        "CTRL_fk_toe.L",
+        "CTRL_fk_toe.R",
+        "CTRL_fk_upper_arm.L",
+        "CTRL_fk_upper_arm.R",
+        "CTRL_foot_ik.L",
+        "CTRL_foot_ik.R",
+        "CTRL_foot_roll.L",
+        "CTRL_foot_roll.R",
+        "CTRL_gaze",
+        "CTRL_glasses",
+        "CTRL_ground_slam_presentation",
+        "CTRL_hand_ik.L",
+        "CTRL_hand_ik.R",
+        "CTRL_hand_pose.L",
+        "CTRL_hand_pose.R",
+        "CTRL_hat",
+        "CTRL_head",
+        "CTRL_jaw",
+        "CTRL_knee_pole.L",
+        "CTRL_knee_pole.R",
+        "CTRL_lower_lid.L",
+        "CTRL_lower_lid.R",
+        "CTRL_lower_lip",
+        "CTRL_motion",
+        "CTRL_mouth_corner.L",
+        "CTRL_mouth_corner.R",
+        "CTRL_neck_base",
+        "CTRL_neck_mid",
+        "CTRL_neck_shape",
+        "CTRL_neck_upper",
+        "CTRL_pelvis",
+        "CTRL_pouch",
+        "CTRL_presentation",
+        "CTRL_spine_lower",
+        "CTRL_spine_mid",
+        "CTRL_spine_upper",
+        "CTRL_thumb.L",
+        "CTRL_thumb.R",
+        "CTRL_toe_roll.L",
+        "CTRL_toe_roll.R",
+        "CTRL_upper_lid.L",
+        "CTRL_upper_lid.R",
+        "CTRL_upper_lip",
+        "CTRL_world"
+      ],
+      "allHelpers": [
+        "MCH_ball_pivot.L",
+        "MCH_ball_pivot.R",
+        "MCH_bank_pivot.L",
+        "MCH_bank_pivot.R",
+        "MCH_foot_target.L",
+        "MCH_foot_target.R",
+        "MCH_forearm_twist.L",
+        "MCH_forearm_twist.R",
+        "MCH_heel_pivot.L",
+        "MCH_heel_pivot.R",
+        "MCH_ik_forearm.L",
+        "MCH_ik_forearm.R",
+        "MCH_ik_shin.L",
+        "MCH_ik_shin.R",
+        "MCH_ik_thigh.L",
+        "MCH_ik_thigh.R",
+        "MCH_ik_upper_arm.L",
+        "MCH_ik_upper_arm.R",
+        "MCH_thigh_twist.L",
+        "MCH_thigh_twist.R",
+        "MCH_toe_pivot.L",
+        "MCH_toe_pivot.R",
+        "MCH_upper_arm_twist.L",
+        "MCH_upper_arm_twist.R"
+      ],
+      "ikFk": {
+        "arms": {
+          "L": {
+            "switchProperty": "arm_ik_fk_L",
+            "range": [
+              0,
+              1
+            ],
+            "fk": [
+              "CTRL_fk_upper_arm.L",
+              "CTRL_fk_forearm.L",
+              "CTRL_fk_hand.L"
+            ],
+            "ikTarget": "CTRL_hand_ik.L",
+            "pole": "CTRL_elbow_pole.L",
+            "mechanism": [
+              "MCH_ik_upper_arm.L",
+              "MCH_ik_forearm.L"
+            ],
+            "stretch": false
+          },
+          "R": {
+            "switchProperty": "arm_ik_fk_R",
+            "range": [
+              0,
+              1
+            ],
+            "fk": [
+              "CTRL_fk_upper_arm.R",
+              "CTRL_fk_forearm.R",
+              "CTRL_fk_hand.R"
+            ],
+            "ikTarget": "CTRL_hand_ik.R",
+            "pole": "CTRL_elbow_pole.R",
+            "mechanism": [
+              "MCH_ik_upper_arm.R",
+              "MCH_ik_forearm.R"
+            ],
+            "stretch": false
+          }
+        },
+        "legs": {
+          "L": {
+            "switchProperty": "leg_ik_fk_L",
+            "range": [
+              0,
+              1
+            ],
+            "fk": [
+              "CTRL_fk_thigh.L",
+              "CTRL_fk_shin.L",
+              "CTRL_fk_foot.L",
+              "CTRL_fk_toe.L"
+            ],
+            "ikTarget": "CTRL_foot_ik.L",
+            "pole": "CTRL_knee_pole.L",
+            "footMechanism": [
+              "MCH_heel_pivot.L",
+              "MCH_bank_pivot.L",
+              "MCH_ball_pivot.L",
+              "MCH_toe_pivot.L",
+              "MCH_foot_target.L"
+            ],
+            "stretch": false
+          },
+          "R": {
+            "switchProperty": "leg_ik_fk_R",
+            "range": [
+              0,
+              1
+            ],
+            "fk": [
+              "CTRL_fk_thigh.R",
+              "CTRL_fk_shin.R",
+              "CTRL_fk_foot.R",
+              "CTRL_fk_toe.R"
+            ],
+            "ikTarget": "CTRL_foot_ik.R",
+            "pole": "CTRL_knee_pole.R",
+            "footMechanism": [
+              "MCH_heel_pivot.R",
+              "MCH_bank_pivot.R",
+              "MCH_ball_pivot.R",
+              "MCH_toe_pivot.R",
+              "MCH_foot_target.R"
+            ],
+            "stretch": false
+          }
+        },
+        "snapTool": "tools/blender/production_rig_stage_2_snap.py",
+        "poseToleranceMetres": 0.0001
+      },
+      "feet": {
+        "L": {
+          "control": "CTRL_foot_ik.L",
+          "properties": [
+            "footRoll",
+            "heelLift",
+            "ballRoll",
+            "toeRoll",
+            "bank",
+            "dorsiflexion",
+            "plantarflexion",
+            "skidOrientation",
+            "crouchPlacement",
+            "slidePlacement",
+            "landingCompression",
+            "groundSlamContact"
+          ]
+        },
+        "R": {
+          "control": "CTRL_foot_ik.R",
+          "properties": [
+            "footRoll",
+            "heelLift",
+            "ballRoll",
+            "toeRoll",
+            "bank",
+            "dorsiflexion",
+            "plantarflexion",
+            "skidOrientation",
+            "crouchPlacement",
+            "slidePlacement",
+            "landingCompression",
+            "groundSlamContact"
+          ]
+        }
+      },
+      "hands": {
+        "L": {
+          "selector": "CTRL_hand_pose.L",
+          "poses": [
+            "relaxedOpen",
+            "runningCup",
+            "fist",
+            "landingBrace",
+            "skidBrace",
+            "strike",
+            "grab",
+            "carry",
+            "victory"
+          ],
+          "compactControls": [
+            "CTRL_thumb.L",
+            "CTRL_fingers_main.L",
+            "CTRL_fingers_outer.L"
+          ],
+          "blendable": true
+        },
+        "R": {
+          "selector": "CTRL_hand_pose.R",
+          "poses": [
+            "relaxedOpen",
+            "runningCup",
+            "fist",
+            "landingBrace",
+            "skidBrace",
+            "strike",
+            "grab",
+            "carry",
+            "victory"
+          ],
+          "compactControls": [
+            "CTRL_thumb.R",
+            "CTRL_fingers_main.R",
+            "CTRL_fingers_outer.R"
+          ],
+          "blendable": true
+        }
+      },
+      "face": {
+        "interface": "CTRL_face",
+        "properties": [
+          "eyeAimHorizontal",
+          "eyeAimVertical",
+          "blink",
+          "browRaise",
+          "browCompression",
+          "mouthNeutral",
+          "mouthOpen",
+          "effortGrit",
+          "hurt",
+          "surprise",
+          "victory",
+          "cheekCorrection",
+          "jawCorrection",
+          "headStabilization"
+        ],
+        "controls": [
+          "CTRL_brow.L",
+          "CTRL_brow.R",
+          "CTRL_cheek.L",
+          "CTRL_cheek.R",
+          "CTRL_eye.L",
+          "CTRL_eye.R",
+          "CTRL_face",
+          "CTRL_gaze",
+          "CTRL_jaw",
+          "CTRL_lower_lid.L",
+          "CTRL_lower_lid.R",
+          "CTRL_lower_lip",
+          "CTRL_mouth_corner.L",
+          "CTRL_mouth_corner.R",
+          "CTRL_upper_lid.L",
+          "CTRL_upper_lid.R",
+          "CTRL_upper_lip"
+        ],
+        "finalShapeSculptingDeferredToStage3": true
+      },
+      "accessories": {
+        "DEF_hat": {
+          "control": "CTRL_hat",
+          "parentSpace": "head",
+          "followDefault": 1.0,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_glasses": {
+          "control": "CTRL_glasses",
+          "parentSpace": "headAndFaceStabilization",
+          "followDefault": 0.96,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_adams_apple": {
+          "control": "CTRL_adams_apple",
+          "parentSpace": "middleNeck",
+          "followDefault": 0.92,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_cape_root": {
+          "control": "CTRL_cape",
+          "parentSpace": "chest",
+          "followDefault": 0.86,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_cape_yoke.L": {
+          "control": "CTRL_cape_yoke.L",
+          "parentSpace": "capeRoot",
+          "followDefault": 0.8,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_cape_wing.L": {
+          "control": "CTRL_cape_wing.L",
+          "parentSpace": "capeYoke",
+          "followDefault": 0.7,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_cape_yoke.R": {
+          "control": "CTRL_cape_yoke.R",
+          "parentSpace": "capeRoot",
+          "followDefault": 0.8,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_cape_wing.R": {
+          "control": "CTRL_cape_wing.R",
+          "parentSpace": "capeYoke",
+          "followDefault": 0.7,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_belt": {
+          "control": "CTRL_belt",
+          "parentSpace": "pelvis",
+          "followDefault": 0.98,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        },
+        "DEF_pouch": {
+          "control": "CTRL_pouch",
+          "parentSpace": "belt",
+          "followDefault": 0.82,
+          "lagInterface": "secondaryLag",
+          "overrideInterface": "animatorOverride",
+          "resetPose": "zero-local-transform",
+          "export": "deform-bone-only",
+          "collisionResponsibility": "Stage-3 corrective-and-clipping-validation",
+          "implementation": "bone-control-and-constraint"
+        }
+      },
+      "sockets": {
+        "backOrBackpack": "SOCKET_back",
+        "capeOrigin": "SOCKET_cape_origin",
+        "carryAttachment": "SOCKET_carry",
+        "characterRoot": "SOCKET_character_root",
+        "effectOrigin": "SOCKET_effect_origin",
+        "leftFoot": "SOCKET_foot.L",
+        "rightFoot": "SOCKET_foot.R",
+        "gameplayCenter": "SOCKET_gameplay_center",
+        "groundSlamImpact": "SOCKET_ground_slam_impact",
+        "leftHand": "SOCKET_hand.L",
+        "rightHand": "SOCKET_hand.R",
+        "hat": "SOCKET_hat",
+        "head": "SOCKET_head",
+        "heldItemLeft": "SOCKET_held_item.L",
+        "heldItemRight": "SOCKET_held_item.R",
+        "interactionOrigin": "SOCKET_interaction",
+        "powerUpOrigin": "SOCKET_power_up"
+      },
+      "actions": {
+        "groundSlamPresentation": "CTRL_ground_slam_presentation",
+        "mebbleGlide": {
+          "control": "CTRL_cape",
+          "properties": [
+            "glideOpening",
+            "glideFullyOpen",
+            "glideSustainCurvature",
+            "glideClosing",
+            "landingSettle"
+          ]
+        }
+      }
     }
-  },
-  "semanticSockets": {
-    "characterRoot": "SOCKET_character_root",
-    "gameplayCenter": "SOCKET_gameplay_center",
-    "leftHand": "SOCKET_hand.L",
-    "rightHand": "SOCKET_hand.R",
-    "leftFoot": "SOCKET_foot.L",
-    "rightFoot": "SOCKET_foot.R",
-    "head": "SOCKET_head",
-    "hat": "SOCKET_hat",
-    "backOrBackpack": "SOCKET_back",
-    "effectOrigin": "SOCKET_effect_origin",
-    "groundSlamImpact": "SOCKET_ground_slam_impact",
-    "HargoldScarfOrigin": "SOCKET_scarf_origin",
-    "MebbleCapeOrigin": "SOCKET_cape_origin"
   },
   "interim24BoneMigrationMap": {
     "Hips": "DEF_pelvis",
@@ -116,15 +1080,28 @@
     "head_end": "DEF_head",
     "headfront": "CTRL_gaze"
   },
+  "rollback": {
+    "activeRuntimeRemainsInterim": true,
+    "Hargold": "assets/exports/meshy/hargold_canonical_gameplay_rig.glb",
+    "Mebble": "assets/exports/meshy/mebble_canonical_gameplay_rig.glb",
+    "runtimeSwitchAuthorized": false
+  },
+  "deprecated": {
+    "stage1RigObjectNames": [
+      "Hargold_PRODUCTION_RIG_STAGE_1",
+      "Mebble_PRODUCTION_RIG_STAGE_1"
+    ],
+    "rawInterimNamesInNewGameplayCode": "forbidden-use-semantic-map",
+    "rejectedProceduralCharacters": [
+      "assets/exports/hargold_character.glb",
+      "assets/exports/mebble_character.glb"
+    ]
+  },
   "pendingBeforeRuntimeUse": [
-    "complete Stage 2 constraints, IK/FK switching, and purposeful control architecture",
-    "skin the locked production surface in Stage 3",
-    "implement and verify constraints and IK/FK switching",
-    "implement hand-pose and facial deformation systems",
-    "implement accessory deformation and correctives",
-    "pass the Stage 5 pose gate",
-    "export versioned candidate GLBs",
-    "adapt the runtime through this semantic interface",
-    "pass runtime parity and rollback validation"
+    "Stage 3 skinning, topology correction, weighting and corrective deformation",
+    "Stage 4 final hand, face and accessory deformation systems",
+    "Stage 5 locked-surface deformation pose gate",
+    "Stage 6 versioned candidate GLB export and semantic integration",
+    "Stage 7 runtime parity and rollback validation"
   ]
 }
