@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "hero": "Mebble",
-  "status": "stage-0-complete-stage-1-authoring-source-created-gates-2-through-7-pending",
+  "status": "stage-0-complete-stage-1-pass-ready-for-stage-2-no-skinning",
   "baseline": {
     "livePath": "assets/exports/meshy/mebble_canonical_gameplay_rig.glb",
     "rollbackPath": "assets/exports/rollback/2026-07-31/mebble_interim_24bone.glb",
@@ -43,8 +43,8 @@
   },
   "productionSource": {
     "blendPath": "assets/blender/production/mebble_production_rig.blend",
-    "sha256": "BD3352BA2DC98E81375A8D5D73D98CA5EA1A4184AD35D161E5CE26CD6F0D14BC",
-    "bytes": 55154342,
+    "sha256": "BA16271883A92529E74FF4B1D7C70881911F75BAB91BF3177F407FC8D55D557E",
+    "bytes": 55186315,
     "canonicalHeightMetres": 2.2932,
     "canonicalNormalizationScale": 1.348940832347,
     "lockedSurfaceBoundsMetres": {
@@ -73,25 +73,31 @@
     "primaryReviewOrientation": "true-side",
     "footOrigin": "world-origin-floor-z0",
     "collections": [
-      "LOCKED_VISIBLE_IDENTITY",
-      "INTERIM_24_BONE_ROLLBACK_REFERENCE",
-      "PRODUCTION_RIG_STAGE_1",
-      "GAMEPLAY_SOCKETS_STAGE_1",
-      "REFERENCE_GUIDES"
+      "CHARACTER_MESH",
+      "DEFORM_RIG",
+      "CONTROL_RIG",
+      "HELPER_CONTROLS",
+      "ACCESSORY_RIG",
+      "FACIAL_SYSTEM",
+      "SOCKETS",
+      "VALIDATION_POSES",
+      "EXPORT",
+      "REFERENCE_ONLY"
     ],
     "rigObject": "Mebble_PRODUCTION_RIG_STAGE_1",
-    "rigStatus": "unskinned-stage-1-scaffold-not-approved",
+    "rigStatus": "stage-1-scaffold-audited-unskinned-stage-2-pending",
     "boneCounts": {
-      "deform": 25,
-      "control": 17,
-      "helper": 4,
-      "accessory": 12
+      "body-deform": 26,
+      "accessory-deform": 12,
+      "control": 25,
+      "helper": 6
     },
     "bones": {
-      "deform": [
+      "body-deform": [
         "DEF_pelvis",
         "DEF_spine_lower",
         "DEF_spine_mid",
+        "DEF_spine_upper",
         "DEF_chest",
         "DEF_neck_base",
         "DEF_neck_mid",
@@ -102,45 +108,20 @@
         "DEF_upper_arm.L",
         "DEF_forearm.L",
         "DEF_hand.L",
-        "DEF_thigh.L",
-        "DEF_shin.L",
-        "DEF_foot.L",
-        "DEF_toe.L",
         "DEF_clavicle.R",
         "DEF_upper_arm.R",
         "DEF_forearm.R",
         "DEF_hand.R",
+        "DEF_thigh.L",
+        "DEF_shin.L",
+        "DEF_foot.L",
+        "DEF_toe.L",
         "DEF_thigh.R",
         "DEF_shin.R",
         "DEF_foot.R",
         "DEF_toe.R"
       ],
-      "control": [
-        "CTRL_world",
-        "CTRL_motion",
-        "CTRL_hand_ik.L",
-        "CTRL_foot_ik.L",
-        "CTRL_elbow_pole.L",
-        "CTRL_knee_pole.L",
-        "CTRL_hand_ik.R",
-        "CTRL_foot_ik.R",
-        "CTRL_elbow_pole.R",
-        "CTRL_knee_pole.R",
-        "CTRL_pelvis",
-        "CTRL_chest",
-        "CTRL_head",
-        "CTRL_gaze",
-        "CTRL_hand_pose.L",
-        "CTRL_hand_pose.R",
-        "CTRL_face"
-      ],
-      "helper": [
-        "MCH_upper_arm_twist.L",
-        "MCH_thigh_twist.L",
-        "MCH_upper_arm_twist.R",
-        "MCH_thigh_twist.R"
-      ],
-      "accessory": [
+      "accessory-deform": [
         "DEF_hat",
         "DEF_glasses",
         "DEF_adams_apple",
@@ -153,12 +134,48 @@
         "DEF_cape_06",
         "DEF_belt",
         "DEF_pouch"
+      ],
+      "control": [
+        "CTRL_world",
+        "CTRL_motion",
+        "CTRL_pelvis",
+        "CTRL_chest",
+        "CTRL_head",
+        "CTRL_face",
+        "CTRL_glasses",
+        "CTRL_neck_shape",
+        "CTRL_hat",
+        "CTRL_cape",
+        "CTRL_hand_ik.L",
+        "CTRL_foot_ik.L",
+        "CTRL_foot_roll.L",
+        "CTRL_toe_roll.L",
+        "CTRL_elbow_pole.L",
+        "CTRL_knee_pole.L",
+        "CTRL_hand_ik.R",
+        "CTRL_foot_ik.R",
+        "CTRL_foot_roll.R",
+        "CTRL_toe_roll.R",
+        "CTRL_elbow_pole.R",
+        "CTRL_knee_pole.R",
+        "CTRL_gaze",
+        "CTRL_hand_pose.L",
+        "CTRL_hand_pose.R"
+      ],
+      "helper": [
+        "MCH_upper_arm_twist.L",
+        "MCH_forearm_twist.L",
+        "MCH_upper_arm_twist.R",
+        "MCH_forearm_twist.R",
+        "MCH_thigh_twist.L",
+        "MCH_thigh_twist.R"
       ]
     },
     "sockets": [
       {
-        "name": "SOCKET_root",
-        "semanticParent": "CTRL_world",
+        "name": "SOCKET_character_root",
+        "semantic": "characterRoot",
+        "bindingBone": "CTRL_world",
         "locationMetres": [
           0.0,
           0.0,
@@ -166,62 +183,9 @@
         ]
       },
       {
-        "name": "SOCKET_head",
-        "semanticParent": "DEF_head",
-        "locationMetres": [
-          0.0,
-          0.0,
-          2.247336
-        ]
-      },
-      {
-        "name": "SOCKET_hand.L",
-        "semanticParent": "DEF_hand.L",
-        "locationMetres": [
-          0.304078,
-          -0.137592,
-          0.710892
-        ]
-      },
-      {
-        "name": "SOCKET_hand.R",
-        "semanticParent": "DEF_hand.R",
-        "locationMetres": [
-          -0.304078,
-          -0.137592,
-          0.710892
-        ]
-      },
-      {
-        "name": "SOCKET_foot.L",
-        "semanticParent": "DEF_foot.L",
-        "locationMetres": [
-          0.215561,
-          -0.011466,
-          0.126126
-        ]
-      },
-      {
-        "name": "SOCKET_foot.R",
-        "semanticParent": "DEF_foot.R",
-        "locationMetres": [
-          -0.215561,
-          -0.011466,
-          0.126126
-        ]
-      },
-      {
-        "name": "SOCKET_back",
-        "semanticParent": "DEF_chest",
-        "locationMetres": [
-          0.0,
-          0.12,
-          1.651104
-        ]
-      },
-      {
-        "name": "SOCKET_effect",
-        "semanticParent": "DEF_pelvis",
+        "name": "SOCKET_gameplay_center",
+        "semantic": "gameplayCenter",
+        "bindingBone": "CTRL_motion",
         "locationMetres": [
           0.0,
           0.0,
@@ -229,15 +193,108 @@
         ]
       },
       {
-        "name": "SOCKET_cape",
-        "semanticParent": "DEF_cape_root",
+        "name": "SOCKET_head",
+        "semantic": "head",
+        "bindingBone": "DEF_head",
         "locationMetres": [
           0.0,
-          0.08,
-          1.651104
+          0.0,
+          2.258802
+        ]
+      },
+      {
+        "name": "SOCKET_hat",
+        "semantic": "hat",
+        "bindingBone": "DEF_hat",
+        "locationMetres": [
+          0.0,
+          0.0,
+          2.316132
+        ]
+      },
+      {
+        "name": "SOCKET_hand.L",
+        "semantic": "leftHand",
+        "bindingBone": "DEF_hand.L",
+        "locationMetres": [
+          0.332514,
+          -0.470106,
+          0.882882
+        ]
+      },
+      {
+        "name": "SOCKET_hand.R",
+        "semantic": "rightHand",
+        "bindingBone": "DEF_hand.R",
+        "locationMetres": [
+          -0.332514,
+          -0.470106,
+          0.882882
+        ]
+      },
+      {
+        "name": "SOCKET_foot.L",
+        "semantic": "leftFoot",
+        "bindingBone": "DEF_foot.L",
+        "locationMetres": [
+          0.204783,
+          0.0,
+          0.126126
+        ]
+      },
+      {
+        "name": "SOCKET_foot.R",
+        "semantic": "rightFoot",
+        "bindingBone": "DEF_foot.R",
+        "locationMetres": [
+          -0.204783,
+          0.0,
+          0.126126
+        ]
+      },
+      {
+        "name": "SOCKET_back",
+        "semantic": "backOrBackpack",
+        "bindingBone": "DEF_chest",
+        "locationMetres": [
+          0.0,
+          0.160524,
+          1.685502
+        ]
+      },
+      {
+        "name": "SOCKET_effect_origin",
+        "semantic": "effectOrigin",
+        "bindingBone": "DEF_pelvis",
+        "locationMetres": [
+          0.0,
+          0.0,
+          1.100736
+        ]
+      },
+      {
+        "name": "SOCKET_ground_slam_impact",
+        "semantic": "groundSlamImpact",
+        "bindingBone": "CTRL_world",
+        "locationMetres": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "SOCKET_cape_origin",
+        "semantic": "capeOrigin",
+        "bindingBone": "DEF_cape_root",
+        "locationMetres": [
+          0.0,
+          0.080262,
+          1.685502
         ]
       }
-    ]
+    ],
+    "stage1Inventory": "assets/blender/production/mebble_stage-1-rig-inventory.json",
+    "stage1PoseSheet": "assets/previews/rig-stage-1/mebble-scaffold-pose-review.png"
   },
   "gates": {
     "stage0BaselinePreserved": true,
@@ -251,6 +308,9 @@
     "stage5PoseGatePassed": false,
     "stage6CandidateExportIntegrated": false,
     "stage7RuntimeParityPassed": false,
-    "stage8FinalAnimationAllowed": false
+    "stage8FinalAnimationAllowed": false,
+    "stage1SourceOrganizationPassed": true,
+    "stage1CoordinateAndRollAuditPassed": true,
+    "stage1ScaffoldPoseReviewPassed": true
   }
 }

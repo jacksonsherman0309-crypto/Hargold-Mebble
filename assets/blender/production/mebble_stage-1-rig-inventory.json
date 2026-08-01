@@ -1,0 +1,3147 @@
+{
+  "schemaVersion": 1,
+  "hero": "Mebble",
+  "status": "stage-1-pass-ready-for-stage-2-no-skinning",
+  "blenderVersion": "5.2.0 LTS",
+  "sourceFile": {
+    "path": "assets/blender/production/mebble_production_rig.blend",
+    "sha256": "BA16271883A92529E74FF4B1D7C70881911F75BAB91BF3177F407FC8D55D557E",
+    "bytes": 55186315,
+    "opensWithoutMissingDependencies": true,
+    "missingDependencies": []
+  },
+  "lockedBaseline": {
+    "sourceGlbSha256": "392D8F9C12AD140AFA738AB118D3C3A63F9A40DA41DD8A061FE8A37F91DE3A3B",
+    "visibleIdentityChanged": false,
+    "meshMaterialTopologyOrUvFingerprintChanged": false,
+    "surfaceFingerprint": {
+      "vertices": 183495,
+      "polygons": 289548,
+      "loops": 868644,
+      "materialAssignments": [
+        "Material_1"
+      ],
+      "uvLayers": [
+        "UVMap"
+      ],
+      "canonicalVertexSha256": "52A12AFD141D24AFF107320A1C232240F78D2B30A2F923BE17464088C7D29F1D",
+      "topologySha256": "91B201D3F04F9E89BACC454C90C0166E2C2E349717C18C2AFD2C3314A8FEC3EB",
+      "uvSha256": "C8A843C290DDB08F6D4A5309DB685B7A09BAFBA7C5E37915B8B1331E04E1EE32"
+    }
+  },
+  "coordinateConvention": {
+    "units": "metres",
+    "worldUp": "+Z",
+    "nativeForward": "-Y",
+    "trueSideCameraAxis": "+X looking toward origin",
+    "footOrigin": "between-feet-on-ground-z0",
+    "canonicalHeightMetres": 2.2932,
+    "meshObjectScale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "armatureObjectScale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "negativeScaleMirroring": false
+  },
+  "collections": [
+    "CHARACTER_MESH",
+    "DEFORM_RIG",
+    "CONTROL_RIG",
+    "HELPER_CONTROLS",
+    "ACCESSORY_RIG",
+    "FACIAL_SYSTEM",
+    "SOCKETS",
+    "VALIDATION_POSES",
+    "EXPORT",
+    "REFERENCE_ONLY"
+  ],
+  "armature": {
+    "rigObject": "Mebble_PRODUCTION_RIG_STAGE_1",
+    "objectTransforms": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotationDegrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "counts": {
+      "body-deform": 26,
+      "accessory-deform": 12,
+      "control": 25,
+      "helper": 6
+    },
+    "boneCollectionNames": [
+      "DEFORM_RIG",
+      "CONTROL_RIG",
+      "HELPER_CONTROLS",
+      "ACCESSORY_RIG",
+      "FACIAL_SYSTEM"
+    ],
+    "hierarchy": [
+      {
+        "name": "CTRL_world",
+        "parent": null,
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          0.22932
+        ],
+        "lengthMetres": 0.22932,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_motion",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          1.100736
+        ],
+        "lengthMetres": 1.100736,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_pelvis",
+        "parent": "CTRL_motion",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.100736
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          1.26126
+        ],
+        "lengthMetres": 0.160524,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_chest",
+        "parent": "CTRL_motion",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.6855021
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          1.800162
+        ],
+        "lengthMetres": 0.1146599,
+        "rollDegrees": 1e-05,
+        "localAxes": {
+          "x": [
+            1.0,
+            1e-07,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            0.9999999
+          ],
+          "z": [
+            1e-07,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_head",
+        "parent": "CTRL_motion",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.960686
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          2.2588019
+        ],
+        "lengthMetres": 0.298116,
+        "rollDegrees": 1e-05,
+        "localAxes": {
+          "x": [
+            1.0,
+            1e-07,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            0.9999999
+          ],
+          "z": [
+            1e-07,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_face",
+        "parent": "CTRL_head",
+        "category": "control",
+        "system": "FACIAL_SYSTEM",
+        "useDeform": false,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.960686
+        ],
+        "tailMetres": [
+          0.0,
+          -0.126126,
+          1.960686
+        ],
+        "lengthMetres": 0.126126,
+        "rollDegrees": -0.0,
+        "localAxes": {
+          "x": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            -0.0,
+            -1.0,
+            0.0
+          ],
+          "z": [
+            0.0,
+            0.0,
+            0.9999999
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_glasses",
+        "parent": "CTRL_head",
+        "category": "control",
+        "system": "ACCESSORY_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.0,
+          -0.091728,
+          1.983618
+        ],
+        "tailMetres": [
+          0.0,
+          -0.160524,
+          1.983618
+        ],
+        "lengthMetres": 0.068796,
+        "rollDegrees": -0.0,
+        "localAxes": {
+          "x": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            -0.0,
+            -1.0,
+            0.0
+          ],
+          "z": [
+            0.0,
+            0.0,
+            0.9999999
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_neck_shape",
+        "parent": "CTRL_head",
+        "category": "control",
+        "system": "FACIAL_SYSTEM",
+        "useDeform": false,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.8740031
+        ],
+        "tailMetres": [
+          0.0,
+          -0.091728,
+          1.8740031
+        ],
+        "lengthMetres": 0.091728,
+        "rollDegrees": -0.0,
+        "localAxes": {
+          "x": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            -0.0,
+            -1.0,
+            0.0
+          ],
+          "z": [
+            0.0,
+            0.0,
+            0.9999999
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_hat",
+        "parent": "CTRL_motion",
+        "category": "control",
+        "system": "ACCESSORY_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.0,
+          0.0,
+          2.2588019
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          2.4307919
+        ],
+        "lengthMetres": 0.1719899,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_cape",
+        "parent": "CTRL_motion",
+        "category": "control",
+        "system": "ACCESSORY_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.0,
+          0.080262,
+          1.7084341
+        ],
+        "tailMetres": [
+          0.0,
+          0.22932,
+          1.6625701
+        ],
+        "lengthMetres": 0.1559545,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            -0.0,
+            -0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.955779,
+            -0.2940858
+          ],
+          "z": [
+            0.0,
+            0.2940855,
+            0.955779
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_hand_ik.L",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.3391643,
+          -0.332514,
+          0.997542
+        ],
+        "tailMetres": [
+          0.3391643,
+          -0.332514,
+          1.1236681
+        ],
+        "lengthMetres": 0.1261261,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_foot_ik.L",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.2047828,
+          0.0,
+          0.126126
+        ],
+        "tailMetres": [
+          0.2047828,
+          -0.2641766,
+          0.103194
+        ],
+        "lengthMetres": 0.2651701,
+        "rollDegrees": -6e-05,
+        "localAxes": {
+          "x": [
+            -1.0,
+            -1e-07,
+            1.1e-06
+          ],
+          "yLongitudinal": [
+            0.0,
+            -0.9962531,
+            -0.0864803
+          ],
+          "z": [
+            1.1e-06,
+            -0.0864805,
+            0.9962534
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_foot_roll.L",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.2047828,
+          0.0,
+          0.126126
+        ],
+        "tailMetres": [
+          0.2047828,
+          -0.2641766,
+          0.103194
+        ],
+        "lengthMetres": 0.2651701,
+        "rollDegrees": -6e-05,
+        "localAxes": {
+          "x": [
+            -1.0,
+            -1e-07,
+            1.1e-06
+          ],
+          "yLongitudinal": [
+            0.0,
+            -0.9962531,
+            -0.0864803
+          ],
+          "z": [
+            1.1e-06,
+            -0.0864805,
+            0.9962534
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_toe_roll.L",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.2047828,
+          -0.2641766,
+          0.103194
+        ],
+        "tailMetres": [
+          0.2047828,
+          -0.550368,
+          0.080262
+        ],
+        "lengthMetres": 0.2871087,
+        "rollDegrees": -4e-05,
+        "localAxes": {
+          "x": [
+            -1.0,
+            -1e-07,
+            6e-07
+          ],
+          "yLongitudinal": [
+            0.0,
+            -0.9968052,
+            -0.0798722
+          ],
+          "z": [
+            6e-07,
+            -0.0798722,
+            0.9968051
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_elbow_pole.L",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.3458146,
+          -0.447174,
+          1.3759201
+        ],
+        "tailMetres": [
+          0.3458146,
+          -0.447174,
+          1.4791141
+        ],
+        "lengthMetres": 0.103194,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_knee_pole.L",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.2113184,
+          -0.355446,
+          0.596232
+        ],
+        "tailMetres": [
+          0.2113184,
+          -0.355446,
+          0.699426
+        ],
+        "lengthMetres": 0.103194,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_hand_ik.R",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          -0.3391643,
+          -0.332514,
+          0.997542
+        ],
+        "tailMetres": [
+          -0.3391643,
+          -0.332514,
+          1.1236681
+        ],
+        "lengthMetres": 0.1261261,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_foot_ik.R",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          -0.2047828,
+          0.0,
+          0.126126
+        ],
+        "tailMetres": [
+          -0.2047828,
+          -0.2641766,
+          0.103194
+        ],
+        "lengthMetres": 0.2651701,
+        "rollDegrees": -6e-05,
+        "localAxes": {
+          "x": [
+            -1.0,
+            -1e-07,
+            1.1e-06
+          ],
+          "yLongitudinal": [
+            0.0,
+            -0.9962531,
+            -0.0864803
+          ],
+          "z": [
+            1.1e-06,
+            -0.0864805,
+            0.9962534
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_foot_roll.R",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          -0.2047828,
+          0.0,
+          0.126126
+        ],
+        "tailMetres": [
+          -0.2047828,
+          -0.2641766,
+          0.103194
+        ],
+        "lengthMetres": 0.2651701,
+        "rollDegrees": -6e-05,
+        "localAxes": {
+          "x": [
+            -1.0,
+            -1e-07,
+            1.1e-06
+          ],
+          "yLongitudinal": [
+            0.0,
+            -0.9962531,
+            -0.0864803
+          ],
+          "z": [
+            1.1e-06,
+            -0.0864805,
+            0.9962534
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_toe_roll.R",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          -0.2047828,
+          -0.2641766,
+          0.103194
+        ],
+        "tailMetres": [
+          -0.2047828,
+          -0.550368,
+          0.080262
+        ],
+        "lengthMetres": 0.2871087,
+        "rollDegrees": -4e-05,
+        "localAxes": {
+          "x": [
+            -1.0,
+            -1e-07,
+            6e-07
+          ],
+          "yLongitudinal": [
+            0.0,
+            -0.9968052,
+            -0.0798722
+          ],
+          "z": [
+            6e-07,
+            -0.0798722,
+            0.9968051
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_elbow_pole.R",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          -0.3458146,
+          -0.447174,
+          1.3759201
+        ],
+        "tailMetres": [
+          -0.3458146,
+          -0.447174,
+          1.4791141
+        ],
+        "lengthMetres": 0.103194,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_knee_pole.R",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          -0.2113184,
+          -0.355446,
+          0.596232
+        ],
+        "tailMetres": [
+          -0.2113184,
+          -0.355446,
+          0.699426
+        ],
+        "lengthMetres": 0.103194,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_gaze",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "FACIAL_SYSTEM",
+        "useDeform": false,
+        "headMetres": [
+          0.0,
+          -0.22932,
+          1.960686
+        ],
+        "tailMetres": [
+          0.0,
+          -0.34398,
+          1.960686
+        ],
+        "lengthMetres": 0.11466,
+        "rollDegrees": -1e-05,
+        "localAxes": {
+          "x": [
+            -1.0,
+            0.0,
+            1e-07
+          ],
+          "yLongitudinal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "z": [
+            1e-07,
+            0.0,
+            1.0
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_hand_pose.L",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          0.3391643,
+          -0.332514,
+          0.997542
+        ],
+        "tailMetres": [
+          0.3391643,
+          -0.332514,
+          1.08927
+        ],
+        "lengthMetres": 0.091728,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "CTRL_hand_pose.R",
+        "parent": "CTRL_world",
+        "category": "control",
+        "system": "CONTROL_RIG",
+        "useDeform": false,
+        "headMetres": [
+          -0.3391643,
+          -0.332514,
+          0.997542
+        ],
+        "tailMetres": [
+          -0.3391643,
+          -0.332514,
+          1.08927
+        ],
+        "lengthMetres": 0.091728,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "DEF_pelvis",
+        "parent": null,
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.100736
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          1.226862
+        ],
+        "lengthMetres": 0.1261259,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_spine_lower",
+        "parent": "DEF_pelvis",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.226862
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          1.387386
+        ],
+        "lengthMetres": 0.160524,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_spine_mid",
+        "parent": "DEF_spine_lower",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.387386
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          1.559376
+        ],
+        "lengthMetres": 0.17199,
+        "rollDegrees": 1e-05,
+        "localAxes": {
+          "x": [
+            1.0,
+            1e-07,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            0.9999999
+          ],
+          "z": [
+            1e-07,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_spine_upper",
+        "parent": "DEF_spine_mid",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.559376
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          1.6855021
+        ],
+        "lengthMetres": 0.1261261,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            0.9999999
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_chest",
+        "parent": "DEF_spine_upper",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.6855021
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          1.800162
+        ],
+        "lengthMetres": 0.1146599,
+        "rollDegrees": 1e-05,
+        "localAxes": {
+          "x": [
+            1.0,
+            1e-07,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            0.9999999
+          ],
+          "z": [
+            1e-07,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_neck_base",
+        "parent": "DEF_chest",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.800162
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          1.85367
+        ],
+        "lengthMetres": 0.0535081,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            0.9999999
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_neck_mid",
+        "parent": "DEF_neck_base",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.85367
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          1.9071779
+        ],
+        "lengthMetres": 0.0535079,
+        "rollDegrees": 1e-05,
+        "localAxes": {
+          "x": [
+            1.0,
+            1e-07,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            0.9999999
+          ],
+          "z": [
+            1e-07,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_neck_upper",
+        "parent": "DEF_neck_mid",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.9071779
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          1.960686
+        ],
+        "lengthMetres": 0.0535081,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            0.9999999
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_head",
+        "parent": "DEF_neck_upper",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.960686
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          2.2588019
+        ],
+        "lengthMetres": 0.298116,
+        "rollDegrees": 1e-05,
+        "localAxes": {
+          "x": [
+            1.0,
+            1e-07,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            0.9999999
+          ],
+          "z": [
+            1e-07,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_jaw",
+        "parent": "DEF_head",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          -0.0412776,
+          2.0345268
+        ],
+        "tailMetres": [
+          0.0,
+          -0.1444716,
+          1.9703172
+        ],
+        "lengthMetres": 0.1215396,
+        "rollDegrees": -0.0,
+        "localAxes": {
+          "x": [
+            -1.0,
+            -0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            -0.0,
+            -0.8490566,
+            -0.5283018
+          ],
+          "z": [
+            0.0,
+            -0.5283018,
+            0.8490565
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_hat",
+        "parent": "DEF_head",
+        "category": "accessory-deform",
+        "system": "ACCESSORY_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.0,
+          2.2588019
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          2.384928
+        ],
+        "lengthMetres": 0.1261261,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            0.9999999
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "DEF_glasses",
+        "parent": "DEF_head",
+        "category": "accessory-deform",
+        "system": "ACCESSORY_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          -0.080262,
+          1.983618
+        ],
+        "tailMetres": [
+          0.0,
+          -0.126126,
+          1.983618
+        ],
+        "lengthMetres": 0.045864,
+        "rollDegrees": -0.0,
+        "localAxes": {
+          "x": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "z": [
+            0.0,
+            0.0,
+            0.9999999
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "DEF_adams_apple",
+        "parent": "DEF_neck_mid",
+        "category": "accessory-deform",
+        "system": "ACCESSORY_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.8740031
+        ],
+        "tailMetres": [
+          0.0,
+          -0.0412776,
+          1.8923486
+        ],
+        "lengthMetres": 0.0451708,
+        "rollDegrees": 1e-05,
+        "localAxes": {
+          "x": [
+            1.0,
+            1e-07,
+            2e-07
+          ],
+          "yLongitudinal": [
+            0.0,
+            -0.9138116,
+            0.4061384
+          ],
+          "z": [
+            2e-07,
+            -0.4061384,
+            -0.9138116
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "DEF_clavicle.L",
+        "parent": "DEF_chest",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.2394101,
+          0.0,
+          1.765764
+        ],
+        "tailMetres": [
+          0.332514,
+          0.0,
+          1.765764
+        ],
+        "lengthMetres": 0.0931039,
+        "rollDegrees": 90.0,
+        "localAxes": {
+          "x": [
+            1e-07,
+            -1e-07,
+            -0.9999999
+          ],
+          "yLongitudinal": [
+            0.9999999,
+            0.0,
+            0.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            1e-07
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_upper_arm.L",
+        "parent": "DEF_clavicle.L",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.332514,
+          0.0,
+          1.765764
+        ],
+        "tailMetres": [
+          0.3458146,
+          -0.149058,
+          1.3759201
+        ],
+        "lengthMetres": 0.4175805,
+        "rollDegrees": 5.4597,
+        "localAxes": {
+          "x": [
+            -0.9994185,
+            1e-07,
+            -0.0340977
+          ],
+          "yLongitudinal": [
+            0.0318515,
+            -0.3569563,
+            -0.9335778
+          ],
+          "z": [
+            -0.0121717,
+            -0.9341211,
+            0.3567487
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "MCH_upper_arm_twist.L",
+        "parent": "DEF_upper_arm.L",
+        "category": "helper",
+        "system": "HELPER_CONTROLS",
+        "useDeform": false,
+        "headMetres": [
+          0.3357061,
+          -0.0357739,
+          1.6722014
+        ],
+        "tailMetres": [
+          0.3402283,
+          -0.0864536,
+          1.5396545
+        ],
+        "lengthMetres": 0.1419774,
+        "rollDegrees": 5.4597,
+        "localAxes": {
+          "x": [
+            -0.9994185,
+            -1e-07,
+            -0.0340978
+          ],
+          "yLongitudinal": [
+            0.0318516,
+            -0.3569564,
+            -0.9335778
+          ],
+          "z": [
+            -0.0121715,
+            -0.934121,
+            0.3567488
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_forearm.L",
+        "parent": "DEF_upper_arm.L",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.3458146,
+          -0.149058,
+          1.3759201
+        ],
+        "tailMetres": [
+          0.3391643,
+          -0.332514,
+          0.997542
+        ],
+        "lengthMetres": 0.4205595,
+        "rollDegrees": -2.30729,
+        "localAxes": {
+          "x": [
+            -0.9998456,
+            -3e-07,
+            0.0175732
+          ],
+          "yLongitudinal": [
+            -0.0158129,
+            -0.4362189,
+            -0.8997016
+          ],
+          "z": [
+            0.0076659,
+            -0.8998405,
+            0.4361515
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "MCH_forearm_twist.L",
+        "parent": "DEF_forearm.L",
+        "category": "helper",
+        "system": "HELPER_CONTROLS",
+        "useDeform": false,
+        "headMetres": [
+          0.3439525,
+          -0.2004257,
+          1.2699742
+        ],
+        "tailMetres": [
+          0.3415584,
+          -0.2664698,
+          1.1337581
+        ],
+        "lengthMetres": 0.1514015,
+        "rollDegrees": -2.30727,
+        "localAxes": {
+          "x": [
+            -0.9998456,
+            -1e-07,
+            0.017573
+          ],
+          "yLongitudinal": [
+            -0.0158128,
+            -0.4362187,
+            -0.8997017
+          ],
+          "z": [
+            0.0076657,
+            -0.8998407,
+            0.4361513
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_hand.L",
+        "parent": "DEF_forearm.L",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.3391643,
+          -0.332514,
+          0.997542
+        ],
+        "tailMetres": [
+          0.332514,
+          -0.470106,
+          0.882882
+        ],
+        "lengthMetres": 0.1792281,
+        "rollDegrees": -4.32058,
+        "localAxes": {
+          "x": [
+            -0.9983222,
+            -1e-07,
+            0.057903
+          ],
+          "yLongitudinal": [
+            -0.0371052,
+            -0.7676922,
+            -0.6397436
+          ],
+          "z": [
+            0.0444516,
+            -0.6408187,
+            0.7664041
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_clavicle.R",
+        "parent": "DEF_chest",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          -0.2394101,
+          0.0,
+          1.765764
+        ],
+        "tailMetres": [
+          -0.332514,
+          0.0,
+          1.765764
+        ],
+        "lengthMetres": 0.0931039,
+        "rollDegrees": -90.0,
+        "localAxes": {
+          "x": [
+            1e-07,
+            1e-07,
+            0.9999999
+          ],
+          "yLongitudinal": [
+            -0.9999999,
+            0.0,
+            0.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            1e-07
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_upper_arm.R",
+        "parent": "DEF_clavicle.R",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          -0.332514,
+          0.0,
+          1.765764
+        ],
+        "tailMetres": [
+          -0.3458146,
+          -0.149058,
+          1.3759201
+        ],
+        "lengthMetres": 0.4175805,
+        "rollDegrees": -5.4597,
+        "localAxes": {
+          "x": [
+            -0.9994185,
+            -1e-07,
+            0.0340977
+          ],
+          "yLongitudinal": [
+            -0.0318515,
+            -0.3569563,
+            -0.9335778
+          ],
+          "z": [
+            0.0121717,
+            -0.9341211,
+            0.3567487
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "MCH_upper_arm_twist.R",
+        "parent": "DEF_upper_arm.R",
+        "category": "helper",
+        "system": "HELPER_CONTROLS",
+        "useDeform": false,
+        "headMetres": [
+          -0.3357061,
+          -0.0357739,
+          1.6722014
+        ],
+        "tailMetres": [
+          -0.3402283,
+          -0.0864536,
+          1.5396545
+        ],
+        "lengthMetres": 0.1419774,
+        "rollDegrees": -5.4597,
+        "localAxes": {
+          "x": [
+            -0.9994185,
+            1e-07,
+            0.0340978
+          ],
+          "yLongitudinal": [
+            -0.0318516,
+            -0.3569564,
+            -0.9335778
+          ],
+          "z": [
+            0.0121715,
+            -0.934121,
+            0.3567488
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_forearm.R",
+        "parent": "DEF_upper_arm.R",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          -0.3458146,
+          -0.149058,
+          1.3759201
+        ],
+        "tailMetres": [
+          -0.3391643,
+          -0.332514,
+          0.997542
+        ],
+        "lengthMetres": 0.4205595,
+        "rollDegrees": 2.30729,
+        "localAxes": {
+          "x": [
+            -0.9998456,
+            3e-07,
+            -0.0175732
+          ],
+          "yLongitudinal": [
+            0.0158129,
+            -0.4362189,
+            -0.8997016
+          ],
+          "z": [
+            -0.0076659,
+            -0.8998405,
+            0.4361515
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "MCH_forearm_twist.R",
+        "parent": "DEF_forearm.R",
+        "category": "helper",
+        "system": "HELPER_CONTROLS",
+        "useDeform": false,
+        "headMetres": [
+          -0.3439525,
+          -0.2004257,
+          1.2699742
+        ],
+        "tailMetres": [
+          -0.3415584,
+          -0.2664698,
+          1.1337581
+        ],
+        "lengthMetres": 0.1514015,
+        "rollDegrees": 2.30727,
+        "localAxes": {
+          "x": [
+            -0.9998456,
+            1e-07,
+            -0.017573
+          ],
+          "yLongitudinal": [
+            0.0158128,
+            -0.4362187,
+            -0.8997017
+          ],
+          "z": [
+            -0.0076657,
+            -0.8998407,
+            0.4361513
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_hand.R",
+        "parent": "DEF_forearm.R",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          -0.3391643,
+          -0.332514,
+          0.997542
+        ],
+        "tailMetres": [
+          -0.332514,
+          -0.470106,
+          0.882882
+        ],
+        "lengthMetres": 0.1792281,
+        "rollDegrees": 4.32058,
+        "localAxes": {
+          "x": [
+            -0.9983222,
+            1e-07,
+            -0.057903
+          ],
+          "yLongitudinal": [
+            0.0371052,
+            -0.7676922,
+            -0.6397436
+          ],
+          "z": [
+            -0.0444516,
+            -0.6408187,
+            0.7664041
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_cape_root",
+        "parent": "DEF_chest",
+        "category": "accessory-deform",
+        "system": "ACCESSORY_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.080262,
+          1.7084341
+        ],
+        "tailMetres": [
+          0.0,
+          0.1077804,
+          1.5823081
+        ],
+        "lengthMetres": 0.1290932,
+        "rollDegrees": -179.99999,
+        "localAxes": {
+          "x": [
+            -1.0,
+            2e-07,
+            0.0
+          ],
+          "yLongitudinal": [
+            -0.0,
+            0.2131669,
+            -0.9770157
+          ],
+          "z": [
+            -2e-07,
+            -0.977016,
+            -0.213167
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "DEF_cape_01",
+        "parent": "DEF_cape_root",
+        "category": "accessory-deform",
+        "system": "ACCESSORY_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.1077804,
+          1.5823081
+        ],
+        "tailMetres": [
+          0.0,
+          0.1444716,
+          1.456182
+        ],
+        "lengthMetres": 0.1313546,
+        "rollDegrees": -179.99999,
+        "localAxes": {
+          "x": [
+            -1.0,
+            1e-07,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.2793295,
+            -0.9601953
+          ],
+          "z": [
+            -1e-07,
+            -0.9601955,
+            -0.2793295
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "DEF_cape_02",
+        "parent": "DEF_cape_01",
+        "category": "accessory-deform",
+        "system": "ACCESSORY_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.1352988,
+          1.4561821
+        ],
+        "tailMetres": [
+          0.0,
+          0.17199,
+          1.3300561
+        ],
+        "lengthMetres": 0.1313546,
+        "rollDegrees": -179.99999,
+        "localAxes": {
+          "x": [
+            -1.0,
+            1e-07,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.2793294,
+            -0.9601953
+          ],
+          "z": [
+            -1e-07,
+            -0.9601955,
+            -0.2793295
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "DEF_cape_03",
+        "parent": "DEF_cape_02",
+        "category": "accessory-deform",
+        "system": "ACCESSORY_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.1628172,
+          1.3300561
+        ],
+        "tailMetres": [
+          0.0,
+          0.1995084,
+          1.20393
+        ],
+        "lengthMetres": 0.1313546,
+        "rollDegrees": -179.99999,
+        "localAxes": {
+          "x": [
+            -1.0,
+            1e-07,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.2793294,
+            -0.9601953
+          ],
+          "z": [
+            -1e-07,
+            -0.9601955,
+            -0.2793295
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "DEF_cape_04",
+        "parent": "DEF_cape_03",
+        "category": "accessory-deform",
+        "system": "ACCESSORY_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.1903356,
+          1.2039301
+        ],
+        "tailMetres": [
+          0.0,
+          0.2270268,
+          1.0778041
+        ],
+        "lengthMetres": 0.1313546,
+        "rollDegrees": -179.99999,
+        "localAxes": {
+          "x": [
+            -1.0,
+            1e-07,
+            0.0
+          ],
+          "yLongitudinal": [
+            -0.0,
+            0.2793294,
+            -0.9601953
+          ],
+          "z": [
+            -1e-07,
+            -0.9601955,
+            -0.2793295
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "DEF_cape_05",
+        "parent": "DEF_cape_04",
+        "category": "accessory-deform",
+        "system": "ACCESSORY_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.217854,
+          1.0778041
+        ],
+        "tailMetres": [
+          0.0,
+          0.2545452,
+          0.9516781
+        ],
+        "lengthMetres": 0.1313545,
+        "rollDegrees": 179.99999,
+        "localAxes": {
+          "x": [
+            -1.0,
+            -1e-07,
+            -0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.2793294,
+            -0.9601953
+          ],
+          "z": [
+            2e-07,
+            -0.9601955,
+            -0.2793295
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "DEF_cape_06",
+        "parent": "DEF_cape_05",
+        "category": "accessory-deform",
+        "system": "ACCESSORY_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.2453724,
+          0.9516781
+        ],
+        "tailMetres": [
+          0.0,
+          0.2820636,
+          0.8255521
+        ],
+        "lengthMetres": 0.1313545,
+        "rollDegrees": 179.99999,
+        "localAxes": {
+          "x": [
+            -1.0,
+            -1e-07,
+            -0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.2793295,
+            -0.9601953
+          ],
+          "z": [
+            2e-07,
+            -0.9601955,
+            -0.2793295
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "DEF_thigh.L",
+        "parent": "DEF_pelvis",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.217854,
+          0.0,
+          1.100736
+        ],
+        "tailMetres": [
+          0.2113184,
+          -0.05733,
+          0.596232
+        ],
+        "lengthMetres": 0.507793,
+        "rollDegrees": -6.54532,
+        "localAxes": {
+          "x": [
+            -0.9999163,
+            3e-06,
+            0.0129529
+          ],
+          "yLongitudinal": [
+            -0.0128706,
+            -0.1129004,
+            -0.9935232
+          ],
+          "z": [
+            0.0014627,
+            -0.9936202,
+            0.1128941
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "MCH_thigh_twist.L",
+        "parent": "DEF_thigh.L",
+        "category": "helper",
+        "system": "HELPER_CONTROLS",
+        "useDeform": false,
+        "headMetres": [
+          0.2162854,
+          -0.0137592,
+          0.979655
+        ],
+        "tailMetres": [
+          0.2140633,
+          -0.0332514,
+          0.8081237
+        ],
+        "lengthMetres": 0.1726496,
+        "rollDegrees": -6.5453,
+        "localAxes": {
+          "x": [
+            -0.9999163,
+            3.1e-06,
+            0.0129529
+          ],
+          "yLongitudinal": [
+            -0.0128706,
+            -0.1129004,
+            -0.9935232
+          ],
+          "z": [
+            0.0014626,
+            -0.9936202,
+            0.1128941
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_shin.L",
+        "parent": "DEF_thigh.L",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.2113184,
+          -0.05733,
+          0.596232
+        ],
+        "tailMetres": [
+          0.2047828,
+          0.0,
+          0.126126
+        ],
+        "lengthMetres": 0.4736333,
+        "rollDegrees": -173.44783,
+        "localAxes": {
+          "x": [
+            -0.9999035,
+            3e-06,
+            0.0139005
+          ],
+          "yLongitudinal": [
+            -0.0137989,
+            0.121043,
+            -0.9925529
+          ],
+          "z": [
+            -0.0016824,
+            -0.9926612,
+            -0.1210251
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_foot.L",
+        "parent": "DEF_shin.L",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.2047828,
+          0.0,
+          0.126126
+        ],
+        "tailMetres": [
+          0.2047828,
+          -0.2641766,
+          0.103194
+        ],
+        "lengthMetres": 0.2651666,
+        "rollDegrees": -2e-05,
+        "localAxes": {
+          "x": [
+            -1.0000001,
+            3.2e-06,
+            4e-07
+          ],
+          "yLongitudinal": [
+            -0.0,
+            -0.9962668,
+            -0.0864815
+          ],
+          "z": [
+            9e-07,
+            -0.0864874,
+            0.9962542
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_toe.L",
+        "parent": "DEF_foot.L",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.2047828,
+          -0.2641766,
+          0.103194
+        ],
+        "tailMetres": [
+          0.2047828,
+          -0.550368,
+          0.080262
+        ],
+        "lengthMetres": 0.2871048,
+        "rollDegrees": -0.0,
+        "localAxes": {
+          "x": [
+            -1.0000001,
+            3.2e-06,
+            1e-07
+          ],
+          "yLongitudinal": [
+            -0.0,
+            -0.9968184,
+            -0.0798733
+          ],
+          "z": [
+            6e-07,
+            -0.079879,
+            0.9968057
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_thigh.R",
+        "parent": "DEF_pelvis",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          -0.217854,
+          0.0,
+          1.100736
+        ],
+        "tailMetres": [
+          -0.2113184,
+          -0.05733,
+          0.596232
+        ],
+        "lengthMetres": 0.507793,
+        "rollDegrees": 6.54532,
+        "localAxes": {
+          "x": [
+            -0.9999163,
+            -3e-06,
+            -0.0129529
+          ],
+          "yLongitudinal": [
+            0.0128706,
+            -0.1129004,
+            -0.9935232
+          ],
+          "z": [
+            -0.0014627,
+            -0.9936202,
+            0.1128941
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "MCH_thigh_twist.R",
+        "parent": "DEF_thigh.R",
+        "category": "helper",
+        "system": "HELPER_CONTROLS",
+        "useDeform": false,
+        "headMetres": [
+          -0.2162854,
+          -0.0137592,
+          0.979655
+        ],
+        "tailMetres": [
+          -0.2140633,
+          -0.0332514,
+          0.8081237
+        ],
+        "lengthMetres": 0.1726496,
+        "rollDegrees": 6.5453,
+        "localAxes": {
+          "x": [
+            -0.9999163,
+            -3.1e-06,
+            -0.0129529
+          ],
+          "yLongitudinal": [
+            0.0128706,
+            -0.1129004,
+            -0.9935232
+          ],
+          "z": [
+            -0.0014626,
+            -0.9936202,
+            0.1128941
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_shin.R",
+        "parent": "DEF_thigh.R",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          -0.2113184,
+          -0.05733,
+          0.596232
+        ],
+        "tailMetres": [
+          -0.2047828,
+          0.0,
+          0.126126
+        ],
+        "lengthMetres": 0.4736333,
+        "rollDegrees": 173.44783,
+        "localAxes": {
+          "x": [
+            -0.9999035,
+            -3e-06,
+            -0.0139005
+          ],
+          "yLongitudinal": [
+            0.0137989,
+            0.121043,
+            -0.9925529
+          ],
+          "z": [
+            0.0016824,
+            -0.9926612,
+            -0.1210251
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_foot.R",
+        "parent": "DEF_shin.R",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          -0.2047828,
+          0.0,
+          0.126126
+        ],
+        "tailMetres": [
+          -0.2047828,
+          -0.2641766,
+          0.103194
+        ],
+        "lengthMetres": 0.2651666,
+        "rollDegrees": -0.00011,
+        "localAxes": {
+          "x": [
+            -1.0000001,
+            -3.4e-06,
+            1.8e-06
+          ],
+          "yLongitudinal": [
+            0.0,
+            -0.9962668,
+            -0.0864815
+          ],
+          "z": [
+            1.3e-06,
+            -0.0864874,
+            0.9962542
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_toe.R",
+        "parent": "DEF_foot.R",
+        "category": "body-deform",
+        "system": "DEFORM_RIG",
+        "useDeform": true,
+        "headMetres": [
+          -0.2047828,
+          -0.2641766,
+          0.103194
+        ],
+        "tailMetres": [
+          -0.2047828,
+          -0.550368,
+          0.080262
+        ],
+        "lengthMetres": 0.2871048,
+        "rollDegrees": -7e-05,
+        "localAxes": {
+          "x": [
+            -1.0000001,
+            -3.3e-06,
+            1.2e-06
+          ],
+          "yLongitudinal": [
+            -0.0,
+            -0.9968184,
+            -0.0798733
+          ],
+          "z": [
+            6e-07,
+            -0.079879,
+            0.9968057
+          ]
+        },
+        "rollReference": "world-up-plus-Z",
+        "bendAxis": "LOCAL_X",
+        "twistAxis": "LOCAL_Y"
+      },
+      {
+        "name": "DEF_belt",
+        "parent": "DEF_pelvis",
+        "category": "accessory-deform",
+        "system": "ACCESSORY_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.0,
+          0.0,
+          1.100736
+        ],
+        "tailMetres": [
+          0.0,
+          0.0,
+          1.20393
+        ],
+        "lengthMetres": 0.103194,
+        "rollDegrees": 0.0,
+        "localAxes": {
+          "x": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "z": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      },
+      {
+        "name": "DEF_pouch",
+        "parent": "DEF_belt",
+        "category": "accessory-deform",
+        "system": "ACCESSORY_RIG",
+        "useDeform": true,
+        "headMetres": [
+          0.091728,
+          0.0,
+          1.100736
+        ],
+        "tailMetres": [
+          0.091728,
+          0.0,
+          0.986076
+        ],
+        "lengthMetres": 0.11466,
+        "rollDegrees": -179.99999,
+        "localAxes": {
+          "x": [
+            -1.0,
+            1e-07,
+            0.0
+          ],
+          "yLongitudinal": [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "z": [
+            -1e-07,
+            -1.0,
+            0.0
+          ]
+        },
+        "rollReference": "native-forward-minus-Y",
+        "bendAxis": "N/A",
+        "twistAxis": "N/A"
+      }
+    ],
+    "mirroredPairs": [
+      {
+        "left": "CTRL_hand_ik.L",
+        "right": "CTRL_hand_ik.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "CTRL_foot_ik.L",
+        "right": "CTRL_foot_ik.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "CTRL_foot_roll.L",
+        "right": "CTRL_foot_roll.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "CTRL_toe_roll.L",
+        "right": "CTRL_toe_roll.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "CTRL_elbow_pole.L",
+        "right": "CTRL_elbow_pole.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "CTRL_knee_pole.L",
+        "right": "CTRL_knee_pole.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "CTRL_hand_pose.L",
+        "right": "CTRL_hand_pose.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "DEF_clavicle.L",
+        "right": "DEF_clavicle.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "DEF_upper_arm.L",
+        "right": "DEF_upper_arm.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "MCH_upper_arm_twist.L",
+        "right": "MCH_upper_arm_twist.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "DEF_forearm.L",
+        "right": "DEF_forearm.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "MCH_forearm_twist.L",
+        "right": "MCH_forearm_twist.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "DEF_hand.L",
+        "right": "DEF_hand.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "DEF_thigh.L",
+        "right": "DEF_thigh.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "MCH_thigh_twist.L",
+        "right": "MCH_thigh_twist.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "DEF_shin.L",
+        "right": "DEF_shin.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "DEF_foot.L",
+        "right": "DEF_foot.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      },
+      {
+        "left": "DEF_toe.L",
+        "right": "DEF_toe.R",
+        "maximumRestSymmetryErrorMetres": 0.0
+      }
+    ],
+    "boneRollAudit": {
+      "pass": true,
+      "longitudinalAxis": "LOCAL_Y",
+      "sideViewBendAxis": "LOCAL_X",
+      "twistAxis": "LOCAL_Y",
+      "worldUp": "+Z",
+      "nativeForward": "-Y",
+      "errors": []
+    },
+    "hierarchyAudit": {
+      "pass": true,
+      "errors": []
+    }
+  },
+  "sockets": [
+    {
+      "name": "SOCKET_character_root",
+      "semantic": "characterRoot",
+      "bindingBone": "CTRL_world",
+      "locationMetres": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "SOCKET_gameplay_center",
+      "semantic": "gameplayCenter",
+      "bindingBone": "CTRL_motion",
+      "locationMetres": [
+        0.0,
+        0.0,
+        1.100736
+      ]
+    },
+    {
+      "name": "SOCKET_head",
+      "semantic": "head",
+      "bindingBone": "DEF_head",
+      "locationMetres": [
+        0.0,
+        0.0,
+        2.258802
+      ]
+    },
+    {
+      "name": "SOCKET_hat",
+      "semantic": "hat",
+      "bindingBone": "DEF_hat",
+      "locationMetres": [
+        0.0,
+        0.0,
+        2.316132
+      ]
+    },
+    {
+      "name": "SOCKET_hand.L",
+      "semantic": "leftHand",
+      "bindingBone": "DEF_hand.L",
+      "locationMetres": [
+        0.332514,
+        -0.470106,
+        0.882882
+      ]
+    },
+    {
+      "name": "SOCKET_hand.R",
+      "semantic": "rightHand",
+      "bindingBone": "DEF_hand.R",
+      "locationMetres": [
+        -0.332514,
+        -0.470106,
+        0.882882
+      ]
+    },
+    {
+      "name": "SOCKET_foot.L",
+      "semantic": "leftFoot",
+      "bindingBone": "DEF_foot.L",
+      "locationMetres": [
+        0.204783,
+        0.0,
+        0.126126
+      ]
+    },
+    {
+      "name": "SOCKET_foot.R",
+      "semantic": "rightFoot",
+      "bindingBone": "DEF_foot.R",
+      "locationMetres": [
+        -0.204783,
+        0.0,
+        0.126126
+      ]
+    },
+    {
+      "name": "SOCKET_back",
+      "semantic": "backOrBackpack",
+      "bindingBone": "DEF_chest",
+      "locationMetres": [
+        0.0,
+        0.160524,
+        1.685502
+      ]
+    },
+    {
+      "name": "SOCKET_effect_origin",
+      "semantic": "effectOrigin",
+      "bindingBone": "DEF_pelvis",
+      "locationMetres": [
+        0.0,
+        0.0,
+        1.100736
+      ]
+    },
+    {
+      "name": "SOCKET_ground_slam_impact",
+      "semantic": "groundSlamImpact",
+      "bindingBone": "CTRL_world",
+      "locationMetres": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "SOCKET_cape_origin",
+      "semantic": "capeOrigin",
+      "bindingBone": "DEF_cape_root",
+      "locationMetres": [
+        0.0,
+        0.080262,
+        1.685502
+      ]
+    }
+  ],
+  "exportConfiguration": {
+    "format": "glTF_2_0",
+    "candidateExportAllowed": false,
+    "animations": false,
+    "exportOnlyDeformBones": true,
+    "includeCollections": [
+      "CHARACTER_MESH",
+      "DEFORM_RIG",
+      "SOCKETS"
+    ],
+    "excludeCollections": [
+      "CONTROL_RIG",
+      "HELPER_CONTROLS",
+      "VALIDATION_POSES",
+      "REFERENCE_ONLY"
+    ],
+    "normalGameplayRootMotion": false
+  },
+  "poseReview": {
+    "sheet": "assets/previews/rig-stage-1/mebble-scaffold-pose-review.png",
+    "reviewOrientation": "true-side-camera-along-native-plus-X",
+    "poseCount": 10,
+    "allMechanicallyAchievable": true,
+    "results": [
+      {
+        "pose": "deep_crouch",
+        "type": "static-validation-envelope-not-animation",
+        "grounded": true,
+        "maximumRequestedJointRotationDegrees": 92,
+        "floorAligned": true,
+        "allRequestedBonesPresent": true,
+        "mechanicallyAchievable": true
+      },
+      {
+        "pose": "crouch_walk_contact",
+        "type": "static-validation-envelope-not-animation",
+        "grounded": true,
+        "maximumRequestedJointRotationDegrees": 104,
+        "floorAligned": true,
+        "allRequestedBonesPresent": true,
+        "mechanicallyAchievable": true
+      },
+      {
+        "pose": "slide",
+        "type": "static-validation-envelope-not-animation",
+        "grounded": true,
+        "maximumRequestedJointRotationDegrees": 108,
+        "floorAligned": true,
+        "allRequestedBonesPresent": true,
+        "mechanicallyAchievable": true
+      },
+      {
+        "pose": "run_extension",
+        "type": "static-validation-envelope-not-animation",
+        "grounded": false,
+        "maximumRequestedJointRotationDegrees": 48,
+        "floorAligned": null,
+        "allRequestedBonesPresent": true,
+        "mechanicallyAchievable": true
+      },
+      {
+        "pose": "planted_skid",
+        "type": "static-validation-envelope-not-animation",
+        "grounded": true,
+        "maximumRequestedJointRotationDegrees": 68,
+        "floorAligned": true,
+        "allRequestedBonesPresent": true,
+        "mechanicallyAchievable": true
+      },
+      {
+        "pose": "jump_anticipation",
+        "type": "static-validation-envelope-not-animation",
+        "grounded": true,
+        "maximumRequestedJointRotationDegrees": 106,
+        "floorAligned": true,
+        "allRequestedBonesPresent": true,
+        "mechanicallyAchievable": true
+      },
+      {
+        "pose": "heavy_landing",
+        "type": "static-validation-envelope-not-animation",
+        "grounded": true,
+        "maximumRequestedJointRotationDegrees": 116,
+        "floorAligned": true,
+        "allRequestedBonesPresent": true,
+        "mechanicallyAchievable": true
+      },
+      {
+        "pose": "ground_slam_maximum_tuck",
+        "type": "static-validation-envelope-not-animation",
+        "grounded": false,
+        "maximumRequestedJointRotationDegrees": 116,
+        "floorAligned": null,
+        "allRequestedBonesPresent": true,
+        "mechanicallyAchievable": true
+      },
+      {
+        "pose": "ground_slam_committed_descent",
+        "type": "static-validation-envelope-not-animation",
+        "grounded": false,
+        "maximumRequestedJointRotationDegrees": 82,
+        "floorAligned": null,
+        "allRequestedBonesPresent": true,
+        "mechanicallyAchievable": true
+      },
+      {
+        "pose": "mebble_glide_sustain",
+        "type": "static-validation-envelope-not-animation",
+        "grounded": false,
+        "maximumRequestedJointRotationDegrees": 66,
+        "floorAligned": null,
+        "allRequestedBonesPresent": true,
+        "mechanicallyAchievable": true
+      }
+    ],
+    "limitations": "Rigid envelope scaffold evidence only; no locked-surface deformation, weight, or animation approval is implied."
+  },
+  "unresolvedScaffoldIssues": [],
+  "deferredNotFailures": [
+    "Stage 2 constraints, IK/FK switching, and final purposeful control architecture",
+    "Stage 3 skinning, topology corrections, and corrective deformation",
+    "Stage 4 hand, face, and production accessory systems",
+    "Stage 5 locked-surface deformation pose gate",
+    "Stage 6 candidate GLB export and semantic integration",
+    "Stage 7 runtime parity",
+    "Stage 8 final animation production"
+  ],
+  "stage1Pass": true,
+  "stage2Started": false,
+  "stage3Started": false,
+  "finalAnimationAllowed": false
+}

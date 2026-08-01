@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "authority": "rig-first-character-production-gate-2026-07-31",
   "appliesTo": [
     "Hargold",
@@ -8,7 +8,7 @@
   "animationPolishPolicy": "paused-as-final-production-until-production-rig-stages-0-through-7-pass",
   "productionRigStages": {
     "stage0BaselinePreservation": "pass",
-    "stage1EditableBlenderSources": "created-but-production-topology-and-armature-approval-pending",
+    "stage1EditableBlenderSources": "pass-source-integrity-coordinate-hierarchy-roll-sockets-and-static-scaffold-poses",
     "stage2PurposefulSkeletons": "not-approved",
     "stage3SkinningTopologyCorrectives": "not-started",
     "stage4HandsFaceAccessories": "not-started",
@@ -31,7 +31,7 @@
     {
       "id": "skeleton",
       "label": "Skeleton approved",
-      "status": "interim-24-bone-runtime-skeleton-approved-for-rollback-only-production-skeleton-pending"
+      "status": "stage1-scaffold-audited-interim-24-bone-runtime-preserved-stage2-production-skeleton-pending"
     },
     {
       "id": "connected-body",
@@ -41,7 +41,7 @@
     {
       "id": "joint-deformation",
       "label": "Joint deformation complete",
-      "status": "blocked-until-production-rig-skinning",
+      "status": "scheduled-stage-3-after-stage-2-purposeful-skeleton",
       "implementation": "locked-24-bone-meshy-skin-plus-runtime-contact-correction",
       "automatedStructuralGate": "locked-rig-and-bind-inventory-pass",
       "visualStressGate": "live-gameplay-review-required",
@@ -75,7 +75,7 @@
     {
       "id": "facial-topology",
       "label": "Facial topology complete",
-      "status": "blocked-by-locked-source-rig",
+      "status": "scheduled-stage-4-after-stage-3-skinning",
       "requiredLoops": [
         "eyelids",
         "eyebrows",
@@ -90,7 +90,7 @@
     {
       "id": "hand-topology",
       "label": "Hand topology complete",
-      "status": "blocked-by-locked-source-rig",
+      "status": "scheduled-stage-4-after-stage-3-skinning",
       "requirements": [
         "thumb saddle",
         "finger knuckles",
@@ -101,7 +101,7 @@
     {
       "id": "clothing-integration",
       "label": "Clothing integration complete",
-      "status": "locked-mesh-preserved-secondary-controls-missing",
+      "status": "stage1-accessory-scaffolds-present-production-controls-scheduled-stage-4",
       "requirements": [
         "cape attachment",
         "suspenders",

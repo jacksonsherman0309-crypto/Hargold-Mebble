@@ -4,7 +4,8 @@ Last verified: July 31, 2026
 
 > Rig-first override: the runtime behavior below is retained as interim
 > controller, timing, migration, and rollback evidence. It is not the final
-> animation-authoring path. Final polish is blocked until Stages 0–7 in
+> animation-authoring path. Stage 0 and Stage 1 pass; final polish remains
+> blocked until Stages 2–7 in
 > `docs/rig-first-character-production-gate-2026-07-31.md` pass.
 
 ## Runtime authority
@@ -76,12 +77,13 @@ responsive.
 
 An airborne Down/S/SLAM press has a short deterministic intent buffer so a
 press immediately after takeoff is not lost before minimum clearance is
-reached. A valid slam is feet-down throughout its six-frame startup,
-controller-driven descent, five-frame impact, and ten-frame recovery. It emits
-commit, impact, landing-contact, and recovery-cancel markers at the approved
-frames. Live impact events drive dust/ring effects, camera response, and nearby
-mob contact through each mob's existing world-specific stomp behavior. An
-invalid low descending press remains an ordinary fast fall.
+reached. The authoritative production pose sequence is the nine-frame air
+brake, tuck, forward-somersault, orientation, and committed descent in
+`docs/animation-motion-override-2026-07-31.md`. Interim 24-bone presentation
+remains diagnostic evidence only. Live impact events drive dust/ring effects,
+camera response, and nearby mob contact through each mob's existing
+world-specific stomp behavior. An invalid low descending press remains an
+ordinary fast fall.
 
 Hargold's double jump launches immediately at the approved speed and uses a
 distinct tuck, extension, and counter-twist pose. Mebble's glide has numeric
@@ -135,7 +137,7 @@ hero ability available, use:
 
 The fully unlocked profile is query-scoped and non-persistent. It enables
 Hargold's learned double jump and starts the test session at the canonical
-three health layers and 99-life caps. Mebble's glide, shared air twirl, ground
+three health layers and 99-life caps. Mebble's glide, Hargold-only air twirl, ground
 slam, combat, and hero swapping are already available through the live
 controller. Planned elemental power-ups are not claimed or simulated by this
 test profile.
@@ -172,9 +174,10 @@ hat, feather, glasses, belt, backpack, or corrective control bones. Therefore:
   physics cannot be authored safely from the existing controls;
 - pose-space deformation correction remains unavailable.
 
-Adding those features requires an artist-reviewed extension of the locked rigs
-and skin weights without replacing or redesigning the visible meshes. Until
-that source work exists, the runtime must not fabricate capability claims.
+Adding those features requires the reviewed Stage 2–4 production-rig,
+skinning, and control work without replacing or redesigning the visible
+meshes. Until those gates pass, the runtime must not fabricate capability
+claims.
 
 ## Deprecated and quarantined inputs
 

@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "hero": "Hargold",
-  "status": "stage-0-complete-stage-1-authoring-source-created-gates-2-through-7-pending",
+  "status": "stage-0-complete-stage-1-pass-ready-for-stage-2-no-skinning",
   "baseline": {
     "livePath": "assets/exports/meshy/hargold_canonical_gameplay_rig.glb",
     "rollbackPath": "assets/exports/rollback/2026-07-31/hargold_interim_24bone.glb",
@@ -43,8 +43,8 @@
   },
   "productionSource": {
     "blendPath": "assets/blender/production/hargold_production_rig.blend",
-    "sha256": "80910890C07E2BB7F98772EA6DA67FD1EF26E22B020C1826532DBA3DFEC23E81",
-    "bytes": 55847228,
+    "sha256": "1023FC83B1E11BAD3B9BF80215BDB377722B499EC6A02F9B78DEDDDB21747B05",
+    "bytes": 55876082,
     "canonicalHeightMetres": 1.82,
     "canonicalNormalizationScale": 1.070588391695,
     "lockedSurfaceBoundsMetres": {
@@ -73,25 +73,31 @@
     "primaryReviewOrientation": "true-side",
     "footOrigin": "world-origin-floor-z0",
     "collections": [
-      "LOCKED_VISIBLE_IDENTITY",
-      "INTERIM_24_BONE_ROLLBACK_REFERENCE",
-      "PRODUCTION_RIG_STAGE_1",
-      "GAMEPLAY_SOCKETS_STAGE_1",
-      "REFERENCE_GUIDES"
+      "CHARACTER_MESH",
+      "DEFORM_RIG",
+      "CONTROL_RIG",
+      "HELPER_CONTROLS",
+      "ACCESSORY_RIG",
+      "FACIAL_SYSTEM",
+      "SOCKETS",
+      "VALIDATION_POSES",
+      "EXPORT",
+      "REFERENCE_ONLY"
     ],
     "rigObject": "Hargold_PRODUCTION_RIG_STAGE_1",
-    "rigStatus": "unskinned-stage-1-scaffold-not-approved",
+    "rigStatus": "stage-1-scaffold-audited-unskinned-stage-2-pending",
     "boneCounts": {
-      "deform": 23,
-      "control": 17,
-      "helper": 4,
-      "accessory": 10
+      "body-deform": 24,
+      "accessory-deform": 10,
+      "control": 25,
+      "helper": 6
     },
     "bones": {
-      "deform": [
+      "body-deform": [
         "DEF_pelvis",
         "DEF_spine_lower",
         "DEF_spine_mid",
+        "DEF_spine_upper",
         "DEF_chest",
         "DEF_neck_base",
         "DEF_head",
@@ -100,45 +106,21 @@
         "DEF_upper_arm.L",
         "DEF_forearm.L",
         "DEF_hand.L",
-        "DEF_thigh.L",
-        "DEF_shin.L",
-        "DEF_foot.L",
-        "DEF_toe.L",
         "DEF_clavicle.R",
         "DEF_upper_arm.R",
         "DEF_forearm.R",
         "DEF_hand.R",
+        "DEF_thigh.L",
+        "DEF_shin.L",
+        "DEF_foot.L",
+        "DEF_toe.L",
         "DEF_thigh.R",
         "DEF_shin.R",
         "DEF_foot.R",
         "DEF_toe.R"
       ],
-      "control": [
-        "CTRL_world",
-        "CTRL_motion",
-        "CTRL_hand_ik.L",
-        "CTRL_foot_ik.L",
-        "CTRL_elbow_pole.L",
-        "CTRL_knee_pole.L",
-        "CTRL_hand_ik.R",
-        "CTRL_foot_ik.R",
-        "CTRL_elbow_pole.R",
-        "CTRL_knee_pole.R",
-        "CTRL_pelvis",
-        "CTRL_chest",
-        "CTRL_head",
-        "CTRL_gaze",
-        "CTRL_hand_pose.L",
-        "CTRL_hand_pose.R",
-        "CTRL_face"
-      ],
-      "helper": [
-        "MCH_upper_arm_twist.L",
-        "MCH_thigh_twist.L",
-        "MCH_upper_arm_twist.R",
-        "MCH_thigh_twist.R"
-      ],
-      "accessory": [
+      "accessory-deform": [
+        "DEF_facial_hair",
         "DEF_hat",
         "DEF_feather_01",
         "DEF_feather_02",
@@ -147,14 +129,49 @@
         "DEF_scarf_tail.R",
         "DEF_backpack",
         "DEF_belt",
-        "DEF_pouch",
-        "DEF_facial_hair"
+        "DEF_pouch"
+      ],
+      "control": [
+        "CTRL_world",
+        "CTRL_motion",
+        "CTRL_pelvis",
+        "CTRL_chest",
+        "CTRL_head",
+        "CTRL_face",
+        "CTRL_hat",
+        "CTRL_feather",
+        "CTRL_scarf",
+        "CTRL_backpack",
+        "CTRL_hand_ik.L",
+        "CTRL_foot_ik.L",
+        "CTRL_foot_roll.L",
+        "CTRL_toe_roll.L",
+        "CTRL_elbow_pole.L",
+        "CTRL_knee_pole.L",
+        "CTRL_hand_ik.R",
+        "CTRL_foot_ik.R",
+        "CTRL_foot_roll.R",
+        "CTRL_toe_roll.R",
+        "CTRL_elbow_pole.R",
+        "CTRL_knee_pole.R",
+        "CTRL_gaze",
+        "CTRL_hand_pose.L",
+        "CTRL_hand_pose.R"
+      ],
+      "helper": [
+        "MCH_upper_arm_twist.L",
+        "MCH_forearm_twist.L",
+        "MCH_upper_arm_twist.R",
+        "MCH_forearm_twist.R",
+        "MCH_thigh_twist.L",
+        "MCH_thigh_twist.R"
       ]
     },
     "sockets": [
       {
-        "name": "SOCKET_root",
-        "semanticParent": "CTRL_world",
+        "name": "SOCKET_character_root",
+        "semantic": "characterRoot",
+        "bindingBone": "CTRL_world",
         "locationMetres": [
           0.0,
           0.0,
@@ -162,78 +179,118 @@
         ]
       },
       {
-        "name": "SOCKET_head",
-        "semanticParent": "DEF_head",
+        "name": "SOCKET_gameplay_center",
+        "semantic": "gameplayCenter",
+        "bindingBone": "CTRL_motion",
         "locationMetres": [
           0.0,
           0.0,
-          1.7108
+          0.6461
+        ]
+      },
+      {
+        "name": "SOCKET_head",
+        "semantic": "head",
+        "bindingBone": "DEF_head",
+        "locationMetres": [
+          0.0,
+          0.0,
+          1.7199
+        ]
+      },
+      {
+        "name": "SOCKET_hat",
+        "semantic": "hat",
+        "bindingBone": "DEF_hat",
+        "locationMetres": [
+          0.0,
+          0.0,
+          1.7654
         ]
       },
       {
         "name": "SOCKET_hand.L",
-        "semanticParent": "DEF_hand.L",
+        "semantic": "leftHand",
+        "bindingBone": "DEF_hand.L",
         "locationMetres": [
-          0.334152,
-          -0.1092,
-          0.455
+          0.3731,
+          -0.5187,
+          0.6734
         ]
       },
       {
         "name": "SOCKET_hand.R",
-        "semanticParent": "DEF_hand.R",
+        "semantic": "rightHand",
+        "bindingBone": "DEF_hand.R",
         "locationMetres": [
-          -0.334152,
-          -0.1092,
-          0.455
+          -0.3731,
+          -0.5187,
+          0.6734
         ]
       },
       {
         "name": "SOCKET_foot.L",
-        "semanticParent": "DEF_foot.L",
+        "semantic": "leftFoot",
+        "bindingBone": "DEF_foot.L",
         "locationMetres": [
-          0.239512,
-          -0.0091,
+          0.290836,
+          0.0,
           0.1001
         ]
       },
       {
         "name": "SOCKET_foot.R",
-        "semanticParent": "DEF_foot.R",
+        "semantic": "rightFoot",
+        "bindingBone": "DEF_foot.R",
         "locationMetres": [
-          -0.239512,
-          -0.0091,
+          -0.290836,
+          0.0,
           0.1001
         ]
       },
       {
         "name": "SOCKET_back",
-        "semanticParent": "DEF_chest",
+        "semantic": "backOrBackpack",
+        "bindingBone": "DEF_backpack",
         "locationMetres": [
           0.0,
-          0.12,
-          1.1102
+          0.1274,
+          1.1193
         ]
       },
       {
-        "name": "SOCKET_effect",
-        "semanticParent": "DEF_pelvis",
+        "name": "SOCKET_effect_origin",
+        "semantic": "effectOrigin",
+        "bindingBone": "DEF_pelvis",
         "locationMetres": [
           0.0,
           0.0,
-          0.6552
+          0.6461
         ]
       },
       {
-        "name": "SOCKET_scarf",
-        "semanticParent": "DEF_scarf_root",
+        "name": "SOCKET_ground_slam_impact",
+        "semantic": "groundSlamImpact",
+        "bindingBone": "CTRL_world",
         "locationMetres": [
           0.0,
           0.0,
-          1.2558
+          0.0
+        ]
+      },
+      {
+        "name": "SOCKET_scarf_origin",
+        "semantic": "scarfOrigin",
+        "bindingBone": "DEF_scarf_root",
+        "locationMetres": [
+          0.0,
+          0.0,
+          1.2649
         ]
       }
-    ]
+    ],
+    "stage1Inventory": "assets/blender/production/hargold_stage-1-rig-inventory.json",
+    "stage1PoseSheet": "assets/previews/rig-stage-1/hargold-scaffold-pose-review.png"
   },
   "gates": {
     "stage0BaselinePreserved": true,
@@ -247,6 +304,9 @@
     "stage5PoseGatePassed": false,
     "stage6CandidateExportIntegrated": false,
     "stage7RuntimeParityPassed": false,
-    "stage8FinalAnimationAllowed": false
+    "stage8FinalAnimationAllowed": false,
+    "stage1SourceOrganizationPassed": true,
+    "stage1CoordinateAndRollAuditPassed": true,
+    "stage1ScaffoldPoseReviewPassed": true
   }
 }

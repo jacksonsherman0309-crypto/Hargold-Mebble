@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "hero": "Mebble",
+  "status": "pass",
+  "scope": "Stage 1 source integrity, coordinate, hierarchy, roll, socket, and static scaffold-pose gate only",
+  "pass": true,
+  "blenderVersion": "5.2.0 LTS",
+  "blend": "assets/blender/production/mebble_production_rig.blend",
+  "blendSha256": "BA16271883A92529E74FF4B1D7C70881911F75BAB91BF3177F407FC8D55D557E",
+  "surface": {
+    "vertices": 183495,
+    "polygons": 289548,
+    "materials": [
+      "Material_1"
+    ],
+    "boundsMinimum": [
+      -0.345886737,
+      -0.284628749,
+      -2e-09
+    ],
+    "boundsMaximum": [
+      0.345886678,
+      0.284628779,
+      2.293199778
+    ],
+    "heightMetres": 2.29319978,
+    "floorZ": -2e-09,
+    "objectScale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "rigCategoryCounts": {
+    "body-deform": 26,
+    "accessory-deform": 12,
+    "control": 25,
+    "helper": 6
+  },
+  "socketCount": 12,
+  "actionCount": 0,
+  "missingDependencies": [],
+  "boneRollAuditPass": true,
+  "hierarchyAuditPass": true,
+  "staticScaffoldPosePass": true,
+  "stage2Started": false,
+  "stage3Started": false,
+  "runtimeSwitchAuthorized": false,
+  "finalAnimationAllowed": false,
+  "errors": []
+}

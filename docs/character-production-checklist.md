@@ -19,8 +19,11 @@ order is `docs/rig-first-character-production-gate-2026-07-31.md`.
 - [x] Canonical static bind surfaces floor-aligned at 1.82 m and 2.2932 m, scale `1,1,1`
 - [x] Imported Meshy actions removed from production authoring sources
 - [x] Original production-rig and semantic-control scaffolds created and clearly marked unskinned/not live
-- [ ] Stage 1 production topology approved
+- [x] Stage 1 source collections, coordinate convention, transforms, facing, floor origin, and export metadata verified
+- [x] Stage 1 hierarchy, deliberate bone roll, deform/control/helper/accessory classification, and 12 semantic sockets verified
+- [x] Stage 1 ten-pose rigid-envelope scaffold review passed for both heroes
 - [ ] Stage 2 purposeful skeletons, constraints, and IK/FK approved
+- [ ] Stage 3 production topology corrections approved after Stage 2 skeleton completion
 - [ ] Stage 3 skinning, weights, and correctives approved
 - [ ] Stage 4 face, hand, and accessory systems approved
 - [ ] Stage 5 enlarged static/action pose gate passed
@@ -52,9 +55,10 @@ diagnostic coverage:
 - [ ] LOD generation and mobile profiling
 - [ ] Export-ready production approval
 
-The facial, finger, accessory, and corrective boxes cannot be checked with the
-present source GLBs: both rigs have 24 body bones and zero morph targets.
-Documentation and body poses are not substitutes for those missing controls.
+The facial, finger, production accessory, and corrective boxes cannot be
+checked from Stage 1 scaffolds or the present runtime GLBs. Stage 2-4 must
+create and validate those systems; documentation and rigid pose proxies are
+not substitutes for working controls and deformation.
 
 No unchecked item may be reported as complete without a saved source asset,
 runtime integration where applicable, automated validation where practical,

@@ -1,10 +1,12 @@
 {
   "schemaVersion": 1,
   "hero": "Hargold",
+  "status": "pass",
+  "scope": "Stage 1 source integrity, coordinate, hierarchy, roll, socket, and static scaffold-pose gate only",
   "pass": true,
-  "scope": "Stage 0 baseline preservation and Stage 1 authoring-source structure only",
+  "blenderVersion": "5.2.0 LTS",
   "blend": "assets/blender/production/hargold_production_rig.blend",
-  "blendSha256": "80910890C07E2BB7F98772EA6DA67FD1EF26E22B020C1826532DBA3DFEC23E81",
+  "blendSha256": "1023FC83B1E11BAD3B9BF80215BDB377722B499EC6A02F9B78DEDDDB21747B05",
   "surface": {
     "vertices": 223097,
     "polygons": 293376,
@@ -21,26 +23,29 @@
       0.57604301,
       1.820000172
     ],
-    "heightMetres": 1.820000163
+    "heightMetres": 1.820000163,
+    "floorZ": 9e-09,
+    "objectScale": [
+      1.0,
+      1.0,
+      1.0
+    ]
   },
   "rigCategoryCounts": {
-    "body-deform": 23,
-    "control": 17,
-    "helper": 4,
-    "accessory-deform": 10
+    "body-deform": 24,
+    "accessory-deform": 10,
+    "control": 25,
+    "helper": 6
   },
-  "socketCount": 9,
+  "socketCount": 12,
   "actionCount": 0,
+  "missingDependencies": [],
+  "boneRollAuditPass": true,
+  "hierarchyAuditPass": true,
+  "staticScaffoldPosePass": true,
+  "stage2Started": false,
+  "stage3Started": false,
   "runtimeSwitchAuthorized": false,
   "finalAnimationAllowed": false,
-  "remainingBlockedStages": [
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8
-  ],
   "errors": []
 }

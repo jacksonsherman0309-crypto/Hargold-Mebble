@@ -1,7 +1,11 @@
 # Character rig production — Stage 0 and Stage 1 report
 
 Date: July 31, 2026
-Status: Stage 0 complete; Stage 1 authoring sources created; production rigs not established
+Status: Stage 0 complete; Stage 1 subsequently passed; production rigs not established
+
+The completed Stage 1 evidence superseding the in-progress scaffold section of
+this historical report is recorded in `docs/character-rig-stage-1-report.md`.
+Stages 2-7 and final animation remain blocked.
 
 ## Outcome
 

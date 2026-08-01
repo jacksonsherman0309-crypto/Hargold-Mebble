@@ -47,6 +47,7 @@ test('Stage 1 Blender sources and validation reports are real and internally con
     assert.ok(Math.abs(validation.surface.boundsMinimum[2]) < 0.00001);
     assert.equal(record.productionScaffold.skinned, false);
     assert.equal(record.productionScaffold.approved, false);
+    assert.equal(record.productionScaffold.stage1ScaffoldAuditPass, true);
   }
 });
 
@@ -55,7 +56,8 @@ test('semantic migration interface covers every interim rig bone without becomin
   const mappedBones = Object.keys(semantic.interim24BoneMigrationMap).sort();
   assert.deepEqual(mappedBones, interimBones);
   assert.equal(semantic.runtimeUsesThisMap, false);
-  assert.equal(semantic.status, 'stage-1-interface-draft-not-active-in-runtime');
+  assert.equal(semantic.status, 'stage-1-semantic-plan-complete-not-active-in-runtime');
+  assert.equal(semantic.sharedSemanticControls.upperSpine, 'DEF_spine_upper');
   assert.ok(semantic.heroSpecificSemanticControls.Mebble.neckChain.length >= 3);
   assert.ok(semantic.heroSpecificSemanticControls.Mebble.capeChain.length >= 7);
   assert.ok(semantic.heroSpecificSemanticControls.Hargold.featherChain.length >= 2);

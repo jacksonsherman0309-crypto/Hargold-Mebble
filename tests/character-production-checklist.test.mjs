@@ -21,17 +21,17 @@ const milestones = new Map(
   checklist.milestones.map((milestone) => [milestone.id, milestone])
 );
 
-assert.equal(checklist.schemaVersion, 3);
+assert.equal(checklist.schemaVersion, 4);
 assert.equal(checklist.authority, 'rig-first-character-production-gate-2026-07-31');
 assert.equal(rigGate.coreDecision.finalAnimationProductionBlockedUntilRigGatesPass, true);
 assert.equal(checklist.productionRigStages.stage0BaselinePreservation, 'pass');
-assert.match(checklist.productionRigStages.stage1EditableBlenderSources, /created/);
+assert.match(checklist.productionRigStages.stage1EditableBlenderSources, /pass-source-integrity/);
 assert.equal(checklist.productionRigStages.stage8FinalAnimationProduction, 'blocked');
 assert.equal(milestones.get('silhouette')?.status, 'approved');
 assert.equal(milestones.get('proportions')?.status, 'approved');
 assert.match(milestones.get('skeleton')?.status, /interim-24-bone-runtime/);
 assert.match(milestones.get('connected-body')?.status, /production-deformation-topology-pending/);
-assert.equal(milestones.get('joint-deformation')?.status, 'blocked-until-production-rig-skinning');
+assert.equal(milestones.get('joint-deformation')?.status, 'scheduled-stage-3-after-stage-2-purposeful-skeleton');
 assert.equal(
   milestones.get('joint-deformation')?.automatedStructuralGate,
   'locked-rig-and-bind-inventory-pass'
@@ -47,11 +47,11 @@ assert.equal(
 assert.match(checklist.animationPolishPolicy, /paused-as-final-production/);
 assert.equal(
   milestones.get('facial-topology')?.status,
-  'blocked-by-locked-source-rig'
+  'scheduled-stage-4-after-stage-3-skinning'
 );
 assert.equal(
   milestones.get('hand-topology')?.status,
-  'blocked-by-locked-source-rig'
+  'scheduled-stage-4-after-stage-3-skinning'
 );
 assert.deepEqual(
   milestones.get('final-animation-polish')?.runtimePresentationClipCounts,

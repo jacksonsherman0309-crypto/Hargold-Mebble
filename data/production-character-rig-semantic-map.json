@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "stage-1-interface-draft-not-active-in-runtime",
+  "status": "stage-1-semantic-plan-complete-not-active-in-runtime",
   "runtimeUsesThisMap": false,
   "rawExportNamesAllowedInGameplayLogic": false,
   "productionSources": {
@@ -13,6 +13,7 @@
     "pelvis": "DEF_pelvis",
     "lowerSpine": "DEF_spine_lower",
     "middleSpine": "DEF_spine_mid",
+    "upperSpine": "DEF_spine_upper",
     "chest": "DEF_chest",
     "leftClavicle": "DEF_clavicle.L",
     "rightClavicle": "DEF_clavicle.R",
@@ -30,6 +31,14 @@
     "rightShin": "DEF_shin.R",
     "rightFoot": "DEF_foot.R",
     "rightToe": "DEF_toe.R",
+    "leftHandIk": "CTRL_hand_ik.L",
+    "rightHandIk": "CTRL_hand_ik.R",
+    "leftFootIk": "CTRL_foot_ik.L",
+    "rightFootIk": "CTRL_foot_ik.R",
+    "leftFootRoll": "CTRL_foot_roll.L",
+    "rightFootRoll": "CTRL_foot_roll.R",
+    "leftToeRoll": "CTRL_toe_roll.L",
+    "rightToeRoll": "CTRL_toe_roll.R",
     "head": "DEF_head",
     "jaw": "DEF_jaw",
     "gaze": "CTRL_gaze",
@@ -41,9 +50,13 @@
     "Hargold": {
       "neckChain": ["DEF_neck_base"],
       "hat": "DEF_hat",
+      "hatControl": "CTRL_hat",
       "featherChain": ["DEF_feather_01", "DEF_feather_02"],
+      "featherControl": "CTRL_feather",
       "scarfChain": ["DEF_scarf_root", "DEF_scarf_tail.L", "DEF_scarf_tail.R"],
+      "scarfControl": "CTRL_scarf",
       "backpack": "DEF_backpack",
+      "backpackControl": "CTRL_backpack",
       "belt": "DEF_belt",
       "pouch": "DEF_pouch",
       "facialHair": "DEF_facial_hair"
@@ -51,12 +64,31 @@
     "Mebble": {
       "neckChain": ["DEF_neck_base", "DEF_neck_mid", "DEF_neck_upper"],
       "hat": "DEF_hat",
+      "hatControl": "CTRL_hat",
       "glasses": "DEF_glasses",
+      "glassesControl": "CTRL_glasses",
       "adamsApple": "DEF_adams_apple",
+      "neckShapeControl": "CTRL_neck_shape",
       "capeChain": ["DEF_cape_root", "DEF_cape_01", "DEF_cape_02", "DEF_cape_03", "DEF_cape_04", "DEF_cape_05", "DEF_cape_06"],
+      "capeControl": "CTRL_cape",
       "belt": "DEF_belt",
       "pouch": "DEF_pouch"
     }
+  },
+  "semanticSockets": {
+    "characterRoot": "SOCKET_character_root",
+    "gameplayCenter": "SOCKET_gameplay_center",
+    "leftHand": "SOCKET_hand.L",
+    "rightHand": "SOCKET_hand.R",
+    "leftFoot": "SOCKET_foot.L",
+    "rightFoot": "SOCKET_foot.R",
+    "head": "SOCKET_head",
+    "hat": "SOCKET_hat",
+    "backOrBackpack": "SOCKET_back",
+    "effectOrigin": "SOCKET_effect_origin",
+    "groundSlamImpact": "SOCKET_ground_slam_impact",
+    "HargoldScarfOrigin": "SOCKET_scarf_origin",
+    "MebbleCapeOrigin": "SOCKET_cape_origin"
   },
   "interim24BoneMigrationMap": {
     "Hips": "DEF_pelvis",
@@ -85,7 +117,7 @@
     "headfront": "CTRL_gaze"
   },
   "pendingBeforeRuntimeUse": [
-    "approve Stage 2 joint placement and axes",
+    "complete Stage 2 constraints, IK/FK switching, and purposeful control architecture",
     "skin the locked production surface in Stage 3",
     "implement and verify constraints and IK/FK switching",
     "implement hand-pose and facial deformation systems",

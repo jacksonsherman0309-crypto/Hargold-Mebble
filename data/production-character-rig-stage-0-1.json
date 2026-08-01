@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "stage-0-complete-stage-1-authoring-sources-created-production-rigs-not-established",
+  "status": "stage-0-complete-stage-1-pass-ready-for-stage-2-production-rigs-not-established",
   "date": "2026-07-31",
   "authority": {
     "productionOrder": "data/rig-first-character-production-gate-2026-07-31.json",
@@ -27,7 +27,7 @@
       "liveBytes": 37367328,
       "rollback": "assets/exports/rollback/2026-07-31/hargold_interim_24bone.glb",
       "blend": "assets/blender/production/hargold_production_rig.blend",
-      "blendSha256": "80910890C07E2BB7F98772EA6DA67FD1EF26E22B020C1826532DBA3DFEC23E81",
+      "blendSha256": "1023FC83B1E11BAD3B9BF80215BDB377722B499EC6A02F9B78DEDDDB21747B05",
       "canonicalHeightMetres": 1.82,
       "sourceBindHeightMetres": 1.699999752,
       "sourceNormalizationScale": 1.070588391695,
@@ -38,14 +38,17 @@
       "sourceMaterialAssignments": ["Material_1"],
       "sourceGameplaySockets": [],
       "productionScaffold": {
-        "bodyDeform": 23,
+        "bodyDeform": 24,
         "accessoryDeform": 10,
-        "control": 17,
-        "helper": 4,
-        "total": 54,
+        "control": 25,
+        "helper": 6,
+        "total": 65,
         "skinned": false,
-        "approved": false
+        "approved": false,
+        "stage1ScaffoldAuditPass": true
       },
+      "stage1Inventory": "assets/blender/production/hargold_stage-1-rig-inventory.json",
+      "stage1PoseSheet": "assets/previews/rig-stage-1/hargold-scaffold-pose-review.png",
       "sourceReport": "assets/blender/production/hargold_stage-0-1-source-report.json",
       "validation": "assets/blender/production/hargold_stage-0-1-validation.json"
     },
@@ -54,7 +57,7 @@
       "liveBytes": 37906996,
       "rollback": "assets/exports/rollback/2026-07-31/mebble_interim_24bone.glb",
       "blend": "assets/blender/production/mebble_production_rig.blend",
-      "blendSha256": "BD3352BA2DC98E81375A8D5D73D98CA5EA1A4184AD35D161E5CE26CD6F0D14BC",
+      "blendSha256": "BA16271883A92529E74FF4B1D7C70881911F75BAB91BF3177F407FC8D55D557E",
       "canonicalHeightMetres": 2.2932,
       "sourceBindHeightMetres": 1.700000434,
       "sourceNormalizationScale": 1.348940832347,
@@ -65,14 +68,17 @@
       "sourceMaterialAssignments": ["Material_1"],
       "sourceGameplaySockets": [],
       "productionScaffold": {
-        "bodyDeform": 25,
+        "bodyDeform": 26,
         "accessoryDeform": 12,
-        "control": 17,
-        "helper": 4,
-        "total": 58,
+        "control": 25,
+        "helper": 6,
+        "total": 69,
         "skinned": false,
-        "approved": false
+        "approved": false,
+        "stage1ScaffoldAuditPass": true
       },
+      "stage1Inventory": "assets/blender/production/mebble_stage-1-rig-inventory.json",
+      "stage1PoseSheet": "assets/previews/rig-stage-1/mebble-scaffold-pose-review.png",
       "sourceReport": "assets/blender/production/mebble_stage-0-1-source-report.json",
       "validation": "assets/blender/production/mebble_stage-0-1-validation.json"
     }
@@ -82,8 +88,11 @@
     "stage0BaselinePreserved": "pass",
     "stage1EditableBlenderSourcesCreated": "pass",
     "stage1CanonicalStaticSurfaceCreated": "pass",
-    "stage1ProductionTopologyApproved": "fail-not-yet-reviewed",
-    "stage1ProductionArmatureApproved": "fail-scaffold-is-unskinned",
+    "stage1SourceOrganizationAndIntegrity": "pass",
+    "stage1CoordinateFacingAndBoneRollAudit": "pass",
+    "stage1StaticScaffoldPoseReview": "pass",
+    "stage1ProductionTopologyApproved": "deferred-to-stage-3",
+    "stage1ProductionArmatureApproved": "false-stage-2-purposeful-skeleton-and-controls-pending",
     "stage2PurposefulSkeletonApproved": "not-run",
     "stage3SkinningAndCorrectivesApproved": "not-run",
     "stage4HandFaceAccessorySystemsApproved": "not-run",

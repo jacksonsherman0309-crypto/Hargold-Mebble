@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "status": "stage-1-pass-ready-for-stage-2-no-skinning",
+  "date": "2026-07-31",
+  "authority": {
+    "productionOrder": "data/rig-first-character-production-gate-2026-07-31.json",
+    "rigDirection": "data/character-rig-direction-override-2026-07-31.json",
+    "motionOverride": "data/animation-motion-override-2026-07-31.json",
+    "stage0Evidence": "data/production-character-rig-stage-0-1.json",
+    "semanticNamingPlan": "data/production-character-rig-semantic-map.json"
+  },
+  "tooling": {
+    "blender": "5.2.0 LTS",
+    "initialSourceBuilder": "tools/blender/build_production_rig_sources.py",
+    "stage1Finalizer": "tools/blender/finalize_production_rig_stage_1.py",
+    "stage1Validator": "tools/blender/validate_production_rig_stage_1.py"
+  },
+  "coordinateConvention": {
+    "units": "metres",
+    "worldUp": "+Z",
+    "nativeForward": "-Y",
+    "trueSideCameraAxis": "+X looking toward origin",
+    "origin": "between-feet-on-ground-z0",
+    "negativeScaleMirroring": false,
+    "boneLongitudinalAxis": "LOCAL_Y",
+    "sideViewBendAxis": "LOCAL_X",
+    "twistAxis": "LOCAL_Y"
+  },
+  "sourceOrganization": [
+    "CHARACTER_MESH",
+    "DEFORM_RIG",
+    "CONTROL_RIG",
+    "HELPER_CONTROLS",
+    "ACCESSORY_RIG",
+    "FACIAL_SYSTEM",
+    "SOCKETS",
+    "VALIDATION_POSES",
+    "EXPORT",
+    "REFERENCE_ONLY"
+  ],
+  "heroes": {
+    "Hargold": {
+      "source": "assets/blender/production/hargold_production_rig.blend",
+      "sha256": "1023FC83B1E11BAD3B9BF80215BDB377722B499EC6A02F9B78DEDDDB21747B05",
+      "bytes": 55876082,
+      "canonicalHeightMetres": 1.82,
+      "objectScale": [1, 1, 1],
+      "floorZ": 0,
+      "inventory": "assets/blender/production/hargold_stage-1-rig-inventory.json",
+      "validation": "assets/blender/production/hargold_stage-1-validation.json",
+      "poseSheet": "assets/previews/rig-stage-1/hargold-scaffold-pose-review.png",
+      "counts": {
+        "bodyDeform": 24,
+        "accessoryDeform": 10,
+        "controls": 25,
+        "helpers": 6,
+        "sockets": 12,
+        "staticScaffoldPoses": 10
+      },
+      "stage1Pass": true,
+      "unresolvedScaffoldIssues": []
+    },
+    "Mebble": {
+      "source": "assets/blender/production/mebble_production_rig.blend",
+      "sha256": "BA16271883A92529E74FF4B1D7C70881911F75BAB91BF3177F407FC8D55D557E",
+      "bytes": 55186315,
+      "canonicalHeightMetres": 2.2932,
+      "objectScale": [1, 1, 1],
+      "floorZ": 0,
+      "inventory": "assets/blender/production/mebble_stage-1-rig-inventory.json",
+      "validation": "assets/blender/production/mebble_stage-1-validation.json",
+      "poseSheet": "assets/previews/rig-stage-1/mebble-scaffold-pose-review.png",
+      "counts": {
+        "bodyDeform": 26,
+        "accessoryDeform": 12,
+        "controls": 25,
+        "helpers": 6,
+        "sockets": 12,
+        "staticScaffoldPoses": 10
+      },
+      "stage1Pass": true,
+      "unresolvedScaffoldIssues": []
+    }
+  },
+  "exportConfiguration": {
+    "format": "glTF_2_0",
+    "candidateExportAllowed": false,
+    "animations": false,
+    "exportOnlyDeformBones": true,
+    "includeCollections": ["CHARACTER_MESH", "DEFORM_RIG", "SOCKETS"],
+    "excludeCollections": ["CONTROL_RIG", "HELPER_CONTROLS", "VALIDATION_POSES", "REFERENCE_ONLY"],
+    "normalGameplayRootMotion": false
+  },
+  "gateResult": {
+    "stage0BaselinePreservation": "pass-reused",
+    "stage1SourceIntegrity": "pass",
+    "stage1CanonicalScaleAndTransforms": "pass",
+    "stage1FacingAxesAndFootOrigin": "pass",
+    "stage1HierarchyAndBoneRoll": "pass",
+    "stage1SystemSeparation": "pass",
+    "stage1SemanticSockets": "pass",
+    "stage1StaticScaffoldPoses": "pass",
+    "stage2PurposefulSkeletonAndControlArchitecture": "not-started",
+    "stage3SkinningTopologyAndCorrectives": "not-started",
+    "runtimeSwitchAuthorized": false,
+    "finalAnimationAllowed": false
+  },
+  "deferredWork": [
+    "Stage 2 constraints, IK/FK switching, and final purposeful control architecture",
+    "Stage 3 skinning, topology corrections, and corrective deformation",
+    "Stage 4 hand, face, and production accessory systems",
+    "Stage 5 locked-surface deformation pose gate",
+    "Stage 6 candidate GLB export and semantic integration",
+    "Stage 7 runtime parity",
+    "Stage 8 final animation production"
+  ]
+}

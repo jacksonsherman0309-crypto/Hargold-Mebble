@@ -6,13 +6,13 @@ Last verified: July 31, 2026
 
 Final animation polish on the current 24-bone rigs is paused. Those rigs remain
 the live rollback/controller-test baseline while the purpose-built Blender rigs
-are developed. Stage 0 is complete and Stage 1 authoring sources now exist at
-`assets/blender/production/hargold_production_rig.blend` and
+are developed. Stage 0 and the Stage 1 source/scaffold gate now pass. The
+authoritative Blender sources are `assets/blender/production/hargold_production_rig.blend` and
 `assets/blender/production/mebble_production_rig.blend`.
 
-The new armatures are unskinned authoring scaffolds, not approved production
-rigs. No candidate GLB has replaced the runtime. See
-`docs/character-rig-stage-0-1-report.md` and the authoritative
+The new armatures remain unskinned scaffolds, not approved production rigs.
+Stage 2 purposeful controls and Stage 3 skinning have not begun. No candidate
+GLB has replaced the runtime. See `docs/character-rig-stage-1-report.md` and the authoritative
 `docs/rig-first-character-production-gate-2026-07-31.md`.
 
 ## Locked production path
@@ -78,9 +78,9 @@ The current Meshy skeleton does not contain:
 The present body clips can pose each hand as one rigid deform group and can
 stabilize the head/neck/body during Mebble's glide. They cannot open Mebble's
 cape, articulate fingers, animate a face, or simulate accessories
-independently. Those features are not claimed complete. They require a
-reviewed extension of the locked source rigs and weights without replacing the
-approved visible meshes.
+independently. Those features are not claimed complete. They require the
+reviewed Stage 2-4 production-rig, skinning, and control work while preserving
+the approved visible meshes.
 
 The current meshes are also high-density LOD0 assets: roughly 293k triangles
 for Hargold and 290k for Mebble. Reviewed lower LODs and mobile texture variants
@@ -122,6 +122,8 @@ Implemented and live:
 
 Still incomplete:
 
+- Stage 2 purposeful skeleton constraints and control architecture;
+- Stage 3 production skinning, topology corrections, and correctives;
 - source-authored facial rig and animation;
 - finger controls and distinct finger poses;
 - independent cloth/accessory controls and collision-safe secondary simulation;
