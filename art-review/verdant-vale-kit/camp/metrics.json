@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "qualityGate": "camp",
+  "visualApproval": "PENDING",
+  "productionApproved": false,
+  "integration": "BLOCKED",
+  "backgroundStatus": "APPROVED STATIC LAYER - UNMODIFIED",
+  "gameplayLayoutStatus": "FROZEN - UNMODIFIED",
+  "campAnchor": [-0.15, -0.485714, 0.0],
+  "objects": 195,
+  "meshes": 145,
+  "curves": 34,
+  "materials": 18,
+  "visibleCampObjects": 181,
+  "blockedLaterAssets": [
+    "tree-family",
+    "terrain-bank",
+    "rock-root-formation",
+    "integration-export"
+  ],
+  "soleQualityTarget": "assets/references/terrain/meadow-wake-production-quality-target.jpeg",
+  "currentGameplayReferenceRole": "orientation/context only"
+}
