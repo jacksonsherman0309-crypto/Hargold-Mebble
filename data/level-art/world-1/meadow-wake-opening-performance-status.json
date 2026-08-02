@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "sliceId": "world-1-1-meadow-wake-opening-vertical-slice",
+  "status": "BLOCKOUT_METRICS_ONLY_UNITY_AND_DEVICE_MEASUREMENT_REQUIRED",
+  "productionReady": false,
+  "blenderScene": {
+    "totalTrianglesIncludingGuides": 2714,
+    "terrainHighBlockoutTriangles": 60,
+    "campBlockoutTriangles": 24,
+    "treeBlockoutTriangles": 84,
+    "collisionTriangles": 120,
+    "materialDatablocks": 16,
+    "imageDatablocks": 3
+  },
+  "unityRuntime": {
+    "visibleTriangles": "NOT_MEASURED",
+    "drawCalls": "NOT_MEASURED",
+    "materialCount": "NOT_MEASURED",
+    "textureMemoryBytes": "NOT_MEASURED",
+    "cpuFrameTimeMs": "NOT_MEASURED",
+    "gpuFrameTimeMs": "NOT_MEASURED",
+    "loadingTimeMs": "NOT_MEASURED",
+    "reason": "Unity editor is not installed; the Hub editor download is paused."
+  },
+  "targetDevice": {
+    "class": "iPhone 14 Pro Max landscape",
+    "tested": false,
+    "certified": false
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "asset": "Meadow Wake opening vertical slice",
+  "source": "assets/blender/environments/world-1/meadow-wake-opening.blend",
+  "blenderVersion": "5.2.0",
+  "status": "PASS_STRUCTURE_ONLY_MANUAL_ART_BLOCKED",
+  "productionReady": false,
+  "checks": [
+    {
+      "id": "required-collections",
+      "pass": true,
+      "detail": "missing=[]"
+    },
+    {
+      "id": "metric-scene-units",
+      "pass": true,
+      "detail": "system=METRIC, scale=1.0"
+    },
+    {
+      "id": "not-production-approved",
+      "pass": true,
+      "detail": "SCULPT_REQUIRED_RETOPO_REQUIRED_UV_REQUIRED_ART_REVIEW_REQUIRED"
+    },
+    {
+      "id": "collision-ground-present",
+      "pass": true,
+      "detail": "<bpy_struct, Object(\"MW_COL_OpeningGroundProfile\") at 0x0000011B86425D20>"
+    },
+    {
+      "id": "all-block-guides",
+      "pass": true,
+      "detail": "scene=5, layout=5"
+    },
+    {
+      "id": "breakable-block-guides",
+      "pass": true,
+      "detail": "count=3"
+    },
+    {
+      "id": "all-platform-guides",
+      "pass": true,
+      "detail": "scene=5, layout=5"
+    },
+    {
+      "id": "fixed-comparison-cameras",
+      "pass": true,
+      "detail": "count=5"
+    },
+    {
+      "id": "manual-art-gates-visible",
+      "pass": true,
+      "detail": "manual_objects=25"
+    },
+    {
+      "id": "no-sculpt-blockout-in-export",
+      "pass": true,
+      "detail": "invalid=[]"
+    }
+  ],
+  "metrics": {
+    "objects": 111,
+    "meshObjects": 77,
+    "vertices": 1512,
+    "triangles": 2714,
+    "materials": 16,
+    "textures": 3,
+    "collections": 18
+  },
+  "manualWorkRequired": [
+    "manual terrain sculpt and silhouette review",
+    "game-mesh retopology and deliberate LOD authoring",
+    "UV unwrap, trim/material planning, and texture baking",
+    "camp benchmark asset final modeling",
+    "benchmark tree/root final modeling",
+    "foliage, decal, midground, and background integration art review",
+    "Unity editor import validation and device traversal capture"
+  ]
+}

@@ -1,0 +1,2088 @@
+{
+  "schemaVersion": 1,
+  "id": "world-1-1-meadow-wake-opening-vertical-slice",
+  "status": "authoritative-layout-freeze",
+  "visibleArtStatus": "SCULPT_REQUIRED_RETOPO_REQUIRED_UV_REQUIRED_ART_REVIEW_REQUIRED",
+  "completionClaim": false,
+  "scope": {
+    "courseId": "1-1",
+    "courseName": "Meadow Wake",
+    "playableRangeMetres": [
+      0,
+      30
+    ],
+    "visualBufferRangeMetres": [
+      -2,
+      34
+    ],
+    "targetTraversalSeconds": [
+      20,
+      30
+    ],
+    "expansionBlockedUntilArtApproval": true
+  },
+  "authority": {
+    "layout": "current runnable browser implementation",
+    "historicalScaffoldStatus": "coordinate-free; not used as coordinate authority",
+    "visibleTerrain": "assets/blender/environments/world-1/meadow-wake-opening.blend",
+    "productionAssemblyTarget": "unity/HargoldMebble",
+    "sources": [
+      {
+        "path": "src/content/meadow-wake-course.js",
+        "sha256": "0ede23185a7f2465f8b80d123285f7c9d250f3680499df13d85611b99d93e1b5"
+      },
+      {
+        "path": "src/content/meadow-wake-level-data.js",
+        "sha256": "97d14b5f9d5dbaad96bcea201761fedae8761b371f09f0d86220129a597caac7"
+      },
+      {
+        "path": "src/content/meadow-wake-scenery.js",
+        "sha256": "6c53de5565ca7879b282a7fd5a1366f41d2aeae3168d82e331b056facee81a91"
+      },
+      {
+        "path": "src/game.js",
+        "sha256": "424c0cbdac43596c3f64f37ce7eb5b882c91a79441267ff72e3d3a9509b56d0c"
+      }
+    ]
+  },
+  "unitsAndAxes": {
+    "gameplayMetreToBlenderMetre": 1,
+    "gameplayMetreToUnityUnit": 1,
+    "blender": {
+      "course": "+X",
+      "presentationDepth": "+Y",
+      "vertical": "+Z"
+    },
+    "unity": {
+      "course": "+X",
+      "vertical": "+Y",
+      "presentationDepth": "+Z"
+    },
+    "runtimeBrowser": {
+      "course": "+X",
+      "vertical": "+Y downward"
+    },
+    "browserToBlender": {
+      "x": "x",
+      "y": 0,
+      "z": "7.9 - runtimeY",
+      "groundDatumRuntimeY": 7.9
+    }
+  },
+  "scaleReferences": {
+    "Hargold": {
+      "heightMetres": 1.82,
+      "widthMetres": 1.02
+    },
+    "Mebble": {
+      "heightMetres": 2.2932,
+      "widthMetres": 0.72
+    },
+    "standardBlock": {
+      "widthMetres": 0.74,
+      "heightMetres": 0.74,
+      "depthMetres": 0.74
+    }
+  },
+  "gameplayPlane": {
+    "blenderY": 0,
+    "unityZ": 0,
+    "traversalDepthLocked": true,
+    "collisionWidthMetres": 0.8,
+    "artKeepClearDepthMetres": 1.1
+  },
+  "spawn": {
+    "id": "start",
+    "x": 1.8,
+    "blenderPosition": {
+      "x": 1.8,
+      "y": 0,
+      "z": 0
+    },
+    "unityPosition": {
+      "x": 1.8,
+      "y": 0,
+      "z": 0
+    },
+    "source": {
+      "id": "start",
+      "type": "level-start",
+      "position": {
+        "x": 1.8,
+        "y": 0,
+        "z": 0
+      },
+      "areaId": "camp-departure",
+      "destinationLevelId": null,
+      "destinationEntranceId": null,
+      "railId": null,
+      "isLevelExit": false
+    }
+  },
+  "exitTransition": {
+    "id": "opening-slice-exit",
+    "x": 30,
+    "blenderPosition": {
+      "x": 30,
+      "y": 0,
+      "z": 1.4
+    },
+    "nextRoomId": "shellback-quarry",
+    "completionTrigger": false,
+    "purpose": "Vertical-slice review boundary only; not a course goal."
+  },
+  "terrain": {
+    "groundProfile": [
+      {
+        "x": 0,
+        "runtimeY": 7.9,
+        "blenderZ": 0
+      },
+      {
+        "x": 4,
+        "runtimeY": 7.9,
+        "blenderZ": 0
+      },
+      {
+        "x": 8,
+        "runtimeY": 7.72,
+        "blenderZ": 0.18
+      },
+      {
+        "x": 10.5,
+        "runtimeY": 7.58,
+        "blenderZ": 0.32
+      },
+      {
+        "x": 12.5,
+        "runtimeY": 7.28,
+        "blenderZ": 0.62
+      },
+      {
+        "x": 14.5,
+        "runtimeY": 7.08,
+        "blenderZ": 0.82
+      },
+      {
+        "x": 16.5,
+        "runtimeY": 7.42,
+        "blenderZ": 0.48
+      },
+      {
+        "x": 18.5,
+        "runtimeY": 7.2,
+        "blenderZ": 0.7
+      },
+      {
+        "x": 20.5,
+        "runtimeY": 7.02,
+        "blenderZ": 0.88
+      },
+      {
+        "x": 22.5,
+        "runtimeY": 7.28,
+        "blenderZ": 0.62
+      },
+      {
+        "x": 24.5,
+        "runtimeY": 7.04,
+        "blenderZ": 0.86
+      },
+      {
+        "x": 27,
+        "runtimeY": 6.62,
+        "blenderZ": 1.28
+      },
+      {
+        "x": 29.5,
+        "runtimeY": 6.43,
+        "blenderZ": 1.47
+      },
+      {
+        "x": 30,
+        "runtimeY": 6.5,
+        "blenderZ": 1.4
+      }
+    ],
+    "collisionRepresentation": "single deterministic linear profile; no visible-terrain collision",
+    "pits": [],
+    "modules": [
+      {
+        "id": "trailhead-packed-loam",
+        "from": 0,
+        "to": 5.4,
+        "variant": "compacted-clay",
+        "roomId": "trailhead-camp",
+        "surfaceFinish": {
+          "roomId": "trailhead-camp",
+          "crownProfile": [
+            0.72,
+            1.08,
+            0.82,
+            1.2,
+            0.68,
+            0.94
+          ],
+          "wornWindows": [
+            [
+              3.2,
+              4.15
+            ],
+            [
+              7.75,
+              8.55
+            ]
+          ],
+          "undergroundScale": 0.7
+        },
+        "visibleRepresentation": "verdant-vale-relief-mesh",
+        "collisionRepresentation": "meadow-wake-ground-profile",
+        "lowerProfile": [
+          0.58,
+          0.66,
+          0.54,
+          0.72,
+          0.61,
+          0.56
+        ],
+        "lowerInset": [
+          0.18,
+          0.08
+        ],
+        "textureScale": 7.4,
+        "seed": 3,
+        "faceDepth": 462,
+        "visualFrom": -1.7,
+        "purpose": "non-collision visual apron grounds the opening lodge",
+        "authoredRange": [
+          0,
+          5.4
+        ],
+        "sliceRange": [
+          -1.7,
+          5.4
+        ],
+        "productionMeshStatus": "SCULPT_REQUIRED"
+      },
+      {
+        "id": "trailhead-root-edge",
+        "from": 5.4,
+        "to": 10.5,
+        "variant": "root-bound",
+        "roomId": "trailhead-camp",
+        "surfaceFinish": {
+          "roomId": "trailhead-camp",
+          "crownProfile": [
+            0.72,
+            1.08,
+            0.82,
+            1.2,
+            0.68,
+            0.94
+          ],
+          "wornWindows": [
+            [
+              3.2,
+              4.15
+            ],
+            [
+              7.75,
+              8.55
+            ]
+          ],
+          "undergroundScale": 0.7
+        },
+        "visibleRepresentation": "verdant-vale-relief-mesh",
+        "collisionRepresentation": "meadow-wake-ground-profile",
+        "lowerProfile": [
+          0.63,
+          0.82,
+          0.71,
+          0.92,
+          0.68,
+          0.57
+        ],
+        "lowerInset": [
+          0.08,
+          0.24
+        ],
+        "textureScale": 6.7,
+        "seed": 11,
+        "faceDepth": 438,
+        "transitionRight": "root",
+        "authoredRange": [
+          5.4,
+          10.5
+        ],
+        "sliceRange": [
+          5.4,
+          10.5
+        ],
+        "productionMeshStatus": "SCULPT_REQUIRED"
+      },
+      {
+        "id": "elder-root-rise",
+        "from": 10.5,
+        "to": 15,
+        "variant": "root-hollow",
+        "roomId": "elder-root-walk",
+        "surfaceFinish": {
+          "roomId": "elder-root-walk",
+          "crownProfile": [
+            1.16,
+            0.74,
+            1.28,
+            0.86,
+            1.04,
+            0.7
+          ],
+          "wornWindows": [
+            [
+              12.2,
+              13.05
+            ],
+            [
+              18.55,
+              19.35
+            ]
+          ],
+          "undergroundScale": 0.68
+        },
+        "visibleRepresentation": "verdant-vale-relief-mesh",
+        "collisionRepresentation": "meadow-wake-ground-profile",
+        "lowerProfile": [
+          0.7,
+          0.9,
+          0.78,
+          0.64,
+          0.84,
+          0.73
+        ],
+        "lowerInset": [
+          0.2,
+          0.12
+        ],
+        "textureScale": 7.9,
+        "seed": 19,
+        "faceDepth": 476,
+        "transitionLeft": "root",
+        "authoredRange": [
+          10.5,
+          15
+        ],
+        "sliceRange": [
+          10.5,
+          15
+        ],
+        "productionMeshStatus": "SCULPT_REQUIRED"
+      },
+      {
+        "id": "elder-root-hollow",
+        "from": 15,
+        "to": 20.5,
+        "variant": "root-hollow",
+        "roomId": "elder-root-walk",
+        "surfaceFinish": {
+          "roomId": "elder-root-walk",
+          "crownProfile": [
+            1.16,
+            0.74,
+            1.28,
+            0.86,
+            1.04,
+            0.7
+          ],
+          "wornWindows": [
+            [
+              12.2,
+              13.05
+            ],
+            [
+              18.55,
+              19.35
+            ]
+          ],
+          "undergroundScale": 0.68
+        },
+        "visibleRepresentation": "verdant-vale-relief-mesh",
+        "collisionRepresentation": "meadow-wake-ground-profile",
+        "lowerProfile": [
+          0.74,
+          0.62,
+          0.88,
+          0.96,
+          0.69,
+          0.76
+        ],
+        "lowerInset": [
+          0.12,
+          0.28
+        ],
+        "textureScale": 8.4,
+        "seed": 29,
+        "faceDepth": 522,
+        "transitionRight": "boulder",
+        "authoredRange": [
+          15,
+          20.5
+        ],
+        "sliceRange": [
+          15,
+          20.5
+        ],
+        "productionMeshStatus": "SCULPT_REQUIRED"
+      },
+      {
+        "id": "mason-shelf-low",
+        "from": 20.5,
+        "to": 25.5,
+        "variant": "stone-seam",
+        "roomId": "mason-shelf",
+        "surfaceFinish": {
+          "roomId": "mason-shelf",
+          "crownProfile": [
+            0.78,
+            1.18,
+            0.7,
+            1.08,
+            0.84,
+            1.22
+          ],
+          "wornWindows": [
+            [
+              23,
+              23.75
+            ],
+            [
+              27.6,
+              28.45
+            ]
+          ],
+          "undergroundScale": 0.71
+        },
+        "visibleRepresentation": "verdant-vale-relief-mesh",
+        "collisionRepresentation": "meadow-wake-ground-profile",
+        "lowerProfile": [
+          0.57,
+          0.74,
+          0.86,
+          0.66,
+          0.59,
+          0.72
+        ],
+        "lowerInset": [
+          0.26,
+          0.1
+        ],
+        "textureScale": 6.9,
+        "seed": 37,
+        "faceDepth": 448,
+        "transitionLeft": "boulder",
+        "authoredRange": [
+          20.5,
+          25.5
+        ],
+        "sliceRange": [
+          20.5,
+          25.5
+        ],
+        "productionMeshStatus": "SCULPT_REQUIRED"
+      },
+      {
+        "id": "mason-shelf-rise",
+        "from": 25.5,
+        "to": 30,
+        "variant": "stone-seam",
+        "roomId": "mason-shelf",
+        "surfaceFinish": {
+          "roomId": "mason-shelf",
+          "crownProfile": [
+            0.78,
+            1.18,
+            0.7,
+            1.08,
+            0.84,
+            1.22
+          ],
+          "wornWindows": [
+            [
+              23,
+              23.75
+            ],
+            [
+              27.6,
+              28.45
+            ]
+          ],
+          "undergroundScale": 0.71
+        },
+        "visibleRepresentation": "verdant-vale-relief-mesh",
+        "collisionRepresentation": "meadow-wake-ground-profile",
+        "lowerProfile": [
+          0.68,
+          0.92,
+          0.79,
+          0.96,
+          0.72,
+          0.64
+        ],
+        "lowerInset": [
+          0.08,
+          0.2
+        ],
+        "textureScale": 7.7,
+        "seed": 43,
+        "faceDepth": 506,
+        "transitionRight": "stone",
+        "authoredRange": [
+          25.5,
+          30
+        ],
+        "sliceRange": [
+          25.5,
+          30
+        ],
+        "productionMeshStatus": "SCULPT_REQUIRED"
+      },
+      {
+        "id": "quarry-foundation-a",
+        "from": 30,
+        "to": 35.5,
+        "variant": "ruin-foundation",
+        "roomId": "shellback-quarry",
+        "surfaceFinish": {
+          "roomId": "shellback-quarry",
+          "crownProfile": [
+            0.68,
+            0.92,
+            1.22,
+            0.74,
+            1.04,
+            0.66
+          ],
+          "wornWindows": [
+            [
+              31,
+              32.15
+            ],
+            [
+              38.1,
+              39.05
+            ]
+          ],
+          "undergroundScale": 0.67
+        },
+        "visibleRepresentation": "verdant-vale-relief-mesh",
+        "collisionRepresentation": "meadow-wake-ground-profile",
+        "lowerProfile": [
+          0.86,
+          0.72,
+          0.94,
+          0.81,
+          0.98,
+          0.76
+        ],
+        "lowerInset": [
+          0.12,
+          0.06
+        ],
+        "textureScale": 8.1,
+        "seed": 53,
+        "faceDepth": 532,
+        "transitionLeft": "stone",
+        "authoredRange": [
+          30,
+          35.5
+        ],
+        "sliceRange": [
+          30,
+          30
+        ],
+        "productionMeshStatus": "SCULPT_REQUIRED"
+      }
+    ],
+    "landforms": [
+      {
+        "id": "trailhead-embankment",
+        "type": "meadow-terrace",
+        "roomId": "trailhead-camp",
+        "x": 6.4,
+        "width": 6.8,
+        "drop": 1.55,
+        "linkedPlatforms": [
+          "camp-awning-deck"
+        ],
+        "productionMeshStatus": "SCULPT_REQUIRED"
+      },
+      {
+        "id": "elder-root-arch-bank",
+        "type": "root-arch",
+        "roomId": "elder-root-walk",
+        "x": 15.2,
+        "width": 7.4,
+        "drop": 2.15,
+        "linkedPlatforms": [
+          "opening-stump-step",
+          "fallen-log-launch"
+        ],
+        "productionMeshStatus": "SCULPT_REQUIRED"
+      },
+      {
+        "id": "mason-boulder-shelf",
+        "type": "rock-shelf",
+        "roomId": "mason-shelf",
+        "x": 26.2,
+        "width": 7.2,
+        "drop": 1.85,
+        "linkedPlatforms": [
+          "mason-shelf-overlook"
+        ],
+        "productionMeshStatus": "SCULPT_REQUIRED"
+      }
+    ],
+    "rooms": [
+      {
+        "id": "trailhead-camp",
+        "range": [
+          0,
+          10.5
+        ],
+        "landmark": "opening-lodge",
+        "terrainLanguage": "compacted trailhead embankment",
+        "gameplayPhrase": "runway, staggered block lesson, awning overlook",
+        "sliceRange": [
+          0,
+          10.5
+        ]
+      },
+      {
+        "id": "elder-root-walk",
+        "range": [
+          10.5,
+          20.5
+        ],
+        "landmark": "elder-root-arch",
+        "terrainLanguage": "root-bound hollow and exposed tree toes",
+        "gameplayPhrase": "duck-readable arch, stump step, fallen-log launch",
+        "sliceRange": [
+          10.5,
+          20.5
+        ]
+      },
+      {
+        "id": "mason-shelf",
+        "range": [
+          20.5,
+          30
+        ],
+        "landmark": "mason-shelf-pine",
+        "terrainLanguage": "boulder-supported rock shelf",
+        "gameplayPhrase": "first grounded encounter beneath an optional shelf",
+        "sliceRange": [
+          20.5,
+          30
+        ]
+      },
+      {
+        "id": "shellback-quarry",
+        "range": [
+          30,
+          41
+        ],
+        "landmark": "shellback-ruin-tower",
+        "terrainLanguage": "broken fieldstone quarry and ruin foundation",
+        "gameplayPhrase": "shell-driven block phrase opening the upper route",
+        "sliceRange": [
+          30,
+          30
+        ]
+      }
+    ],
+    "routePhases": [
+      {
+        "id": "camp-departure",
+        "range": [
+          0,
+          14
+        ],
+        "purpose": "safe grounded trailhead camp and staggered block lesson",
+        "sliceRange": [
+          0,
+          14
+        ]
+      },
+      {
+        "id": "first-natural-obstacle",
+        "range": [
+          14,
+          25
+        ],
+        "purpose": "elder-root arch, fallen-log jump, and readable reward arc",
+        "sliceRange": [
+          14,
+          25
+        ]
+      },
+      {
+        "id": "first-gameplay-encounter",
+        "range": [
+          25,
+          40
+        ],
+        "purpose": "mason shelf, ruin tower, and shell-opened fieldstone phrase",
+        "sliceRange": [
+          25,
+          30
+        ]
+      }
+    ]
+  },
+  "safeLandingZones": [
+    {
+      "id": "spawn-meadow-safe",
+      "range": [
+        0.2,
+        4.75
+      ],
+      "groundRelative": true
+    },
+    {
+      "id": "post-block-breath",
+      "range": [
+        10.35,
+        11.35
+      ],
+      "groundRelative": true
+    },
+    {
+      "id": "root-return-breath",
+      "range": [
+        19.65,
+        23.95
+      ],
+      "groundRelative": true
+    },
+    {
+      "id": "slice-exit-breath",
+      "range": [
+        27.7,
+        30
+      ],
+      "groundRelative": true
+    }
+  ],
+  "interactionClearances": {
+    "blocks": {
+      "horizontalRadiusMetres": 0.47,
+      "verticalBelowMetres": 1.82,
+      "presentationDepthHalfWidthMetres": 0.55
+    },
+    "movingPlatforms": {
+      "horizontalPaddingMetres": 0.55,
+      "verticalPaddingMetres": 0.8,
+      "presentationDepthHalfWidthMetres": 0.65
+    },
+    "enemies": {
+      "horizontalRadiusMetres": 0.72,
+      "presentationDepthHalfWidthMetres": 0.55
+    },
+    "coinTrails": {
+      "screenSilhouetteRadiusMetres": 0.18
+    }
+  },
+  "gameplayObjects": {
+    "platforms": [
+      {
+        "id": "camp-awning-deck",
+        "x": 4.85,
+        "y": 6.62,
+        "width": 2.2,
+        "height": 0.28,
+        "oneWay": true,
+        "visual": "camp-deck",
+        "supportStyle": "timber",
+        "supportDrop": 0.82,
+        "roomId": "trailhead-camp",
+        "purpose": "optional lodge-awning overlook",
+        "runtimeCenterY": 6.62,
+        "blenderCenter": {
+          "x": 4.85,
+          "y": 0,
+          "z": 1.28
+        },
+        "blenderSurfaceZ": 1.42,
+        "collisionRole": "one-way-platform",
+        "artRole": "separate-authored-environment-object"
+      },
+      {
+        "id": "opening-stump-step",
+        "x": 11.9,
+        "y": 6.56,
+        "width": 1.08,
+        "height": 0.4,
+        "oneWay": true,
+        "visual": "stump",
+        "roomId": "elder-root-walk",
+        "purpose": "root-arch entry step and duck-height landmark",
+        "runtimeCenterY": 6.56,
+        "blenderCenter": {
+          "x": 11.9,
+          "y": 0,
+          "z": 1.34
+        },
+        "blenderSurfaceZ": 1.54,
+        "collisionRole": "one-way-platform",
+        "artRole": "separate-authored-environment-object"
+      },
+      {
+        "id": "fallen-log-launch",
+        "x": 17.95,
+        "y": 6.38,
+        "width": 3,
+        "height": 0.3,
+        "oneWay": true,
+        "visual": "fallen-log",
+        "roomId": "elder-root-walk",
+        "purpose": "first obvious environmental jump and Compass Coin launch",
+        "motion": {
+          "kind": "seesaw",
+          "maximumAngle": 0.1,
+          "response": 2.8
+        },
+        "runtimeCenterY": 6.38,
+        "blenderCenter": {
+          "x": 17.95,
+          "y": 0,
+          "z": 1.52
+        },
+        "blenderSurfaceZ": 1.67,
+        "collisionRole": "one-way-platform",
+        "artRole": "separate-authored-environment-object"
+      },
+      {
+        "id": "fallen-log-landing",
+        "x": 21.85,
+        "y": 6.58,
+        "width": 1.65,
+        "height": 0.3,
+        "oneWay": true,
+        "visual": "turf-ledge",
+        "supportStyle": "boulder",
+        "supportDrop": 0.78,
+        "roomId": "mason-shelf",
+        "purpose": "boulder-supported landing and upper reward",
+        "runtimeCenterY": 6.58,
+        "blenderCenter": {
+          "x": 21.85,
+          "y": 0,
+          "z": 1.32
+        },
+        "blenderSurfaceZ": 1.47,
+        "collisionRole": "one-way-platform",
+        "artRole": "separate-authored-environment-object"
+      },
+      {
+        "id": "mason-shelf-overlook",
+        "x": 26.55,
+        "y": 5.45,
+        "width": 1.78,
+        "height": 0.34,
+        "oneWay": true,
+        "visual": "creek-stone",
+        "supportStyle": "boulder",
+        "supportDrop": 1.45,
+        "roomId": "mason-shelf",
+        "purpose": "optional rock-shelf reward above the grounded first encounter",
+        "runtimeCenterY": 5.45,
+        "blenderCenter": {
+          "x": 26.55,
+          "y": 0,
+          "z": 2.45
+        },
+        "blenderSurfaceZ": 2.62,
+        "collisionRole": "one-way-platform",
+        "artRole": "separate-authored-environment-object"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "opening-single-breakable",
+        "type": "standard-breakable",
+        "x": 5.85,
+        "lift": 1.22,
+        "formation": "opening-staggered-lesson",
+        "width": 0.74,
+        "height": 0.74,
+        "phraseStep": 1,
+        "runtimeGroundY": 7.81675,
+        "runtimeCenterY": 6.59675,
+        "blenderCenter": {
+          "x": 5.85,
+          "y": 0,
+          "z": 1.30325
+        }
+      },
+      {
+        "id": "opening-raised-coin",
+        "type": "coin",
+        "x": 7.55,
+        "lift": 1.72,
+        "formation": "opening-staggered-lesson",
+        "width": 0.74,
+        "height": 0.74,
+        "reward": 5,
+        "phraseStep": 2,
+        "runtimeGroundY": 7.74025,
+        "runtimeCenterY": 6.02025,
+        "blenderCenter": {
+          "x": 7.55,
+          "y": 0,
+          "z": 1.87975
+        }
+      },
+      {
+        "id": "opening-pair-a",
+        "type": "standard-breakable",
+        "x": 9.25,
+        "lift": 1.24,
+        "formation": "opening-staggered-lesson",
+        "width": 0.74,
+        "height": 0.74,
+        "phraseStep": 3,
+        "runtimeGroundY": 7.65,
+        "runtimeCenterY": 6.41,
+        "blenderCenter": {
+          "x": 9.25,
+          "y": 0,
+          "z": 1.49
+        }
+      },
+      {
+        "id": "opening-pair-b",
+        "type": "standard-breakable",
+        "x": 10,
+        "lift": 1.24,
+        "formation": "opening-staggered-lesson",
+        "width": 0.74,
+        "height": 0.74,
+        "phraseStep": 4,
+        "runtimeGroundY": 7.608,
+        "runtimeCenterY": 6.368,
+        "blenderCenter": {
+          "x": 10,
+          "y": 0,
+          "z": 1.532
+        }
+      },
+      {
+        "id": "power-before-first-encounter",
+        "type": "power-up",
+        "x": 24.75,
+        "lift": 1.55,
+        "formation": "first-encounter-support",
+        "width": 0.74,
+        "height": 0.74,
+        "reward": "grow",
+        "phraseStep": 1,
+        "runtimeGroundY": 6.998,
+        "runtimeCenterY": 5.448,
+        "blenderCenter": {
+          "x": 24.75,
+          "y": 0,
+          "z": 2.452
+        }
+      }
+    ],
+    "blockPhrases": [
+      {
+        "id": "opening-staggered-lesson",
+        "roomId": "trailhead-camp",
+        "intent": "teach hit height and optional follow-up",
+        "pattern": [
+          "single-breakable",
+          "raised-coin",
+          "breakable-pair"
+        ]
+      },
+      {
+        "id": "first-encounter-support",
+        "roomId": "mason-shelf",
+        "intent": "visible recovery before the first enemy observation space",
+        "pattern": [
+          "power-up-support"
+        ]
+      }
+    ],
+    "coins": [
+      {
+        "id": "meadow-coin-001",
+        "x": 2.2,
+        "lift": 0.78,
+        "route": "main",
+        "runtimeGroundY": 7.9,
+        "runtimeCenterY": 7.12,
+        "blenderCenter": {
+          "x": 2.2,
+          "y": 0,
+          "z": 0.78
+        }
+      },
+      {
+        "id": "meadow-coin-002",
+        "x": 2.7714285714285714,
+        "lift": 0.78,
+        "route": "main",
+        "runtimeGroundY": 7.9,
+        "runtimeCenterY": 7.12,
+        "blenderCenter": {
+          "x": 2.7714285714285714,
+          "y": 0,
+          "z": 0.78
+        }
+      },
+      {
+        "id": "meadow-coin-003",
+        "x": 3.342857142857143,
+        "lift": 0.78,
+        "route": "main",
+        "runtimeGroundY": 7.9,
+        "runtimeCenterY": 7.12,
+        "blenderCenter": {
+          "x": 3.342857142857143,
+          "y": 0,
+          "z": 0.78
+        }
+      },
+      {
+        "id": "meadow-coin-004",
+        "x": 3.9142857142857146,
+        "lift": 0.78,
+        "route": "main",
+        "runtimeGroundY": 7.9,
+        "runtimeCenterY": 7.12,
+        "blenderCenter": {
+          "x": 3.9142857142857146,
+          "y": 0,
+          "z": 0.78
+        }
+      },
+      {
+        "id": "meadow-coin-005",
+        "x": 4.485714285714286,
+        "lift": 0.78,
+        "route": "main",
+        "runtimeGroundY": 7.878143,
+        "runtimeCenterY": 7.098143,
+        "blenderCenter": {
+          "x": 4.485714285714286,
+          "y": 0,
+          "z": 0.801857
+        }
+      },
+      {
+        "id": "meadow-coin-006",
+        "x": 5.057142857142857,
+        "lift": 0.78,
+        "route": "main",
+        "runtimeGroundY": 7.852429,
+        "runtimeCenterY": 7.072429,
+        "blenderCenter": {
+          "x": 5.057142857142857,
+          "y": 0,
+          "z": 0.827571
+        }
+      },
+      {
+        "id": "meadow-coin-007",
+        "x": 5.628571428571428,
+        "lift": 0.78,
+        "route": "main",
+        "runtimeGroundY": 7.826714,
+        "runtimeCenterY": 7.046714,
+        "blenderCenter": {
+          "x": 5.628571428571428,
+          "y": 0,
+          "z": 0.853286
+        }
+      },
+      {
+        "id": "meadow-coin-008",
+        "x": 6.2,
+        "lift": 0.78,
+        "route": "main",
+        "runtimeGroundY": 7.801,
+        "runtimeCenterY": 7.021,
+        "blenderCenter": {
+          "x": 6.2,
+          "y": 0,
+          "z": 0.879
+        }
+      },
+      {
+        "id": "meadow-coin-009",
+        "x": 11.6,
+        "lift": 0.82,
+        "route": "main",
+        "runtimeGroundY": 7.415,
+        "runtimeCenterY": 6.595,
+        "blenderCenter": {
+          "x": 11.6,
+          "y": 0,
+          "z": 1.305
+        }
+      },
+      {
+        "id": "meadow-coin-010",
+        "x": 12.4,
+        "lift": 1.2651374398094588,
+        "route": "main",
+        "runtimeGroundY": 7.295,
+        "runtimeCenterY": 6.029863,
+        "blenderCenter": {
+          "x": 12.4,
+          "y": 0,
+          "z": 1.870137
+        }
+      },
+      {
+        "id": "meadow-coin-011",
+        "x": 13.2,
+        "lift": 1.6742124915798442,
+        "route": "main",
+        "runtimeGroundY": 7.21,
+        "runtimeCenterY": 5.535788,
+        "blenderCenter": {
+          "x": 13.2,
+          "y": 0,
+          "z": 2.364212
+        }
+      },
+      {
+        "id": "meadow-coin-012",
+        "x": 14,
+        "lift": 2.014084327479728,
+        "route": "main",
+        "runtimeGroundY": 7.13,
+        "runtimeCenterY": 5.115916,
+        "blenderCenter": {
+          "x": 14,
+          "y": 0,
+          "z": 2.784084
+        }
+      },
+      {
+        "id": "meadow-coin-013",
+        "x": 14.799999999999999,
+        "lift": 2.257218552660139,
+        "route": "main",
+        "runtimeGroundY": 7.131,
+        "runtimeCenterY": 4.873781,
+        "blenderCenter": {
+          "x": 14.799999999999999,
+          "y": 0,
+          "z": 3.026219
+        }
+      },
+      {
+        "id": "meadow-coin-014",
+        "x": 15.6,
+        "lift": 2.3839178781718737,
+        "route": "main",
+        "runtimeGroundY": 7.267,
+        "runtimeCenterY": 4.883082,
+        "blenderCenter": {
+          "x": 15.6,
+          "y": 0,
+          "z": 3.016918
+        }
+      },
+      {
+        "id": "meadow-coin-015",
+        "x": 16.4,
+        "lift": 2.3839178781718737,
+        "route": "main",
+        "runtimeGroundY": 7.403,
+        "runtimeCenterY": 5.019082,
+        "blenderCenter": {
+          "x": 16.4,
+          "y": 0,
+          "z": 2.880918
+        }
+      },
+      {
+        "id": "meadow-coin-016",
+        "x": 17.2,
+        "lift": 2.257218552660139,
+        "route": "main",
+        "runtimeGroundY": 7.343,
+        "runtimeCenterY": 5.085781,
+        "blenderCenter": {
+          "x": 17.2,
+          "y": 0,
+          "z": 2.814219
+        }
+      },
+      {
+        "id": "meadow-coin-017",
+        "x": 18,
+        "lift": 2.014084327479728,
+        "route": "main",
+        "runtimeGroundY": 7.255,
+        "runtimeCenterY": 5.240916,
+        "blenderCenter": {
+          "x": 18,
+          "y": 0,
+          "z": 2.659084
+        }
+      },
+      {
+        "id": "meadow-coin-018",
+        "x": 18.799999999999997,
+        "lift": 1.674212491579844,
+        "route": "main",
+        "runtimeGroundY": 7.173,
+        "runtimeCenterY": 5.498788,
+        "blenderCenter": {
+          "x": 18.799999999999997,
+          "y": 0,
+          "z": 2.401212
+        }
+      },
+      {
+        "id": "meadow-coin-019",
+        "x": 19.599999999999998,
+        "lift": 1.2651374398094595,
+        "route": "main",
+        "runtimeGroundY": 7.101,
+        "runtimeCenterY": 5.835863,
+        "blenderCenter": {
+          "x": 19.599999999999998,
+          "y": 0,
+          "z": 2.064137
+        }
+      },
+      {
+        "id": "meadow-coin-020",
+        "x": 20.4,
+        "lift": 0.8200000000000002,
+        "route": "main",
+        "runtimeGroundY": 7.029,
+        "runtimeCenterY": 6.209,
+        "blenderCenter": {
+          "x": 20.4,
+          "y": 0,
+          "z": 1.691
+        }
+      },
+      {
+        "id": "meadow-coin-021",
+        "x": 22.6,
+        "lift": 0.82,
+        "route": "main",
+        "runtimeGroundY": 7.268,
+        "runtimeCenterY": 6.448,
+        "blenderCenter": {
+          "x": 22.6,
+          "y": 0,
+          "z": 1.452
+        }
+      },
+      {
+        "id": "meadow-coin-022",
+        "x": 23.28571428571429,
+        "lift": 0.82,
+        "route": "main",
+        "runtimeGroundY": 7.185714,
+        "runtimeCenterY": 6.365714,
+        "blenderCenter": {
+          "x": 23.28571428571429,
+          "y": 0,
+          "z": 1.534286
+        }
+      },
+      {
+        "id": "meadow-coin-023",
+        "x": 23.97142857142857,
+        "lift": 0.82,
+        "route": "main",
+        "runtimeGroundY": 7.103429,
+        "runtimeCenterY": 6.283429,
+        "blenderCenter": {
+          "x": 23.97142857142857,
+          "y": 0,
+          "z": 1.616571
+        }
+      },
+      {
+        "id": "meadow-coin-024",
+        "x": 24.65714285714286,
+        "lift": 0.82,
+        "route": "main",
+        "runtimeGroundY": 7.0136,
+        "runtimeCenterY": 6.1936,
+        "blenderCenter": {
+          "x": 24.65714285714286,
+          "y": 0,
+          "z": 1.7064
+        }
+      },
+      {
+        "id": "meadow-coin-025",
+        "x": 25.34285714285714,
+        "lift": 0.82,
+        "route": "main",
+        "runtimeGroundY": 6.8984,
+        "runtimeCenterY": 6.0784,
+        "blenderCenter": {
+          "x": 25.34285714285714,
+          "y": 0,
+          "z": 1.8216
+        }
+      },
+      {
+        "id": "meadow-coin-026",
+        "x": 26.02857142857143,
+        "lift": 0.82,
+        "route": "main",
+        "runtimeGroundY": 6.7832,
+        "runtimeCenterY": 5.9632,
+        "blenderCenter": {
+          "x": 26.02857142857143,
+          "y": 0,
+          "z": 1.9368
+        }
+      },
+      {
+        "id": "meadow-coin-027",
+        "x": 26.71428571428571,
+        "lift": 0.82,
+        "route": "main",
+        "runtimeGroundY": 6.668,
+        "runtimeCenterY": 5.848,
+        "blenderCenter": {
+          "x": 26.71428571428571,
+          "y": 0,
+          "z": 2.052
+        }
+      },
+      {
+        "id": "meadow-coin-028",
+        "x": 27.4,
+        "lift": 0.82,
+        "route": "main",
+        "runtimeGroundY": 6.5896,
+        "runtimeCenterY": 5.7696,
+        "blenderCenter": {
+          "x": 27.4,
+          "y": 0,
+          "z": 2.1304
+        }
+      },
+      {
+        "id": "meadow-coin-029",
+        "x": 29.1,
+        "lift": 0.88,
+        "route": "upper-shell-route",
+        "runtimeGroundY": 6.4604,
+        "runtimeCenterY": 5.5804,
+        "blenderCenter": {
+          "x": 29.1,
+          "y": 0,
+          "z": 2.3196
+        }
+      },
+      {
+        "id": "meadow-coin-030",
+        "x": 29.85,
+        "lift": 1.3148159957722347,
+        "route": "upper-shell-route",
+        "runtimeGroundY": 6.479,
+        "runtimeCenterY": 5.164184,
+        "blenderCenter": {
+          "x": 29.85,
+          "y": 0,
+          "z": 2.735816
+        }
+      }
+    ],
+    "compassCoins": [
+      {
+        "id": "1-1-C1",
+        "x": 17.95,
+        "y": 4.02,
+        "solution": "fallen-log-upper-arc",
+        "blenderPosition": {
+          "x": 17.95,
+          "y": 0,
+          "z": 3.88
+        }
+      }
+    ],
+    "enemyAnchors": [
+      {
+        "id": "1-1-critter-a",
+        "actorType": "enemy/camp_critter",
+        "x": 6.4,
+        "blenderPosition": {
+          "x": 6.4,
+          "y": 0,
+          "z": 0.108
+        },
+        "patrolRange": [
+          5.1,
+          7.6
+        ],
+        "areaId": "camp-departure",
+        "placementMode": "ground-relative",
+        "artClearance": {
+          "horizontalRadiusMetres": 0.72,
+          "presentationDepthHalfWidthMetres": 0.55,
+          "rule": "No terrain dressing, roots, or props may obscure the actor silhouette or patrol floor."
+        },
+        "runtimeAuthority": "src/content/meadow-wake-level-data.js"
+      },
+      {
+        "id": "1-1-shellback-a",
+        "actorType": "enemy/shellback",
+        "x": 8.7,
+        "blenderPosition": {
+          "x": 8.7,
+          "y": 0,
+          "z": 0.2192
+        },
+        "patrolRange": [
+          8.05,
+          9.05
+        ],
+        "areaId": "camp-departure",
+        "placementMode": "ground-relative",
+        "artClearance": {
+          "horizontalRadiusMetres": 0.72,
+          "presentationDepthHalfWidthMetres": 0.55,
+          "rule": "No terrain dressing, roots, or props may obscure the actor silhouette or patrol floor."
+        },
+        "runtimeAuthority": "src/content/meadow-wake-level-data.js"
+      },
+      {
+        "id": "1-1-critter-b",
+        "actorType": "enemy/camp_critter",
+        "x": 13.1,
+        "blenderPosition": {
+          "x": 13.1,
+          "y": 0,
+          "z": 0.68
+        },
+        "patrolRange": [
+          11.5,
+          14.8
+        ],
+        "areaId": "camp-departure",
+        "placementMode": "ground-relative",
+        "artClearance": {
+          "horizontalRadiusMetres": 0.72,
+          "presentationDepthHalfWidthMetres": 0.55,
+          "rule": "No terrain dressing, roots, or props may obscure the actor silhouette or patrol floor."
+        },
+        "runtimeAuthority": "src/content/meadow-wake-level-data.js"
+      },
+      {
+        "id": "1-1-shellback-b",
+        "actorType": "enemy/shellback",
+        "x": 17.1,
+        "blenderPosition": {
+          "x": 17.1,
+          "y": 0,
+          "z": 0.546
+        },
+        "patrolRange": [
+          15.8,
+          19.4
+        ],
+        "areaId": "first-natural-obstacle",
+        "placementMode": "ground-relative",
+        "artClearance": {
+          "horizontalRadiusMetres": 0.72,
+          "presentationDepthHalfWidthMetres": 0.55,
+          "rule": "No terrain dressing, roots, or props may obscure the actor silhouette or patrol floor."
+        },
+        "runtimeAuthority": "src/content/meadow-wake-level-data.js"
+      },
+      {
+        "id": "1-1-critter-c",
+        "actorType": "enemy/camp_critter",
+        "x": 25.6,
+        "blenderPosition": {
+          "x": 25.6,
+          "y": 0,
+          "z": 1.0448
+        },
+        "patrolRange": [
+          24.1,
+          27.4
+        ],
+        "areaId": "first-gameplay-encounter",
+        "placementMode": "ground-relative",
+        "artClearance": {
+          "horizontalRadiusMetres": 0.72,
+          "presentationDepthHalfWidthMetres": 0.55,
+          "rule": "No terrain dressing, roots, or props may obscure the actor silhouette or patrol floor."
+        },
+        "runtimeAuthority": "src/content/meadow-wake-level-data.js"
+      }
+    ]
+  },
+  "environmentAnchors": {
+    "scenery": [
+      {
+        "id": "opening-lodge",
+        "type": "camp-lodge",
+        "x": -0.15,
+        "scale": 0.98,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": -34,
+        "heroLandmark": true,
+        "runtimeDepthUnits": -34,
+        "blenderAnchor": {
+          "x": -0.15,
+          "y": -0.485714,
+          "z": 0
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "opening-wayfinder",
+        "type": "trail-sign",
+        "x": 0.35,
+        "scale": 0.68,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "facing": 1,
+        "depth": 34,
+        "runtimeDepthUnits": 34,
+        "blenderAnchor": {
+          "x": 0.35,
+          "y": 0.485714,
+          "z": 0
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "opening-lantern",
+        "type": "lantern-post",
+        "x": 3.8,
+        "scale": 0.78,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": 28,
+        "runtimeDepthUnits": 28,
+        "blenderAnchor": {
+          "x": 3.8,
+          "y": 0.4,
+          "z": 0
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "opening-crates",
+        "type": "crate-stack",
+        "x": 5.15,
+        "scale": 0.62,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": 18,
+        "runtimeDepthUnits": 18,
+        "blenderAnchor": {
+          "x": 5.15,
+          "y": 0.257143,
+          "z": 0.05175
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "opening-woodpile",
+        "type": "woodpile",
+        "x": 10.05,
+        "scale": 0.72,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": -12,
+        "runtimeDepthUnits": -12,
+        "blenderAnchor": {
+          "x": 10.05,
+          "y": -0.171429,
+          "z": 0.2948
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "opening-flower-bank",
+        "type": "flower-bank",
+        "x": 11.35,
+        "scale": 1.05,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": 38,
+        "runtimeDepthUnits": 38,
+        "blenderAnchor": {
+          "x": 11.35,
+          "y": 0.542857,
+          "z": 0.4475
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "opening-trail-fence",
+        "type": "trail-fence",
+        "x": 12.75,
+        "scale": 0.88,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": -20,
+        "runtimeDepthUnits": -20,
+        "blenderAnchor": {
+          "x": 12.75,
+          "y": -0.285714,
+          "z": 0.645
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "opening-oak",
+        "type": "canopy-tree",
+        "x": 14.2,
+        "scale": 1.12,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": -96,
+        "runtimeDepthUnits": -96,
+        "blenderAnchor": {
+          "x": 14.2,
+          "y": -1.371429,
+          "z": 0.79
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "elder-root-arch",
+        "type": "root-arch-tree",
+        "x": 15.15,
+        "scale": 1.24,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": 18,
+        "heroLandmark": true,
+        "runtimeDepthUnits": 18,
+        "blenderAnchor": {
+          "x": 15.15,
+          "y": 0.257143,
+          "z": 0.7095
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "log-hollow-root-fan",
+        "type": "root-fan",
+        "x": 16.08,
+        "scale": 1.1,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": -4,
+        "runtimeDepthUnits": -4,
+        "blenderAnchor": {
+          "x": 16.08,
+          "y": -0.057143,
+          "z": 0.5514
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "log-hollow-ferns",
+        "type": "fern-bank",
+        "x": 18.65,
+        "scale": 1.08,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": 42,
+        "runtimeDepthUnits": 42,
+        "blenderAnchor": {
+          "x": 18.65,
+          "y": 0.6,
+          "z": 0.7135
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "log-hollow-fence",
+        "type": "trail-fence",
+        "x": 20.05,
+        "scale": 0.72,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": -28,
+        "runtimeDepthUnits": -28,
+        "blenderAnchor": {
+          "x": 20.05,
+          "y": -0.4,
+          "z": 0.8395
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "log-hollow-mushrooms",
+        "type": "mushroom-stump",
+        "x": 21.25,
+        "scale": 0.86,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": 24,
+        "runtimeDepthUnits": 24,
+        "blenderAnchor": {
+          "x": 21.25,
+          "y": 0.342857,
+          "z": 0.7825
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "log-hollow-birch",
+        "type": "canopy-tree",
+        "x": 23.55,
+        "scale": 0.94,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": -108,
+        "runtimeDepthUnits": -108,
+        "blenderAnchor": {
+          "x": 23.55,
+          "y": -1.542857,
+          "z": 0.746
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "mason-shelf-pine",
+        "type": "cliff-pine",
+        "x": 26.2,
+        "scale": 1.18,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": -28,
+        "heroLandmark": true,
+        "runtimeDepthUnits": -28,
+        "blenderAnchor": {
+          "x": 26.2,
+          "y": -0.4,
+          "z": 1.1456
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      },
+      {
+        "id": "shellback-low-wall",
+        "type": "ruin-wall",
+        "x": 25,
+        "scale": 0.92,
+        "layer": "playfield-back",
+        "assetStatus": "authored-original-runtime-mesh",
+        "temporaryProxy": false,
+        "anchorRequired": true,
+        "depth": -18,
+        "runtimeDepthUnits": -18,
+        "blenderAnchor": {
+          "x": 25,
+          "y": -0.257143,
+          "z": 0.944
+        },
+        "visibleAssetStatus": "MANUAL_ART_REQUIRED",
+        "anchorAuthority": "src/content/meadow-wake-scenery.js"
+      }
+    ],
+    "landmarks": [
+      {
+        "roomId": "trailhead-camp",
+        "propId": "opening-lodge",
+        "silhouette": "raised canvas lodge",
+        "traversal": "camp awning is an optional overlook",
+        "linkedPlatformIds": [
+          "camp-awning-deck"
+        ]
+      },
+      {
+        "roomId": "elder-root-walk",
+        "propId": "elder-root-arch",
+        "silhouette": "walk-under elder root arch",
+        "traversal": "root toe and fallen log form the jump lesson",
+        "linkedPlatformIds": [
+          "opening-stump-step",
+          "fallen-log-launch"
+        ]
+      },
+      {
+        "roomId": "mason-shelf",
+        "propId": "mason-shelf-pine",
+        "silhouette": "pine rooted into a boulder shelf",
+        "traversal": "rock overlook sits above the grounded first encounter",
+        "linkedPlatformIds": [
+          "mason-shelf-overlook"
+        ]
+      }
+    ],
+    "priorFinishReferences": [
+      {
+        "roomId": "trailhead-camp",
+        "component": "TerrainKit_CompactedEdge",
+        "x": 3.75,
+        "scale": 1.02,
+        "depth": 116,
+        "facing": 1,
+        "role": "reference-only; not final visible terrain"
+      },
+      {
+        "roomId": "elder-root-walk",
+        "component": "TerrainKit_RootBank",
+        "x": 16.95,
+        "scale": 1.18,
+        "depth": 118,
+        "facing": 1,
+        "role": "reference-only; not final visible terrain"
+      },
+      {
+        "roomId": "mason-shelf",
+        "component": "TerrainKit_CompactedEdge",
+        "x": 26.3,
+        "scale": 1.12,
+        "depth": 114,
+        "facing": -1,
+        "role": "reference-only; not final visible terrain"
+      }
+    ]
+  },
+  "camera": {
+    "mode": "strict-side-profile",
+    "orthographic": true,
+    "gameplayLookAheadMetres": 2.1,
+    "freeDepthMovement": false,
+    "gameplayAreas": [
+      {
+        "id": "camp-departure",
+        "bounds": {
+          "minX": 0,
+          "maxX": 14,
+          "minY": -20,
+          "maxY": 20
+        },
+        "camera": {
+          "mode": "safe-opening",
+          "lookAheadMetres": 2.1
+        },
+        "zoom": {
+          "mode": "profile-gameplay",
+          "value": 1
+        },
+        "verticalTracking": {
+          "minimumY": 0,
+          "maximumY": 10.5,
+          "deadZone": 1.1
+        },
+        "backgroundSet": "verdant-vale-meadow-wake",
+        "music": {
+          "cue": "meadow-wake-original-cue",
+          "mode": "exploration"
+        },
+        "direction": "right",
+        "activationRules": {
+          "actorAreaPrewarm": true,
+          "retainPreviousArea": false
+        }
+      },
+      {
+        "id": "first-natural-obstacle",
+        "bounds": {
+          "minX": 14,
+          "maxX": 25,
+          "minY": -20,
+          "maxY": 20
+        },
+        "camera": {
+          "mode": "smooth-follow",
+          "lookAheadMetres": 2.1
+        },
+        "zoom": {
+          "mode": "profile-gameplay",
+          "value": 1
+        },
+        "verticalTracking": {
+          "minimumY": 0,
+          "maximumY": 10.5,
+          "deadZone": 1.1
+        },
+        "backgroundSet": "verdant-vale-meadow-wake",
+        "music": {
+          "cue": "meadow-wake-original-cue",
+          "mode": "exploration"
+        },
+        "direction": "right",
+        "activationRules": {
+          "actorAreaPrewarm": true,
+          "retainPreviousArea": true
+        }
+      },
+      {
+        "id": "first-gameplay-encounter",
+        "bounds": {
+          "minX": 25,
+          "maxX": 30,
+          "minY": -20,
+          "maxY": 20
+        },
+        "camera": {
+          "mode": "smooth-follow",
+          "lookAheadMetres": 2.1
+        },
+        "zoom": {
+          "mode": "profile-gameplay",
+          "value": 1
+        },
+        "verticalTracking": {
+          "minimumY": 0,
+          "maximumY": 10.5,
+          "deadZone": 1.1
+        },
+        "backgroundSet": "verdant-vale-meadow-wake",
+        "music": {
+          "cue": "meadow-wake-original-cue",
+          "mode": "exploration"
+        },
+        "direction": "right",
+        "activationRules": {
+          "actorAreaPrewarm": true,
+          "retainPreviousArea": true
+        }
+      }
+    ],
+    "fixedComparisonViewpoints": [
+      {
+        "id": "spawn",
+        "focus": [
+          2.8,
+          0.45
+        ],
+        "cameraBlender": [
+          2.8,
+          -18,
+          3.7
+        ],
+        "orthographicScale": 7.5
+      },
+      {
+        "id": "first-terrain-transition",
+        "focus": [
+          9.4,
+          0.65
+        ],
+        "cameraBlender": [
+          9.4,
+          -18,
+          3.8
+        ],
+        "orthographicScale": 7.5
+      },
+      {
+        "id": "block-phrase",
+        "focus": [
+          7.9,
+          1
+        ],
+        "cameraBlender": [
+          7.9,
+          -18,
+          4
+        ],
+        "orthographicScale": 7.5
+      },
+      {
+        "id": "enemy-encounter",
+        "focus": [
+          25.6,
+          1.25
+        ],
+        "cameraBlender": [
+          25.6,
+          -18,
+          4.25
+        ],
+        "orthographicScale": 7.5
+      },
+      {
+        "id": "slice-exit",
+        "focus": [
+          29,
+          1.25
+        ],
+        "cameraBlender": [
+          29,
+          -18,
+          4.25
+        ],
+        "orthographicScale": 7.5
+      }
+    ]
+  },
+  "productionGates": {
+    "blenderSceneOrganization": "required",
+    "neutralGuide": "required",
+    "highSculpt": "manual",
+    "gameRetopology": "manual",
+    "uv": "manual",
+    "textureBake": "manual",
+    "collision": "automatable from approved layout",
+    "lod": "manual-after-game-mesh",
+    "unityImportAndTraversal": "requires installed Unity editor",
+    "targetDevicePerformance": "not-measured"
+  }
+}

@@ -1,0 +1,480 @@
+{
+  "schemaVersion": 1,
+  "sliceId": "world-1-1-meadow-wake-opening-vertical-slice",
+  "productionReady": false,
+  "canonicalScale": {
+    "Hargold": {
+      "heightMetres": 1.82,
+      "widthMetres": 1.02
+    },
+    "Mebble": {
+      "heightMetres": 2.2932,
+      "widthMetres": 0.72
+    },
+    "standardBlock": {
+      "widthMetres": 0.74,
+      "heightMetres": 0.74,
+      "depthMetres": 0.74
+    }
+  },
+  "boundsMetres": {
+    "playableX": [
+      0,
+      30
+    ],
+    "visualX": [
+      -2,
+      34
+    ],
+    "gameplayDepth": [
+      -0.4,
+      0.4
+    ]
+  },
+  "sceneMetrics": {
+    "objects": 111,
+    "meshObjects": 77,
+    "vertices": 1512,
+    "triangles": 2714,
+    "materials": 16,
+    "textures": 3,
+    "collections": 18
+  },
+  "objectMetrics": {
+    "GUIDE_Block_opening-pair-a": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_Block_opening-pair-b": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_Block_opening-raised-coin": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_Block_opening-single-breakable": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_Block_power-before-first-encounter": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-001": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-002": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-003": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-004": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-005": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-006": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-007": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-008": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-009": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-010": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-011": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-012": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-013": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-014": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-015": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-016": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-017": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-018": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-019": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-020": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-021": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-022": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-023": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-024": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-025": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-026": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-027": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-028": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-029": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Coin_meadow-coin-030": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Hargold_Mannequin": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Mebble_Mannequin": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 1
+    },
+    "GUIDE_Platform_camp-awning-deck": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_Platform_fallen-log-landing": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_Platform_fallen-log-launch": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_Platform_mason-shelf-overlook": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_Platform_opening-stump-step": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_SafeLanding_post-block-breath": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_SafeLanding_root-return-breath": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_SafeLanding_slice-exit-breath": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "GUIDE_SafeLanding_spawn-meadow-safe": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "MW_BackgroundIntegration_ReferenceOnly": {
+      "vertices": 4,
+      "triangles": 2,
+      "materials": 1
+    },
+    "MW_BenchmarkTreeCanopy_SCULPT_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_BenchmarkTreeCanopy_SCULPT_REQUIRED.001": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_BenchmarkTreeTrunk_SCULPT_REQUIRED": {
+      "vertices": 24,
+      "triangles": 44,
+      "materials": 1
+    },
+    "MW_COL_OpeningGroundProfile": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 2
+    },
+    "MW_COL_Platform_camp-awning-deck": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "MW_COL_Platform_fallen-log-landing": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "MW_COL_Platform_fallen-log-launch": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "MW_COL_Platform_mason-shelf-overlook": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "MW_COL_Platform_opening-stump-step": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "MW_CampFoundation_SCULPT_REQUIRED": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "MW_CampLodgeMass_ART_REVIEW_REQUIRED": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "MW_FoliageMass_00_ART_REVIEW_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_FoliageMass_01_ART_REVIEW_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_FoliageMass_02_ART_REVIEW_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_FoliageMass_03_ART_REVIEW_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_FoliageMass_04_ART_REVIEW_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_FoliageMass_05_ART_REVIEW_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_FoliageMass_06_ART_REVIEW_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_RockMass_00_SCULPT_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_RockMass_01_SCULPT_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_RockMass_02_SCULPT_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_RockMass_03_SCULPT_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_RockMass_04_SCULPT_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_RootMass_13.9_SCULPT_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_RootMass_14.8_SCULPT_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_RootMass_16.0_SCULPT_REQUIRED": {
+      "vertices": 12,
+      "triangles": 20,
+      "materials": 1
+    },
+    "MW_RuinStone_00_RETOPO_REQUIRED": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "MW_RuinStone_01_RETOPO_REQUIRED": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "MW_RuinStone_02_RETOPO_REQUIRED": {
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 1
+    },
+    "MW_TerrainHigh_SculptVolume_SCULPT_REQUIRED": {
+      "vertices": 32,
+      "triangles": 60,
+      "materials": 2
+    }
+  },
+  "lodStatus": "LOD_REQUIRED_AFTER_MANUAL_GAME_MESH",
+  "collisionStatus": "layout-derived guide present; Unity import validation required",
+  "textureStatus": "reference texture linked; production UV/bake set not authored",
+  "targetDevicePerformance": "NOT_MEASURED",
+  "assets": [
+    {
+      "path": "assets/blender/environments/world-1/meadow-wake-opening.blend",
+      "source": "project-authored Blender master assembled from canonical layout",
+      "version": "meadow-wake-opening-v0-sculpt-handoff",
+      "role": "canonical Blender authoring source",
+      "approvalStatus": "manual-art-in-progress",
+      "bytes": 153071,
+      "sha256": "e2f6626eb890f5ce1e2116a268d9cab1272c1fbfb3237677be179666fabde8ca",
+      "triangles": 2714,
+      "materialCount": 16,
+      "textureReferences": [
+        "assets/references/terrain/meadow-wake-terrain-quality-reference.jpeg"
+      ],
+      "lodStatus": "LOD_REQUIRED_AFTER_MANUAL_GAME_MESH",
+      "collisionStatus": "separate collision guide present"
+    },
+    {
+      "path": "assets/exports/world-1/meadow-wake-opening/mw_opening_neutral_guide.glb",
+      "source": "generated from canonical layout by tools/blender/build_meadow_wake_opening_vertical_slice.py",
+      "version": "meadow-wake-opening-v0-sculpt-handoff",
+      "role": "neutral gameplay guide",
+      "approvalStatus": "approved-guide-only",
+      "bytes": 166760,
+      "sha256": "f26d8921f0dec5bfea1fd0ec84218d9fb14d0c298b8ddb0c1495706e1a1415d2",
+      "triangles": 2208,
+      "materialCount": 6,
+      "textureReferences": [],
+      "lodStatus": "not-applicable-guide",
+      "collisionStatus": "contains collision guides"
+    },
+    {
+      "path": "unity/HargoldMebble/Assets/Game/Worlds/World01_MeadowWake/Art/Source/MW_Opening_BlockoutGuide.fbx",
+      "source": "90_EXPORT collection in canonical Blender scene",
+      "version": "meadow-wake-opening-v0-sculpt-handoff",
+      "role": "Unity collision/blockout guide",
+      "approvalStatus": "approved-guide-only",
+      "bytes": 29596,
+      "sha256": "2a7e9deb1b45812cc693fe0ba6f2775352708a8c0ae71e83f64d446169519512",
+      "triangles": 120,
+      "materialCount": 3,
+      "textureReferences": [],
+      "lodStatus": "not-applicable-guide",
+      "collisionStatus": "layout-derived collision only"
+    }
+  ]
+}

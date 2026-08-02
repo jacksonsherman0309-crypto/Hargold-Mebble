@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "sliceId": "world-1-1-meadow-wake-opening-vertical-slice",
+  "status": "PASS_LAYOUT_AND_SPACING_UNITY_RUNTIME_NOT_EXECUTED",
+  "productionReady": false,
+  "checks": [
+    {
+      "id": "slice-bounds",
+      "pass": true,
+      "detail": "[0,30]"
+    },
+    {
+      "id": "connected-ground",
+      "pass": true,
+      "detail": "points=14, pits=0"
+    },
+    {
+      "id": "opening-slope-readability",
+      "pass": true,
+      "detail": "maximumRisePerMetre=0.1700"
+    },
+    {
+      "id": "platform-anchors",
+      "pass": true,
+      "detail": "count=5"
+    },
+    {
+      "id": "block-anchors",
+      "pass": true,
+      "detail": "count=5"
+    },
+    {
+      "id": "breakable-blocks",
+      "pass": true,
+      "detail": "opening-single-breakable + opening-pair-a + opening-pair-b"
+    },
+    {
+      "id": "coin-route",
+      "pass": true,
+      "detail": "coins=30, compass=1"
+    },
+    {
+      "id": "enemy-anchors",
+      "pass": true,
+      "detail": "count=5"
+    },
+    {
+      "id": "safe-landing-enemy-clearance",
+      "pass": true,
+      "detail": "overlaps=none"
+    },
+    {
+      "id": "fixed-camera-views",
+      "pass": true,
+      "detail": "spawn,first-terrain-transition,block-phrase,enemy-encounter,slice-exit"
+    },
+    {
+      "id": "strict-plane",
+      "pass": true,
+      "detail": "{\"blenderY\":0,\"unityZ\":0,\"traversalDepthLocked\":true,\"collisionWidthMetres\":0.8,\"artKeepClearDepthMetres\":1.1}"
+    }
+  ],
+  "metrics": {
+    "groundPointCount": 14,
+    "maximumAbsoluteSlopeRisePerMetre": 0.17,
+    "platforms": 5,
+    "blocks": 5,
+    "breakableBlocks": 3,
+    "coins": 30,
+    "compassCoins": 1,
+    "enemyAnchors": 5
+  },
+  "heroTraversal": {
+    "Hargold": {
+      "result": "STATIC_CONNECTED_ROUTE_PASS",
+      "canonicalHeightMetres": 1.82,
+      "unityRuntimeExecuted": false,
+      "note": "Browser movement regression suite passed; this report does not substitute for Unity traversal."
+    },
+    "Mebble": {
+      "result": "STATIC_CONNECTED_ROUTE_PASS",
+      "canonicalHeightMetres": 2.2932,
+      "unityRuntimeExecuted": false,
+      "note": "Browser movement regression suite passed; this report does not substitute for Unity traversal."
+    }
+  }
+}
