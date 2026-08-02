@@ -4,6 +4,7 @@ node_modules/
 __pycache__/
 .codex-staged-block-check/
 DROP_FILES_HERE/*
+.art-work/
 
 # User-supplied Meshy archives are preserved locally. One archive exceeds
 # GitHub's per-file limit, so only the inventoried, processed gameplay assets

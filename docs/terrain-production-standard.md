@@ -5,13 +5,15 @@ terrain craft. It does not authorize generated courses or replacement layouts.
 
 ## Quality reference and originality boundary
 
-The minimum visual-quality reference is stored once at
-`assets/references/terrain/meadow-wake-terrain-quality-reference.jpeg`.
-
-The exact user-supplied finished-product composition reference is preserved at
-`assets/references/terrain/meadow-wake-finished-product-reference.jpeg`. Treat
+The canonical minimum visual-quality reference is the exact user-supplied
+finished-product composition preserved at
+`assets/references/terrain/meadow-wake-production-quality-target.jpeg`. Treat
 it as a locked visual benchmark for Meadow Wake presentation, not as a source
 texture or an asset that may be copied into the rendered scene.
+
+`assets/references/terrain/meadow-wake-terrain-quality-reference.jpeg` remains
+only as a legacy external dependency of the frozen pre-gate Blender handoff. It
+is not a second canonical target and must not be used for new review work.
 
 It is a benchmark for:
 

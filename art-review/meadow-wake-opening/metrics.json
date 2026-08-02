@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "gate": "Meadow Wake opening Blender environment art gate",
+  "status": "AWAITING USER VISUAL APPROVAL",
+  "codexVisualGatePass": false,
+  "userApprovalRequired": true,
+  "evidenceRoles": {
+    "qualityTarget": "assets/references/terrain/meadow-wake-production-quality-target.jpeg",
+    "currentGameplay": "assets/references/terrain/meadow-wake-current-deployment.png",
+    "comparisonOrder": "quality target left; Blender art-gate render right"
+  },
+  "lockedCamera": {
+    "name": "MW_CAM_OpeningArtGate",
+    "type": "ORTHOGRAPHIC",
+    "orthographicWidthMetres": 14.0,
+    "verticalFieldMetresAt16By9": 7.875,
+    "position": [0.1, -18.0, 1.5],
+    "rotationEulerRadians": [1.57079649, 0.0, 0.0],
+    "resolution": [1536, 864],
+    "walkingSurfaceScreenFraction": 0.69,
+    "hargoldScreenFraction": 0.2311111111,
+    "lockStatus": "LOCKED_AFTER_BLOCKOUT"
+  },
+  "sourceScene": {
+    "path": "assets/blender/environments/world-1/meadow-wake-opening-art-gate.blend",
+    "blenderVersion": "5.2.0 LTS",
+    "renderEngine": "EEVEE",
+    "finalLightingRenderSeconds": 58.20,
+    "unitScale": "1 Blender metre = 1 gameplay metre",
+    "integrationStatus": "NOT STARTED - visual approval required"
+  },
+  "sceneCounts": {
+    "objects": 340,
+    "meshes": 313,
+    "curves": 15,
+    "vertices": 33224,
+    "polygons": 25038,
+    "materials": 37,
+    "lights": 5,
+    "primaryTerrainObjects": 2,
+    "campObjects": 71,
+    "primaryTreeObjects": 10,
+    "rootObjects": 8,
+    "foliageAndGroundCoverObjects": 20,
+    "midgroundObjects": 46,
+    "backgroundObjects": 14
+  },
+  "textureAccounting": {
+    "renderingExternalTextureCount": 0,
+    "renderingExternalTextureBytes": 0,
+    "proceduralMaterialCount": 37,
+    "nonRenderingReferenceImageCount": 2,
+    "nonRenderingReferenceImageBytes": 3419187,
+    "note": "Both external images are hidden image empties only; no material, world, or compositor references either image."
+  },
+  "referenceEvidence": {
+    "qualityTarget": {
+      "dimensions": [1536, 864],
+      "sha256": "0DE3CADE62F70051022E824EF4C9C2E4B9AC633C7CDFEAA0A6286D452D82F338"
+    },
+    "currentGameplay": {
+      "dimensions": [1536, 864],
+      "sha256": "C3A60853954ACC188AE163419A4A516E77A2649891AB2E783FFAC9722B6D3534"
+    }
+  },
+  "scores": {
+    "terrainSilhouette": {
+      "score": 3.4,
+      "deficiency": "The connected rise and shallow body read correctly, but the landform still lacks the target's sculpted erosion, undercuts, and convincing geological transitions."
+    },
+    "terrainToScreenProportion": {
+      "score": 4.4,
+      "deficiency": null
+    },
+    "campCraftsmanship": {
+      "score": 2.9,
+      "deficiency": "The camp has authored beams, braces, ropes, lanterns, footings, steps, a bench, and a sign, but its broad canvas surfaces and joinery still read as an intermediate asset rather than target-level craftsmanship."
+    },
+    "treeQuality": {
+      "score": 3.4,
+      "deficiency": "The tree has a tapered lofted trunk, branch hierarchy, root flare, asymmetry, and individual leaves, but the leaf shapes and bark treatment remain visibly procedural and angular."
+    },
+    "rockAndRootIntegration": {
+      "score": 3.2,
+      "deficiency": "Roots connect to the rise, but too many similarly treated embedded stones read as low-poly wallpaper instead of fewer, stronger formations."
+    },
+    "foliageRichness": {
+      "score": 3.0,
+      "deficiency": "The scene has grass, ferns, flowers, leaf masses, moss, and foreground brambles, yet it lacks the target's layered botanical density and shape refinement."
+    },
+    "materialRichness": {
+      "score": 2.7,
+      "deficiency": "Procedural materials separate all required classes, but they lack authored UV detail, microvariation, edge wear, translucency, and high-frequency texture definition."
+    },
+    "depthSeparation": {
+      "score": 3.2,
+      "deficiency": "Four depth bands are readable, but the mountain, forest, cloud, and waterfall layers remain too graphic and do not blend with target-level haze and spatial complexity."
+    },
+    "lightingCohesion": {
+      "score": 2.8,
+      "deficiency": "Warm key, cool fill, foliage rim, and lantern lights are present, but contact shadows, bounced color, aerial perspective, and local contrast are not yet production quality."
+    },
+    "gameplayReadability": {
+      "score": 4.3,
+      "deficiency": null
+    },
+    "environmentalStorytelling": {
+      "score": 3.5,
+      "deficiency": "The camp, trail sign, bench, lanterns, block lesson, collectibles, root rise, and transition waterfall form a coherent opening, but the space needs more integrated wear, debris, and landmark specificity."
+    },
+    "overallProductionFinish": {
+      "score": 2.9,
+      "deficiency": "The scene is substantive authored geometry and a useful art-direction gate, but it remains visibly below the supplied target's production finish."
+    }
+  },
+  "automaticFailureConditionsPresent": [
+    "broad camp canvas surfaces still read as flat green panels",
+    "embedded stones remain too repetitive and low-poly",
+    "the finished lighting render remains visibly primitive beside the supplied quality target"
+  ],
+  "revisionHistory": [
+    {
+      "revision": 1,
+      "comparisonFinding": "The original 8.2 m orthographic width cropped the camp and tree; the imported active-WIP hero export also dominated the frame.",
+      "meaningfulChange": "Recomputed the camera to a 14 m width at 16:9 and replaced the conflicting rig import with a tagged 1.82 m environment-only scale mannequin."
+    },
+    {
+      "revision": 2,
+      "comparisonFinding": "The opening fit the frame, but the camp roof, tree canopy, sky, mountains, and midground forest read as sparse flat geometry.",
+      "meaningfulChange": "Reshaped the cloth canopy, increased individually modeled leaf density, added a gradient sky, alpine facets, softened cloud geometry, and rebuilt the forest band."
+    },
+    {
+      "revision": 3,
+      "comparisonFinding": "Midground trunks aligned under the blocks and weakened their floating interactive read; terrain and camp storytelling remained sparse.",
+      "meaningfulChange": "Cleared the block sightline, added embedded geological variation, face moss, exposed root veins, camp props, and a compass-coin guidance arc."
+    },
+    {
+      "revision": 4,
+      "comparisonFinding": "The color render was clearer but checkpoint evidence did not sufficiently prove forms and topology.",
+      "meaningfulChange": "Created locked-camera Workbench blockout/clay checkpoints and an edge-derived Eevee wireframe proof render while retaining the same camera."
+    }
+  ],
+  "provisionalAssets": [
+    "MW_Hargold_EnvironmentScaleMannequin is a scale reference only because production hero rigs are active WIP and out of scope.",
+    "All materials are procedural review materials without final UV-authored texture sets.",
+    "Collision, retopology, LODs, export preparation, engine integration, and mobile optimization intentionally remain unstarted.",
+    "Clouds, distant mountains, forest silhouettes, and the waterfall require a higher-fidelity art pass."
+  ],
+  "validation": {
+    "blenderSceneValidation": "PASS",
+    "missingExternalFiles": 0,
+    "referenceProjectionDetected": false,
+    "diagnosticCollectionsRenderVisible": false,
+    "finalRenderCompleted": true,
+    "repositoryTests": "PASS — pnpm test (all repository suites)"
+  }
+}

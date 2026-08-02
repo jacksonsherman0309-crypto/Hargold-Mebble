@@ -1,8 +1,8 @@
 export const CANON_VERSION = '2026-07-31-meadow-wake-ground-dominant-composition-3';
 
 export const VERDANT_VALE_TERRAIN_STANDARD = Object.freeze({
-  version: '2026-07-30-meadow-wake-production-benchmark-2',
-  referenceAsset: 'assets/references/terrain/meadow-wake-terrain-quality-reference.jpeg',
+  version: '2026-08-02-meadow-wake-production-benchmark-3',
+  referenceAsset: 'assets/references/terrain/meadow-wake-production-quality-target.jpeg',
   referenceScope: 'terrain-environment-depth-material-finish-and-side-scrolling-composition-only',
   originalAuthoredArtworkRequired: true,
   individuallyAuthoredCourseLayoutsRequired: true,

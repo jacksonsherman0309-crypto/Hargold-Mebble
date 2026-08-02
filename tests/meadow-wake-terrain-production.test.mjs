@@ -151,15 +151,19 @@ assert.deepEqual(
 );
 assert.equal(VERDANT_VALE_TERRAIN_STANDARD.visibleCollisionSeparationRequired, true);
 assert.equal(VERDANT_VALE_TERRAIN_STANDARD.individuallyAuthoredCourseLayoutsRequired, true);
+assert.equal(
+  VERDANT_VALE_TERRAIN_STANDARD.referenceAsset,
+  'assets/references/terrain/meadow-wake-production-quality-target.jpeg'
+);
 assert.equal(VERDANT_VALE_TERRAIN_STANDARD.runtimeAsset, 'assets/exports/world-1/verdant_vale_terrain_kit.glb');
 assert.equal(
   VERDANT_VALE_TERRAIN_STANDARD.terrainAlbedoAsset,
   'assets/textures/world-1/meadow-wake/meadow-soil-stone-albedo-v3.png'
 );
 
-const referencePath = new URL('../assets/references/terrain/meadow-wake-terrain-quality-reference.jpeg', import.meta.url);
+const referencePath = new URL('../assets/references/terrain/meadow-wake-production-quality-target.jpeg', import.meta.url);
 const referenceBytes = readFileSync(referencePath);
-assert.ok(referenceBytes.length > 300_000);
+assert.ok(referenceBytes.length > 500_000);
 assert.equal(referenceBytes[0], 0xff);
 assert.equal(referenceBytes[1], 0xd8);
 assert.equal(referenceBytes.at(-2), 0xff);
