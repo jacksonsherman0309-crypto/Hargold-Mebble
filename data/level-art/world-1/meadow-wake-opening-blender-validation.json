@@ -1,9 +1,9 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "asset": "Meadow Wake opening vertical slice",
   "source": "assets/blender/environments/world-1/meadow-wake-opening.blend",
   "blenderVersion": "5.2.0",
-  "status": "PASS_STRUCTURE_ONLY_MANUAL_ART_BLOCKED",
+  "status": "PASS_DCC_HANDOFF_ONLY_VISIBLE_REPLACEMENT_NOT_AUTHORED",
   "productionReady": false,
   "checks": [
     {
@@ -19,12 +19,62 @@
     {
       "id": "not-production-approved",
       "pass": true,
-      "detail": "SCULPT_REQUIRED_RETOPO_REQUIRED_UV_REQUIRED_ART_REVIEW_REQUIRED"
+      "detail": "BROWSER_VISUAL_FROZEN_AT_55cd085_HUMAN_DCC_TERRAIN_NOT_AUTHORED"
+    },
+    {
+      "id": "procedural-visible-terrain-frozen",
+      "pass": true,
+      "detail": "approvedBrowserCommit=55cd085"
     },
     {
       "id": "collision-ground-present",
       "pass": true,
-      "detail": "<bpy_struct, Object(\"MW_COL_OpeningGroundProfile\") at 0x0000011B86425D20>"
+      "detail": "<bpy_struct, Object(\"Terrain_Collision_Master\") at 0x0000025860B54820>"
+    },
+    {
+      "id": "visible-terrain-target-present",
+      "pass": true,
+      "detail": "<bpy_struct, Object(\"Terrain_Visible_Master\") at 0x0000025860B54120>"
+    },
+    {
+      "id": "independent-master-objects",
+      "pass": true,
+      "detail": "collision=<bpy_struct, Object(\"Terrain_Collision_Master\") at 0x0000025860B54820>, visible=<bpy_struct, Object(\"Terrain_Visible_Master\") at 0x0000025860B54120>"
+    },
+    {
+      "id": "visible-terrain-not-authored",
+      "pass": true,
+      "detail": "contract=NOT_AUTHORED, objectType=EMPTY"
+    },
+    {
+      "id": "frozen-collision-fingerprint",
+      "pass": true,
+      "detail": "8009a945126c4c7ab361ead414414be97cec7cd25ef5f643732402128270fb0e"
+    },
+    {
+      "id": "protected-gameplay-snapshot",
+      "pass": true,
+      "detail": "a00bf81913452518d3ed7cbc0e8e2a60c3fc7e2b34e5f9762322fcb23acf58d9"
+    },
+    {
+      "id": "collision-render-collections-hidden",
+      "pass": true,
+      "detail": "authoring and export collision collections hide from normal renders"
+    },
+    {
+      "id": "collision-debug-material-only",
+      "pass": true,
+      "detail": "['MAT_CollisionGuide', 'MAT_CollisionGuide']"
+    },
+    {
+      "id": "visible-collision-disabled",
+      "pass": true,
+      "detail": "collision_enabled=False"
+    },
+    {
+      "id": "collision-master-low-poly",
+      "pass": true,
+      "detail": "triangles=60"
     },
     {
       "id": "all-block-guides",
@@ -47,32 +97,49 @@
       "detail": "count=5"
     },
     {
-      "id": "manual-art-gates-visible",
+      "id": "manual-dcc-targets-visible",
       "pass": true,
-      "detail": "manual_objects=25"
+      "detail": "manual_targets=9"
     },
     {
-      "id": "no-sculpt-blockout-in-export",
+      "id": "dedicated-collision-export",
       "pass": true,
-      "detail": "invalid=[]"
+      "detail": "['Terrain_Collision_Master', 'MW_COL_Platform_camp-awning-deck', 'MW_COL_Platform_opening-stump-step', 'MW_COL_Platform_fallen-log-launch', 'MW_COL_Platform_fallen-log-landing', 'MW_COL_Platform_mason-shelf-overlook']"
+    },
+    {
+      "id": "visible-export-withheld",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "id": "legacy-mixed-export-empty",
+      "pass": true,
+      "detail": "[]"
+    },
+    {
+      "id": "no-generated-visible-proxy-meshes",
+      "pass": true,
+      "detail": "[]"
     }
   ],
   "metrics": {
-    "objects": 111,
-    "meshObjects": 77,
-    "vertices": 1512,
-    "triangles": 2714,
-    "materials": 16,
+    "objects": 92,
+    "meshObjects": 52,
+    "vertices": 1208,
+    "triangles": 2208,
+    "materials": 8,
     "textures": 3,
-    "collections": 18
+    "collections": 20
   },
   "manualWorkRequired": [
-    "manual terrain sculpt and silhouette review",
+    "human-authored terrain sculpt and silhouette review",
     "game-mesh retopology and deliberate LOD authoring",
     "UV unwrap, trim/material planning, and texture baking",
-    "camp benchmark asset final modeling",
-    "benchmark tree/root final modeling",
+    "camp benchmark asset modeling",
+    "benchmark tree/root modeling",
     "foliage, decal, midground, and background integration art review",
-    "Unity editor import validation and device traversal capture"
+    "create Terrain_Visible_Master from genuine DCC work; no visible mesh or visible FBX currently exists",
+    "Unity editor import validation proving collision renderers are disabled and visible-art colliders are absent",
+    "target-device traversal capture"
   ]
 }

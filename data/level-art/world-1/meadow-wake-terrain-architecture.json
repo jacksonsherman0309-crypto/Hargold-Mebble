@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 2,
+  "sliceId": "world-1-1-meadow-wake-opening-vertical-slice",
+  "status": "COLLISION_FROZEN_BROWSER_VISUAL_FROZEN_DCC_VISIBLE_NOT_AUTHORED",
+  "productionReady": false,
+  "emergencyTerrainFreeze": {
+    "active": true,
+    "approvedVisibleCommit": "55cd085",
+    "approvedVisibleCommitSubject": "Correct Meadow Wake terrain presentation",
+    "approvedScreenshot": "assets/previews/terrain-validation/correction-pass/opening-after.png",
+    "rule": "Do not replace or modify the deployed visible terrain until a genuine human-authored DCC terrain asset has passed sculpt, retopology, UV, material, LOD, integration, performance, and art review.",
+    "proceduralVisibleTerrainAllowed": false,
+    "collisionDebugRequiresExplicitFlag": true
+  },
+  "protectedGameplaySnapshot": {
+    "algorithm": "sha256(stable-json({spawn, exitTransition, gameplayPlane, groundProfile, pits, safeLandingZones, platforms, blocks, enemyAnchors, camera}))",
+    "sha256": "a00bf81913452518d3ed7cbc0e8e2a60c3fc7e2b34e5f9762322fcb23acf58d9",
+    "purpose": "DCC terrain work must leave this fingerprint unchanged."
+  },
+  "collisionMaster": {
+    "objectName": "Terrain_Collision_Master",
+    "meshName": "Terrain_Collision_Master_Mesh",
+    "authoringCollection": "12_TERRAIN_COLLISION",
+    "exportCollection": "90_EXPORT_COLLISION",
+    "unityAsset": "unity/HargoldMebble/Assets/Game/Worlds/World01_MeadowWake/Collision/Source/Terrain_Collision_Master.fbx",
+    "unityHierarchy": "Collision/Terrain_Collision_Master",
+    "sourceLayout": "data/level-art/world-1/meadow-wake-opening-layout.json",
+    "halfDepthMetres": 0.4,
+    "closureBottomZMetres": -4.8,
+    "geometryFingerprintAlgorithm": "sha256(stable-json({name, halfDepthMetres, closureBottomZMetres, groundProfile:[[x,blenderZ], ...]}))",
+    "geometryFingerprintSha256": "8009a945126c4c7ab361ead414414be97cec7cd25ef5f643732402128270fb0e",
+    "authoritativeFor": [
+      "character-controller support",
+      "enemy ground support",
+      "raycasts",
+      "physics",
+      "jump and landing validation",
+      "gameplay spacing"
+    ],
+    "visibleInGame": false,
+    "renderersEnabled": false,
+    "materialPolicy": "debug visualization only",
+    "modificationPolicy": "frozen; change only to correct a verified gameplay defect"
+  },
+  "visibleMaster": {
+    "objectName": "Terrain_Visible_Master",
+    "meshName": null,
+    "authoringCollection": "10_TERRAIN_HIGH",
+    "exportCollection": "90_EXPORT_VISIBLE",
+    "unityAsset": null,
+    "unityHierarchy": "Art/Terrain_Visible_Master__AUTHORED_DCC_ASSET_REQUIRED",
+    "status": "NOT_AUTHORED",
+    "collisionEnabled": false,
+    "independentMeshData": true,
+    "productionStatus": "HUMAN_DCC_SCULPT_REQUIRED_RETOPO_REQUIRED_UV_REQUIRED_MATERIALS_REQUIRED_LOD_REQUIRED_ENGINE_INTEGRATION_REQUIRED_ART_REVIEW_REQUIRED",
+    "deployedFallback": {
+      "kind": "browser-authored-visible-terrain",
+      "commit": "55cd085",
+      "screenshot": "assets/previews/terrain-validation/correction-pass/opening-after.png",
+      "files": [
+        "index.html",
+        "styles.css",
+        "src/game.js",
+        "src/content/meadow-wake-course.js",
+        "src/content/meadow-wake-level-data.js",
+        "src/content/meadow-wake-scenery.js",
+        "src/environment/meadow-wake-environment.js",
+        "src/environment/meadow-wake-foreground.js",
+        "src/environment/verdant-vale-terrain-kit.js"
+      ]
+    },
+    "requiredSurfaceFamilies": [
+      "grass lip",
+      "root transition",
+      "soil layer",
+      "embedded stone",
+      "moss",
+      "erosion",
+      "undercuts",
+      "small cavities"
+    ],
+    "authoringPolicy": {
+      "generatedMeshForbidden": true,
+      "primitiveApproximationForbidden": true,
+      "emptyDccTargetAllowed": true,
+      "visibleExportAllowedBeforeApproval": false
+    }
+  },
+  "invariants": [
+    "The deployed browser-visible terrain remains exactly at commit 55cd085 until approved DCC art replaces it.",
+    "Terrain_Visible_Master remains an empty handoff target and 90_EXPORT_VISIBLE remains empty until genuine DCC art exists.",
+    "No generated terrain shell, cylinder tree, cube camp, primitive rock mass, or other proxy may be rendered or exported as visible game art.",
+    "The collision master is never rendered in normal gameplay and collision debug requires an explicit flag or tool.",
+    "The visible master is never a CharacterController, enemy, raycast, or physics collision source.",
+    "Visible-terrain edits cannot mutate terrain collision, platform collision, gameplay anchors, checkpoints, cameras, or movement values.",
+    "Trees, roots, embedded rocks, foliage, and terrain materials attach only to genuine authored visible art.",
+    "Collision and future visible terrain are separate assets and separate Unity hierarchies."
+  ]
+}

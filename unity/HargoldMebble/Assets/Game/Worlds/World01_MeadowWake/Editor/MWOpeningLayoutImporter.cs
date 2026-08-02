@@ -13,8 +13,8 @@ namespace HargoldMebble.Editor.World01
     {
         private const string ScenePath =
             "Assets/Game/Worlds/World01_MeadowWake/Scenes/MW_Opening_VerticalSlice.unity";
-        private const string GuideFbxPath =
-            "Assets/Game/Worlds/World01_MeadowWake/Art/Source/MW_Opening_BlockoutGuide.fbx";
+        private const string CollisionFbxPath =
+            "Assets/Game/Worlds/World01_MeadowWake/Collision/Source/Terrain_Collision_Master.fbx";
 
         [Serializable] private sealed class Layout
         {
@@ -23,15 +23,12 @@ namespace HargoldMebble.Editor.World01
             public bool completionClaim;
             public Scope scope;
             public Spawn spawn;
-            public Terrain terrain;
             public GameplayObjects gameplayObjects;
         }
 
         [Serializable] private sealed class Scope { public float[] playableRangeMetres; }
         [Serializable] private sealed class Spawn { public Position unityPosition; }
         [Serializable] private sealed class Position { public float x; public float y; public float z; }
-        [Serializable] private sealed class Terrain { public GroundPoint[] groundProfile; }
-        [Serializable] private sealed class GroundPoint { public float x; public float blenderZ; }
         [Serializable] private sealed class GameplayObjects { public Block[] blocks; public Enemy[] enemyAnchors; }
         [Serializable] private sealed class Block { public string id; public string type; public Position blenderCenter; public float width; public float height; }
         [Serializable] private sealed class Enemy { public string id; public string actorType; public Position blenderPosition; }
@@ -52,36 +49,79 @@ namespace HargoldMebble.Editor.World01
                 throw new InvalidDataException("Opening layout schema/status is not safe to import.");
             }
 
-            AssetDatabase.ImportAsset(GuideFbxPath, ImportAssetOptions.ForceUpdate);
+            AssetDatabase.ImportAsset(CollisionFbxPath, ImportAssetOptions.ForceUpdate);
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-            GameObject root = new GameObject("MW_Opening_VerticalSlice__MANUAL_ART_REQUIRED");
+            GameObject root = new GameObject("MW_Opening_VerticalSlice__DCC_VISIBLE_ART_NOT_AUTHORED");
             root.AddComponent<MWVerticalSliceStatus>();
 
-            Transform art = Child(root.transform, "Art__SCULPT_RETOPO_UV_REQUIRED");
+            Transform art = Child(root.transform, "Art");
             Transform collision = Child(root.transform, "Collision");
             Transform gameplay = Child(root.transform, "GameplayAnchors");
             Transform lighting = Child(root.transform, "Lighting__URP_VALIDATION_REQUIRED");
 
-            GameObject guidePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(GuideFbxPath);
-            if (guidePrefab != null)
-            {
-                GameObject instance = PrefabUtility.InstantiatePrefab(guidePrefab, art) as GameObject;
-                if (instance != null)
-                {
-                    instance.name = "MW_Opening_BlockoutGuide__NOT_FINAL_ART";
-                    instance.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-                }
-            }
-
-            BuildCollision(layout, collision);
+            InstantiateCollisionMaster(collision);
+            InstantiateVisibleMaster(art);
             BuildGameplayGuides(layout, gameplay);
             GameObject player = BuildTraversalProxy(layout, gameplay);
             BuildCamera(player.transform, root.transform);
             BuildLighting(lighting);
+            ValidateTerrainSeparation();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             AssetDatabase.SaveAssets();
-            Debug.Log("Meadow Wake opening slice rebuilt from canonical layout. Manual art and Unity validation remain required.");
+            Debug.Log("Meadow Wake opening handoff rebuilt with hidden frozen collision and an empty DCC visible-art target. No visible terrain FBX exists or is claimed.");
+        }
+
+        [MenuItem("Hargold & Mebble/Meadow Wake/Validate Terrain Separation")]
+        public static void ValidateTerrainSeparation()
+        {
+            GameObject collision = GameObject.Find("Terrain_Collision_Master");
+            GameObject visible = GameObject.Find("Terrain_Visible_Master__AUTHORED_DCC_ASSET_REQUIRED");
+            if (collision == null || visible == null || collision == visible)
+            {
+                throw new InvalidDataException("Frozen collision or empty Meadow Wake DCC terrain target is missing.");
+            }
+
+            bool collisionRendererEnabled = false;
+            foreach (Renderer renderer in collision.GetComponentsInChildren<Renderer>(true))
+            {
+                collisionRendererEnabled |= renderer.enabled;
+            }
+            MeshCollider[] collisionColliders = collision.GetComponentsInChildren<MeshCollider>(true);
+            Collider[] visibleColliders = visible.GetComponentsInChildren<Collider>(true);
+            Renderer[] visibleRenderers = visible.GetComponentsInChildren<Renderer>(true);
+            MeshFilter[] visibleMeshFilters = visible.GetComponentsInChildren<MeshFilter>(true);
+
+            var collisionMeshes = new HashSet<Mesh>();
+            foreach (MeshFilter filter in collision.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (filter.sharedMesh != null) collisionMeshes.Add(filter.sharedMesh);
+            }
+            bool sharedMesh = false;
+            foreach (MeshFilter filter in visible.GetComponentsInChildren<MeshFilter>(true))
+            {
+                sharedMesh |= filter.sharedMesh != null && collisionMeshes.Contains(filter.sharedMesh);
+            }
+
+            MWVerticalSliceStatus status = UnityEngine.Object.FindFirstObjectByType<MWVerticalSliceStatus>();
+            if (status != null)
+            {
+                status.terrainMastersShareGeometry = sharedMesh;
+                status.collisionRenderersEnabled = collisionRendererEnabled;
+                status.visibleTerrainCollisionEnabled = visibleColliders.Length > 0;
+                status.visibleTerrainMeshPresent = visibleRenderers.Length > 0 || visibleMeshFilters.Length > 0;
+                EditorUtility.SetDirty(status);
+            }
+
+            if (collisionRendererEnabled || collisionColliders.Length == 0 || visibleColliders.Length > 0 ||
+                visibleRenderers.Length > 0 || visibleMeshFilters.Length > 0 || sharedMesh)
+            {
+                throw new InvalidDataException(
+                    $"Terrain separation failed: collisionRenderers={collisionRendererEnabled}, " +
+                    $"collisionMeshColliders={collisionColliders.Length}, visibleColliders={visibleColliders.Length}, " +
+                    $"visibleRenderers={visibleRenderers.Length}, visibleMeshes={visibleMeshFilters.Length}, sharedMesh={sharedMesh}");
+            }
+            Debug.Log("Meadow Wake terrain freeze passed: collision is hidden/physical and the DCC visible-art target is empty.");
         }
 
         private static Transform Child(Transform parent, string name)
@@ -91,44 +131,48 @@ namespace HargoldMebble.Editor.World01
             return child.transform;
         }
 
-        private static void BuildCollision(Layout layout, Transform parent)
+        private static GameObject InstantiateAsset(string assetPath, Transform parent, string instanceName)
         {
-            if (layout.terrain?.groundProfile == null || layout.terrain.groundProfile.Length < 2)
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+            if (prefab == null)
             {
-                throw new InvalidDataException("Ground profile is missing.");
+                throw new FileNotFoundException($"Required Meadow Wake terrain asset is missing: {assetPath}");
             }
-
-            const float halfDepth = 0.4f;
-            GroundPoint[] points = layout.terrain.groundProfile;
-            var vertices = new List<Vector3>();
-            foreach (GroundPoint point in points)
+            GameObject instance = PrefabUtility.InstantiatePrefab(prefab, parent) as GameObject;
+            if (instance == null)
             {
-                vertices.Add(new Vector3(point.x, point.blenderZ, -halfDepth));
-                vertices.Add(new Vector3(point.x, point.blenderZ, halfDepth));
+                throw new InvalidDataException($"Could not instantiate Meadow Wake terrain asset: {assetPath}");
             }
-
-            var triangles = new List<int>();
-            for (int i = 0; i < points.Length - 1; i++)
-            {
-                int left = i * 2;
-                int right = (i + 1) * 2;
-                AddQuad(triangles, left, right, right + 1, left + 1);
-            }
-
-            Mesh mesh = new Mesh { name = "MW_COL_OpeningProfile" };
-            mesh.SetVertices(vertices);
-            mesh.SetTriangles(triangles, 0);
-            mesh.RecalculateNormals();
-            GameObject collisionObject = new GameObject("MW_COL_OpeningProfile");
-            collisionObject.transform.SetParent(parent, false);
-            collisionObject.AddComponent<MeshFilter>().sharedMesh = mesh;
-            collisionObject.AddComponent<MeshCollider>().sharedMesh = mesh;
+            instance.name = instanceName;
+            instance.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            instance.transform.localScale = Vector3.one;
+            return instance;
         }
 
-        private static void AddQuad(List<int> triangles, int a, int b, int c, int d)
+        private static void InstantiateCollisionMaster(Transform parent)
         {
-            triangles.Add(a); triangles.Add(b); triangles.Add(c);
-            triangles.Add(a); triangles.Add(c); triangles.Add(d);
+            GameObject instance = InstantiateAsset(CollisionFbxPath, parent, "Terrain_Collision_Master");
+            foreach (Renderer renderer in instance.GetComponentsInChildren<Renderer>(true))
+            {
+                renderer.enabled = false;
+            }
+            foreach (MeshFilter filter in instance.GetComponentsInChildren<MeshFilter>(true))
+            {
+                MeshCollider collider = filter.GetComponent<MeshCollider>();
+                if (collider == null)
+                {
+                    collider = filter.gameObject.AddComponent<MeshCollider>();
+                }
+                collider.sharedMesh = filter.sharedMesh;
+            }
+        }
+
+        private static void InstantiateVisibleMaster(Transform parent)
+        {
+            GameObject target = new GameObject("Terrain_Visible_Master__AUTHORED_DCC_ASSET_REQUIRED");
+            target.transform.SetParent(parent, false);
+            target.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            target.transform.localScale = Vector3.one;
         }
 
         private static void BuildGameplayGuides(Layout layout, Transform parent)
@@ -141,6 +185,7 @@ namespace HargoldMebble.Editor.World01
                 marker.transform.position = new Vector3(block.blenderCenter.x, block.blenderCenter.z, 0f);
                 marker.transform.localScale = new Vector3(block.width, block.height, 0.74f);
                 UnityEngine.Object.DestroyImmediate(marker.GetComponent<Collider>());
+                marker.GetComponent<Renderer>().enabled = false;
             }
             foreach (Enemy enemy in layout.gameplayObjects?.enemyAnchors ?? Array.Empty<Enemy>())
             {
@@ -157,6 +202,7 @@ namespace HargoldMebble.Editor.World01
             proxy.transform.SetParent(parent, false);
             proxy.transform.position = new Vector3(layout.spawn.unityPosition.x, layout.spawn.unityPosition.y + 0.91f, 0f);
             UnityEngine.Object.DestroyImmediate(proxy.GetComponent<Collider>());
+            proxy.GetComponent<Renderer>().enabled = false;
             CharacterController controller = proxy.AddComponent<CharacterController>();
             controller.height = 1.82f;
             controller.radius = 0.45f;

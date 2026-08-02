@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-02",
+  "approvedVisibleCommit": "55cd085",
+  "bodyOverflow": "hidden",
+  "canvasCount": 2,
+  "debugTerrain": null,
+  "htmlClasses": "",
+  "playableRegion": true,
+  "touchControlLabels": [
+    "Move left",
+    "Move right",
+    "Swap hero",
+    "Ground slam while airborne",
+    "Attack or interact",
+    "Jump, air twirl, double jump, or Mebble glide"
+  ],
+  "url": "http://127.0.0.1:4174/",
+  "viewport": {
+    "height": 864,
+    "width": 1536
+  }
+}

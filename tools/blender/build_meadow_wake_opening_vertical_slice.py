@@ -1,13 +1,14 @@
 """Build the canonical Meadow Wake opening Blender authoring scene.
 
-This script automates scene structure, exact gameplay guides, collision, fixed
-review cameras, export, and deliberately coarse sculpt-ready volumes. It does
-not claim to replace manual sculpting, retopology, UV work, baking, or art review.
+This script automates scene structure, exact gameplay guides, frozen collision,
+fixed review cameras, and empty DCC authoring targets. It deliberately creates
+no visible terrain mesh, primitive environment proxy, or production screenshot.
 """
 
 from __future__ import annotations
 
 import json
+import hashlib
 import math
 from pathlib import Path
 import sys
@@ -18,10 +19,10 @@ from mathutils import Vector
 
 ROOT = Path(__file__).resolve().parents[2]
 LAYOUT_PATH = ROOT / "data/level-art/world-1/meadow-wake-opening-layout.json"
+ARCHITECTURE_PATH = ROOT / "data/level-art/world-1/meadow-wake-terrain-architecture.json"
 BLEND_PATH = ROOT / "assets/blender/environments/world-1/meadow-wake-opening.blend"
 GUIDE_GLB = ROOT / "assets/exports/world-1/meadow-wake-opening/mw_opening_neutral_guide.glb"
-UNITY_FBX = ROOT / "unity/HargoldMebble/Assets/Game/Worlds/World01_MeadowWake/Art/Source/MW_Opening_BlockoutGuide.fbx"
-PREVIEW_DIR = ROOT / "assets/previews/terrain-validation/blender-vertical-slice"
+COLLISION_FBX = ROOT / "unity/HargoldMebble/Assets/Game/Worlds/World01_MeadowWake/Collision/Source/Terrain_Collision_Master.fbx"
 REFERENCE_IMAGE = ROOT / "assets/references/terrain/meadow-wake-terrain-quality-reference.jpeg"
 
 COLLECTION_NAMES = [
@@ -42,10 +43,20 @@ COLLECTION_NAMES = [
     "41_BACKGROUND_INTEGRATION",
     "50_LIGHTING_PREVIEW",
     "90_EXPORT",
+    "90_EXPORT_COLLISION",
+    "90_EXPORT_VISIBLE",
     "99_ARCHIVE_DISABLED",
 ]
 
-MANUAL_GATES = ("SCULPT_REQUIRED", "RETOPO_REQUIRED", "UV_REQUIRED", "ART_REVIEW_REQUIRED")
+MANUAL_GATES = (
+    "HUMAN_DCC_SCULPT_REQUIRED",
+    "RETOPO_REQUIRED",
+    "UV_REQUIRED",
+    "MATERIALS_REQUIRED",
+    "LOD_REQUIRED",
+    "ENGINE_INTEGRATION_REQUIRED",
+    "ART_REVIEW_REQUIRED",
+)
 
 
 def reset_scene():
@@ -63,9 +74,16 @@ def make_collections():
     result = {}
     for name in COLLECTION_NAMES:
         collection = bpy.data.collections.new(name)
-        bpy.context.scene.collection.children.link(collection)
         result[name] = collection
-    for name in ("00_REFERENCE", "01_GAMEPLAY_GUIDES", "02_CAMERA_GUIDES", "12_TERRAIN_COLLISION", "90_EXPORT"):
+    for name, collection in result.items():
+        if name in ("90_EXPORT_COLLISION", "90_EXPORT_VISIBLE"):
+            result["90_EXPORT"].children.link(collection)
+        else:
+            bpy.context.scene.collection.children.link(collection)
+    for name in (
+        "00_REFERENCE", "01_GAMEPLAY_GUIDES", "02_CAMERA_GUIDES", "12_TERRAIN_COLLISION",
+        "41_BACKGROUND_INTEGRATION", "90_EXPORT", "90_EXPORT_COLLISION", "90_EXPORT_VISIBLE"
+    ):
         result[name].hide_render = True
     return result
 
@@ -96,7 +114,7 @@ def material(name, color, metallic=0.0, roughness=0.78, emission=None):
     return mat
 
 
-def tag_manual(obj, stage="sculpt-ready-blockout-volume"):
+def tag_manual(obj, stage="authored-dcc-asset-required"):
     obj["asset_status"] = stage
     obj["production_approved"] = False
     for gate in MANUAL_GATES:
@@ -194,6 +212,21 @@ def profile_prism(name, points, half_depth, bottom_z, collection, materials, man
     return obj
 
 
+def collision_geometry_fingerprint(layout, architecture):
+    collision = architecture["collisionMaster"]
+    payload = {
+        "name": collision["objectName"],
+        "halfDepthMetres": collision["halfDepthMetres"],
+        "closureBottomZMetres": collision["closureBottomZMetres"],
+        "groundProfile": [
+            [point["x"], point["blenderZ"]]
+            for point in layout["terrain"]["groundProfile"]
+        ],
+    }
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def terrain_z(layout, x):
     points = layout["terrain"]["groundProfile"]
     for left, right in zip(points, points[1:]):
@@ -203,20 +236,32 @@ def terrain_z(layout, x):
     return points[-1]["blenderZ"]
 
 
-def build_guides(layout, collections, mats):
+def build_guides(layout, architecture, collections, mats):
     guides = collections["01_GAMEPLAY_GUIDES"]
     collision = collections["12_TERRAIN_COLLISION"]
-    export = collections["90_EXPORT"]
+    export = collections["90_EXPORT_COLLISION"]
+    collision_contract = architecture["collisionMaster"]
+    fingerprint = collision_geometry_fingerprint(layout, architecture)
+    if fingerprint != collision_contract["geometryFingerprintSha256"]:
+        raise ValueError("Frozen Terrain_Collision_Master fingerprint no longer matches the canonical layout")
     ground = profile_prism(
-        "MW_COL_OpeningGroundProfile",
+        collision_contract["objectName"],
         layout["terrain"]["groundProfile"],
-        0.4,
-        -4.8,
+        collision_contract["halfDepthMetres"],
+        collision_contract["closureBottomZMetres"],
         collision,
         [mats["collision"], mats["collision"]],
     )
+    ground.data.name = collision_contract["meshName"]
+    ground["terrain_role"] = "gameplay-collision-authority"
     ground["collision_role"] = "deterministic-ground-profile"
     ground["source_layout"] = "data/level-art/world-1/meadow-wake-opening-layout.json"
+    ground["source_architecture"] = "data/level-art/world-1/meadow-wake-terrain-architecture.json"
+    ground["geometry_fingerprint_sha256"] = fingerprint
+    ground["visible_in_game"] = False
+    ground["renderers_enabled"] = False
+    ground["material_policy"] = "gameplay-visualization-only"
+    ground["modification_policy"] = collision_contract["modificationPolicy"]
     link_to_collection(ground, export)
 
     add_empty("ANCHOR_Spawn_Hargold", tuple(layout["spawn"]["blenderPosition"].values()), guides,
@@ -296,93 +341,72 @@ def build_guides(layout, collections, mats):
         )
 
 
-def build_sculpt_ready_volumes(layout, collections, mats):
-    terrain = profile_prism(
-        "MW_TerrainHigh_SculptVolume_SCULPT_REQUIRED",
-        layout["terrain"]["groundProfile"],
-        2.8,
-        -4.65,
+def build_dcc_handoff_targets(layout, architecture, collections):
+    visible_contract = architecture["visibleMaster"]
+    terrain = add_empty(
+        visible_contract["objectName"],
+        (15.0, 0.0, 0.0),
         collections["10_TERRAIN_HIGH"],
-        [mats["soil"], mats["turf"]],
-        manual=True,
+        "PLAIN_AXES",
+        1.0,
+        {
+            "asset_status": visible_contract["status"],
+            "production_status": visible_contract["productionStatus"],
+            "production_approved": False,
+            "collision_enabled": False,
+            "generated_mesh_forbidden": True,
+            "procedural_visible_terrain_allowed": False,
+            "approved_browser_visible_commit": architecture["emergencyTerrainFreeze"]["approvedVisibleCommit"],
+        },
     )
-    terrain["purpose"] = "connected sculpt-ready volume; manual landform sculpting required"
-    bevel = terrain.modifiers.new("PreviewEdgeSoftening_NONFINAL", "BEVEL")
-    bevel.width = 0.08
-    bevel.segments = 2
+    terrain["terrain_role"] = "empty-human-dcc-authoring-target"
+    terrain["purpose"] = "replace only with approved human-authored DCC terrain"
+    terrain["source_architecture"] = "data/level-art/world-1/meadow-wake-terrain-architecture.json"
+    terrain["source_collision_fingerprint"] = architecture["collisionMaster"]["geometryFingerprintSha256"]
+    for gate in MANUAL_GATES:
+        terrain[gate] = True
 
-    placeholder = add_empty(
-        "MW_TerrainGame_RETOPO_REQUIRED", (15, 0, -1.5), collections["11_TERRAIN_GAME"],
-        properties={"RETOPO_REQUIRED": True, "UV_REQUIRED": True, "production_approved": False}
+    targets = (
+        ("MW_DCC_TARGET_Camp", "20_CAMP", (1.0, 0.0, 0.35), "camp foundation, lodge, timber, canvas"),
+        ("MW_DCC_TARGET_Trees", "21_TREES", (14.7, 0.0, 2.1), "tree trunks and canopies"),
+        ("MW_DCC_TARGET_Roots", "22_ROOTS", (14.8, 0.0, 0.8), "terrain-integrated root systems"),
+        ("MW_DCC_TARGET_Rocks", "23_ROCKS", (24.5, 0.0, 0.7), "authored rock families"),
+        ("MW_DCC_TARGET_RuinsAndTimber", "24_RUINS_AND_TIMBER", (25.0, 0.0, 0.8), "ruins and fallen timber"),
+        ("MW_DCC_TARGET_Foliage", "30_FOLIAGE", (15.0, 0.0, 0.2), "foliage and grass cards"),
+        ("MW_DCC_TARGET_Decals", "31_DECALS", (15.0, 0.0, 0.0), "terrain decals and blend masks"),
+        ("MW_DCC_TARGET_Midground", "40_MIDGROUND", (15.0, 3.2, 1.5), "authored midground integration"),
     )
-    placeholder["source_high_mesh"] = terrain.name
-
-    # Deliberately coarse starting masses at the authored landmarks. They are
-    # useful sculpt targets, never final asset substitutes.
-    camp_floor = add_cube("MW_CampFoundation_SCULPT_REQUIRED", (1.0, 0.85, 0.35), (3.7, 1.45, 0.35),
-                          collections["20_CAMP"], mats["timber"], manual=True)
-    camp_floor["benchmark_asset"] = "camp-foundation-bank"
-    add_cube("MW_CampLodgeMass_ART_REVIEW_REQUIRED", (-0.25, 1.15, 1.6), (1.75, 0.85, 1.25),
-             collections["20_CAMP"], mats["canvas"], manual=True)
-    for x, z, sx, sz in ((13.9, 1.1, 0.55, 1.2), (14.8, 0.7, 0.42, 0.85), (16.0, 0.55, 0.38, 0.75)):
-        root = add_ico(f"MW_RootMass_{x:.1f}_SCULPT_REQUIRED", (x, 0.35, z), (sx, 1.1, sz),
-                       collections["22_ROOTS"], mats["bark"], manual=True)
-        root.rotation_euler.y = -0.35
-    add_cylinder("MW_BenchmarkTreeTrunk_SCULPT_REQUIRED", (14.7, 1.0, 2.1), 0.62, 4.2,
-                 collections["21_TREES"], mats["bark"], vertices=12, manual=True)
-    for loc, scale in (((14.2, 1.0, 4.2), (1.65, 1.1, 1.05)), ((15.3, 1.05, 4.35), (1.5, 1.15, 1.0))):
-        add_ico("MW_BenchmarkTreeCanopy_SCULPT_REQUIRED", loc, scale, collections["21_TREES"], mats["foliage"], manual=True)
-    for index, (x, z, scale) in enumerate(((21.4, 0.15, 0.7), (22.2, 0.3, 0.55), (25.5, 0.65, 0.9), (26.4, 0.8, 1.0), (27.2, 0.7, 0.75))):
-        add_ico(f"MW_RockMass_{index:02d}_SCULPT_REQUIRED", (x, 0.3, z), (scale, 1.0, scale * 0.7),
-                collections["23_ROCKS"], mats["stone"], manual=True)
-    for index, (x, z) in enumerate(((24.2, 0.55), (25.0, 0.72), (25.8, 0.9))):
-        add_cube(f"MW_RuinStone_{index:02d}_RETOPO_REQUIRED", (x, 0.72, z), (0.42, 0.48, 0.34),
-                 collections["24_RUINS_AND_TIMBER"], mats["stone"], manual=True)
-
-    for index, x in enumerate((3.3, 4.1, 10.9, 18.8, 20.8, 23.1, 28.2)):
-        add_ico(f"MW_FoliageMass_{index:02d}_ART_REVIEW_REQUIRED", (x, -0.9, terrain_z(layout, x) + 0.16),
-                (0.42, 0.32, 0.22), collections["30_FOLIAGE"], mats["foliage"], manual=True)
-
-    add_empty("MW_DecalPlan_UV_REQUIRED", (15, -1.1, 0), collections["31_DECALS"],
-              properties={"UV_REQUIRED": True, "bake_required": True})
-    add_empty("MW_MidgroundPlan_ART_REVIEW_REQUIRED", (15, 3.2, 1.5), collections["40_MIDGROUND"],
-              properties={"ART_REVIEW_REQUIRED": True})
+    for name, collection_name, location, purpose in targets:
+        target = add_empty(
+            name,
+            location,
+            collections[collection_name],
+            properties={
+                "asset_status": "NOT_AUTHORED",
+                "production_approved": False,
+                "purpose": purpose,
+                "generated_proxy_forbidden": True,
+            },
+        )
+        for gate in MANUAL_GATES:
+            target[gate] = True
 
 
-def build_background(collections, mats):
+def build_background(collections):
     if not REFERENCE_IMAGE.exists():
         return
     image = bpy.data.images.load(str(REFERENCE_IMAGE), check_existing=True)
-    mat = bpy.data.materials.new("MAT_BackgroundIntegration_Reference")
-    mat.use_nodes = True
-    nodes = mat.node_tree.nodes
-    links = mat.node_tree.links
-    for node in list(nodes):
-        nodes.remove(node)
-    output = nodes.new("ShaderNodeOutputMaterial")
-    emission = nodes.new("ShaderNodeEmission") if hasattr(bpy.types, "ShaderNodeEmission") else None
-    texture = nodes.new("ShaderNodeTexImage")
-    texture.image = image
-    if emission:
-        links.new(texture.outputs["Color"], emission.inputs["Color"])
-        emission.inputs["Strength"].default_value = 0.75
-        links.new(emission.outputs["Emission"], output.inputs["Surface"])
-    else:
-        bsdf = nodes.new("ShaderNodeBsdfPrincipled")
-        links.new(texture.outputs["Color"], bsdf.inputs["Base Color"])
-        bsdf.inputs["Roughness"].default_value = 1
-        links.new(bsdf.outputs["BSDF"], output.inputs["Surface"])
-    bpy.ops.mesh.primitive_plane_add(size=2, location=(15, 5.2, 3.1), rotation=(math.pi / 2, 0, 0))
-    plane = move_to_collection(bpy.context.object, collections["41_BACKGROUND_INTEGRATION"])
-    plane.name = "MW_BackgroundIntegration_ReferenceOnly"
-    plane.scale = (19.5, 6.0, 1)
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-    plane.data.materials.append(mat)
-    plane["source"] = str(REFERENCE_IMAGE.relative_to(ROOT)).replace("\\", "/")
-    plane["role"] = "background integration preview; not terrain geometry"
-
-    add_empty("REFERENCE_MeadowWakeQualityTarget", (15, 5.3, 3.1), collections["00_REFERENCE"],
-              properties={"filepath": str(REFERENCE_IMAGE), "non_rendering_reference": True})
+    reference = add_empty(
+        "REFERENCE_MeadowWakeQualityTarget",
+        (15, 5.3, 3.1),
+        collections["00_REFERENCE"],
+        "IMAGE",
+        8.0,
+        {"filepath": str(REFERENCE_IMAGE), "non_rendering_reference": True},
+    )
+    reference.data = image
+    reference.empty_image_depth = "BACK"
+    reference.color[3] = 0.8
 
 
 def look_at(obj, target):
@@ -424,13 +448,6 @@ def build_cameras_and_lighting(layout, collections):
 
 def make_materials():
     return {
-        "soil": material("MAT_Blockout_Soil_MANUAL_ART_REQUIRED", (0.23, 0.095, 0.035)),
-        "turf": material("MAT_Blockout_Turf_MANUAL_ART_REQUIRED", (0.18, 0.48, 0.08)),
-        "timber": material("MAT_Blockout_Timber_MANUAL_ART_REQUIRED", (0.26, 0.11, 0.035)),
-        "canvas": material("MAT_Blockout_Canvas_MANUAL_ART_REQUIRED", (0.18, 0.32, 0.12)),
-        "bark": material("MAT_Blockout_Bark_MANUAL_ART_REQUIRED", (0.16, 0.065, 0.025)),
-        "stone": material("MAT_Blockout_Stone_MANUAL_ART_REQUIRED", (0.25, 0.27, 0.21)),
-        "foliage": material("MAT_Blockout_Foliage_MANUAL_ART_REQUIRED", (0.22, 0.55, 0.09)),
         "collision": material("MAT_CollisionGuide", (0.1, 0.8, 0.9), emission=(0.1, 0.6, 0.8)),
         "safe": material("MAT_SafeLandingGuide", (0.18, 1.0, 0.28), emission=(0.1, 0.7, 0.2)),
         "platform": material("MAT_PlatformGuide", (0.95, 0.66, 0.12), emission=(0.8, 0.4, 0.05)),
@@ -463,23 +480,9 @@ def export_selected(objects, filepath, kind):
         )
 
 
-def render_previews(scene, cameras):
-    PREVIEW_DIR.mkdir(parents=True, exist_ok=True)
-    scene.render.engine = "BLENDER_EEVEE"
-    scene.render.resolution_x = 1280
-    scene.render.resolution_y = 720
-    scene.render.resolution_percentage = 75
-    scene.render.image_settings.file_format = "PNG"
-    scene.render.film_transparent = False
-    scene.world.color = (0.28, 0.48, 0.72)
-    for view_id, camera in cameras.items():
-        scene.camera = camera
-        scene.render.filepath = str(PREVIEW_DIR / f"blockout-{view_id}.png")
-        bpy.ops.render.render(write_still=True)
-
-
 def main():
     layout = json.loads(LAYOUT_PATH.read_text(encoding="utf-8"))
+    architecture = json.loads(ARCHITECTURE_PATH.read_text(encoding="utf-8"))
     reset_scene()
     collections = make_collections()
     mats = make_materials()
@@ -488,28 +491,34 @@ def main():
     scene.unit_settings.scale_length = 1.0
     scene["asset_id"] = layout["id"]
     scene["layout_source"] = str(LAYOUT_PATH.relative_to(ROOT)).replace("\\", "/")
+    scene["terrain_architecture_source"] = str(ARCHITECTURE_PATH.relative_to(ROOT)).replace("\\", "/")
+    scene["terrain_collision_master"] = architecture["collisionMaster"]["objectName"]
+    scene["terrain_visible_master"] = architecture["visibleMaster"]["objectName"]
+    scene["terrain_masters_share_geometry"] = False
     scene["visible_art_status"] = layout["visibleArtStatus"]
     scene["production_approved"] = False
     scene["browser_runtime_role"] = "layout-and-traversal-reference-only"
     scene["unity_role"] = "production-assembly-target"
-    scene["blender_role"] = "visible-environment-source-of-truth"
+    scene["blender_role"] = "dcc-handoff-guides-and-frozen-collision-only"
+    scene["visible_dcc_asset_status"] = architecture["visibleMaster"]["status"]
+    scene["procedural_visible_terrain_allowed"] = False
+    scene["approved_browser_visible_commit"] = architecture["emergencyTerrainFreeze"]["approvedVisibleCommit"]
     scene["scale_contract"] = "1 gameplay metre = 1 Blender metre = 1 Unity unit"
-    build_guides(layout, collections, mats)
-    build_sculpt_ready_volumes(layout, collections, mats)
-    build_background(collections, mats)
-    cameras = build_cameras_and_lighting(layout, collections)
+    build_guides(layout, architecture, collections, mats)
+    build_dcc_handoff_targets(layout, architecture, collections)
+    build_background(collections)
+    build_cameras_and_lighting(layout, collections)
 
     guide_objects = list(collections["01_GAMEPLAY_GUIDES"].objects) + list(collections["12_TERRAIN_COLLISION"].objects)
     export_selected(guide_objects, GUIDE_GLB, "glb")
-    export_selected(list(collections["90_EXPORT"].objects), UNITY_FBX, "fbx")
-
-    render_previews(scene, cameras)
+    export_selected(list(collections["90_EXPORT_COLLISION"].objects), COLLISION_FBX, "fbx")
     BLEND_PATH.parent.mkdir(parents=True, exist_ok=True)
     bpy.context.preferences.filepaths.save_version = 0
     bpy.ops.wm.save_as_mainfile(filepath=str(BLEND_PATH), check_existing=False)
     print(f"Saved {BLEND_PATH}")
     print(f"Exported {GUIDE_GLB}")
-    print(f"Exported {UNITY_FBX}")
+    print(f"Exported {COLLISION_FBX}")
+    print("Visible terrain export intentionally withheld: human-authored DCC asset not present")
 
 
 if __name__ == "__main__":

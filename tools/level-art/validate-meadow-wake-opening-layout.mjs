@@ -45,6 +45,11 @@ export function validateMeadowWakeOpeningLayout(layout) {
     layout.camera.fixedComparisonViewpoints.map(view => view.id).join(','));
   check('strict-plane', layout.gameplayPlane.traversalDepthLocked && layout.gameplayPlane.blenderY === 0,
     JSON.stringify(layout.gameplayPlane));
+  check('terrain-master-separation',
+    layout.terrain.collisionMaster === 'Terrain_Collision_Master' &&
+      layout.terrain.visibleMaster === 'Terrain_Visible_Master' &&
+      layout.terrain.mastersShareGeometry === false,
+    `${layout.terrain.collisionMaster}/${layout.terrain.visibleMaster}/shared=${layout.terrain.mastersShareGeometry}`);
 
   const allPassed = checks.every(item => item.pass);
   return {

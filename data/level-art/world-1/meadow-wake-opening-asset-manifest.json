@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "sliceId": "world-1-1-meadow-wake-opening-vertical-slice",
   "productionReady": false,
   "canonicalScale": {
@@ -32,13 +32,13 @@
     ]
   },
   "sceneMetrics": {
-    "objects": 111,
-    "meshObjects": 77,
-    "vertices": 1512,
-    "triangles": 2714,
-    "materials": 16,
+    "objects": 92,
+    "meshObjects": 52,
+    "vertices": 1208,
+    "triangles": 2208,
+    "materials": 8,
     "textures": 3,
-    "collections": 18
+    "collections": 20
   },
   "objectMetrics": {
     "GUIDE_Block_opening-pair-a": {
@@ -271,31 +271,6 @@
       "triangles": 12,
       "materials": 1
     },
-    "MW_BackgroundIntegration_ReferenceOnly": {
-      "vertices": 4,
-      "triangles": 2,
-      "materials": 1
-    },
-    "MW_BenchmarkTreeCanopy_SCULPT_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_BenchmarkTreeCanopy_SCULPT_REQUIRED.001": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_BenchmarkTreeTrunk_SCULPT_REQUIRED": {
-      "vertices": 24,
-      "triangles": 44,
-      "materials": 1
-    },
-    "MW_COL_OpeningGroundProfile": {
-      "vertices": 32,
-      "triangles": 60,
-      "materials": 2
-    },
     "MW_COL_Platform_camp-awning-deck": {
       "vertices": 8,
       "triangles": 12,
@@ -321,141 +296,43 @@
       "triangles": 12,
       "materials": 1
     },
-    "MW_CampFoundation_SCULPT_REQUIRED": {
-      "vertices": 8,
-      "triangles": 12,
-      "materials": 1
-    },
-    "MW_CampLodgeMass_ART_REVIEW_REQUIRED": {
-      "vertices": 8,
-      "triangles": 12,
-      "materials": 1
-    },
-    "MW_FoliageMass_00_ART_REVIEW_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_FoliageMass_01_ART_REVIEW_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_FoliageMass_02_ART_REVIEW_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_FoliageMass_03_ART_REVIEW_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_FoliageMass_04_ART_REVIEW_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_FoliageMass_05_ART_REVIEW_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_FoliageMass_06_ART_REVIEW_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_RockMass_00_SCULPT_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_RockMass_01_SCULPT_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_RockMass_02_SCULPT_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_RockMass_03_SCULPT_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_RockMass_04_SCULPT_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_RootMass_13.9_SCULPT_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_RootMass_14.8_SCULPT_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_RootMass_16.0_SCULPT_REQUIRED": {
-      "vertices": 12,
-      "triangles": 20,
-      "materials": 1
-    },
-    "MW_RuinStone_00_RETOPO_REQUIRED": {
-      "vertices": 8,
-      "triangles": 12,
-      "materials": 1
-    },
-    "MW_RuinStone_01_RETOPO_REQUIRED": {
-      "vertices": 8,
-      "triangles": 12,
-      "materials": 1
-    },
-    "MW_RuinStone_02_RETOPO_REQUIRED": {
-      "vertices": 8,
-      "triangles": 12,
-      "materials": 1
-    },
-    "MW_TerrainHigh_SculptVolume_SCULPT_REQUIRED": {
+    "Terrain_Collision_Master": {
       "vertices": 32,
       "triangles": 60,
       "materials": 2
     }
   },
-  "lodStatus": "LOD_REQUIRED_AFTER_MANUAL_GAME_MESH",
-  "collisionStatus": "layout-derived guide present; Unity import validation required",
-  "textureStatus": "reference texture linked; production UV/bake set not authored",
+  "lodStatus": "LOD_REQUIRED_AFTER_HUMAN_DCC_GAME_MESH",
+  "terrainArchitecture": "data/level-art/world-1/meadow-wake-terrain-architecture.json",
+  "collisionStatus": "Terrain_Collision_Master fingerprint frozen; Unity editor validation required",
+  "visibleTerrainStatus": "DCC Terrain_Visible_Master is NOT_AUTHORED; deployed browser terrain remains frozen at commit 55cd085",
+  "textureStatus": "reference image is linked for DCC handoff; no Blender production terrain UV/material/bake set exists",
   "targetDevicePerformance": "NOT_MEASURED",
   "assets": [
     {
       "path": "assets/blender/environments/world-1/meadow-wake-opening.blend",
       "source": "project-authored Blender master assembled from canonical layout",
-      "version": "meadow-wake-opening-v0-sculpt-handoff",
-      "role": "canonical Blender authoring source",
-      "approvalStatus": "manual-art-in-progress",
-      "bytes": 153071,
-      "sha256": "e2f6626eb890f5ce1e2116a268d9cab1272c1fbfb3237677be179666fabde8ca",
-      "triangles": 2714,
-      "materialCount": 16,
+      "version": "meadow-wake-opening-v2-emergency-visible-freeze",
+      "role": "DCC handoff, guide, and frozen-collision source",
+      "approvalStatus": "dcc-visible-art-not-authored",
+      "bytes": 133648,
+      "sha256": "bccfd3713796995239d713df1994cf113999424e47eec0a62f92a0cba161d5a8",
+      "triangles": 2208,
+      "materialCount": 8,
       "textureReferences": [
         "assets/references/terrain/meadow-wake-terrain-quality-reference.jpeg"
       ],
-      "lodStatus": "LOD_REQUIRED_AFTER_MANUAL_GAME_MESH",
-      "collisionStatus": "separate collision guide present"
+      "lodStatus": "LOD_REQUIRED_AFTER_HUMAN_DCC_GAME_MESH",
+      "collisionStatus": "frozen Terrain_Collision_Master present; visible DCC target empty"
     },
     {
       "path": "assets/exports/world-1/meadow-wake-opening/mw_opening_neutral_guide.glb",
       "source": "generated from canonical layout by tools/blender/build_meadow_wake_opening_vertical_slice.py",
-      "version": "meadow-wake-opening-v0-sculpt-handoff",
+      "version": "meadow-wake-opening-v2-emergency-visible-freeze",
       "role": "neutral gameplay guide",
       "approvalStatus": "approved-guide-only",
-      "bytes": 166760,
-      "sha256": "f26d8921f0dec5bfea1fd0ec84218d9fb14d0c298b8ddb0c1495706e1a1415d2",
+      "bytes": 167536,
+      "sha256": "c028305791c84883edb842568a3a44c6dc5f4b8d033432f88ae4f1287010fe4e",
       "triangles": 2208,
       "materialCount": 6,
       "textureReferences": [],
@@ -463,18 +340,18 @@
       "collisionStatus": "contains collision guides"
     },
     {
-      "path": "unity/HargoldMebble/Assets/Game/Worlds/World01_MeadowWake/Art/Source/MW_Opening_BlockoutGuide.fbx",
-      "source": "90_EXPORT collection in canonical Blender scene",
-      "version": "meadow-wake-opening-v0-sculpt-handoff",
-      "role": "Unity collision/blockout guide",
-      "approvalStatus": "approved-guide-only",
-      "bytes": 29596,
-      "sha256": "2a7e9deb1b45812cc693fe0ba6f2775352708a8c0ae71e83f64d446169519512",
+      "path": "unity/HargoldMebble/Assets/Game/Worlds/World01_MeadowWake/Collision/Source/Terrain_Collision_Master.fbx",
+      "source": "90_EXPORT_COLLISION collection in canonical Blender scene",
+      "version": "meadow-wake-opening-v2-emergency-visible-freeze",
+      "role": "Unity gameplay collision master",
+      "approvalStatus": "frozen-gameplay-authority",
+      "bytes": 29580,
+      "sha256": "b7c2d8c00858983572f70847319f6b70ce1217c1c1722a12d75a331f9cac7038",
       "triangles": 120,
-      "materialCount": 3,
+      "materialCount": 2,
       "textureReferences": [],
-      "lodStatus": "not-applicable-guide",
-      "collisionStatus": "layout-derived collision only"
+      "lodStatus": "not-applicable-collision",
+      "collisionStatus": "render-disabled gameplay collision authority"
     }
   ]
 }

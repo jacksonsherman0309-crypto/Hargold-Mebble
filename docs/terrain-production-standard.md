@@ -8,6 +8,11 @@ terrain craft. It does not authorize generated courses or replacement layouts.
 The minimum visual-quality reference is stored once at
 `assets/references/terrain/meadow-wake-terrain-quality-reference.jpeg`.
 
+The exact user-supplied finished-product composition reference is preserved at
+`assets/references/terrain/meadow-wake-finished-product-reference.jpeg`. Treat
+it as a locked visual benchmark for Meadow Wake presentation, not as a source
+texture or an asset that may be copied into the rendered scene.
+
 It is a benchmark for:
 
 - thick, readable 3D playable terrain;
@@ -20,14 +25,48 @@ It is not a source asset. Geometry, UVs, textures, props, arrangements, symbols,
 blocks, collectibles, layouts, names, code, and audio must remain original to
 Hargold & Mebble.
 
-## Runtime separation
+## Emergency Meadow Wake visible-terrain freeze
 
-Meadow Wake has three independent terrain responsibilities:
+The last approved-looking Meadow Wake deployment is commit `55cd085` (`Correct
+Meadow Wake terrain presentation`). Its browser-authored terrain, camp, trees,
+roots, rocks, dressing, background, fullscreen composition, compact HUD, and
+touch controls remain the visible runtime authority. Do not modify or replace
+that visible layer until genuine human-authored DCC terrain has completed
+sculpt, retopology, UV, authored materials, LOD, engine integration,
+performance, and art review.
+
+Generated terrain shells, primitive camp/tree/root/rock approximations,
+collision-derived visual meshes, and automatic blockout renders are forbidden.
+The freeze is machine-readable in
+`data/level-art/world-1/meadow-wake-terrain-architecture.json`.
+
+The opening vertical slice keeps two distinct terrain responsibilities:
+
+- `Terrain_Collision_Master` is the frozen low-poly gameplay authority. It
+  owns character/enemy support, raycasts, physics, jump validation, and terrain
+  spacing. Its fingerprint is recorded in
+  `data/level-art/world-1/meadow-wake-terrain-architecture.json`. It remains
+  hidden in normal Blender renders and every Unity renderer below it is
+  disabled. Only a verified gameplay defect may authorize changing it.
+- `Terrain_Visible_Master` is currently an **empty DCC authoring target**. No
+  Blender production mesh or visible-terrain FBX exists. A future human-authored
+  mesh will own the visible landform and environment materials, but it must
+  never supply gameplay collision.
+
+The collision mesh and empty visible target are different Blender objects and
+different Unity hierarchies. `90_EXPORT_VISIBLE` remains empty until approved
+DCC art exists. They cannot be joined or regenerated from one another. Trees,
+embedded rocks, roots, grass, cavities, erosion, and overhangs belong only to
+future authored visible art.
+
+Across the full course, Meadow Wake has three independent terrain
+responsibilities:
 
 1. `MEADOW_WAKE_TERRAIN_POINTS`, pits, semisolids, rails, and block actors are
    deterministic gameplay data.
-2. `verdant-vale-terrain-kit.js` builds visible relief bodies and turf crowns
-   that do not participate in collision.
+2. `verdant-vale-terrain-kit.js` supplies the currently approved deployed
+   visible relief at commit `55cd085`; it does not participate in collision and
+   is frozen against further procedural-terrain replacement.
 3. `verdant_vale_terrain_kit.glb` supplies original Blender-authored room
    finishes bound to explicit room profiles in `meadow-wake-scenery.js`.
 
@@ -35,6 +74,9 @@ Fatal pit volumes remain separate from visible cliff art. Interactive blocks,
 moving platforms, falling platforms, lifts, seesaws, coins, Compass Coins,
 checkpoint objects, and the goal remain independent gameplay actors attached
 through authored anchors. Visual meshes cannot silently change collision.
+The protected opening gameplay fingerprint covers its collision profile,
+platforms, blocks, enemies, spawn/exit, safe zones, gameplay plane, and camera;
+visible-only revisions must leave that fingerprint unchanged.
 
 ## Meadow Wake room finish matrix
 
@@ -124,8 +166,9 @@ production viewport, compact HUD, and corrected touch hierarchy are
 implemented. The opening lodge now includes a modeled draped canopy, visible
 foundations, joinery, ropes, fasteners, entry steps, and depth-bearing openings.
 
-The current original runtime-modeled scenery is no longer classified as a
-temporary proxy, but it is not a claim of final DCC-authored asset quality.
+The current original runtime-modeled scenery is the frozen deployed fallback,
+not a claim of final DCC-authored asset quality. The Blender handoff contains
+no visible replacement mesh and no primitive visual approximation.
 Target-device lighting approval, mesh LODs, compressed textures, final UV
 review, several purpose-built landmark mesh replacements, and a final visual
 review at the start, middle, and goal remain production work. The course is not

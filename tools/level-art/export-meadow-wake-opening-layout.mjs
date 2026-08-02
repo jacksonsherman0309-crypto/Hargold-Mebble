@@ -153,7 +153,7 @@ export async function buildMeadowWakeOpeningLayout() {
     schemaVersion: 1,
     id: 'world-1-1-meadow-wake-opening-vertical-slice',
     status: 'authoritative-layout-freeze',
-    visibleArtStatus: 'SCULPT_REQUIRED_RETOPO_REQUIRED_UV_REQUIRED_ART_REVIEW_REQUIRED',
+    visibleArtStatus: 'BROWSER_VISUAL_FROZEN_AT_55cd085_HUMAN_DCC_TERRAIN_NOT_AUTHORED',
     completionClaim: false,
     scope: {
       courseId: '1-1',
@@ -166,7 +166,9 @@ export async function buildMeadowWakeOpeningLayout() {
     authority: {
       layout: 'current runnable browser implementation',
       historicalScaffoldStatus: 'coordinate-free; not used as coordinate authority',
-      visibleTerrain: 'assets/blender/environments/world-1/meadow-wake-opening.blend',
+      deployedVisibleTerrain: 'browser implementation at commit 55cd085',
+      blenderDccStatus: 'handoff guides and frozen collision only; visible terrain not authored',
+      terrainArchitecture: 'data/level-art/world-1/meadow-wake-terrain-architecture.json',
       productionAssemblyTarget: 'unity/HargoldMebble',
       sources
     },
@@ -211,6 +213,9 @@ export async function buildMeadowWakeOpeningLayout() {
       purpose: 'Vertical-slice review boundary only; not a course goal.'
     },
     terrain: {
+      collisionMaster: 'Terrain_Collision_Master',
+      visibleMaster: 'Terrain_Visible_Master',
+      mastersShareGeometry: false,
       groundProfile,
       collisionRepresentation: 'single deterministic linear profile; no visible-terrain collision',
       pits: MEADOW_WAKE_PITS.filter(pit => pit.to >= SLICE_MIN_X && pit.from <= SLICE_MAX_X),
@@ -220,11 +225,11 @@ export async function buildMeadowWakeOpeningLayout() {
           ...module,
           authoredRange: [module.from, module.to],
           sliceRange: [Math.max(module.visualFrom ?? module.from, VISUAL_MIN_X), Math.min(module.to, SLICE_MAX_X)],
-          productionMeshStatus: 'SCULPT_REQUIRED'
+          productionMeshStatus: 'HUMAN_DCC_ASSET_REQUIRED_NOT_AUTHORED'
         })),
       landforms: MEADOW_WAKE_LANDFORM_FEATURES
         .filter(landform => inSlice(landform.x))
-        .map(landform => ({ ...landform, productionMeshStatus: 'SCULPT_REQUIRED' })),
+        .map(landform => ({ ...landform, productionMeshStatus: 'HUMAN_DCC_ASSET_REQUIRED_NOT_AUTHORED' })),
       rooms: MEADOW_WAKE_GAMEPLAY_ROOMS
         .filter(room => overlapsSlice(room.range))
         .map(room => ({ ...room, sliceRange: clampRange(room.range) })),
@@ -286,6 +291,8 @@ export async function buildMeadowWakeOpeningLayout() {
       uv: 'manual',
       textureBake: 'manual',
       collision: 'automatable from approved layout',
+      collisionFreeze: 'fingerprint-locked; gameplay-defect approval required',
+      visibleTerrainCollision: 'prohibited',
       lod: 'manual-after-game-mesh',
       unityImportAndTraversal: 'requires installed Unity editor',
       targetDevicePerformance: 'not-measured'

@@ -1,15 +1,17 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "sliceId": "world-1-1-meadow-wake-opening-vertical-slice",
-  "status": "BLOCKOUT_METRICS_ONLY_UNITY_AND_DEVICE_MEASUREMENT_REQUIRED",
+  "status": "DCC_HANDOFF_METRICS_ONLY_VISIBLE_TERRAIN_NOT_AUTHORED",
   "productionReady": false,
   "blenderScene": {
-    "totalTrianglesIncludingGuides": 2714,
-    "terrainHighBlockoutTriangles": 60,
-    "campBlockoutTriangles": 24,
-    "treeBlockoutTriangles": 84,
+    "totalTrianglesIncludingGuides": 2208,
+    "terrainVisibleMeshTriangles": 0,
+    "campProxyTriangles": 0,
+    "treeProxyTriangles": 0,
     "collisionTriangles": 120,
-    "materialDatablocks": 16,
+    "collisionExportTriangles": 120,
+    "visibleExportTriangles": 0,
+    "materialDatablocks": 8,
     "imageDatablocks": 3
   },
   "unityRuntime": {

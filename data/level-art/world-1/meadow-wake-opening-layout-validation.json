@@ -58,6 +58,11 @@
       "id": "strict-plane",
       "pass": true,
       "detail": "{\"blenderY\":0,\"unityZ\":0,\"traversalDepthLocked\":true,\"collisionWidthMetres\":0.8,\"artKeepClearDepthMetres\":1.1}"
+    },
+    {
+      "id": "terrain-master-separation",
+      "pass": true,
+      "detail": "Terrain_Collision_Master/Terrain_Visible_Master/shared=false"
     }
   ],
   "metrics": {

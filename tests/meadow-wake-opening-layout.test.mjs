@@ -57,7 +57,7 @@ for (const safeZone of fileLayout.safeLandingZones) {
 }
 
 assert.equal(fileLayout.camera.fixedComparisonViewpoints.length, 5);
-assert.equal(fileLayout.visibleArtStatus.includes('SCULPT_REQUIRED'), true);
+assert.equal(fileLayout.visibleArtStatus, 'BROWSER_VISUAL_FROZEN_AT_55cd085_HUMAN_DCC_TERRAIN_NOT_AUTHORED');
 assert.equal(fileLayout.completionClaim, false);
 
 for (const requiredPath of [
@@ -67,7 +67,8 @@ for (const requiredPath of [
   '../data/level-art/world-1/meadow-wake-opening-layout-validation.json',
   '../data/level-art/world-1/meadow-wake-opening-asset-manifest.json',
   '../data/level-art/world-1/meadow-wake-opening-performance-status.json',
-  '../unity/HargoldMebble/Assets/Game/Worlds/World01_MeadowWake/Art/Source/MW_Opening_BlockoutGuide.fbx',
+  '../data/level-art/world-1/meadow-wake-terrain-architecture.json',
+  '../unity/HargoldMebble/Assets/Game/Worlds/World01_MeadowWake/Collision/Source/Terrain_Collision_Master.fbx',
   '../unity/HargoldMebble/Assets/Game/Worlds/World01_MeadowWake/Scenes/MW_Opening_VerticalSlice.unity'
 ]) {
   await access(new URL(requiredPath, import.meta.url));
@@ -77,7 +78,7 @@ const blenderValidation = JSON.parse(await readFile(
   new URL('../data/level-art/world-1/meadow-wake-opening-blender-validation.json', import.meta.url),
   'utf8'
 ));
-assert.equal(blenderValidation.status, 'PASS_STRUCTURE_ONLY_MANUAL_ART_BLOCKED');
+assert.equal(blenderValidation.status, 'PASS_DCC_HANDOFF_ONLY_VISIBLE_REPLACEMENT_NOT_AUTHORED');
 assert.equal(blenderValidation.productionReady, false);
 assert.ok(blenderValidation.checks.every(check => check.pass));
 
@@ -115,7 +116,9 @@ const unityTraversal = await readFile(
 );
 assert.match(unityImporter, /meadow-wake-opening-layout\.json/);
 assert.match(unityImporter, /MW_Opening_VerticalSlice\.unity/);
-assert.match(unityImporter, /MW_Opening_BlockoutGuide\.fbx/);
+assert.match(unityImporter, /Collision\/Source\/Terrain_Collision_Master\.fbx/);
+assert.match(unityImporter, /Terrain_Visible_Master__AUTHORED_DCC_ASSET_REQUIRED/);
+assert.doesNotMatch(unityImporter, /VisibleFbxPath/);
 assert.match(unityTraversal, /locked\.z = gameplayPlaneZ/);
 assert.match(unityTraversal, /temporaryValidationProxy/);
 

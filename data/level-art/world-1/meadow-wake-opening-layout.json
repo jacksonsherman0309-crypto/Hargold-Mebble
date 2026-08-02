@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "world-1-1-meadow-wake-opening-vertical-slice",
   "status": "authoritative-layout-freeze",
-  "visibleArtStatus": "SCULPT_REQUIRED_RETOPO_REQUIRED_UV_REQUIRED_ART_REVIEW_REQUIRED",
+  "visibleArtStatus": "BROWSER_VISUAL_FROZEN_AT_55cd085_HUMAN_DCC_TERRAIN_NOT_AUTHORED",
   "completionClaim": false,
   "scope": {
     "courseId": "1-1",
@@ -24,24 +24,26 @@
   "authority": {
     "layout": "current runnable browser implementation",
     "historicalScaffoldStatus": "coordinate-free; not used as coordinate authority",
-    "visibleTerrain": "assets/blender/environments/world-1/meadow-wake-opening.blend",
+    "deployedVisibleTerrain": "browser implementation at commit 55cd085",
+    "blenderDccStatus": "handoff guides and frozen collision only; visible terrain not authored",
+    "terrainArchitecture": "data/level-art/world-1/meadow-wake-terrain-architecture.json",
     "productionAssemblyTarget": "unity/HargoldMebble",
     "sources": [
       {
         "path": "src/content/meadow-wake-course.js",
-        "sha256": "0ede23185a7f2465f8b80d123285f7c9d250f3680499df13d85611b99d93e1b5"
+        "sha256": "515e4bb0a2d8734081914311c8dc4ce29946fa74df08ba455dc51116e7683bb6"
       },
       {
         "path": "src/content/meadow-wake-level-data.js",
-        "sha256": "97d14b5f9d5dbaad96bcea201761fedae8761b371f09f0d86220129a597caac7"
+        "sha256": "12d4f6567233d81f72b8bc3f72047d4f4e3a7b53b6592602ed22e3dbbf4063b0"
       },
       {
         "path": "src/content/meadow-wake-scenery.js",
-        "sha256": "6c53de5565ca7879b282a7fd5a1366f41d2aeae3168d82e331b056facee81a91"
+        "sha256": "0ecbe898441bb2b7dd6ffb62528497ebfd4910b73d48d8ad68aef9a97b37ba54"
       },
       {
         "path": "src/game.js",
-        "sha256": "424c0cbdac43596c3f64f37ce7eb5b882c91a79441267ff72e3d3a9509b56d0c"
+        "sha256": "11ce8ea422976603040e2922b8b10e035fc3ad51c7015f8eb03187c0a5f3cf63"
       }
     ]
   },
@@ -132,6 +134,9 @@
     "purpose": "Vertical-slice review boundary only; not a course goal."
   },
   "terrain": {
+    "collisionMaster": "Terrain_Collision_Master",
+    "visibleMaster": "Terrain_Visible_Master",
+    "mastersShareGeometry": false,
     "groundProfile": [
       {
         "x": 0,
@@ -213,28 +218,6 @@
         "to": 5.4,
         "variant": "compacted-clay",
         "roomId": "trailhead-camp",
-        "surfaceFinish": {
-          "roomId": "trailhead-camp",
-          "crownProfile": [
-            0.72,
-            1.08,
-            0.82,
-            1.2,
-            0.68,
-            0.94
-          ],
-          "wornWindows": [
-            [
-              3.2,
-              4.15
-            ],
-            [
-              7.75,
-              8.55
-            ]
-          ],
-          "undergroundScale": 0.7
-        },
         "visibleRepresentation": "verdant-vale-relief-mesh",
         "collisionRepresentation": "meadow-wake-ground-profile",
         "lowerProfile": [
@@ -262,7 +245,7 @@
           -1.7,
           5.4
         ],
-        "productionMeshStatus": "SCULPT_REQUIRED"
+        "productionMeshStatus": "HUMAN_DCC_ASSET_REQUIRED_NOT_AUTHORED"
       },
       {
         "id": "trailhead-root-edge",
@@ -270,28 +253,6 @@
         "to": 10.5,
         "variant": "root-bound",
         "roomId": "trailhead-camp",
-        "surfaceFinish": {
-          "roomId": "trailhead-camp",
-          "crownProfile": [
-            0.72,
-            1.08,
-            0.82,
-            1.2,
-            0.68,
-            0.94
-          ],
-          "wornWindows": [
-            [
-              3.2,
-              4.15
-            ],
-            [
-              7.75,
-              8.55
-            ]
-          ],
-          "undergroundScale": 0.7
-        },
         "visibleRepresentation": "verdant-vale-relief-mesh",
         "collisionRepresentation": "meadow-wake-ground-profile",
         "lowerProfile": [
@@ -318,7 +279,7 @@
           5.4,
           10.5
         ],
-        "productionMeshStatus": "SCULPT_REQUIRED"
+        "productionMeshStatus": "HUMAN_DCC_ASSET_REQUIRED_NOT_AUTHORED"
       },
       {
         "id": "elder-root-rise",
@@ -326,28 +287,6 @@
         "to": 15,
         "variant": "root-hollow",
         "roomId": "elder-root-walk",
-        "surfaceFinish": {
-          "roomId": "elder-root-walk",
-          "crownProfile": [
-            1.16,
-            0.74,
-            1.28,
-            0.86,
-            1.04,
-            0.7
-          ],
-          "wornWindows": [
-            [
-              12.2,
-              13.05
-            ],
-            [
-              18.55,
-              19.35
-            ]
-          ],
-          "undergroundScale": 0.68
-        },
         "visibleRepresentation": "verdant-vale-relief-mesh",
         "collisionRepresentation": "meadow-wake-ground-profile",
         "lowerProfile": [
@@ -374,7 +313,7 @@
           10.5,
           15
         ],
-        "productionMeshStatus": "SCULPT_REQUIRED"
+        "productionMeshStatus": "HUMAN_DCC_ASSET_REQUIRED_NOT_AUTHORED"
       },
       {
         "id": "elder-root-hollow",
@@ -382,28 +321,6 @@
         "to": 20.5,
         "variant": "root-hollow",
         "roomId": "elder-root-walk",
-        "surfaceFinish": {
-          "roomId": "elder-root-walk",
-          "crownProfile": [
-            1.16,
-            0.74,
-            1.28,
-            0.86,
-            1.04,
-            0.7
-          ],
-          "wornWindows": [
-            [
-              12.2,
-              13.05
-            ],
-            [
-              18.55,
-              19.35
-            ]
-          ],
-          "undergroundScale": 0.68
-        },
         "visibleRepresentation": "verdant-vale-relief-mesh",
         "collisionRepresentation": "meadow-wake-ground-profile",
         "lowerProfile": [
@@ -430,7 +347,7 @@
           15,
           20.5
         ],
-        "productionMeshStatus": "SCULPT_REQUIRED"
+        "productionMeshStatus": "HUMAN_DCC_ASSET_REQUIRED_NOT_AUTHORED"
       },
       {
         "id": "mason-shelf-low",
@@ -438,28 +355,6 @@
         "to": 25.5,
         "variant": "stone-seam",
         "roomId": "mason-shelf",
-        "surfaceFinish": {
-          "roomId": "mason-shelf",
-          "crownProfile": [
-            0.78,
-            1.18,
-            0.7,
-            1.08,
-            0.84,
-            1.22
-          ],
-          "wornWindows": [
-            [
-              23,
-              23.75
-            ],
-            [
-              27.6,
-              28.45
-            ]
-          ],
-          "undergroundScale": 0.71
-        },
         "visibleRepresentation": "verdant-vale-relief-mesh",
         "collisionRepresentation": "meadow-wake-ground-profile",
         "lowerProfile": [
@@ -486,7 +381,7 @@
           20.5,
           25.5
         ],
-        "productionMeshStatus": "SCULPT_REQUIRED"
+        "productionMeshStatus": "HUMAN_DCC_ASSET_REQUIRED_NOT_AUTHORED"
       },
       {
         "id": "mason-shelf-rise",
@@ -494,28 +389,6 @@
         "to": 30,
         "variant": "stone-seam",
         "roomId": "mason-shelf",
-        "surfaceFinish": {
-          "roomId": "mason-shelf",
-          "crownProfile": [
-            0.78,
-            1.18,
-            0.7,
-            1.08,
-            0.84,
-            1.22
-          ],
-          "wornWindows": [
-            [
-              23,
-              23.75
-            ],
-            [
-              27.6,
-              28.45
-            ]
-          ],
-          "undergroundScale": 0.71
-        },
         "visibleRepresentation": "verdant-vale-relief-mesh",
         "collisionRepresentation": "meadow-wake-ground-profile",
         "lowerProfile": [
@@ -542,7 +415,7 @@
           25.5,
           30
         ],
-        "productionMeshStatus": "SCULPT_REQUIRED"
+        "productionMeshStatus": "HUMAN_DCC_ASSET_REQUIRED_NOT_AUTHORED"
       },
       {
         "id": "quarry-foundation-a",
@@ -550,28 +423,6 @@
         "to": 35.5,
         "variant": "ruin-foundation",
         "roomId": "shellback-quarry",
-        "surfaceFinish": {
-          "roomId": "shellback-quarry",
-          "crownProfile": [
-            0.68,
-            0.92,
-            1.22,
-            0.74,
-            1.04,
-            0.66
-          ],
-          "wornWindows": [
-            [
-              31,
-              32.15
-            ],
-            [
-              38.1,
-              39.05
-            ]
-          ],
-          "undergroundScale": 0.67
-        },
         "visibleRepresentation": "verdant-vale-relief-mesh",
         "collisionRepresentation": "meadow-wake-ground-profile",
         "lowerProfile": [
@@ -598,7 +449,7 @@
           30,
           30
         ],
-        "productionMeshStatus": "SCULPT_REQUIRED"
+        "productionMeshStatus": "HUMAN_DCC_ASSET_REQUIRED_NOT_AUTHORED"
       }
     ],
     "landforms": [
@@ -612,7 +463,7 @@
         "linkedPlatforms": [
           "camp-awning-deck"
         ],
-        "productionMeshStatus": "SCULPT_REQUIRED"
+        "productionMeshStatus": "HUMAN_DCC_ASSET_REQUIRED_NOT_AUTHORED"
       },
       {
         "id": "elder-root-arch-bank",
@@ -625,7 +476,7 @@
           "opening-stump-step",
           "fallen-log-launch"
         ],
-        "productionMeshStatus": "SCULPT_REQUIRED"
+        "productionMeshStatus": "HUMAN_DCC_ASSET_REQUIRED_NOT_AUTHORED"
       },
       {
         "id": "mason-boulder-shelf",
@@ -637,7 +488,7 @@
         "linkedPlatforms": [
           "mason-shelf-overlook"
         ],
-        "productionMeshStatus": "SCULPT_REQUIRED"
+        "productionMeshStatus": "HUMAN_DCC_ASSET_REQUIRED_NOT_AUTHORED"
       }
     ],
     "rooms": [
@@ -2081,6 +1932,8 @@
     "uv": "manual",
     "textureBake": "manual",
     "collision": "automatable from approved layout",
+    "collisionFreeze": "fingerprint-locked; gameplay-defect approval required",
+    "visibleTerrainCollision": "prohibited",
     "lod": "manual-after-game-mesh",
     "unityImportAndTraversal": "requires installed Unity editor",
     "targetDevicePerformance": "not-measured"
