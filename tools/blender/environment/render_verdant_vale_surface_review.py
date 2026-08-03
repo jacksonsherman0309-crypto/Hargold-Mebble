@@ -16,10 +16,10 @@ ROOT = Path(__file__).resolve().parents[3]
 OUTPUT = ROOT / "art-review/verdant-vale-kit/terrain-bank"
 
 
-def configure_output(scene, name: str) -> None:
+def configure_output(scene, name: str, resolution=(1440,900)) -> None:
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    scene.render.resolution_x = 1440
-    scene.render.resolution_y = 900
+    scene.render.resolution_x = resolution[0]
+    scene.render.resolution_y = resolution[1]
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = "PNG"
     scene.render.filepath = str(OUTPUT / name)
@@ -28,6 +28,12 @@ def configure_output(scene, name: str) -> None:
 def render_material(scene) -> None:
     configure_output(scene, "surface-material.png")
     scene.render.engine = "BLENDER_EEVEE"
+    bpy.ops.render.render(write_still=True)
+
+
+def render_gameplay_camera(scene) -> None:
+    configure_output(scene,"surface-gameplay-camera.png",(1536,864))
+    scene.render.engine="BLENDER_EEVEE"
     bpy.ops.render.render(write_still=True)
 
 
@@ -45,6 +51,12 @@ def prepare_workbench(scene) -> list[bpy.types.Object]:
     background = bpy.data.objects.get("VV_APPROVED_STATIC_Background")
     if background:
         background.hide_render = True
+    # Alpha cards are a declared medium-detail optimization.  Workbench ignores
+    # their alpha and would show opaque rectangles, so clay/wireframe isolate
+    # the actual modeled silhouette, root mat, roots, stones, and soil geometry.
+    for obj in scene.objects:
+        if obj.get("surface_ecosystem_detail_system") == "2 of 3 - sparse grass cards and clumps":
+            obj.hide_render=True
     return [obj for obj in bpy.context.scene.objects if obj.type == "MESH" and not obj.hide_render]
 
 
@@ -92,9 +104,12 @@ def render_clay(scene) -> None:
 
 def main() -> None:
     scene = bpy.context.scene
+    wide_camera=bpy.data.objects.get("VV_CAM_TerrainBankQualityGate")
     detail_camera = bpy.data.objects.get("VV_CAM_TerrainBankDetailGate")
-    if detail_camera is None:
-        raise RuntimeError("frozen detail review camera is missing")
+    if wide_camera is None or detail_camera is None:
+        raise RuntimeError("frozen surface review camera set is incomplete")
+    scene.camera=wide_camera
+    render_gameplay_camera(scene)
     scene.camera = detail_camera
     render_material(scene)
     meshes = prepare_workbench(scene)

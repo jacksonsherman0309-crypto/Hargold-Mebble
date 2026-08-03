@@ -26,6 +26,7 @@ TERRAIN_CROSS_SECTION_PATH = ROOT / "assets/textures/world-1/meadow-wake/meadow-
 TURF_PATH = ROOT / "assets/textures/world-1/meadow-wake/meadow-turf-albedo-v1.png"
 STONE_PATH = ROOT / "assets/textures/world-1/meadow-wake/meadow-ruin-stone-albedo-v1.png"
 BARK_PATH = ROOT / "assets/textures/world-1/meadow-wake/meadow-bark-albedo-v1.png"
+LIVING_SURFACE_ATLAS_PATH = ROOT / "assets/textures/world-1/meadow-wake/verdant-vale-living-surface-atlas-v1.png"
 
 REVIEW_ORIGIN_X = 2.8
 CAMERA_FOCUS_X = 2.8
@@ -66,6 +67,15 @@ LOWER_PROFILE = (
     (4.94,-2.54), (5.46,-2.66), (5.94,-2.55), (6.36,-2.61),
     (6.62,-2.52), (7.20,-2.63), (7.82,-2.56), (8.42,-2.65),
     (9.02,-2.54), (9.60,-2.62), (10.10,-2.48),
+)
+
+# Tight, hand-verified alpha bounds for the eight original atlas colonies.
+# Pixel coordinates use the source image's top-left origin; card UV conversion
+# happens in living_surface_card.  Cropping empty atlas padding lets the actual
+# vegetation use the full <=30 cm card height without oversized geometry.
+LIVING_SURFACE_ATLAS_BOUNDS = (
+    (74,316,359,468),(400,196,712,467),(770,118,1156,473),(1148,95,1460,468),
+    (39,536,388,908),(380,648,717,903),(784,657,1156,905),(1148,745,1489,905),
 )
 
 
@@ -175,6 +185,91 @@ def flat_material(name, color, roughness=.9, metallic=0.0):
     return material
 
 
+def living_surface_card_material():
+    """Alpha-card material for the authored medium-detail ecology layer.
+
+    The source atlas contains eight original, isolated vegetation colonies.
+    Cards are deliberately sparse and sit between modeled silhouette geometry
+    and procedural fine material detail; they are not a replacement terrain
+    texture and never participate in collision.
+    """
+    material = bpy.data.materials.new("VV Living surface medium-detail card atlas")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    nodes.clear()
+    output = nodes.new("ShaderNodeOutputMaterial")
+    bsdf = nodes.new("ShaderNodeBsdfPrincipled")
+    transparent = nodes.new("ShaderNodeBsdfTransparent")
+    shader_mix = nodes.new("ShaderNodeMixShader")
+    texture = nodes.new("ShaderNodeTexImage")
+    texture.image = load_image(LIVING_SURFACE_ATLAS_PATH)
+    texture.interpolation = "Linear"
+    texture.extension = "CLIP"
+    coordinate = nodes.new("ShaderNodeTexCoord")
+    bsdf.inputs["Roughness"].default_value = .92
+    bsdf.inputs["Specular IOR Level"].default_value = .18
+    links.new(coordinate.outputs["UV"], texture.inputs["Vector"])
+    links.new(texture.outputs["Color"], bsdf.inputs["Base Color"])
+    links.new(texture.outputs["Alpha"], bsdf.inputs["Alpha"])
+    links.new(texture.outputs["Alpha"], shader_mix.inputs[0])
+    links.new(transparent.outputs["BSDF"], shader_mix.inputs[1])
+    links.new(bsdf.outputs["BSDF"], shader_mix.inputs[2])
+    links.new(shader_mix.outputs["Shader"], output.inputs["Surface"])
+    if hasattr(material, "surface_render_method"):
+        material.surface_render_method = "DITHERED"
+    elif hasattr(material, "blend_method"):
+        material.blend_method = "HASHED"
+    material.diffuse_color = (.14, .34, .04, 1.0)
+    material["detail_system"] = "2 of 3 - sparse grass cards and colony clumps"
+    material["source_original"] = True
+    return material
+
+
+def organic_matter_material():
+    """Dark, biologically rich material for local root-mat pockets."""
+    material = bpy.data.materials.new("VV Root mat organic soil and decomposing litter")
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    nodes.clear()
+    output = nodes.new("ShaderNodeOutputMaterial")
+    bsdf = nodes.new("ShaderNodeBsdfPrincipled")
+    coordinate = nodes.new("ShaderNodeTexCoord")
+    mapping = nodes.new("ShaderNodeMapping")
+    mapping.inputs["Scale"].default_value = (5.5, 2.0, 8.0)
+    noise = nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = 5.2
+    noise.inputs["Detail"].default_value = 7.0
+    noise.inputs["Roughness"].default_value = .80
+    flecks = nodes.new("ShaderNodeTexVoronoi")
+    flecks.distance = "EUCLIDEAN"
+    flecks.feature = "DISTANCE_TO_EDGE"
+    flecks.inputs["Scale"].default_value = 22.0
+    ramp = nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].position = .20
+    ramp.color_ramp.elements[0].color = (.070, .035, .009, 1.0)
+    ramp.color_ramp.elements[1].position = .80
+    ramp.color_ramp.elements[1].color = (.275, .135, .032, 1.0)
+    middle = ramp.color_ramp.elements.new(.48)
+    middle.color = (.155, .076, .016, 1.0)
+    bump = nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = .40
+    bump.inputs["Distance"].default_value = .018
+    bsdf.inputs["Roughness"].default_value = .99
+    links.new(coordinate.outputs["Generated"], mapping.inputs["Vector"])
+    links.new(mapping.outputs["Vector"], noise.inputs["Vector"])
+    links.new(mapping.outputs["Vector"], flecks.inputs["Vector"])
+    links.new(noise.outputs["Fac"], ramp.inputs["Fac"])
+    links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
+    links.new(flecks.outputs["Distance"], bump.inputs["Height"])
+    links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    links.new(bsdf.outputs["BSDF"], output.inputs["Surface"])
+    material.diffuse_color = (.055, .047, .012, 1.0)
+    material["ecological_stratum"] = "dense root mat, humus, decomposing plant matter"
+    return material
+
+
 def stone_material(name, color):
     material = bpy.data.materials.new(name)
     material.use_nodes = True
@@ -231,11 +326,11 @@ def meadow_floor_material():
     noise.inputs["Roughness"].default_value=.72
     ramp=nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.elements[0].position=.22
-    ramp.color_ramp.elements[0].color=(.035,.105,.012,1.0)
+    ramp.color_ramp.elements[0].color=(.030,.075,.010,1.0)
     ramp.color_ramp.elements[1].position=.78
-    ramp.color_ramp.elements[1].color=(.24,.38,.045,1.0)
+    ramp.color_ramp.elements[1].color=(.17,.30,.035,1.0)
     middle=ramp.color_ramp.elements.new(.50)
-    middle.color=(.09,.235,.022,1.0)
+    middle.color=(.075,.18,.018,1.0)
     bump=nodes.new("ShaderNodeBump")
     bump.inputs["Strength"].default_value=.25
     bump.inputs["Distance"].default_value=.025
@@ -247,8 +342,9 @@ def meadow_floor_material():
     links.new(noise.outputs["Fac"],bump.inputs["Height"])
     links.new(bump.outputs["Normal"],bsdf.inputs["Normal"])
     links.new(bsdf.outputs["BSDF"],output.inputs["Surface"])
-    material.diffuse_color=(.09,.235,.022,1.0)
+    material.diffuse_color=(.075,.18,.018,1.0)
     material["surface_role"]="quiet mottled substrate beneath modeled meadow ecology"
+    material["detail_system"]="3 of 3 - fine-scale material variation"
     return material
 
 
@@ -322,6 +418,8 @@ def make_materials():
         "meadow_patch": image_material("VV Bank clustered meadow ecology", TURF_PATH, .95, .24, (1.15, 1.15, 1.0), .92, .98, False),
         "meadow_floor": meadow_floor_material(),
         "surface_blend": surface_blend_material(),
+        "organic_matter": organic_matter_material(),
+        "living_surface_cards": living_surface_card_material(),
         "turf_dark": flat_material("VV Bank shaded turf", (.045, .18, .020), .96),
         "turf_mid": flat_material("VV Bank living turf transition", (.12, .32, .040), .95),
         "turf_light": flat_material("VV Bank sunlit grass", (.23, .45, .075), .94),
@@ -373,7 +471,9 @@ def authored_bank_body(collection, material, top_surface_material):
         # Face order is front, back, top, bottom for every frozen segment.
         # Only the already-existing horizontal top polygons receive the quiet
         # surface-soil material; vertices, faces, bounds, and bevel are intact.
-        body.data.polygons[segment_index*4+2].material_index=1
+        top_face=body.data.polygons[segment_index*4+2]
+        top_face.material_index=1
+        top_face.use_smooth=True
     body["craft"] = "fixed authored rolling bank silhouette with undercut lower edge"
     body["course_geometry"] = False
     body["collision_source"] = False
@@ -493,7 +593,7 @@ def build_surface_transition_band(collection, material):
         .000,.012,-.006,.018,-.010,.004,.016,-.014,.008,-.004,.020,-.012,.006,.014,
         -.008,.010,-.016,.018,-.006,.004,.015,-.010,.008,-.014,.016,-.006,.010,.000,
     )
-    top=[(x,-.862,z+.091+contour_offsets[index]) for index,(x,z) in enumerate(TOP_PROFILE)]
+    top=[(x,-.862,z+.058+contour_offsets[index]) for index,(x,z) in enumerate(TOP_PROFILE)]
     lower=[(x,-.864,z-depths[index]) for index,(x,z) in enumerate(TOP_PROFILE)]
     vertices=top+lower
     count=len(TOP_PROFILE)
@@ -508,8 +608,8 @@ def build_surface_transition_band(collection, material):
     band=mesh_object("VV_SurfaceRootSoilTransitionBand",vertices,faces,collection,material,False,uvs)
     blend=band.data.color_attributes.new(name="SurfaceBlend",type="FLOAT_COLOR",domain="POINT")
     top_weights=(
-        .16,.24,.66,.78,.30,.12,.52,.22,.08,.18,.72,.38,.10,.61,
-        .29,.14,.81,.34,.11,.20,.67,.46,.13,.74,.27,.09,.56,.18,
+        .88,.74,.96,.82,.62,.90,.78,.95,.70,.84,.98,.66,.91,.76,
+        .86,.93,.68,.96,.80,.72,.94,.64,.88,.98,.75,.90,.70,.85,
     )
     lower_weights=(
         .05,.03,.14,.07,.04,.10,.03,.08,.02,.06,.12,.09,.03,.10,
@@ -685,6 +785,21 @@ def build_stones(collection, mats):
             f"VV_TerrainBank_EmbeddedStone_{index+1:02}",(x,-.735,z),scale,
             STONE_OUTLINES[variant],collection,stone_material,mats["soil"],mats["stone_highlight"],mats["stone_shadow"],mats["moss"] if moss else None,
         )
+    # Broken fragments remain inside the same three geological pockets.  They
+    # share burial seams with the larger stones rather than forming a repeated
+    # decorative row.
+    fragments=(
+        (-3.13,.24,(.060,.040),1),(-2.76,.27,(.045,.032),2),
+        (2.56,.25,(.055,.038),2),(2.96,.28,(.040,.029),1),
+        (7.18,.25,(.052,.036),0),(7.55,.29,(.038,.027),2),
+    )
+    for index,(x,depth,scale,variant) in enumerate(fragments):
+        embedded_stone(
+            f"VV_TerrainBank_EmbeddedFragment_{index+1:02}",
+            (x,-.738,profile_z(x)-depth),scale,STONE_OUTLINES[variant],collection,
+            (mats["stone_dark"],mats["stone_cool"])[index%2],mats["soil"],
+            mats["stone_highlight"],mats["stone_shadow"],None,
+        )
 
 
 def erosion_pocket(name, center, scale, collection, mats):
@@ -752,11 +867,17 @@ def build_roots(collection, mats):
         source.hide_render=True
         source["source_role"]="subsurface tree-root crown; trunk remains outside surface-layer scope"
         source["visible_root_fraction"]="minority"
+        built_branches=[]
         for branch_index,offsets in enumerate(branches):
             points=[]
             for dx,dz in offsets:
                 x=source_x+dx
-                points.append((x,-.825,profile_z(source_x)+dz))
+                # Structural roots sit just in front of the organic mat while
+                # secondary roots recede into it.  The depth distinction makes
+                # most of the system disappear naturally into soil instead of
+                # reading as decorative lines pasted on the bank.
+                y=-.894 if branch_index == 0 else -.884
+                points.append((x,y,profile_z(source_x)+dz))
             if branch_index==0:
                 radii=(1.0,.72,.40,.14)
                 depth=.045
@@ -768,8 +889,39 @@ def build_roots(collection, mats):
             )
             root.parent=source
             root.matrix_parent_inverse=source.matrix_world.inverted()
-            root["craft"]="tree-sourced root branching from hidden crown and disappearing into soil"
+            root["craft"]="tree-sourced structural root branching from hidden crown and disappearing into organic soil"
             root["root_source"]=source.name
+            root["root_level"]="structural" if branch_index == 0 else "secondary"
+            built_branches.append((root,points[-1]))
+
+        fine_fans=(
+            ((-.30,-.18),(-.39,-.25),(-.46,-.34)),
+            ((-.18,-.20),(-.12,-.29),(-.16,-.39)),
+            ((.08,-.17),(.16,-.25),(.24,-.35)),
+            ((.22,-.21),(.31,-.31),(.38,-.42)),
+            ((.42,-.22),(.50,-.30),(.56,-.39)),
+            ((-.02,-.24),(.02,-.34),(-.03,-.45)),
+        )
+        direction=-1.0 if system_name == "RightTreeZone" else 1.0
+        for fine_index,offsets in enumerate(fine_fans):
+            points=tuple(
+                (
+                    source_x+dx*direction,
+                    -.868,
+                    profile_z(source_x)+dz,
+                )
+                for dx,dz in offsets
+            )
+            fine=tube_curve(
+                f"VV_SurfaceFineRoot_{system_name}_{fine_index+1}",points,
+                (1.0,.48,.08),collection,mats["root"],.009 if fine_index%2 else .011,2,
+            )
+            fine.parent=source
+            fine.matrix_parent_inverse=source.matrix_world.inverted()
+            fine["craft"]="fine tree-sourced root fan receding behind the organic mat"
+            fine["root_source"]=source.name
+            fine["root_level"]="fine"
+            fine["mostly_hidden"]=True
 
 
 def grass_blade(name, base, height, lean, width, collection, material):
@@ -862,7 +1014,7 @@ def meadow_flower(name, x, height, material, collection, mats):
     return flower
 
 
-def build_foliage(collection, mats):
+def _legacy_build_foliage(collection, mats):
     # Low, overlapping moss/ground-cover cushions are deliberately authored in
     # colonies with broad gaps.  They hide neither the soil nor every root;
     # instead they break the former continuous green ribbon into living masses.
@@ -1043,6 +1195,264 @@ def build_foliage(collection, mats):
         meadow_flower(f"VV_SurfaceFlower_{index}",x,height,mats[material_name],collection,mats)
 
 
+def mark_surface_art(obj, detail_system, depth=.30):
+    obj["course_geometry"]=False
+    obj["collision_source"]=False
+    obj["integration_approved"]=False
+    obj["surface_layer_depth_m"]=min(.30,depth)
+    obj["surface_ecosystem_detail_system"]=detail_system
+    return obj
+
+
+def root_mat_patch(name, x0, x1, top_offsets, depths, collection, material):
+    """A local humus/root-mat pocket; never a continuous horizontal band."""
+    count=len(top_offsets)
+    xs=[x0+(x1-x0)*index/(count-1) for index in range(count)]
+    top=[(x,-.902,profile_z(x)+.062+top_offsets[index]) for index,x in enumerate(xs)]
+    lower=[]
+    for index,x in enumerate(xs):
+        if index in (0,count-1):
+            lower.append((x,-.904,top[index][2]-.006))
+        else:
+            lower.append((x,-.904,profile_z(x)-depths[index]))
+    vertices=top+lower
+    faces=[(index,index+1,count+index+1,count+index) for index in range(count-1)]
+    patch=mesh_object(name,vertices,faces,collection,material)
+    patch["craft"]="localized irregular organic root mat with decomposing matter; not a material band"
+    patch["ecological_stratum"]="immediate beneath-surface humus and dense root mat"
+    bevel(patch,.005,2)
+    return mark_surface_art(patch,"modeled ecological transition geometry",max(depths))
+
+
+def silhouette_colony(name, center_x, y, scale, variant, collection, materials):
+    """One modeled colony mesh supplies the gameplay-distance grass silhouette."""
+    patterns={
+        "low":(
+            (-.42,.08,-.040,.030),(-.28,.12,-.052,.032),(-.12,.09,.018,.026),
+            (.02,.15,.030,.036),(.18,.10,-.018,.030),(.34,.13,.050,.030),(.46,.07,.025,.024),
+        ),
+        "broken":(
+            (-.48,.07,-.050,.026),(-.32,.16,-.070,.034),(-.08,.10,.020,.030),
+            (.08,.22,.044,.040),(.30,.12,-.020,.032),(.47,.18,.068,.034),
+        ),
+        "meadow":(
+            (-.50,.10,-.060,.028),(-.37,.17,-.080,.034),(-.23,.12,.012,.032),
+            (-.08,.23,-.030,.042),(.08,.18,.055,.038),(.23,.25,.070,.042),
+            (.38,.14,.025,.032),(.50,.09,.060,.026),
+        ),
+        "weedy":(
+            (-.45,.08,-.040,.026),(-.30,.14,-.065,.030),(-.16,.20,-.040,.034),
+            (0,.28,.025,.038),(.14,.18,.062,.032),(.28,.24,.080,.034),(.46,.10,.040,.026),
+        ),
+    }
+    vertices=[]
+    faces=[]
+    face_materials=[]
+    for blade_index,(offset,height,lean,width) in enumerate(patterns[variant]):
+        x=center_x+offset*scale
+        base_z=profile_z(x)+.052
+        h=min(.295,height*scale)
+        w=width*scale
+        bend=lean*scale
+        start=len(vertices)
+        vertices.extend((
+            (x-w,y,base_z),
+            (x+w,y,base_z),
+            (x+w*.72+bend*.42,y-.002,base_z+h*.42),
+            (x+w*.34+bend*.82,y-.003,base_z+h*.76),
+            (x+bend,y,base_z+h),
+            (x-w*.30+bend*.52,y+.002,base_z+h*.58),
+        ))
+        faces.append(tuple(range(start,start+6)))
+        face_materials.append(blade_index%len(materials))
+    colony=mesh_object(name,vertices,faces,collection,materials[0])
+    for material in materials[1:]:
+        colony.data.materials.append(material)
+    for polygon,material_index in zip(colony.data.polygons,face_materials):
+        polygon.material_index=material_index
+    colony["craft"]="single optimized modeled colony with curved, unequal blade silhouettes"
+    colony["ecological_cluster"]=name.rsplit("_",1)[-1]
+    colony["blade_distribution"]="clustered, unequal, broken"
+    return mark_surface_art(colony,"1 of 3 - modeled gameplay silhouette",.295)
+
+
+def living_surface_card(name, x, y, width, height, cell, lean, collection, material):
+    """One atlas-mapped card from the sparse eight-colony vegetation sheet."""
+    base_z=profile_z(x)+.048
+    if y < -.80:
+        y=min(y,-.946)
+    half=width*.5
+    top_shift=lean
+    vertices=(
+        (x-half,y,base_z),(x+half,y,base_z),
+        (x+half+top_shift,y,base_z+height),(x-half+top_shift,y,base_z+height),
+    )
+    px0,py0,px1,py1=LIVING_SURFACE_ATLAS_BOUNDS[cell]
+    u0=px0/1536.0
+    u1=px1/1536.0
+    v0=1.0-py1/1024.0
+    v1=1.0-py0/1024.0
+    card=mesh_object(name,vertices,[(0,1,2,3)],collection,material,False,{0:(u0,v0),1:(u1,v0),2:(u1,v1),3:(u0,v1)})
+    card["craft"]="sparse original atlas colony card supplying medium vegetation detail"
+    card["atlas_cell"]=cell
+    card["mobile_strategy"]="single quad; authored placement; alpha-dithered"
+    return mark_surface_art(card,"2 of 3 - sparse grass cards and clumps",height)
+
+
+def build_root_mat_ecology(collection, mats):
+    patches=(
+        (-4.24,-3.52,(.000,.014,-.006,.020,.004),(.05,.09,.13,.08,.04)),
+        (-2.54,-2.12,(.004,.016,-.008,.010,.000),(.04,.10,.08,.12,.05)),
+        (-.76,-.28,(.016,.002,.012,-.008,.018),(.07,.12,.09,.13,.06)),
+        (1.16,1.66,(.014,-.006,.020,.004,.010),(.06,.12,.09,.14,.05)),
+        (2.30,2.70,(.000,.012,-.008,.018,.004),(.04,.10,.07,.12,.05)),
+        (5.44,5.88,(.004,.020,-.004,.012,.000),(.05,.12,.09,.13,.06)),
+        (6.50,7.18,(.016,.002,.010,-.008,.018),(.07,.14,.10,.12,.05)),
+        (8.22,8.72,(.000,.014,-.006,.020,.006),(.04,.10,.13,.08,.05)),
+        (9.26,9.68,(.010,-.004,.018,.002,.012),(.06,.12,.08,.13,.05)),
+    )
+    for index,(x0,x1,offsets,depths) in enumerate(patches):
+        root_mat_patch(f"VV_SurfaceRootMatPatch_{index:02}",x0,x1,offsets,depths,collection,mats["organic_matter"])
+
+    # Small moss colonies cross selected humus edges, preventing any one clean
+    # material boundary from surviving across the frame.
+    moss_colonies=(
+        (-3.88,.13,.055),(-3.12,.18,.072),(-2.30,.12,.048),(-.56,.16,.064),
+        (.48,.12,.050),(1.44,.18,.070),(2.54,.13,.052),(3.98,.16,.060),
+        (5.52,.18,.070),(6.94,.14,.055),(8.10,.18,.068),(9.30,.15,.058),
+    )
+    for index,(x,width,height) in enumerate(moss_colonies):
+        for lobe,(dx,sx,sz) in enumerate(((-.32,.62,.70),(.05,.88,1.0),(.38,.55,.64))):
+            lobe_x=x+dx*width
+            disk=organic_disk(
+                f"VV_SurfaceMossColony_{index:02}_{lobe}",
+                (lobe_x,-.914-lobe*.001,profile_z(lobe_x)+.040),
+                (width*sx,height*sz),collection,mats["moss"],9,
+            )
+            disk["craft"]="localized moss colony bridging humus, exposed soil, and grass"
+            mark_surface_art(disk,"modeled ecological transition geometry",height*2)
+
+
+def build_foliage(collection, mats):
+    """Build the living surface as three complementary mobile-ready systems."""
+    build_root_mat_ecology(collection,mats)
+
+    silhouette_materials=(mats["turf_dark"],mats["turf_mid"],mats["turf_olive"],mats["turf_light"])
+    silhouette_specs=(
+        (-4.18,.92,"meadow"),(-3.70,.72,"low"),(-3.02,1.00,"weedy"),(-2.42,.78,"broken"),
+        (-1.46,.88,"meadow"),(-.64,.96,"broken"),(.28,.74,"low"),(.96,1.04,"meadow"),
+        (1.72,.86,"weedy"),(2.52,.76,"broken"),(3.42,.94,"meadow"),(4.20,.82,"low"),
+        (5.18,1.00,"weedy"),(5.94,.74,"broken"),(6.76,.92,"meadow"),(7.58,.80,"low"),
+        (8.36,1.02,"weedy"),(9.28,.88,"meadow"),(9.82,.64,"broken"),
+    )
+    for index,(x,scale,variant) in enumerate(silhouette_specs):
+        silhouette_colony(
+            f"VV_SurfaceSilhouetteColony_{index:02}",x,-.928-(index%3)*.002,scale,variant,
+            collection,silhouette_materials,
+        )
+
+    # Medium-detail cards are grouped into ecological colonies with deliberate
+    # gaps.  Every card remains below the 30 cm surface-layer contract.
+    card_specs=(
+        (-4.06,-.920,.46,.22,0,-.025),(-3.62,-.916,.50,.27,1,.018),
+        (-3.04,-.922,.44,.29,5,-.018),(-2.66,-.918,.48,.24,0,.022),
+        (-1.52,-.920,.46,.25,4,-.020),(-1.18,-.916,.42,.20,7,.016),
+        (-.56,-.922,.50,.27,1,-.018),(-.18,-.918,.38,.21,0,.012),
+        (.70,-.920,.46,.24,6,-.018),(1.12,-.916,.52,.29,2,.020),(1.54,-.922,.42,.22,0,-.010),
+        (2.58,-.918,.46,.24,4,.018),(3.20,-.922,.50,.28,1,-.022),(3.62,-.916,.40,.20,7,.014),
+        (4.34,-.920,.44,.23,0,-.015),(5.20,-.922,.52,.29,3,.018),(5.62,-.916,.42,.21,5,-.010),
+        (6.56,-.920,.48,.25,6,.016),(6.98,-.922,.46,.23,0,-.018),
+        (7.72,-.916,.52,.28,2,.020),(8.12,-.922,.40,.20,7,-.012),
+        (8.82,-.920,.48,.26,4,.016),(9.28,-.916,.50,.29,1,-.020),(9.70,-.922,.38,.19,0,.010),
+    )
+    for index,(x,y,width,height,cell,lean) in enumerate(card_specs):
+        living_surface_card(
+            f"VV_SurfaceAtlasColony_{index:02}",x,y,width,height,cell,lean,
+            collection,mats["living_surface_cards"],
+        )
+
+    # A separate low ground-cover pass makes grass, moss, and humus overlap at
+    # the seam.  These remain sparse quads, grouped into colonies with visible
+    # soil gaps; they are not a continuous green ribbon.
+    mat_card_specs=(
+        (-4.24,.46,.13,0),(-3.86,.52,.10,7),(-3.48,.40,.12,0),
+        (-2.62,.46,.09,7),(-2.25,.42,.13,0),
+        (-1.38,.44,.14,0),(-1.02,.50,.10,7),(-.60,.40,.12,0),
+        (.40,.42,.12,0),(.82,.52,.09,7),(1.24,.46,.14,0),
+        (2.46,.48,.10,7),(2.86,.42,.13,0),
+        (3.86,.44,.13,0),(4.24,.50,.09,7),
+        (5.22,.46,.14,0),(5.60,.52,.10,7),(6.02,.40,.12,0),
+        (6.92,.44,.13,0),(7.30,.48,.09,7),
+        (8.16,.42,.12,0),(8.52,.54,.10,7),(8.92,.44,.14,0),(9.34,.48,.09,7),(9.70,.40,.12,0),
+    )
+    for index,(x,width,height,cell) in enumerate(mat_card_specs):
+        living_surface_card(
+            f"VV_SurfaceGroundMatCard_{index:02}",x,-.950,width,height,cell,
+            (-.012,.014,-.008,.018)[index%4],collection,mats["living_surface_cards"],
+        )
+
+    depth_rows=(
+        (-.58,(-4.02,-3.06,-1.70,-.74,.42,1.50,2.74,3.88,5.18,6.46,7.72,9.04)),
+        (-.16,(-3.72,-2.52,-1.28,-.16,1.02,2.24,3.46,4.70,5.92,7.18,8.34,9.48)),
+        (.26,(-3.34,-2.08,-.92,.28,1.62,2.90,4.18,5.44,6.70,7.98,9.18)),
+    )
+    depth_card_index=0
+    for row_index,(y,positions) in enumerate(depth_rows):
+        for column_index,x in enumerate(positions):
+            cell=(0,7,0,4)[(column_index+row_index)%4]
+            height=(.12,.09,.14,.16)[(column_index*3+row_index)%4]
+            width=(.40,.48,.44,.52)[(column_index+row_index*2)%4]
+            living_surface_card(
+                f"VV_SurfaceMeadowDepthCard_{depth_card_index:02}",x,y,width,height,cell,
+                (-.012,.010,.018,-.008)[(column_index+row_index)%4],
+                collection,mats["living_surface_cards"],
+            )
+            depth_card_index+=1
+
+    tongue_specs=(
+        (-3.72,.08,.12,-.025),(-2.46,.10,.16,.030),(-.40,.07,.10,-.020),
+        (1.36,.09,.14,.025),(3.92,.075,.11,-.025),(5.70,.10,.17,.035),
+        (7.84,.08,.13,-.030),(9.34,.07,.10,.020),
+    )
+    for index,(x,width,depth,lean) in enumerate(tongue_specs):
+        tongue=hanging_turf_tongue(
+            f"VV_SurfaceTurfTongue_{index}",x,profile_z(x)+.078,width,depth,lean,
+            collection,mats["turf_dark"] if index%3 else mats["turf_olive"],
+        )
+        mark_surface_art(tongue,"modeled ecological transition geometry",depth)
+
+    for index,(x,y,sx,sy) in enumerate((
+        (-3.30,-.34,.18,.12),(-2.02,-.28,.12,.09),(-.98,-.40,.17,.11),
+        (2.28,-.36,.15,.10),(4.72,-.30,.13,.09),(6.12,-.42,.17,.12),(8.72,-.34,.16,.11),
+    )):
+        pocket=top_soil_pocket(f"VV_SurfaceSoilPocket_{index}",x,y,(sx,sy),collection,mats["soil_transition"])
+        mark_surface_art(pocket,"fine material and exposed-soil interruption",.03)
+
+    leaf_specs=(
+        (-3.18,.036,.042,-.18,"leaf_brown"),(-3.02,.046,.035,.12,"leaf_gold"),
+        (-1.32,.040,.038,.16,"leaf_gold"),(.92,.045,.042,-.10,"leaf_brown"),
+        (1.10,.038,.034,.14,"leaf_gold"),(4.08,.043,.040,-.14,"leaf_brown"),
+        (5.46,.032,.044,.18,"leaf_gold"),(5.62,.046,.034,-.12,"leaf_brown"),
+        (7.86,.044,.040,.10,"leaf_gold"),(9.10,.038,.036,-.16,"leaf_brown"),
+    )
+    for index,(x,z_offset,scale,lean,material_name) in enumerate(leaf_specs):
+        leaf=fallen_leaf(
+            f"VV_SurfaceFallenLeaf_{index}",x,profile_z(x)+z_offset,scale,lean,collection,mats[material_name],
+        )
+        mark_surface_art(leaf,"fine modeled litter detail",.03)
+
+    twig_specs=(
+        ((-2.86,-.936,profile_z(-2.86)+.045),(-2.68,-.938,profile_z(-2.68)+.062),(-2.48,-.936,profile_z(-2.48)+.050)),
+        ((.34,-.936,profile_z(.34)+.046),(.50,-.938,profile_z(.50)+.058),(.72,-.936,profile_z(.72)+.044)),
+        ((4.40,-.936,profile_z(4.40)+.042),(4.58,-.938,profile_z(4.58)+.055),(4.76,-.936,profile_z(4.76)+.046)),
+        ((8.32,-.936,profile_z(8.32)+.044),(8.48,-.938,profile_z(8.48)+.060),(8.70,-.936,profile_z(8.70)+.047)),
+    )
+    for index,points in enumerate(twig_specs):
+        twig=tube_curve(f"VV_SurfaceFallenTwig_{index}",points,(.8,1.0,.35),collection,mats["root"],.006,2)
+        twig["craft"]="small fallen twig inside a localized litter pocket"
+        mark_surface_art(twig,"fine modeled litter detail",.03)
+
+
 def install_reference(name, path, role, collection):
     image = load_image(path)
     obj = bpy.data.objects.new(name, None)
@@ -1184,10 +1594,13 @@ def configure_scene(scene):
     scene["terrain_thickness_status"]="FROZEN - UNMODIFIED"
     scene["camera_status"]="FROZEN - UNMODIFIED"
     scene["lighting_status"]="FROZEN - UNMODIFIED"
+    scene["living_surface_systems"]="modeled silhouette; sparse atlas cards; fine material detail"
+    scene["surface_ecology_status"]="PENDING VISUAL APPROVAL"
+    scene["individual_blade_scatter"]="PROHIBITED"
 
 
 def main():
-    for path in (TARGET_PATH,CURRENT_PATH,BACKGROUND_PATH,SOIL_PATH,TERRAIN_CROSS_SECTION_PATH,TURF_PATH,STONE_PATH,BARK_PATH):
+    for path in (TARGET_PATH,CURRENT_PATH,BACKGROUND_PATH,SOIL_PATH,TERRAIN_CROSS_SECTION_PATH,TURF_PATH,STONE_PATH,BARK_PATH,LIVING_SURFACE_ATLAS_PATH):
         if not path.exists():
             raise FileNotFoundError(path)
     reset_scene()
@@ -1195,7 +1608,7 @@ def main():
     mats=make_materials()
     configure_scene(bpy.context.scene)
     build_contract_markers(collections)
-    authored_bank_body(collections["10_TERRAIN_BANK_SOIL"],mats["soil"],mats["soil_transition"])
+    authored_bank_body(collections["10_TERRAIN_BANK_SOIL"],mats["soil"],mats["meadow_floor"])
     build_surface_transition_band(collections["11_TERRAIN_BANK_TURF"],mats["surface_blend"])
     build_surface_overhangs(collections["11_TERRAIN_BANK_TURF"],mats)
     build_stones(collections["12_TERRAIN_BANK_STONES"],mats)

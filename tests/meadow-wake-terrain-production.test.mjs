@@ -37,6 +37,7 @@ const rendererSource = read('../src/character-renderer.js');
 const gameSource = read('../src/game.js');
 const htmlSource = read('../index.html');
 const blenderSource = read('../tools/blender/build_verdant_vale_terrain_kit.py');
+const livingSurfaceBuilderSource = read('../tools/blender/environment/build_verdant_vale_terrain_bank_quality_gate.py');
 
 assert.equal(MEADOW_WAKE_GAMEPLAY_ROOMS.length, 12);
 assert.equal(meadowWakeRoomCoverage(), 1);
@@ -160,6 +161,34 @@ assert.equal(
   VERDANT_VALE_TERRAIN_STANDARD.terrainAlbedoAsset,
   'assets/textures/world-1/meadow-wake/meadow-soil-stone-albedo-v3.png'
 );
+assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.maximumDepthMeters, 0.30);
+assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.surfaceOnly, true);
+assert.deepEqual(
+  VERDANT_VALE_TERRAIN_STANDARD.livingSurface.detailSystems,
+  [
+    'modeled-colony-silhouette',
+    'sparse-alpha-card-clumps',
+    'fine-material-detail'
+  ]
+);
+assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.individualBladeScatterAllowed, false);
+assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.continuousGrassRibbonAllowed, false);
+assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.textureOnlyTransitionAllowed, false);
+assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.collisionBearing, false);
+assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.visualApprovalRequiredBeforeIntegration, true);
+assert.equal(
+  VERDANT_VALE_TERRAIN_STANDARD.livingSurface.atlasAsset,
+  'assets/textures/world-1/meadow-wake/verdant-vale-living-surface-atlas-v1.png'
+);
+
+const livingSurfaceAtlasPath = new URL('../assets/textures/world-1/meadow-wake/verdant-vale-living-surface-atlas-v1.png', import.meta.url);
+const livingSurfaceAtlasBytes = readFileSync(livingSurfaceAtlasPath);
+assert.ok(livingSurfaceAtlasBytes.length > 500_000);
+assert.deepEqual([...livingSurfaceAtlasBytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+assert.match(livingSurfaceBuilderSource, /modeled gameplay silhouette/);
+assert.match(livingSurfaceBuilderSource, /sparse grass cards and clumps/);
+assert.match(livingSurfaceBuilderSource, /fine-scale material variation/);
+assert.match(livingSurfaceBuilderSource, /individual_blade_scatter.*PROHIBITED/);
 
 const referencePath = new URL('../assets/references/terrain/meadow-wake-production-quality-target.jpeg', import.meta.url);
 const referenceBytes = readFileSync(referencePath);

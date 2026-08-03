@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 
 ROOT = Path(__file__).resolve().parents[3]
-BEFORE = ROOT / ".art-work/verdant-vale-kit/terrain-bank/final3-detail.png"
+BEFORE = ROOT / "art-review/verdant-vale-kit/terrain-bank/surface-before.png"
 AFTER = ROOT / "art-review/verdant-vale-kit/terrain-bank/surface-material.png"
 OUTPUT = ROOT / "art-review/verdant-vale-kit/terrain-bank/surface-before-after.png"
 
@@ -28,9 +28,9 @@ def main() -> None:
     draw = ImageDraw.Draw(canvas)
     label = font(38)
     note = font(22)
-    draw.text((34, 22), "BEFORE — manufactured edge", fill=(246, 220, 185), font=label)
+    draw.text((34, 22), "BEFORE - uniform strip and picket blades", fill=(246, 220, 185), font=label)
     canvas.paste(before, (0, 78))
-    draw.text((34, 918), "AFTER — clustered living surface", fill=(214, 244, 184), font=label)
+    draw.text((34, 918), "AFTER - three-scale living surface ecosystem", fill=(214, 244, 184), font=label)
     canvas.paste(after, (0, 974))
     draw.line((0, 906, 1440, 906), fill=(174, 197, 116), width=3)
     draw.text(

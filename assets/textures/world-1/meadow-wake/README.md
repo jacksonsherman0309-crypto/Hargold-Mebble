@@ -19,6 +19,9 @@ Meadow Wake course; they do not generate or replace course geometry.
   camp shelters, banners, and awnings.
 - `meadow-bark-albedo-v1.png` — stylized bark albedo for trunks, stumps,
   fallen logs, roots, and structural timber variation.
+- `verdant-vale-living-surface-atlas-v1.png` — transparent eight-cell atlas of
+  original grass, fern, weed, flower, and moss colonies for sparse mobile
+  cards in the pending Blender living-surface quality gate. It is not deployed.
 
 The bitmap sources were generated with OpenAI's built-in image generation and
 then integrated with real Three.js terrain meshes, lighting, fog, and 3D
@@ -95,3 +98,16 @@ Bark:
 > hand-sculpted forms, restrained moss traces, strong gameplay-distance
 > readability, soft even PBR base-color lighting, tileable on all edges, no
 > text, no characters, no interface, and no copied franchise assets.
+
+Living-surface card atlas:
+
+> Create one clean 4-by-2 atlas containing eight separate original Verdant
+> Vale meadow vegetation clumps: two short soft grass clumps, two medium varied
+> grass clumps, one sparse broken-edge grass clump, one tiny fern-and-weed
+> clump, one small flower-and-grass clump, and one low mossy ground-cover
+> clump. Use polished hand-painted 3D-platformer vegetation with botanically
+> believable varied blade heights, widths, bends, overlaps, gaps, restrained
+> dry blades, ivory and gold flowers, clear side-profile silhouettes, and
+> mobile-friendly medium detail. Isolate every clump with generous padding on
+> a perfectly flat solid magenta chroma background with no shadow, gradient,
+> floor, text, watermark, border, copied asset, or magenta inside vegetation.

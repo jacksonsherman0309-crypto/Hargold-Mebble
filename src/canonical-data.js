@@ -1,7 +1,7 @@
-export const CANON_VERSION = '2026-07-31-meadow-wake-ground-dominant-composition-3';
+export const CANON_VERSION = '2026-08-03-verdant-vale-living-surface-1';
 
 export const VERDANT_VALE_TERRAIN_STANDARD = Object.freeze({
-  version: '2026-08-02-meadow-wake-production-benchmark-3',
+  version: '2026-08-03-verdant-vale-living-surface-1',
   referenceAsset: 'assets/references/terrain/meadow-wake-production-quality-target.jpeg',
   referenceScope: 'terrain-environment-depth-material-finish-and-side-scrolling-composition-only',
   originalAuthoredArtworkRequired: true,
@@ -13,6 +13,36 @@ export const VERDANT_VALE_TERRAIN_STANDARD = Object.freeze({
   blenderSource: 'assets/blender/world-1/verdant_vale_terrain_kit.blend',
   runtimeAsset: 'assets/exports/world-1/verdant_vale_terrain_kit.glb',
   terrainAlbedoAsset: 'assets/textures/world-1/meadow-wake/meadow-soil-stone-albedo-v3.png',
+  livingSurface: Object.freeze({
+    maximumDepthMeters: 0.30,
+    surfaceOnly: true,
+    protectedSystems: Object.freeze([
+      'gameplay',
+      'collision',
+      'terrain-thickness',
+      'level-layout',
+      'background',
+      'lighting',
+      'camera'
+    ]),
+    detailSystems: Object.freeze([
+      'modeled-colony-silhouette',
+      'sparse-alpha-card-clumps',
+      'fine-material-detail'
+    ]),
+    ecologicalStrata: Object.freeze([
+      'varied-grass-flowers-weeds-moss-and-litter',
+      'dense-root-mat-organic-soil-and-decomposition',
+      'fine-roots-compacted-earth-embedded-stone-and-moisture',
+      'tree-sourced-structural-roots-clay-buried-rock-and-subsoil'
+    ]),
+    atlasAsset: 'assets/textures/world-1/meadow-wake/verdant-vale-living-surface-atlas-v1.png',
+    individualBladeScatterAllowed: false,
+    continuousGrassRibbonAllowed: false,
+    textureOnlyTransitionAllowed: false,
+    collisionBearing: false,
+    visualApprovalRequiredBeforeIntegration: true
+  }),
   materialClasses: Object.freeze([
     'grass',
     'exposed-dirt',

@@ -28,6 +28,8 @@ BLOCKED = (
 )
 FINGERPRINT = "a00bf81913452518d3ed7cbc0e8e2a60c3fc7e2b34e5f9762322fcb23acf58d9"
 BACKGROUND_SHA256 = "4aa8ef74e96fd27acd06b08d027d06c26e8b0a11d78ebbf136a8178d72c89670"
+LIVING_SURFACE_ATLAS = ROOT / "assets/textures/world-1/meadow-wake/verdant-vale-living-surface-atlas-v1.png"
+LIVING_SURFACE_ATLAS_SHA256 = "c6e7e1d18e7ccd6f6fed098c405468f248f3ab20331d9aa5b940c883c303ed8a"
 
 
 def require(condition, message):
@@ -70,6 +72,9 @@ def main():
     require(scene.get("terrain_thickness_status") == "FROZEN - UNMODIFIED", "terrain thickness freeze missing")
     require(scene.get("camera_status") == "FROZEN - UNMODIFIED", "camera freeze missing")
     require(scene.get("lighting_status") == "FROZEN - UNMODIFIED", "lighting freeze missing")
+    require(scene.get("living_surface_systems") == "modeled silhouette; sparse atlas cards; fine material detail", "three-system living surface contract missing")
+    require(scene.get("surface_ecology_status") == "PENDING VISUAL APPROVAL", "surface ecology approval status changed")
+    require(scene.get("individual_blade_scatter") == "PROHIBITED", "individual blade scatter prohibition missing")
 
     marker = bpy.data.objects.get("VV_REVIEW_ONLY_TerrainBankOrigin")
     require(marker is not None, "review-only terrain origin missing")
@@ -118,7 +123,7 @@ def main():
         require(blocker.get("status") == "BLOCKED_UNTIL_TERRAIN_BANK_VISUAL_APPROVAL", f"blocker status missing: {name}")
 
     visible_objects = [obj for name in VISIBLE_ASSET_COLLECTIONS for obj in bpy.data.collections[name].objects]
-    require(len(visible_objects) >= 550, "living-surface detail density unexpectedly regressed")
+    require(len(visible_objects) >= 220, "living-surface authored detail density unexpectedly regressed")
     require(all(obj.get("runtime_generated") is not True for obj in visible_objects), "runtime-generated terrain found")
     require(all(obj.get("integration_approved") is not True for obj in visible_objects), "unapproved terrain was marked integrated")
     require(all(obj.get("collision_source") is not True for obj in visible_objects), "visible art was marked as collision")
@@ -135,6 +140,7 @@ def main():
     require(len(body.data.materials) == 2, "frozen bank should have one soil material plus one top-face surface-soil material")
     top_faces = [body.data.polygons[index * 4 + 2] for index in range(27)]
     require(all(face.material_index == 1 for face in top_faces), "surface material escaped or missed existing top faces")
+    require(all(face.use_smooth for face in top_faces), "surface-only smooth shading regressed on frozen top faces")
     require(all(
         polygon.material_index == 0
         for index, polygon in enumerate(body.data.polygons)
@@ -150,8 +156,10 @@ def main():
 
     root_sources = [obj for obj in visible_objects if obj.name.startswith("VV_SurfaceRootSource_")]
     roots = [obj for obj in visible_objects if obj.name.startswith("VV_SurfaceRoot_") and obj.type == "CURVE"]
-    require(len(root_sources) == 2 and len(roots) == 6, "tree-sourced branching root systems regressed")
-    require(all(root.get("root_source") in {source.name for source in root_sources} for root in roots), "isolated or source-less root found")
+    fine_roots = [obj for obj in visible_objects if obj.name.startswith("VV_SurfaceFineRoot_") and obj.type == "CURVE"]
+    require(len(root_sources) == 2 and len(roots) == 6 and len(fine_roots) == 12, "tree-sourced branching root systems regressed")
+    require(all(root.get("root_source") in {source.name for source in root_sources} for root in roots+fine_roots), "isolated or source-less root found")
+    require(all(root.get("mostly_hidden") is True for root in fine_roots), "fine roots no longer recede into the organic mat")
 
     stones = [
         obj for obj in visible_objects
@@ -160,18 +168,44 @@ def main():
     ]
     require(len(stones) == 8, "authored partially buried stone clusters regressed")
     require(all(bpy.data.objects.get(f"{stone.name}_SoilPocket") is not None for stone in stones), "stone is no longer visually buried")
+    fragments = [
+        obj for obj in visible_objects
+        if obj.name.startswith("VV_TerrainBank_EmbeddedFragment_")
+        and obj.type == "MESH" and "SoilPocket" not in obj.name
+    ]
+    require(len(fragments) == 6, "clustered buried stone fragments regressed")
+    require(all(bpy.data.objects.get(f"{fragment.name}_SoilPocket") is not None for fragment in fragments), "stone fragment lost its soil burial pocket")
 
-    cushions = [obj for obj in visible_objects if obj.name.startswith("VV_SurfaceEcologyCushion_")]
-    tufts = [obj for obj in visible_objects if obj.name.startswith("VV_SurfaceCanopyTuft_")]
-    flowers = [obj for obj in visible_objects if obj.name.startswith("VV_SurfaceFlower_") and obj.type == "MESH"]
-    require(len(cushions) == 93, "clustered ground-cover colony count changed")
-    require(len(tufts) == 58, "staggered canopy tuft count changed")
-    require(len(flowers) == 11, "clustered flower count changed")
+    root_mats = [obj for obj in visible_objects if obj.name.startswith("VV_SurfaceRootMatPatch_")]
+    silhouettes = [obj for obj in visible_objects if obj.name.startswith("VV_SurfaceSilhouetteColony_")]
+    cards = [
+        obj for obj in visible_objects
+        if obj.name.startswith("VV_SurfaceAtlasColony_")
+        or obj.name.startswith("VV_SurfaceGroundMatCard_")
+        or obj.name.startswith("VV_SurfaceMeadowDepthCard_")
+    ]
+    moss_colonies = [obj for obj in visible_objects if obj.name.startswith("VV_SurfaceMossColony_")]
+    require(len(root_mats) == 9, "localized organic root-mat patch count changed")
+    require(len(silhouettes) == 19, "modeled grass-silhouette colony count changed")
+    require(len(cards) == 84, "sparse medium-detail card ecology count changed")
+    require(len(moss_colonies) == 36, "localized moss colony count changed")
+    require(all(len(card.data.polygons) == 1 for card in cards), "mobile grass card is no longer a single quad")
+    require(not any(
+        obj.name.startswith(("VV_SurfaceGrass_","VV_SurfaceMicroGrass_","VV_SurfaceIsolatedBlade_"))
+        for obj in visible_objects
+    ), "legacy individual blade scatter returned")
+    detail_systems={obj.get("surface_ecosystem_detail_system") for obj in visible_objects}
+    require("1 of 3 - modeled gameplay silhouette" in detail_systems, "modeled silhouette system missing")
+    require("2 of 3 - sparse grass cards and clumps" in detail_systems, "medium-detail card system missing")
     scoped = [obj for obj in visible_objects if obj.get("surface_layer_depth_m") is not None]
     require(scoped and all(float(obj["surface_layer_depth_m"]) <= .300001 for obj in scoped), "surface geometry exceeds the 0.30 m scope")
 
     transition = ROOT / "assets/textures/world-1/meadow-wake/meadow-terrain-cross-section-albedo-v1.png"
     require(transition.exists(), "authored terrain cross-section texture missing")
+    require(LIVING_SURFACE_ATLAS.exists(), "original living-surface atlas missing")
+    require(sha256(LIVING_SURFACE_ATLAS) == LIVING_SURFACE_ATLAS_SHA256, "living-surface atlas pixels changed")
+    atlas_image=next((image for image in bpy.data.images if Path(bpy.path.abspath(image.filepath)).resolve() == LIVING_SURFACE_ATLAS.resolve()),None)
+    require(atlas_image is not None and atlas_image.channels == 4, "living-surface atlas is not loaded with alpha")
 
     missing_images = []
     for image in bpy.data.images:
@@ -191,18 +225,23 @@ def main():
         "curves": len(bpy.data.curves),
         "materials": len(bpy.data.materials),
         "visible_terrain_objects": len(visible_objects),
-        "surface_ecology_cushions": len(cushions),
-        "surface_canopy_tufts": len(tufts),
-        "surface_flowers": len(flowers),
+        "surface_root_mat_patches": len(root_mats),
+        "surface_silhouette_colonies": len(silhouettes),
+        "surface_atlas_cards": len(cards),
+        "surface_moss_colonies": len(moss_colonies),
         "root_sources": len(root_sources),
         "root_branches": len(roots),
+        "fine_root_branches": len(fine_roots),
         "partially_buried_stones": len(stones),
+        "buried_stone_fragments": len(fragments),
         "frozen_soil_vertices": len(body.data.vertices),
         "frozen_soil_faces": len(body.data.polygons),
         "background_sha256": BACKGROUND_SHA256,
         "blocked_later_assets": list(BLOCKED),
         "background": str(source.relative_to(ROOT)).replace("\\", "/"),
         "terrain_texture": str(transition.relative_to(ROOT)).replace("\\", "/"),
+        "living_surface_atlas": str(LIVING_SURFACE_ATLAS.relative_to(ROOT)).replace("\\", "/"),
+        "living_surface_atlas_sha256": LIVING_SURFACE_ATLAS_SHA256,
         "protected_gameplay_fingerprint": FINGERPRINT,
         "integration": "BLOCKED",
     }

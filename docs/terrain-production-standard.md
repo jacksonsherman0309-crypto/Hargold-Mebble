@@ -127,6 +127,44 @@ Lighting must preserve readable values. Soil may be rich and shaded, but
 required landing edges, route silhouettes, pit lips, blocks, and mechanisms
 cannot disappear into crushed blacks.
 
+## Verdant Vale living-surface contract
+
+The upper `0.30 m` of visible Verdant Vale terrain is a biological system, not
+a grass material applied over a soil material. Surface-only art revisions may
+change the existing top-face material assignment and add non-colliding detail,
+but they may not change gameplay, collision, terrain thickness, the authored
+course layout, background, lighting, or camera.
+
+The surface must communicate four overlapping ecological depths without clean
+horizontal bands:
+
+1. varied long, medium, short, and broken grass with flowers, weeds, moss, and
+   leaf litter;
+2. a dense local root mat, dark organic soil, and decomposing matter;
+3. fine branching roots, compacted earth, moisture variation, and partially
+   buried stone clusters;
+4. tree-sourced structural roots, clay, buried rock, and compact subsoil.
+
+The mobile implementation uses three complementary scales. Modeled colony
+meshes own the gameplay-distance silhouette. Sparse alpha cards from the
+original Verdant Vale atlas supply medium botanical detail. Procedural material
+detail supplies the smallest color and roughness variation. Thousands of
+individual blade objects, evenly repeated clumps, a continuous turf ribbon, and
+texture-only grass-to-soil transitions are prohibited.
+
+Roots must have an authored source and hierarchy: major roots start in tree
+zones, divide into secondary roots, and finish in fine roots that mostly recede
+behind the organic mat. Stones occur in geological pockets as embedded forms,
+partially buried clusters, and fragments. Fully exposed isolated rocks are the
+exception. Ground cover is clustered and keeps the playable silhouette clear.
+
+The current original medium-detail source is
+`assets/textures/world-1/meadow-wake/verdant-vale-living-surface-atlas-v1.png`.
+It is an alpha atlas for sparse cards, not a baked replacement terrain image.
+Clay and wireframe reviews omit alpha-card quads so they show the modeled
+surface structure honestly; the material and gameplay-camera views show all
+three systems together.
+
 ## Debug and validation
 
 The `debugTerrain` query accepts:
