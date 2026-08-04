@@ -68,6 +68,42 @@ const TURF_FRINGE_SITES = Object.freeze([
 ]);
 
 const FLOWER_COLORS = Object.freeze([0xffd850, 0xfff3d1, 0xc8a5ff, 0xffa45a, 0xf0dbe7]);
+const LIVING_SURFACE_ATLAS_WIDTH = 1536;
+const LIVING_SURFACE_ATLAS_HEIGHT = 1024;
+const LIVING_SURFACE_ATLAS_BOUNDS = Object.freeze([
+  [74, 316, 359, 468],
+  [400, 196, 712, 467],
+  [770, 118, 1156, 473],
+  [1148, 95, 1460, 468],
+  [39, 536, 388, 908],
+  [380, 648, 717, 903],
+  [784, 657, 1156, 905],
+  [1148, 745, 1489, 905]
+]);
+
+function livingSurfaceCardGeometry(tileIndex) {
+  const geometry = new THREE.PlaneGeometry(1, 1);
+  const [x0, y0, x1, y1] = LIVING_SURFACE_ATLAS_BOUNDS[tileIndex];
+  const u0 = x0 / LIVING_SURFACE_ATLAS_WIDTH;
+  const u1 = x1 / LIVING_SURFACE_ATLAS_WIDTH;
+  const v0 = 1 - y1 / LIVING_SURFACE_ATLAS_HEIGHT;
+  const v1 = 1 - y0 / LIVING_SURFACE_ATLAS_HEIGHT;
+  const uv = geometry.getAttribute('uv');
+  for (let index = 0; index < uv.count; index += 1) {
+    uv.setXY(
+      index,
+      THREE.MathUtils.lerp(u0, u1, uv.getX(index)),
+      THREE.MathUtils.lerp(v0, v1, uv.getY(index))
+    );
+  }
+  uv.needsUpdate = true;
+  geometry.userData = {
+    terrainRepresentation: 'living-surface-atlas-card',
+    collisionBearing: false,
+    tileIndex
+  };
+  return geometry;
+}
 
 function variation(seed) {
   const value = Math.sin(seed * 12.9898 + 4.1414) * 43758.5453;
@@ -293,6 +329,22 @@ export class MeadowWakeForegroundArt {
       roughness: 0.96,
       metalness: 0
     });
+    this.livingTurfTransition = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.98,
+      metalness: 0,
+      vertexColors: true
+    });
+    this.livingSurfaceCards = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.96,
+      metalness: 0,
+      transparent: true,
+      opacity: 0,
+      alphaTest: 0.24,
+      depthWrite: true,
+      side: THREE.DoubleSide
+    });
     this.strataLine = new THREE.MeshBasicMaterial({
       color: 0xcda47e,
       transparent: true,
@@ -411,7 +463,7 @@ export class MeadowWakeForegroundArt {
     return this.sharedColorMaterials.get(color);
   }
 
-  applySurfaceTextures({ timber, ruinStone, canvas, bark }) {
+  applySurfaceTextures({ timber, ruinStone, canvas, bark, livingSurface }) {
     for (const material of [this.lightWood, this.materials.wood]) {
       material.map = timber;
       material.bumpMap = timber;
@@ -470,6 +522,13 @@ export class MeadowWakeForegroundArt {
     this.mossEdge.bumpScale = 0.36;
     this.mossEdge.color.setHex(0x89a97c);
     this.mossEdge.needsUpdate = true;
+    this.livingTurfTransition.map = this.materials.turf.map;
+    this.livingTurfTransition.bumpMap = this.materials.turf.bumpMap;
+    this.livingTurfTransition.bumpScale = 0.34;
+    this.livingTurfTransition.needsUpdate = true;
+    this.livingSurfaceCards.map = livingSurface;
+    this.livingSurfaceCards.opacity = 1;
+    this.livingSurfaceCards.needsUpdate = true;
     this.terrainBodyMaterial.map = this.materials.soil.map;
     this.terrainBodyMaterial.emissiveMap = this.materials.soil.map;
     this.terrainBodyMaterial.bumpMap = this.materials.soil.bumpMap;
@@ -1122,8 +1181,15 @@ export class MeadowWakeForegroundArt {
           sceneHeight: this.height,
           depth: 204
         }),
-        definition.variant === 'flowered-bank' ? this.mossEdge : this.materials.turf
+        this.livingTurfTransition
       );
+      cap.name = 'modeled-irregular-living-surface-transition';
+      cap.userData = {
+        terrainRepresentation: 'modeled-colony-silhouette-and-organic-transition',
+        collisionBearing: false,
+        maximumSurfaceDepthMetres: 0.3,
+        ecologyScale: 'overall-silhouette'
+      };
       cap.castShadow = true;
       cap.receiveShadow = true;
 
@@ -2675,94 +2741,79 @@ export class MeadowWakeForegroundArt {
       true
     );
 
-    const grassDarkMatrices = [];
-    const grassLightMatrices = [];
-    const flowerStemMatrices = [];
-    const flowerCentreMatrices = [];
-    const petalMatricesByColor = new Map(FLOWER_COLORS.map(color => [color, []]));
+    const cardMatricesByTile = Array.from({ length: 8 }, () => []);
+    const rootMatMatrices = [];
+    const mossMatrices = [];
+    const litterMatrices = [];
     for (let index = 0; index < TURF_FRINGE_SITES.length; index += 1) {
       const x = TURF_FRINGE_SITES[index];
       if (inPit(x)) continue;
       const top = this.height / 2 - heightAt(x) * SCALE;
-      const width = 34 + index % 4 * 5;
-      const bladeCount = Math.max(4, Math.round(width / 6));
-      for (let bladeIndex = 0; bladeIndex < bladeCount; bladeIndex += 1) {
-        const ratio = (bladeIndex + 0.5) / bladeCount;
-        const bladeHeight = 8 + variation((index + x) * 7 + bladeIndex) * 10;
-        const radius = 1.6 + variation(bladeIndex + index + x) * 1.3;
-        const bladeMatrix = matrixFor(
+      const cardCount = 1 + (index % 3 === 0 ? 2 : 1);
+      for (let cardIndex = 0; cardIndex < cardCount; cardIndex += 1) {
+        const tileIndex = (index * 5 + cardIndex * 3) % cardMatricesByTile.length;
+        const cardWidth = 26 + variation(index * 13 + cardIndex) * 24;
+        const cardHeight = 14 + variation(index * 19 + cardIndex * 7) * 8;
+        const lateralOffset = (cardIndex - (cardCount - 1) / 2) * cardWidth * 0.34;
+        cardMatricesByTile[tileIndex].push(matrixFor(
           [
-            x * SCALE - width / 2 + ratio * width,
-            top + 4 + bladeHeight * 0.48,
-            118 + index % 3 * 3 + bladeIndex % 3 * 2
+            x * SCALE + lateralOffset,
+            top + cardHeight * 0.42,
+            116 + cardIndex * 7 + index % 3 * 2
           ],
-          [0, 0, (variation((index + x) * 13 + bladeIndex) - 0.5) * 0.42],
-          [radius, bladeHeight, radius]
-        );
-        (bladeIndex % 3 ? grassDarkMatrices : grassLightMatrices).push(bladeMatrix);
+          [0, (variation(index * 29 + cardIndex) - 0.5) * 0.16, (variation(index * 31 + cardIndex) - 0.5) * 0.18],
+          [cardWidth, cardHeight, 1]
+        ));
       }
-      if (index % 3 === 0) {
-        const flowerScale = 0.65 + index % 2 * 0.1;
-        const flowerX = x * SCALE + 4;
-        const flowerY = top + 4;
-        const flowerZ = 126 + index % 3 * 3;
-        flowerStemMatrices.push(matrixFor(
-          [flowerX, flowerY + 6 * flowerScale, flowerZ],
-          [0, 0, 0],
-          [0.8, 12 * flowerScale, 0.8]
+
+      if (index % 2 === 0) {
+        rootMatMatrices.push(matrixFor(
+          [x * SCALE + (variation(index * 37) - 0.5) * 18, top - 8, 114],
+          [0, 0, (variation(index * 41) - 0.5) * 0.18],
+          [18 + index % 4 * 4, 4.2 + index % 3, 5.5]
         ));
-        flowerCentreMatrices.push(matrixFor(
-          [flowerX, flowerY + 12.5 * flowerScale, flowerZ + 0.5],
-          [0, 0, 0],
-          [1.5 * flowerScale, 1.5 * flowerScale, 0.75 * flowerScale]
+      }
+      if (index % 3 === 1) {
+        mossMatrices.push(matrixFor(
+          [x * SCALE - 6, top - 1, 122],
+          [0, 0, (variation(index * 43) - 0.5) * 0.22],
+          [10 + index % 5 * 2, 3 + index % 2, 4]
         ));
-        const color = FLOWER_COLORS[index % FLOWER_COLORS.length];
-        for (let petalIndex = 0; petalIndex < 5; petalIndex += 1) {
-          const angle = petalIndex / 5 * TAU;
-          petalMatricesByColor.get(color).push(matrixFor(
-            [
-              flowerX + Math.cos(angle) * 2.1 * flowerScale,
-              flowerY + 12.5 * flowerScale + Math.sin(angle) * 2.1 * flowerScale,
-              flowerZ
-            ],
-            [0, 0, angle],
-            [2.2 * flowerScale, 1.2 * flowerScale, 0.75 * flowerScale]
-          ));
-        }
+      }
+      if (index % 4 === 2) {
+        litterMatrices.push(matrixFor(
+          [x * SCALE + 8, top + 2, 130],
+          [0, 0, variation(index * 47) * TAU],
+          [5 + index % 3, 2.2, 1]
+        ));
       }
     }
-    addInstances(
-      'instanced-sculpted-dark-turf-fringe',
-      new THREE.ConeGeometry(1, 1, 5),
-      this.leafDark,
-      grassDarkMatrices
-    );
-    addInstances(
-      'instanced-sculpted-light-turf-fringe',
-      new THREE.ConeGeometry(1, 1, 5),
-      this.leafLight,
-      grassLightMatrices
-    );
-    addInstances(
-      'instanced-wildflower-stems',
-      new THREE.CylinderGeometry(0.55, 0.85, 1, 6),
-      this.leafDark,
-      flowerStemMatrices
-    );
-    addInstances(
-      'instanced-wildflower-centres',
-      new THREE.SphereGeometry(1, 8, 6),
-      this.sharedColorMaterial(0xe5a936),
-      flowerCentreMatrices
-    );
-    for (const [color, matrices] of petalMatricesByColor) {
+    for (let tileIndex = 0; tileIndex < cardMatricesByTile.length; tileIndex += 1) {
       addInstances(
-        `instanced-wildflower-petals-${color.toString(16)}`,
-        new THREE.SphereGeometry(1, 8, 6),
-        this.sharedColorMaterial(color),
-        matrices
+        `instanced-living-surface-atlas-card-${tileIndex}`,
+        livingSurfaceCardGeometry(tileIndex),
+        this.livingSurfaceCards,
+        cardMatricesByTile[tileIndex]
       );
     }
+    addInstances(
+      'instanced-localized-organic-root-mat',
+      new THREE.SphereGeometry(1, 10, 6),
+      this.soilDark,
+      rootMatMatrices
+    );
+    addInstances(
+      'instanced-clustered-surface-moss',
+      new THREE.SphereGeometry(1, 10, 6),
+      this.mossEdge,
+      mossMatrices
+    );
+    addInstances(
+      'instanced-clustered-leaf-litter',
+      new THREE.CircleGeometry(1, 8),
+      this.sharedColorMaterial(0x9a6f3b),
+      litterMatrices
+    );
 
   }
 

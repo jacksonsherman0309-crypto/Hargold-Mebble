@@ -166,7 +166,7 @@ assert.match(motionValidator, /finalApprovalEligible/);
 
 const liveHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 assert.doesNotMatch(liveHtml, /data-action="sprint"/);
-assert.match(liveHtml, /terrain-correction-1/);
+assert.match(liveHtml, /living-surface-1/);
 assert.match(renderer, /canonical_gameplay_rig\.glb/);
 
 console.log(`Meadow Wake art pipeline checks passed from ${root}`);

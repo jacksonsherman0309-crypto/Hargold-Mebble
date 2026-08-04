@@ -21,7 +21,9 @@ Meadow Wake course; they do not generate or replace course geometry.
   fallen logs, roots, and structural timber variation.
 - `verdant-vale-living-surface-atlas-v1.png` — transparent eight-cell atlas of
   original grass, fern, weed, flower, and moss colonies for sparse mobile
-  cards in the pending Blender living-surface quality gate. It is not deployed.
+  cards. The approved runtime surface combines cropped atlas cells with
+  modeled turf transitions, localized root mats, moss, and litter; it does not
+  use the atlas as a replacement terrain image.
 
 The bitmap sources were generated with OpenAI's built-in image generation and
 then integrated with real Three.js terrain meshes, lighting, fog, and 3D

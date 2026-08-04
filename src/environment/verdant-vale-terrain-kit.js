@@ -309,12 +309,13 @@ export function createVerdantGrassOverhangGeometry({
   const back = -depth / 2;
   const vertices = [];
   const uvs = [];
+  const colors = [];
 
   for (const x of samples) {
     const surfaceY = sceneHeight / 2 - heightAt(x) * VERDANT_VALE_SCALE;
     const edge = Math.sin(x * 4.27 + seed) * 1.8 + Math.sin(x * 1.41) * 1.2;
-    const top = surfaceY + 14 + edge;
-    const bottom = surfaceY - 16 - Math.abs(Math.sin(x * 3.13 + seed)) * 8;
+    const top = surfaceY + 8 + edge * 0.72;
+    const bottom = surfaceY - 8 - Math.abs(Math.sin(x * 3.13 + seed)) * 5;
     const frontRelief = Math.sin(x * 3.71 + seed) * 3.2;
     vertices.push(
       x * VERDANT_VALE_SCALE, top, front + frontRelief,
@@ -324,6 +325,19 @@ export function createVerdantGrassOverhangGeometry({
     );
     const u = x / 2.9;
     uvs.push(u, 1, u, 0, u, 1, u, 0);
+    const growthVariation = Math.sin(x * 2.17 + seed) * 0.035;
+    const topColor = [
+      0.64 + growthVariation,
+      0.82 + growthVariation,
+      0.48 + growthVariation * 0.5
+    ];
+    const organicSoilColor = [0.30, 0.22, 0.15];
+    colors.push(
+      ...topColor,
+      ...organicSoilColor,
+      ...topColor,
+      ...organicSoilColor
+    );
   }
 
   const indices = [];
@@ -341,6 +355,7 @@ export function createVerdantGrassOverhangGeometry({
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
   geometry.computeBoundingBox();

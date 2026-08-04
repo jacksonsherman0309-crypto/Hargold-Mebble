@@ -165,6 +165,14 @@ Clay and wireframe reviews omit alpha-card quads so they show the modeled
 surface structure honestly; the material and gameplay-camera views show all
 three systems together.
 
+The user approved this living-surface review gate for runtime integration on
+August 4, 2026. The live browser implementation is confined to the visible
+foreground in `src/environment/meadow-wake-foreground.js`: modeled transition
+geometry supplies the silhouette, cropped atlas cards provide clustered
+medium detail, and the existing turf/soil maps provide fine material detail.
+The deterministic terrain profile, collision, pits, layout, background,
+lighting, and camera remain unchanged.
+
 ## Debug and validation
 
 The `debugTerrain` query accepts:

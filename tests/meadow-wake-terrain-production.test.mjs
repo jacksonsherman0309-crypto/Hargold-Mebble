@@ -32,6 +32,7 @@ import {
 
 const read = path => readFileSync(new URL(path, import.meta.url), 'utf8');
 const foregroundSource = read('../src/environment/meadow-wake-foreground.js');
+const environmentSource = read('../src/environment/meadow-wake-environment.js');
 const terrainKitSource = read('../src/environment/verdant-vale-terrain-kit.js');
 const rendererSource = read('../src/character-renderer.js');
 const gameSource = read('../src/game.js');
@@ -176,6 +177,8 @@ assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.continuousGrassRibbonAl
 assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.textureOnlyTransitionAllowed, false);
 assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.collisionBearing, false);
 assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.visualApprovalRequiredBeforeIntegration, true);
+assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.visualApprovalStatus, 'approved-2026-08-04');
+assert.equal(VERDANT_VALE_TERRAIN_STANDARD.livingSurface.runtimeIntegrationStatus, 'approved-live-visual-layer');
 assert.equal(
   VERDANT_VALE_TERRAIN_STANDARD.livingSurface.atlasAsset,
   'assets/textures/world-1/meadow-wake/verdant-vale-living-surface-atlas-v1.png'
@@ -189,6 +192,13 @@ assert.match(livingSurfaceBuilderSource, /modeled gameplay silhouette/);
 assert.match(livingSurfaceBuilderSource, /sparse grass cards and clumps/);
 assert.match(livingSurfaceBuilderSource, /fine-scale material variation/);
 assert.match(livingSurfaceBuilderSource, /individual_blade_scatter.*PROHIBITED/);
+assert.match(environmentSource, /verdant-vale-living-surface-atlas-v1\.png/);
+assert.match(foregroundSource, /modeled-irregular-living-surface-transition/);
+assert.match(foregroundSource, /instanced-living-surface-atlas-card/);
+assert.match(foregroundSource, /instanced-localized-organic-root-mat/);
+assert.match(foregroundSource, /instanced-clustered-surface-moss/);
+assert.match(foregroundSource, /instanced-clustered-leaf-litter/);
+assert.doesNotMatch(foregroundSource, /instanced-sculpted-dark-turf-fringe/);
 
 const referencePath = new URL('../assets/references/terrain/meadow-wake-production-quality-target.jpeg', import.meta.url);
 const referenceBytes = readFileSync(referencePath);

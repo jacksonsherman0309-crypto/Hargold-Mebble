@@ -1,6 +1,6 @@
 # Verdant Vale living-surface quality gate
 
-Status: **visual approval pending**. This is an isolated Blender hero-asset review, not a production integration or deployment.
+Status: **living surface visually approved August 4, 2026 and integrated into the browser foreground**. The review scene remains the editable Blender source for this surface pass.
 
 ## Required comparison
 
@@ -37,9 +37,9 @@ The earlier whole-bank sheets remain available for historical comparison, but th
 - The approved Verdant Vale background image is reused unchanged as a static camera-aligned layer. No mountains, cliffs, forests, waterfalls, clouds, or sky were modeled or replaced.
 - Gameplay layout and collision retain fingerprint `a00bf81913452518d3ed7cbc0e8e2a60c3fc7e2b34e5f9762322fcb23acf58d9`.
 - The approved background retains SHA-256 `4aa8ef74e96fd27acd06b08d027d06c26e8b0a11d78ebbf136a8178d72c89670`.
-- Deployed visible terrain remains frozen at commit `55cd085`; this bank has not replaced it.
+- The previous deployed visible-terrain baseline remains preserved at commit `55cd085`; the approved surface systems are now layered into the browser foreground without changing its collision profile.
 - Heroes, enemies, blocks, collectibles, UI, camera behavior, movement, checkpoints, and authored course geometry were not touched.
-- Tree family, separate rock/root hero formation, export, integration, and deployment remain explicitly blocked until the terrain bank receives visual approval.
+- Tree-family and separate rock/root hero-formation work remain outside this surface-only approval and were not started.
 
 ## Reproduction and validation
 
@@ -50,4 +50,4 @@ The earlier whole-bank sheets remain available for historical comparison, but th
 & 'C:\Users\jacks\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' tools\blender\environment\compose_verdant_vale_surface_review.py
 ```
 
-The structural validator passes. Alpha cards are hidden only in clay and wireframe diagnostics so those views honestly show modeled structure. Visual approval remains a human art-direction decision and is intentionally not inferred from structural checks.
+The structural validator passes. Alpha cards are hidden only in clay and wireframe diagnostics so those views honestly show modeled structure. The approval recorded here comes from the user's explicit August 4 continuation instruction, not from an automated structural check.

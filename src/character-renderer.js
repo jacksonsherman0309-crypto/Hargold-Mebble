@@ -10,8 +10,8 @@ import {
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins
 } from './content/meadow-wake-course.js?v=terrain-correction-1';
-import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=production-terrain-4';
-import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=terrain-correction-1';
+import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=living-surface-1';
+import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=living-surface-1';
 import { GAME_RULES } from './canonical-data.js';
 import {
   animationIntentFor,

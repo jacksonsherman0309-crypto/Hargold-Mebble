@@ -33,6 +33,10 @@ const TEXTURE_URLS = Object.freeze({
   bark: new URL(
     '../../assets/textures/world-1/meadow-wake/meadow-bark-albedo-v1.png',
     import.meta.url
+  ).href,
+  livingSurface: new URL(
+    '../../assets/textures/world-1/meadow-wake/verdant-vale-living-surface-atlas-v1.png',
+    import.meta.url
   ).href
 });
 
@@ -326,7 +330,17 @@ export class MeadowWakeEnvironmentArt {
   }
 
   async loadTextures() {
-    const [farValley, forestRidge, soil, turf, timber, ruinStone, canvas, bark] = await Promise.all([
+    const [
+      farValley,
+      forestRidge,
+      soil,
+      turf,
+      timber,
+      ruinStone,
+      canvas,
+      bark,
+      livingSurface
+    ] = await Promise.all([
       this.loader.loadAsync(TEXTURE_URLS.farValley),
       this.loader.loadAsync(TEXTURE_URLS.forestRidge),
       this.loader.loadAsync(TEXTURE_URLS.soil),
@@ -334,7 +348,8 @@ export class MeadowWakeEnvironmentArt {
       this.loader.loadAsync(TEXTURE_URLS.timber),
       this.loader.loadAsync(TEXTURE_URLS.ruinStone),
       this.loader.loadAsync(TEXTURE_URLS.canvas),
-      this.loader.loadAsync(TEXTURE_URLS.bark)
+      this.loader.loadAsync(TEXTURE_URLS.bark),
+      this.loader.loadAsync(TEXTURE_URLS.livingSurface)
     ]);
 
     this.farMaterial.map = this.configureColorTexture(farValley);
@@ -363,7 +378,8 @@ export class MeadowWakeEnvironmentArt {
       timber,
       ruinStone,
       canvas: this.configureColorTexture(canvas, { repeat: true }),
-      bark: this.configureColorTexture(bark, { repeat: true })
+      bark: this.configureColorTexture(bark, { repeat: true }),
+      livingSurface: this.configureColorTexture(livingSurface)
     });
   }
 

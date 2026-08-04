@@ -1,7 +1,7 @@
-export const CANON_VERSION = '2026-08-03-verdant-vale-living-surface-1';
+export const CANON_VERSION = '2026-08-04-verdant-vale-living-surface-runtime-1';
 
 export const VERDANT_VALE_TERRAIN_STANDARD = Object.freeze({
-  version: '2026-08-03-verdant-vale-living-surface-1',
+  version: '2026-08-04-verdant-vale-living-surface-runtime-1',
   referenceAsset: 'assets/references/terrain/meadow-wake-production-quality-target.jpeg',
   referenceScope: 'terrain-environment-depth-material-finish-and-side-scrolling-composition-only',
   originalAuthoredArtworkRequired: true,
@@ -41,7 +41,10 @@ export const VERDANT_VALE_TERRAIN_STANDARD = Object.freeze({
     continuousGrassRibbonAllowed: false,
     textureOnlyTransitionAllowed: false,
     collisionBearing: false,
-    visualApprovalRequiredBeforeIntegration: true
+    visualApprovalRequiredBeforeIntegration: true,
+    visualApprovalStatus: 'approved-2026-08-04',
+    runtimeIntegrationStatus: 'approved-live-visual-layer',
+    runtimeModule: 'src/environment/meadow-wake-foreground.js'
   }),
   materialClasses: Object.freeze([
     'grass',

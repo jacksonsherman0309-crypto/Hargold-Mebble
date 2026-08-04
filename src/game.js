@@ -1,4 +1,4 @@
-import { CharacterRenderer } from './character-renderer.js?v=terrain-correction-1';
+import { CharacterRenderer } from './character-renderer.js?v=living-surface-1';
 import {
   MEADOW_WAKE_ENEMY_ACTORS,
   MEADOW_WAKE_LEVEL_DATA

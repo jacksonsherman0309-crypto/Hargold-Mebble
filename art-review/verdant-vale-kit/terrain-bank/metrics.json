@@ -1,10 +1,10 @@
 {
   "status": "PASS",
   "qualityGate": "terrain-bank",
-  "visualApproval": "PENDING",
-  "productionApproved": false,
-  "integration": "BLOCKED",
-  "deployedVisibleTerrain": "FROZEN AT 55cd085",
+  "visualApproval": "APPROVED 2026-08-04",
+  "productionApproved": true,
+  "integration": "APPROVED LIVE VISUAL LAYER",
+  "deployedVisibleTerrain": "BASELINE 55cd085 PRESERVED; LIVING SURFACE LAYER INTEGRATED",
   "backgroundStatus": "APPROVED STATIC LAYER - UNMODIFIED",
   "gameplayLayoutStatus": "FROZEN - UNMODIFIED",
   "collisionStatus": "FROZEN - UNMODIFIED",
@@ -27,8 +27,7 @@
   "frozenSoilFaces": 110,
   "blockedLaterAssets": [
     "tree-family",
-    "rock-root-formation",
-    "integration-export"
+    "rock-root-formation"
   ],
   "soleQualityTarget": "assets/references/terrain/meadow-wake-production-quality-target.jpeg",
   "approvedBackground": "assets/textures/world-1/meadow-wake/verdant-vale-background-v1.png",
