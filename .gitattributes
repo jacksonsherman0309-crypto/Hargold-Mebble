@@ -1,0 +1,15 @@
+# Normalize text files.
+* text=auto eol=lf
+
+# Binary 3D and media assets.
+*.glb binary
+*.gltf text
+*.fbx binary
+*.blend binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.zip binary
+
+# Large active binaries should be evaluated for Git LFS before future additions.
