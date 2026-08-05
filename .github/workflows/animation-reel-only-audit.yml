@@ -1,0 +1,50 @@
+name: Isolated complete 84-animation reel
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/animation-reel-only-audit.yml'
+      - 'tools/animation-reel-only-audit.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  complete-reel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: |
+          npm install --no-save --no-package-lock playwright@1.54.1
+          npx playwright install --with-deps chromium
+      - name: Start preview
+        run: |
+          nohup npm run preview > /tmp/hm-reel-only-preview.log 2>&1 &
+          for attempt in $(seq 1 90); do
+            curl --fail --silent http://127.0.0.1:4173/ > /dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/hm-reel-only-preview.log
+          exit 1
+      - name: Play all 84 listed animations
+        run: node tools/animation-reel-only-audit.mjs
+      - name: Preserve preview log
+        if: always()
+        run: |
+          mkdir -p animation-reel-only-output/logs
+          cp /tmp/hm-reel-only-preview.log animation-reel-only-output/logs/preview.log || true
+      - name: Upload full reel evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: isolated-complete-84-animation-reel
+          path: animation-reel-only-output
+          if-no-files-found: error
+          retention-days: 14
