@@ -1,0 +1,69 @@
+name: Complete animation catalog audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/animation-catalog-audit.yml'
+      - 'tools/animation-catalog-audit.mjs'
+      - 'src/**'
+      - 'data/**'
+      - 'assets/**'
+      - 'index.html'
+      - 'styles.css'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capture-all-listed-animations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install browser audit dependency
+        run: npm install --no-save --no-package-lock playwright@1.54.1
+
+      - name: Install Chromium and system dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Start local production preview
+        run: |
+          nohup npm run preview > /tmp/hargold-mebble-preview.log 2>&1 &
+          echo $! > /tmp/hargold-mebble-preview.pid
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/hargold-mebble-preview.log
+          exit 1
+
+      - name: Capture and play every listed Hargold and Mebble animation
+        run: node tools/animation-catalog-audit.mjs
+
+      - name: Preserve preview log
+        if: always()
+        run: |
+          mkdir -p animation-audit-output/logs
+          cp /tmp/hargold-mebble-preview.log animation-audit-output/logs/preview.log || true
+
+      - name: Upload complete animation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-listed-animation-evidence
+          path: animation-audit-output
+          if-no-files-found: error
+          retention-days: 14
