@@ -3,6 +3,7 @@ import { applyMeadowWakeProductionGate } from './environment/meadow-wake-product
 import { applyMeadowWakeStructuralProductionGate } from './environment/meadow-wake-structural-production-gate.js?v=visual-production-gate-2';
 import { applyMeadowWakeTerrainCleanup } from './environment/meadow-wake-terrain-cleanup.js?v=terrain-finalization-1';
 import { applyMeadowWakeTerrainFinalization } from './environment/meadow-wake-terrain-finalization.js?v=terrain-finalization-2';
+import { applyMeadowWakeTerrainOrganicDetail } from './environment/meadow-wake-terrain-organic-detail.js?v=terrain-finalization-1';
 
 const originalBuildMeadowWake = CharacterRenderer.prototype.buildMeadowWake;
 if (!CharacterRenderer.prototype.__productionGatePatched) {
@@ -14,6 +15,7 @@ if (!CharacterRenderer.prototype.__productionGatePatched) {
       applyMeadowWakeStructuralProductionGate(this);
       applyMeadowWakeTerrainCleanup(this);
       applyMeadowWakeTerrainFinalization(this);
+      applyMeadowWakeTerrainOrganicDetail(this);
     });
     return result;
   };
