@@ -5,6 +5,7 @@ text = path.read_text()
 
 production_import = "import { MeadowWakeOpeningProductionArt } from './environment/meadow-wake-opening-production-art.js?v=opening-production-1';\n"
 polish_import = "import { MeadowWakeOpeningPolish } from './environment/meadow-wake-opening-polish.js?v=opening-production-2';\n"
+cleanup_import = "import { applyMeadowWakeOpeningFallbackCleanup } from './environment/meadow-wake-opening-fallback-cleanup.js?v=opening-production-3';\n"
 anchor = "import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=level-one-layout-20260911';\n"
 if production_import not in text:
     if anchor not in text:
@@ -14,6 +15,10 @@ if polish_import not in text:
     if production_import not in text:
         raise SystemExit('production import anchor not found')
     text = text.replace(production_import, production_import + polish_import, 1)
+if cleanup_import not in text:
+    if polish_import not in text:
+        raise SystemExit('polish import anchor not found')
+    text = text.replace(polish_import, polish_import + cleanup_import, 1)
 
 build_anchor = "    this.buildMeadowWake();\n"
 production_integration = """    this.buildMeadowWake();\n    this.openingProductionArt = new MeadowWakeOpeningProductionArt({\n      world: this.world,\n      height: this.height,\n      platformSlots: this.platformSlots,\n      blockSlots: this.blockSlots\n    });\n    this.openingProductionArt.build();\n"""
@@ -29,5 +34,12 @@ if 'this.openingProductionPolish = new MeadowWakeOpeningPolish' not in text:
         raise SystemExit('opening production-art build marker not found')
     text = text.replace(marker, marker + polish_integration, 1)
 
+cleanup_line = "    applyMeadowWakeOpeningFallbackCleanup(this.world);\n"
+if cleanup_line not in text:
+    marker = "    this.openingProductionPolish.build();\n"
+    if marker not in text:
+        raise SystemExit('opening polish build marker not found')
+    text = text.replace(marker, marker + cleanup_line, 1)
+
 path.write_text(text)
-print('Integrated production opening art and second-pass polish into character renderer')
+print('Integrated authored opening art, polish, and fallback cleanup into character renderer')
