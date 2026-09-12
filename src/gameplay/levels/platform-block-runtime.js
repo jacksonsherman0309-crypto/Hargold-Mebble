@@ -46,12 +46,17 @@ export function bodyOverlapsHorizontal(body, obstacle, inset = 0.02) {
   return body.x + body.width > obstacleLeft && body.x < obstacleRight;
 }
 
-export function supportHeightAt(state, x, terrainHeightAt, platforms) {
+export function supportHeightAt(state, x, terrainHeightAt, platforms, { bodyWidth = 0 } = {}) {
   if (state.supportPlatformId) {
     const support = platforms.find(platform => platform.id === state.supportPlatformId);
     const halfWidth = support?.width / 2 ?? 0;
-    if (support && x >= support.x - halfWidth && x <= support.x + halfWidth) {
-      return platformTop(support, x);
+    // Multi-probe queries must not detach the actor because ONE toe probe
+    // has passed the edge while the rest of the body is still supported.
+    const contactX = bodyWidth > 0 ? state.footX : x;
+    if (support && contactX + bodyWidth / 2 >= support.x - halfWidth &&
+        contactX - bodyWidth / 2 <= support.x + halfWidth) {
+      const sampleX = Math.max(support.x - halfWidth, Math.min(x, support.x + halfWidth));
+      return platformTop(support, sampleX);
     }
     state.supportPlatformId = null;
   }
