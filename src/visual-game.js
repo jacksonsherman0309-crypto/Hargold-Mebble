@@ -4,6 +4,7 @@ import { applyMeadowWakeStructuralProductionGate } from './environment/meadow-wa
 import { applyMeadowWakeTerrainCleanup } from './environment/meadow-wake-terrain-cleanup.js?v=terrain-finalization-1';
 import { applyMeadowWakeTerrainFinalization } from './environment/meadow-wake-terrain-finalization.js?v=terrain-finalization-2';
 import { applyMeadowWakeTerrainOrganicDetail } from './environment/meadow-wake-terrain-organic-detail.js?v=terrain-finalization-1';
+import { applyMeadowWakeTerrainCliffPass } from './environment/meadow-wake-terrain-cliff-pass.js?v=terrain-finalization-1';
 
 const originalBuildMeadowWake = CharacterRenderer.prototype.buildMeadowWake;
 if (!CharacterRenderer.prototype.__productionGatePatched) {
@@ -16,6 +17,7 @@ if (!CharacterRenderer.prototype.__productionGatePatched) {
       applyMeadowWakeTerrainCleanup(this);
       applyMeadowWakeTerrainFinalization(this);
       applyMeadowWakeTerrainOrganicDetail(this);
+      applyMeadowWakeTerrainCliffPass(this);
     });
     return result;
   };
