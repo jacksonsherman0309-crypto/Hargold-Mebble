@@ -27,6 +27,7 @@ jobs:
       - name: Syntax check visual runtime
         run: |
           node --check src/environment/meadow-wake-opening-production-art.js
+          node --check src/environment/meadow-wake-opening-polish.js
           node --check src/character-renderer.js
       - name: Preserve Level 1 gameplay contracts
         run: npm run test:level-one
@@ -38,7 +39,7 @@ jobs:
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git add src/character-renderer.js
-            git commit -m 'Wire authored opening production art into Meadow Wake renderer'
+            git commit -m 'Wire second-pass opening visual polish into Meadow Wake renderer'
             git push origin HEAD:visual/meadow-wake-production-rebuild
           fi
       - name: Install Chromium visual-review tooling
