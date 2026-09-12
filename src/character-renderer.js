@@ -14,6 +14,7 @@ import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.
 import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=level-one-layout-20260911';
 import { MeadowWakeOpeningProductionArt } from './environment/meadow-wake-opening-production-art.js?v=opening-production-1';
 import { MeadowWakeOpeningPolish } from './environment/meadow-wake-opening-polish.js?v=opening-production-2';
+import { applyMeadowWakeOpeningFallbackCleanup } from './environment/meadow-wake-opening-fallback-cleanup.js?v=opening-production-3';
 import { GAME_RULES } from './canonical-data.js';
 import {
   animationIntentFor,
@@ -162,6 +163,7 @@ export class CharacterRenderer {
       height: this.height
     });
     this.openingProductionPolish.build();
+    applyMeadowWakeOpeningFallbackCleanup(this.world);
 
     this.loadPromise = Promise.allSettled(
       [
