@@ -12,6 +12,7 @@ import {
 } from './content/meadow-wake-course.js?v=level-one-layout-20260911';
 import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=living-surface-1';
 import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=level-one-layout-20260911';
+import { MeadowWakeOpeningProductionArt } from './environment/meadow-wake-opening-production-art.js?v=opening-production-1';
 import { GAME_RULES } from './canonical-data.js';
 import {
   animationIntentFor,
@@ -148,6 +149,13 @@ export class CharacterRenderer {
       materialFactory: color => this.material(color)
     });
     this.buildMeadowWake();
+    this.openingProductionArt = new MeadowWakeOpeningProductionArt({
+      world: this.world,
+      height: this.height,
+      platformSlots: this.platformSlots,
+      blockSlots: this.blockSlots
+    });
+    this.openingProductionArt.build();
 
     this.loadPromise = Promise.allSettled(
       [
