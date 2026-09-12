@@ -1,12 +1,15 @@
 name: Meadow Wake layout validation
 on:
   push:
-    branches: [level-one/meadow-wake-layout-2026-09-11]
+    branches: [main, level-one/meadow-wake-layout-2026-09-11]
+    paths: ['src/**', 'tests/**', 'tools/**', 'assets/**', 'index.html', 'styles.css']
+  pull_request:
+    paths: ['src/**', 'tests/**', 'tools/**', 'assets/**', 'index.html', 'styles.css']
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 concurrency:
-  group: meadow-wake-layout-v2-${{ github.ref }}
+  group: meadow-wake-layout-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   validate:
@@ -16,14 +19,11 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Apply verified shell-route transfer
-        if: ${{ hashFiles('tools/meadow-wake-shell-layout-transfer.json') != '' }}
-        run: python tools/apply-meadow-wake-layout-migration.py
-      - name: Test authored layout and normal-input puzzle solutions
+      - name: Test complete layout and real-input puzzle solutions
         id: layout
         run: |
           mkdir -p /tmp/meadow-wake-evidence
-          node --experimental-vm-modules --test tests/meadow-wake-layout-completion.test.mjs tests/meadow-wake-shell-route-input.test.mjs 2>&1 | tee /tmp/meadow-wake-evidence/layout-tests.txt
+          npm run test:level-one 2>&1 | tee /tmp/meadow-wake-evidence/layout-tests.txt
       - name: Test movement and terrain independently of character rigs
         id: terrain
         if: always()
@@ -36,26 +36,17 @@ jobs:
             cat "/tmp/meadow-wake-evidence/$(basename "$test").log"
           done
           exit "$failed"
-      - name: Record full suite including existing animation failure
+      - name: Record full suite including pre-existing animation failure
         id: fullsuite
         if: always()
         continue-on-error: true
         run: npm test > /tmp/meadow-wake-evidence/full-suite.txt 2>&1
-      - name: Commit verified shell-route fixes on the isolated branch
-        if: ${{ steps.layout.outcome == 'success' && hashFiles('tools/meadow-wake-shell-layout-transfer.json') != '' && github.ref == 'refs/heads/level-one/meadow-wake-layout-2026-09-11' }}
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src/game.js src/content/meadow-wake-level-data.js src/gameplay/enemies/mob-simulation.js
-          git rm tools/meadow-wake-shell-layout-transfer.json tools/apply-meadow-wake-layout-migration.py
-          git commit -m 'Make quarry Shellback a safe reusable tool on its authored staging ledge'
-          git push origin HEAD:level-one/meadow-wake-layout-2026-09-11
       - name: Install browser test tooling
         if: always()
         run: |
           npm install --no-save --package-lock=false playwright@1.51.1
           npx playwright install --with-deps chromium
-      - name: Assemble and test the actual static-site payload
+      - name: Assemble and test actual static-site payload
         id: browser
         if: always()
         run: |
