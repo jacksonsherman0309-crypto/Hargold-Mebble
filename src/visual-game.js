@@ -1,6 +1,7 @@
-import { CharacterRenderer } from './character-renderer.js?v=visual-production-gate-2';
+import { CharacterRenderer } from './character-renderer.js?v=visual-production-gate-3';
 import { applyMeadowWakeProductionGate } from './environment/meadow-wake-production-gate.js?v=visual-production-gate-2';
 import { applyMeadowWakeStructuralProductionGate } from './environment/meadow-wake-structural-production-gate.js?v=visual-production-gate-2';
+import { applyMeadowWakeTerrainFinalization } from './environment/meadow-wake-terrain-finalization.js?v=terrain-finalization-1';
 
 const originalBuildMeadowWake = CharacterRenderer.prototype.buildMeadowWake;
 if (!CharacterRenderer.prototype.__productionGatePatched) {
@@ -10,9 +11,10 @@ if (!CharacterRenderer.prototype.__productionGatePatched) {
     queueMicrotask(() => {
       applyMeadowWakeProductionGate(this);
       applyMeadowWakeStructuralProductionGate(this);
+      applyMeadowWakeTerrainFinalization(this);
     });
     return result;
   };
 }
 
-await import('./game.js?v=visual-production-gate-2');
+await import('./game.js?v=visual-production-gate-3');
