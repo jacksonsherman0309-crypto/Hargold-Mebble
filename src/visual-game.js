@@ -1,7 +1,7 @@
 import { CharacterRenderer } from './character-renderer.js?v=visual-production-gate-3';
 import { applyMeadowWakeProductionGate } from './environment/meadow-wake-production-gate.js?v=visual-production-gate-2';
 import { applyMeadowWakeStructuralProductionGate } from './environment/meadow-wake-structural-production-gate.js?v=visual-production-gate-2';
-import { applyMeadowWakeTerrainFinalization } from './environment/meadow-wake-terrain-finalization.js?v=terrain-finalization-1';
+import { applyMeadowWakeTerrainFinalization } from './environment/meadow-wake-terrain-finalization.js?v=terrain-finalization-2';
 
 const originalBuildMeadowWake = CharacterRenderer.prototype.buildMeadowWake;
 if (!CharacterRenderer.prototype.__productionGatePatched) {
