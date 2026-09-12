@@ -6,10 +6,11 @@ await mkdir(output,{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const views=[
   {name:'01-opening',x:4.5},{name:'02-log-lesson',x:20.5},
-  {name:'03-quarry-route',x:35.8},{name:'04-creek-clue',x:57.1},
+  {name:'03-quarry-route',x:32.4},{name:'04-creek-clue',x:57.3},
   {name:'05-bridge-checkpoint',x:70.5},{name:'06-root-ruins',x:93.3},
   {name:'07-three-gap-finale',x:118},{name:'08-mobile-opening',x:4.5,mobile:true},
-  {name:'09-mobile-finale',x:118,mobile:true}
+  {name:'09-mobile-finale',x:118,mobile:true},
+  {name:'10-timber-obstacle',x:47},{name:'11-final-stump',x:108.5}
 ];
 const report={status:'running',rendering:'Chromium software WebGL; not target-device certification',views:[]};
 try{
