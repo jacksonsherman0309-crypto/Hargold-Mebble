@@ -13,6 +13,7 @@ import {
 import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=living-surface-1';
 import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=level-one-layout-20260911';
 import { MeadowWakeOpeningProductionArt } from './environment/meadow-wake-opening-production-art.js?v=opening-production-1';
+import { MeadowWakeOpeningPolish } from './environment/meadow-wake-opening-polish.js?v=opening-production-2';
 import { GAME_RULES } from './canonical-data.js';
 import {
   animationIntentFor,
@@ -156,6 +157,11 @@ export class CharacterRenderer {
       blockSlots: this.blockSlots
     });
     this.openingProductionArt.build();
+    this.openingProductionPolish = new MeadowWakeOpeningPolish({
+      world: this.world,
+      height: this.height
+    });
+    this.openingProductionPolish.build();
 
     this.loadPromise = Promise.allSettled(
       [
