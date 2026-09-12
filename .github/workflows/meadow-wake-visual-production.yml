@@ -1,0 +1,69 @@
+name: Meadow Wake visual production gate
+
+on:
+  push:
+    branches:
+      - visual/meadow-wake-production-rebuild
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: meadow-wake-visual-production-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  opening-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply opening production-art integration
+        run: python tools/apply-meadow-wake-opening-art.py
+      - name: Syntax check visual runtime
+        run: |
+          node --check src/environment/meadow-wake-opening-production-art.js
+          node --check src/character-renderer.js
+      - name: Preserve Level 1 gameplay contracts
+        run: npm run test:level-one
+      - name: Commit renderer integration when newly applied
+        run: |
+          if git diff --quiet -- src/character-renderer.js; then
+            echo 'Renderer already integrated.'
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add src/character-renderer.js
+            git commit -m 'Wire authored opening production art into Meadow Wake renderer'
+            git push origin HEAD:visual/meadow-wake-production-rebuild
+          fi
+      - name: Install Chromium visual-review tooling
+        run: |
+          npm install --no-save --package-lock=false playwright@1.51.1
+          npx playwright install --with-deps chromium
+      - name: Assemble actual playable payload
+        run: |
+          rm -rf /tmp/meadow-wake-site /tmp/meadow-wake-visual
+          mkdir -p /tmp/meadow-wake-site/assets /tmp/meadow-wake-visual
+          cp index.html styles.css /tmp/meadow-wake-site/
+          cp -R src vendor data /tmp/meadow-wake-site/
+          cp -R assets/exports assets/textures /tmp/meadow-wake-site/assets/
+          (cd /tmp/meadow-wake-site && node "$GITHUB_WORKSPACE/tools/local-preview-server.mjs") > /tmp/meadow-wake-visual/server.log 2>&1 &
+          sleep 2
+          HM_CAPTURE_OUTPUT=/tmp/meadow-wake-visual node tools/capture-meadow-wake-layout.mjs
+      - name: Keep first-gate visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meadow-wake-production-opening-gate
+          path: |
+            /tmp/meadow-wake-visual/01-opening.png
+            /tmp/meadow-wake-visual/02-log-lesson.png
+            /tmp/meadow-wake-visual/08-mobile-opening.png
+            /tmp/meadow-wake-visual/browser-report.json
+            /tmp/meadow-wake-visual/server.log
+          retention-days: 7
