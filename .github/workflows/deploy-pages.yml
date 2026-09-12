@@ -21,25 +21,21 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v6
-
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-
       - name: Assemble playable static site
         shell: bash
         run: |
           mkdir -p _site
           cp index.html styles.css _site/
-          cp -R src vendor _site/
+          cp -R src vendor data _site/
           mkdir -p _site/assets
           cp -R assets/exports assets/textures _site/assets/
           touch _site/.nojekyll
-
       - name: Upload playable site
         uses: actions/upload-pages-artifact@v4
         with:
           path: _site
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
