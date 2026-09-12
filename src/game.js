@@ -1036,7 +1036,7 @@ function drawOverlay() {
   ctx.fillText(`${player.hero}  ${hearts}  ×${session.lives}`, 29, 39);
   ctx.fillStyle = '#f4cf53';
   ctx.font = '700 12px system-ui';
-  ctx.fillText(`Coins ${session.standardCoins}/100  ·  Compass ${session.compass}/3  ·  Mobs ${session.enemiesDefeated}/${mobs.length}`, 29, 59);
+  ctx.fillText(`Coins ${session.standardCoins}/100  ·  Compass ${session.compass}/3  ·  Mobs ${session.enemiesDefeated}/${MEADOW_WAKE_ENEMY_ACTORS.length}`, 29, 59);
 
   ctx.fillStyle = 'rgba(7, 20, 12, .56)';
   ctx.beginPath();

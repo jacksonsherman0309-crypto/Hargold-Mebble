@@ -11,7 +11,7 @@ import {
   createMeadowWakeCompassCoins
 } from './content/meadow-wake-course.js?v=level-one-layout-20260911';
 import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=living-surface-1';
-import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=living-surface-1';
+import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=level-one-layout-20260911';
 import { GAME_RULES } from './canonical-data.js';
 import {
   animationIntentFor,

@@ -1,3 +1,4 @@
+import { groundedPlatformArt, alignGroundedPlatformCrown } from './meadow-wake-obstacle-grounding.js';
 import * as THREE from '../../vendor/three/three.module.js';
 import { mergeGeometries } from '../../vendor/three/utils/BufferGeometryUtils.js';
 import {
@@ -1361,6 +1362,7 @@ export class MeadowWakeForegroundArt {
   }
 
   buildPlatform(definition) {
+    definition = groundedPlatformArt(definition, this.terrainHeightAt);
     const root = new THREE.Group();
     root.name = `${definition.id}_${definition.visual}_authored-platform`;
     root.position.set(
@@ -1713,7 +1715,15 @@ export class MeadowWakeForegroundArt {
       this.addContactShadow(root, width * 0.82, { y: -height * 0.7, z: 83, opacity: 0.08 });
     }
 
-    this.addPlatformSupport(root, definition, width, height);
+    alignGroundedPlatformCrown(root, definition, SCALE);
+    let footingRoot = root;
+    if (definition.staticFooting) {
+      footingRoot = new THREE.Group();
+      footingRoot.name = `${definition.id}_stationary-ground-footing`;
+      footingRoot.position.copy(root.position);
+      this.world.add(footingRoot);
+    }
+    this.addPlatformSupport(footingRoot, definition, width, height);
     return { ...definition, root, core, cap, imported: null, authoredForeground: true };
   }
 
