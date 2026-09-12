@@ -28,6 +28,8 @@ jobs:
         run: |
           node --check src/environment/meadow-wake-terrain-cleanup.js
           node --check src/environment/meadow-wake-terrain-finalization.js
+          node --check src/environment/meadow-wake-terrain-organic-detail.js
+          node --check src/environment/meadow-wake-terrain-cliff-pass.js
           node --check src/environment/meadow-wake-production-gate.js
           node --check src/visual-game.js
           node --check src/character-renderer.js
