@@ -9,20 +9,14 @@ import {
   MEADOW_WAKE_SECTIONS,
   MEADOW_WAKE_TERRAIN_POINTS,
   MEADOW_WAKE_WORLD_END
-} from './meadow-wake-course.js?v=terrain-correction-1';
+} from './meadow-wake-course.js?v=level-one-layout-20260911';
 import {
   MEADOW_WAKE_ROOM_FINISH_PROFILES,
   MEADOW_WAKE_TERRAIN_ANCHORS
 } from './meadow-wake-scenery.js?v=terrain-correction-1';
 import { createLevelDefinition } from '../gameplay/levels/level-schema.js';
 
-const MOB_PLACEMENTS = Object.freeze([
-  Object.freeze({ id: '1-1-critter-a', type: 'camp_critter', x: 6.4, patrolFrom: 5.1, patrolTo: 7.6 }),
-  Object.freeze({ id: '1-1-shellback-a', type: 'shellback', x: 8.7, patrolFrom: 8.05, patrolTo: 9.05 }),
-  Object.freeze({ id: '1-1-critter-b', type: 'camp_critter', x: 13.1, patrolFrom: 11.5, patrolTo: 14.8 }),
-  Object.freeze({ id: '1-1-shellback-b', type: 'shellback', x: 17.1, patrolFrom: 15.8, patrolTo: 19.4 }),
-  Object.freeze({ id: '1-1-critter-c', type: 'camp_critter', x: 25.6, patrolFrom: 24.1, patrolTo: 27.4 })
-]);
+import { MEADOW_WAKE_MOB_PLACEMENTS as MOB_PLACEMENTS } from './meadow-wake-encounters.js';
 
 function areaIdAtX(x) {
   return MEADOW_WAKE_ROUTE_PHASES.find(phase => x >= phase.range[0] && x <= phase.range[1])?.id ??
@@ -44,7 +38,9 @@ function actorFromMob(mob) {
       enemyType: mob.type,
       patrolFrom: mob.patrolFrom,
       patrolTo: mob.patrolTo,
-      placementMode: 'ground-relative'
+      purpose: mob.purpose,
+      supportPlatformId: mob.supportPlatformId ?? null,
+      placementMode: mob.supportPlatformId ? 'platform-relative' : 'ground-relative'
     }),
     eventChannels: Object.freeze({ input: null, output: `${mob.id}:defeated` }),
     persistentStateId: null,

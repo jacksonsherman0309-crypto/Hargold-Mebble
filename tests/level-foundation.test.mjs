@@ -22,7 +22,7 @@ import {
 assert.equal(validateLevelDefinition(MEADOW_WAKE_LEVEL_DATA), true);
 assert.equal(MEADOW_WAKE_LEVEL_DATA.strictSideScrollingPlane, true);
 assert.equal(MEADOW_WAKE_LEVEL_DATA.gameplayAreas.length, 9);
-assert.equal(MEADOW_WAKE_ENEMY_ACTORS.length, 5);
+assert.equal(MEADOW_WAKE_ENEMY_ACTORS.length, 9);
 assert.ok(MEADOW_WAKE_LEVEL_DATA.actors.some(actor => actor.actorType === 'platform'));
 assert.ok(MEADOW_WAKE_LEVEL_DATA.actors.some(actor => actor.actorType === 'collectible/compass-coin'));
 assert.equal(MEADOW_WAKE_LEVEL_DATA.rails.length, 7);

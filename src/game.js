@@ -1,8 +1,16 @@
-import { CharacterRenderer } from './character-renderer.js?v=living-surface-1';
+import {
+  collectibleTouchesBody,
+  groundedObstacleBodies,
+  MEADOW_WAKE_TEACHING_CUES,
+  resolveRollingShellObstacle,
+  solidAtPoint,
+  updateQuarryRoute
+} from './gameplay/levels/meadow-wake-course-runtime.js';
+import { CharacterRenderer } from './character-renderer.js?v=level-one-layout-20260911';
 import {
   MEADOW_WAKE_ENEMY_ACTORS,
   MEADOW_WAKE_LEVEL_DATA
-} from './content/meadow-wake-level-data.js?v=terrain-correction-1';
+} from './content/meadow-wake-level-data.js?v=level-one-layout-20260911';
 import { getCourseEnemyRoster } from './content/world-enemy-rosters.js?v=world-mobs-1';
 import {
   MEADOW_WAKE_PITS,
@@ -11,7 +19,7 @@ import {
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins,
   createMeadowWakePlatforms
-} from './content/meadow-wake-course.js?v=terrain-correction-1';
+} from './content/meadow-wake-course.js?v=level-one-layout-20260911';
 import {
   ANIMATION_VALIDATION_STATIONS,
   animationValidationStation
@@ -36,7 +44,7 @@ import {
   stepCoursePlatforms,
   transportRiderWithPlatform,
   supportHeightAt
-} from './gameplay/levels/platform-block-runtime.js?v=block-production-1';
+} from './gameplay/levels/platform-block-runtime.js?v=level-one-layout-20260911';
 import { createActorActivationRuntime } from './gameplay/levels/actor-activation-runtime.js?v=level-foundation-1';
 import { HERO_PROFILES } from './gameplay/movement/hero-profiles.js?v=unified-motion-2';
 import { createMovementInputBuffer } from './gameplay/movement/movement-input-buffer.js?v=unified-motion-2';
@@ -169,6 +177,8 @@ let cameraX = 0;
 let cameraY = 0;
 let lastFrame = performance.now();
 let mobs = [];
+let obstacles = groundedObstacleBodies(platforms, x => terrain.heightAt(x));
+const visitedTeachingCues = new Set();
 let mobActivation = createCourseMobActivation();
 let projectiles = [];
 let notice = fullyUnlockedTestMode
@@ -272,13 +282,22 @@ function createMobFromActor(placement) {
       x: placement.position.x,
       direction: -1
     });
-    mob.y = groundHeightAt(mob.x);
+    mob.supportPlatformId = parameters.supportPlatformId ?? null;
+    mob.y = mobGroundHeightAt(mob, mob.x);
     mob.previousY = mob.y;
     mob.spawnX = placement.position.x;
     mob.patrolFrom = parameters.patrolFrom;
     mob.patrolTo = parameters.patrolTo;
     mob.activated = false;
     return mob;
+}
+
+function mobGroundHeightAt(mob, x) {
+  const support = platforms.find(platform => platform.id === mob.supportPlatformId);
+  if (support && x >= support.x - support.width / 2 && x <= support.x + support.width / 2) {
+    return support.y - support.height / 2;
+  }
+  return groundHeightAt(x);
 }
 
 function createCourseMobActivation() {
@@ -384,7 +403,7 @@ function canOccupy(candidate) {
   if (candidate.x < 0 || candidate.x + candidate.width > WORLD_END) return false;
   const lowOverhang = candidate.x < 14.6 && candidate.x + candidate.width > 13.2;
   if (lowOverhang && candidate.height > HERO_PROFILES.Hargold.height) return false;
-  return !blocks.some(block => {
+  return ![...blocks, ...obstacles].some(block => {
     if (block.broken || (block.hidden && !block.revealed)) return false;
     const blockBody = {
       x: block.x - block.width / 2,
@@ -418,6 +437,7 @@ function respawn() {
   session.invulnerabilitySeconds = 1;
   session.attackSeconds = 0;
   inputBuffer.reset();
+  cameraX = player.footX * SCALE - W * 0.34;
   projectiles = [];
   mobActivation.reset();
   mobs = [];
@@ -465,6 +485,8 @@ function damagePlayer(source, direction = 1) {
 function restartCourse() {
   session = createSession();
   checkpoint.reached = false;
+  visitedTeachingCues.clear();
+  for (const coin of compassCoins) coin.locked = coin.id === '1-1-C2';
   for (const item of [...coins, ...compassCoins]) item.taken = false;
   for (const block of blocks) {
     block.broken = false;
@@ -504,13 +526,13 @@ function awardStandardCoins(amount) {
 
 function collectItems() {
   for (const coin of coins) {
-    if (!coin.taken && Math.hypot(player.footX - coin.x, player.footY - coin.y) < 0.55) {
+    if (collectibleTouchesBody(coin, movementBody(player))) {
       coin.taken = true;
       awardStandardCoins(1);
     }
   }
   for (const coin of compassCoins) {
-    if (!coin.taken && Math.hypot(player.footX - coin.x, player.footY - coin.y) < 0.65) {
+    if (collectibleTouchesBody(coin, movementBody(player), 0.24)) {
       coin.taken = true;
       session.compass += 1;
       notice = `Compass Coin ${session.compass}/3 collected.`;
@@ -534,13 +556,7 @@ function mobBody(mob) {
 }
 
 function activeBlockAtPoint(point) {
-  return blocks.find(block => {
-    if (block.broken || (block.hidden && !block.revealed)) return false;
-    return point.x >= block.x - block.width / 2 &&
-      point.x <= block.x + block.width / 2 &&
-      point.y >= block.y - block.height / 2 &&
-      point.y <= block.y + block.height / 2;
-  }) ?? null;
+  return solidAtPoint(point, [...blocks, ...obstacles]);
 }
 
 function sensorSurfaceAtPoint(point, activeSurfaces, predicate = () => true) {
@@ -617,13 +633,15 @@ function updateCombat(input, previousPlayerFootY, dt) {
   const target = { x: player.footX, y: player.footY - playerBody.height * 0.55 };
   for (const mob of mobs) {
     if (!mob.activated) continue;
+    const previousMobX = mob.x;
     const events = stepMob(mob, dt, {
-      groundHeightAt,
+      groundHeightAt: x => mobGroundHeightAt(mob, x),
       hasGroundAhead: x => !inPit(x),
       minimumX: mob.state === 'shell-roll' ? 0.7 : mob.patrolFrom,
       maximumX: mob.state === 'shell-roll' ? WORLD_END - 0.7 : mob.patrolTo,
       target
     });
+    resolveRollingShellObstacle(mob, previousMobX, obstacles);
     for (const event of events) {
       if (event.type === 'projectile-fired') projectiles.push(createProjectile(event.projectile));
     }
@@ -735,6 +753,7 @@ function fixedUpdate(dt) {
     riderX: player.footX
   });
   transportRiderWithPlatform(player, platforms, dt);
+  obstacles = groundedObstacleBodies(platforms, x => terrain.heightAt(x));
   const previousPlayerFootY = player.footY;
   const previousPlayerBody = movementBody(player);
   const previousHeadY = previousPlayerBody.y;
@@ -742,7 +761,7 @@ function fixedUpdate(dt) {
   const activeSurfaces = activeCourseSurfaces(platforms, blocks);
   updateCourseMobActivation();
   stepUnifiedCharacterController(player, input, dt, {
-    groundHeightAt: x => supportHeightAt(player, x, groundHeightAt, activeSurfaces),
+    groundHeightAt: x => supportHeightAt(player, x, groundHeightAt, activeSurfaces, { bodyWidth: movementBody(player).width }),
     hasGroundAt: x => !inPit(x) || Boolean(
       player.supportPlatformId &&
       activeSurfaces.some(surface =>
@@ -791,6 +810,10 @@ function fixedUpdate(dt) {
     maximumX: WORLD_END,
     doubleJumpUnlocked: session.doubleJumpUnlocked
   });
+  if (previousSupportPlatformId === 'fallen-log-launch' && input.jumpPressed && player.velocityY < 0) {
+    applyMovementBounce(player, { kind: 'spring', jumpHeld: true });
+    player.velocityY = Math.min(player.velocityY, -12.15);
+  }
   if (previousSupportPlatformId && !player.supportPlatformId && player.grounded) {
     player.footY = previousPlayerFootY;
     leaveExternalSupport(player, { downwardSpeed: 0.2 });
@@ -828,20 +851,32 @@ function fixedUpdate(dt) {
     noticeSeconds = 1.8;
   }
   if (!blockEvent) {
-    resolveSolidBlockSideCollision(player, previousPlayerBody, blocks, movementBody(player));
+    resolveSolidBlockSideCollision(player, previousPlayerBody, [...blocks, ...obstacles], movementBody(player));
   }
   stepBlockFeedback(blocks, dt);
-  collectItems();
   updateCombat(input, previousPlayerFootY, dt);
+  if (updateQuarryRoute(blocks, compassCoins)) {
+    notice = 'Quarry column cleared! The Compass Coin is now on the upper ruin route.';
+    noticeSeconds = 4;
+  }
+  collectItems();
+  for (const cue of MEADOW_WAKE_TEACHING_CUES) {
+    if (!visitedTeachingCues.has(cue.id) && player.footX >= cue.from && player.footX <= cue.to) {
+      visitedTeachingCues.add(cue.id);
+      notice = cue.text;
+      noticeSeconds = 5;
+      break;
+    }
+  }
 
-  if (!checkpoint.reached && player.footX >= checkpoint.x) {
+  if (!checkpoint.reached && player.footX >= checkpoint.x && player.footY <= terrain.heightAt(checkpoint.x) + 0.35) {
     checkpoint.reached = true;
     session.spawnX = checkpoint.x;
     notice = 'Checkpoint reached.';
     noticeSeconds = 2.5;
   }
   if (player.footY > 11.5) loseLife('pit');
-  if (player.footX >= WORLD_END - 0.75) {
+  if (player.footX >= WORLD_END - 0.75 && player.grounded && player.footY <= terrain.heightAt(player.footX) + 0.25) {
     session.state = 'complete';
     setMovementForcedState(player, MOVEMENT_STATES.VICTORY);
     notice = 'Meadow Wake complete.';
@@ -922,7 +957,7 @@ function drawCollectibles() {
     ctx.fill();
   }
   for (const coin of compassCoins) {
-    if (coin.taken) continue;
+    if (coin.taken || coin.locked) continue;
     const x = worldToScreenX(coin.x);
     const y = worldToScreenY(coin.y);
     ctx.save();
@@ -949,8 +984,8 @@ function drawMarkers() {
   ctx.fillStyle = checkpoint.reached ? '#f2ca4e' : '#e6e5d7';
   ctx.fillRect(cpX, cpY - 115, 72, 34);
 
-  const goalX = worldToScreenX(35.5);
-  const goalY = worldToScreenY(terrain.heightAt(35.5));
+  const goalX = worldToScreenX(WORLD_END - 0.75);
+  const goalY = worldToScreenY(terrain.heightAt(WORLD_END - 0.75));
   ctx.fillStyle = '#f1e5b5';
   ctx.fillRect(goalX, goalY - 150, 12, 150);
   ctx.fillStyle = '#8f3d33';
@@ -1112,7 +1147,13 @@ function frame(now) {
       lives: session.lives,
       checkpointReached: checkpoint.reached,
       coins: session.standardCoins,
-      compassCoins: session.compass
+      compassCoins: session.compass,
+      supportPlatformId: player.supportPlatformId,
+      activeMobs: mobs.filter(mob => mob.activated && mob.alive).map(mob => ({ id: mob.id, type: mob.type, x: mob.x, y: mob.y, state: mob.state })),
+      quarryRouteOpen: !compassCoins.find(coin => coin.id === '1-1-C2').locked,
+      blocks: blocks.map(block => ({ id: block.id, x: block.x, y: block.y, broken: block.broken, consumed: block.consumed })),
+      compassState: compassCoins.map(coin => ({ id: coin.id, taken: coin.taken, locked: coin.locked, x: coin.x, y: coin.y })),
+      elapsedSeconds: Number(simulationSeconds.toFixed(3))
     });
     document.documentElement.dataset.routeQa = JSON.stringify(window.__HM_ROUTE_QA__);
   }
@@ -1142,7 +1183,7 @@ function frame(now) {
     cameraX,
     cameraY,
     coins,
-    compassCoins,
+    compassCoins: compassCoins.map(coin => ({ ...coin, taken: coin.taken || coin.locked })),
     blocks,
     platforms,
     mobs,

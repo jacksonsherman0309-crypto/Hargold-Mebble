@@ -403,42 +403,42 @@ const block = (id, type, x, lift, formation, extra = {}) => Object.freeze({
 });
 
 export const MEADOW_WAKE_BLOCK_DEFINITIONS = Object.freeze([
-  block('opening-single-breakable', 'standard-breakable', 5.85, 1.22, 'opening-staggered-lesson', { phraseStep: 1 }),
-  block('opening-raised-coin', 'coin', 7.55, 1.72, 'opening-staggered-lesson', { reward: 5, phraseStep: 2 }),
-  block('opening-pair-a', 'standard-breakable', 9.25, 1.24, 'opening-staggered-lesson', { phraseStep: 3 }),
-  block('opening-pair-b', 'standard-breakable', 10, 1.24, 'opening-staggered-lesson', { phraseStep: 4 }),
-  block('power-before-first-encounter', 'power-up', 24.75, 1.55, 'first-encounter-support', { reward: 'grow', phraseStep: 1 }),
-  block('shell-ruin-a', 'standard-breakable', 30.8, 1.34, 'shellback-ruin-line', { phraseStep: 1 }),
-  block('shell-ruin-coin', 'coin', 31.55, 1.72, 'shellback-ruin-line', { reward: 5, phraseStep: 2 }),
-  block('shell-ruin-b', 'standard-breakable', 32.3, 1.34, 'shellback-ruin-line', { phraseStep: 3 }),
-  block('hidden-ruin-lookout', 'coin', 35.55, 2.5, 'shellback-upper-reward', { reward: 10, hidden: true, phraseStep: 1 }),
-  block('shell-column-a', 'standard-breakable', 38.3, 1.28, 'shell-opened-column', { phraseStep: 1 }),
-  block('shell-column-b', 'standard-breakable', 39.05, 1.28, 'shell-opened-column', { phraseStep: 2 }),
-  block('shell-column-c', 'standard-breakable', 39.8, 1.28, 'shell-opened-column', { phraseStep: 3 }),
-  block('shell-column-cap', 'standard-breakable', 39.8, 2.03, 'shell-opened-column', { phraseStep: 4 }),
-  block('timberyard-breakable', 'standard-breakable', 46.1, 1.38, 'timberyard-step-phrase', { phraseStep: 1 }),
-  block('timberyard-raised-coin', 'coin', 47.1, 1.82, 'timberyard-step-phrase', { reward: 5, phraseStep: 2 }),
-  block('timberyard-return-breakable', 'standard-breakable', 48.1, 1.38, 'timberyard-step-phrase', { phraseStep: 3 }),
-  block('power-before-ravine', 'power-up', 58.15, 1.62, 'ravine-support', { reward: 'grow', phraseStep: 1 }),
-  block('checkpoint-rest-breakable', 'standard-breakable', 71.25, 1.36, 'checkpoint-recovery', { phraseStep: 1 }),
-  block('checkpoint-rest-coin', 'coin', 72, 1.72, 'checkpoint-recovery', { reward: 5, phraseStep: 2 }),
-  block('mill-ground-breakable', 'standard-breakable', 76.5, 1.34, 'watermill-paddle-phrase', { phraseStep: 1 }),
-  block('mill-paddle-coin', 'coin', 77.35, 1.82, 'watermill-paddle-phrase', { reward: 5, phraseStep: 2 }),
-  block('mill-ground-return', 'standard-breakable', 78.2, 1.34, 'watermill-paddle-phrase', { phraseStep: 3 }),
-  block('mill-hidden-upper-coin', 'coin', 79.35, 2.48, 'watermill-paddle-phrase', { reward: 10, hidden: true, phraseStep: 4 }),
-  block('root-terrace-breakable', 'standard-breakable', 86.35, 1.42, 'root-terrace-lift-phrase', { phraseStep: 1 }),
-  block('root-terrace-coin', 'coin', 87.1, 1.86, 'root-terrace-lift-phrase', { reward: 5, phraseStep: 2 }),
-  block('root-terrace-upper-coin', 'coin', 91.05, 2.18, 'root-terrace-lift-phrase', { reward: 5, phraseStep: 3 }),
-  block('hargold-gate-a', 'hargold-only', 99.7, 1.28, 'hargold-gate', { phraseStep: 1 }),
-  block('hargold-gate-b', 'hargold-only', 100.53, 1.28, 'hargold-gate', { phraseStep: 2 }),
-  block('hargold-gate-c', 'hargold-only', 101.36, 1.28, 'hargold-gate', { phraseStep: 3 }),
-  block('hargold-gate-cap', 'hargold-only', 101.36, 2.11, 'hargold-gate', { phraseStep: 4 }),
-  block('power-final-recovery', 'power-up', 103.85, 1.64, 'final-recovery', { reward: 'grow', phraseStep: 1 }),
-  block('flower-hill-breakable', 'standard-breakable', 106.25, 1.34, 'flower-hill-reward-phrase', { phraseStep: 1 }),
-  block('flower-hill-coin', 'coin', 107.1, 1.78, 'flower-hill-reward-phrase', { reward: 5, phraseStep: 2 }),
-  block('flower-hill-return', 'standard-breakable', 107.95, 1.34, 'flower-hill-reward-phrase', { phraseStep: 3 }),
-  block('hidden-final-cache', 'coin', 109.3, 2.2, 'final-hidden-reward', { reward: 10, hidden: true, phraseStep: 1 }),
-  block('goal-breakable', 'standard-breakable', 123, 1.28, 'goal-punctuation', { phraseStep: 1 })
+  block('opening-single-breakable', 'standard-breakable', 5.85, 4.25, 'opening-staggered-lesson', { phraseStep: 1 }),
+  block('opening-raised-coin', 'coin', 7.55, 3.42, 'opening-staggered-lesson', { reward: 5, phraseStep: 2 }),
+  block('opening-pair-a', 'standard-breakable', 9.25, 2.94, 'opening-staggered-lesson', { phraseStep: 3 }),
+  block('opening-pair-b', 'standard-breakable', 10, 2.94, 'opening-staggered-lesson', { phraseStep: 4 }),
+  block('power-before-first-encounter', 'power-up', 24.75, 3.25, 'first-encounter-support', { reward: 'grow', phraseStep: 1 }),
+  block('shell-ruin-a', 'standard-breakable', 30.8, 4.5, 'shellback-ruin-line', { phraseStep: 1 }),
+  block('shell-ruin-coin', 'coin', 31.55, 4.75, 'shellback-ruin-line', { reward: 5, phraseStep: 2 }),
+  block('shell-ruin-b', 'standard-breakable', 32.3, 4.5, 'shellback-ruin-line', { phraseStep: 3 }),
+  block('hidden-ruin-lookout', 'coin', 35.55, 4.2, 'shellback-upper-reward', { reward: 10, hidden: true, phraseStep: 1 }),
+  block('shell-column-a', 'standard-breakable', 33.35, 0.35, 'shell-opened-column', { phraseStep: 1 }),
+  block('shell-column-b', 'standard-breakable', 34.1, 0.35, 'shell-opened-column', { phraseStep: 2 }),
+  block('shell-column-c', 'standard-breakable', 34.85, 0.35, 'shell-opened-column', { phraseStep: 3 }),
+  block('shell-column-cap', 'standard-breakable', 34.85, 1.09, 'shell-opened-column', { phraseStep: 4 }),
+  block('timberyard-breakable', 'standard-breakable', 46.1, 3.08, 'timberyard-step-phrase', { phraseStep: 1 }),
+  block('timberyard-raised-coin', 'coin', 47.1, 4.62, 'timberyard-step-phrase', { reward: 5, phraseStep: 2 }),
+  block('timberyard-return-breakable', 'standard-breakable', 48.1, 4.55, 'timberyard-step-phrase', { phraseStep: 3 }),
+  block('power-before-ravine', 'power-up', 58.15, 4.15, 'ravine-support', { reward: 'grow', phraseStep: 1 }),
+  block('checkpoint-rest-breakable', 'standard-breakable', 71.25, 3.9, 'checkpoint-recovery', { phraseStep: 1 }),
+  block('checkpoint-rest-coin', 'coin', 72, 3.42, 'checkpoint-recovery', { reward: 5, phraseStep: 2 }),
+  block('mill-ground-breakable', 'standard-breakable', 76.5, 3.04, 'watermill-paddle-phrase', { phraseStep: 1 }),
+  block('mill-paddle-coin', 'coin', 77.35, 3.52, 'watermill-paddle-phrase', { reward: 5, phraseStep: 2 }),
+  block('mill-ground-return', 'standard-breakable', 78.2, 3.04, 'watermill-paddle-phrase', { phraseStep: 3 }),
+  block('mill-hidden-upper-coin', 'coin', 79.35, 4.18, 'watermill-paddle-phrase', { reward: 10, hidden: true, phraseStep: 4 }),
+  block('root-terrace-breakable', 'standard-breakable', 86.35, 3.12, 'root-terrace-lift-phrase', { phraseStep: 1 }),
+  block('root-terrace-coin', 'coin', 87.1, 3.56, 'root-terrace-lift-phrase', { reward: 5, phraseStep: 2 }),
+  block('root-terrace-upper-coin', 'coin', 91.05, 4.18, 'root-terrace-lift-phrase', { reward: 5, phraseStep: 3 }),
+  block('hargold-gate-a', 'hargold-only', 99.7, 3.6, 'hargold-gate', { phraseStep: 1 }),
+  block('hargold-gate-b', 'hargold-only', 100.53, 3.6, 'hargold-gate', { phraseStep: 2 }),
+  block('hargold-gate-c', 'hargold-only', 101.36, 3.6, 'hargold-gate', { phraseStep: 3 }),
+  block('hargold-gate-cap', 'hargold-only', 101.36, 4.43, 'hargold-gate', { phraseStep: 4 }),
+  block('power-final-recovery', 'power-up', 103.85, 3.34, 'final-recovery', { reward: 'grow', phraseStep: 1 }),
+  block('flower-hill-breakable', 'standard-breakable', 106.25, 3.04, 'flower-hill-reward-phrase', { phraseStep: 1 }),
+  block('flower-hill-coin', 'coin', 107.1, 4.38, 'flower-hill-reward-phrase', { reward: 5, phraseStep: 2 }),
+  block('flower-hill-return', 'standard-breakable', 107.95, 4.06, 'flower-hill-reward-phrase', { phraseStep: 3 }),
+  block('hidden-final-cache', 'coin', 109.3, 3.9, 'final-hidden-reward', { reward: 10, hidden: true, phraseStep: 1 }),
+  block('goal-breakable', 'standard-breakable', 123, 2.98, 'goal-punctuation', { phraseStep: 1 })
 ]);
 
 export const MEADOW_WAKE_BLOCK_PHRASES = Object.freeze([
@@ -490,7 +490,10 @@ const AUTHORED_COIN_ANCHORS = [
   ...line(40.7, 45.3, 8, 0.84),
   ...arc(46.1, 54.7, 12, 0.86, 1.45, 'camp-decks'),
   ...line(55.7, 59.7, 7, 0.8),
-  ...line(60.55, 62.95, 7, 0.62, 'hidden-creek'),
+  ...line(60.55, 62.75, 7, 0.62, 'hidden-creek'),
+  { x: 62.9, y: 7.25, lift: 0.25, route: 'hidden-creek-return' },
+  { x: 63.35, y: 6.8, lift: 0.7, route: 'hidden-creek-return' },
+  { x: 63.8, y: 6.55, lift: 0.9, route: 'hidden-creek-return' },
   ...arc(64.75, 69.15, 10, 0.78, 0.78, 'rope-bridge'),
   ...line(70.2, 81.4, 16, 0.78, 'running-meadow'),
   ...arc(83.8, 98.2, 18, 0.86, 1.78, 'compact-ruin-route'),
@@ -509,7 +512,7 @@ export const MEADOW_WAKE_COIN_DEFINITIONS = Object.freeze(
 
 export const MEADOW_WAKE_COMPASS_COIN_DEFINITIONS = Object.freeze([
   Object.freeze({ id: '1-1-C1', x: 17.95, y: 4.02, solution: 'fallen-log-upper-arc' }),
-  Object.freeze({ id: '1-1-C2', x: 37.05, y: 4.05, solution: 'shellback-breakable-upper-route' }),
+  Object.freeze({ id: '1-1-C2', x: 37.05, y: 4.05, solution: 'shellback-breakable-upper-route', revealTrigger: 'quarry-shell-column-opened' }),
   Object.freeze({ id: '1-1-C3', x: 61.75, y: 7.3, solution: 'interrupted-low-trail-creek-shelf', hidden: true })
 ]);
 
@@ -576,7 +579,8 @@ export function createMeadowWakeBlocks(heightAt) {
 export function createMeadowWakeCoins(heightAt) {
   return MEADOW_WAKE_COIN_DEFINITIONS.map(definition => ({
     ...definition,
-    y: heightAt(definition.x) - definition.lift,
+    y: definition.y ?? (definition.route === 'hidden-creek'
+      ? 7.64 : heightAt(definition.x) - definition.lift),
     taken: false
   }));
 }
@@ -584,7 +588,8 @@ export function createMeadowWakeCoins(heightAt) {
 export function createMeadowWakeCompassCoins() {
   return MEADOW_WAKE_COMPASS_COIN_DEFINITIONS.map(definition => ({
     ...definition,
-    taken: false
+    taken: false,
+    locked: definition.id === '1-1-C2'
   }));
 }
 

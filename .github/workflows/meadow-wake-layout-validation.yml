@@ -1,0 +1,89 @@
+name: Meadow Wake layout validation
+on:
+  push:
+    branches: [level-one/meadow-wake-layout-2026-09-11]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: meadow-wake-layout-v2-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Apply verified shell-route transfer
+        if: ${{ hashFiles('tools/meadow-wake-shell-layout-transfer.json') != '' }}
+        run: python tools/apply-meadow-wake-layout-migration.py
+      - name: Test authored layout and normal-input puzzle solutions
+        id: layout
+        run: |
+          mkdir -p /tmp/meadow-wake-evidence
+          node --experimental-vm-modules --test tests/meadow-wake-layout-completion.test.mjs tests/meadow-wake-shell-route-input.test.mjs 2>&1 | tee /tmp/meadow-wake-evidence/layout-tests.txt
+      - name: Test movement and terrain independently of character rigs
+        id: terrain
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p /tmp/meadow-wake-evidence
+          failed=0
+          for test in tests/canonical-contract.test.mjs tests/fixed-step.test.mjs tests/motion-controller.test.mjs tests/physics-systems.test.mjs tests/live-motion-inputs.test.mjs tests/ground-slam-impact.test.mjs tests/world-specific-runtime.test.mjs tests/platform-block-runtime.test.mjs tests/level-foundation.test.mjs tests/meadow-wake-terrain-production.test.mjs tests/meadow-wake-art-pipeline.test.mjs tests/meadow-wake-terrain-correction.test.mjs tests/meadow-wake-opening-layout.test.mjs tests/meadow-wake-terrain-separation.test.mjs tests/movement/run-all.mjs; do
+            node "$test" > "/tmp/meadow-wake-evidence/$(basename "$test").log" 2>&1 || failed=1
+            cat "/tmp/meadow-wake-evidence/$(basename "$test").log"
+          done
+          exit "$failed"
+      - name: Record full suite including existing animation failure
+        id: fullsuite
+        if: always()
+        continue-on-error: true
+        run: npm test > /tmp/meadow-wake-evidence/full-suite.txt 2>&1
+      - name: Commit verified shell-route fixes on the isolated branch
+        if: ${{ steps.layout.outcome == 'success' && hashFiles('tools/meadow-wake-shell-layout-transfer.json') != '' && github.ref == 'refs/heads/level-one/meadow-wake-layout-2026-09-11' }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/game.js src/content/meadow-wake-level-data.js src/gameplay/enemies/mob-simulation.js
+          git rm tools/meadow-wake-shell-layout-transfer.json tools/apply-meadow-wake-layout-migration.py
+          git commit -m 'Make quarry Shellback a safe reusable tool on its authored staging ledge'
+          git push origin HEAD:level-one/meadow-wake-layout-2026-09-11
+      - name: Install browser test tooling
+        if: always()
+        run: |
+          npm install --no-save --package-lock=false playwright@1.51.1
+          npx playwright install --with-deps chromium
+      - name: Assemble and test the actual static-site payload
+        id: browser
+        if: always()
+        run: |
+          mkdir -p /tmp/meadow-wake-site/assets
+          cp index.html styles.css /tmp/meadow-wake-site/
+          cp -R src vendor data /tmp/meadow-wake-site/
+          cp -R assets/exports assets/textures /tmp/meadow-wake-site/assets/
+          (cd /tmp/meadow-wake-site && node "$GITHUB_WORKSPACE/tools/local-preview-server.mjs") > /tmp/meadow-wake-evidence/server.txt 2>&1 &
+          node tools/capture-meadow-wake-layout.mjs
+      - name: Package exact tested source and evidence
+        if: always()
+        run: |
+          git rev-parse HEAD > /tmp/meadow-wake-evidence/TESTED_COMMIT.txt
+          printf 'Layout: %s\nTerrain: %s\nFull suite: %s\nBrowser: %s\n' '${{ steps.layout.outcome }}' '${{ steps.terrain.outcome }}' '${{ steps.fullsuite.outcome }}' '${{ steps.browser.outcome }}' > /tmp/meadow-wake-evidence/check-results.txt
+          cp tools/local-preview-server.mjs /tmp/meadow-wake-site/preview.mjs
+          tar -czf /tmp/meadow-wake-playable.tar.gz -C /tmp/meadow-wake-site .
+      - name: Upload browser and test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meadow-wake-layout-evidence
+          path: /tmp/meadow-wake-evidence
+          retention-days: 7
+      - name: Upload playable build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meadow-wake-playable
+          path: /tmp/meadow-wake-playable.tar.gz
+          retention-days: 7
+          compression-level: 0

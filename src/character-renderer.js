@@ -9,7 +9,7 @@ import {
   MEADOW_WAKE_WORLD_END,
   createMeadowWakeCoins,
   createMeadowWakeCompassCoins
-} from './content/meadow-wake-course.js?v=terrain-correction-1';
+} from './content/meadow-wake-course.js?v=level-one-layout-20260911';
 import { MeadowWakeEnvironmentArt } from './environment/meadow-wake-environment.js?v=living-surface-1';
 import { MeadowWakeForegroundArt } from './environment/meadow-wake-foreground.js?v=living-surface-1';
 import { GAME_RULES } from './canonical-data.js';
