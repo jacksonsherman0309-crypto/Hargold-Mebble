@@ -1,0 +1,58 @@
+name: Meadow Wake layout validation
+
+on:
+  push:
+    branches:
+      - level-one/meadow-wake-layout-2026-09-11
+  pull_request:
+    paths:
+      - 'src/content/meadow-wake-*'
+      - 'src/game.js'
+      - 'src/gameplay/**'
+      - 'tests/meadow-wake-*'
+      - '.github/workflows/meadow-wake-layout-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: meadow-wake-layout-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out exact source revision
+        uses: actions/checkout@v6
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run full contract and gameplay suite
+        run: npm test
+      - name: Run Level 1 completion regression suite when present
+        if: always()
+        run: |
+          if test -f tests/meadow-wake-layout-completion.test.mjs; then
+            node --test tests/meadow-wake-layout-completion.test.mjs
+          fi
+      - name: Assemble reproducible runtime and repository reference bundle
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p /tmp/meadow-wake-review
+          for path in index.html styles.css package.json AGENTS.md README.md IMPORT_STATUS.txt src vendor tests docs data tools assets/references assets/textures assets/exports archive/imported-packages/20260725-110552/loose-files/world_1_construction_plan.md archive/imported-packages/20260725-110552/loose-files/enemy_catalog.json archive/imported-packages/20260725-110552/loose-files/encounter_budget_manifest.json archive/imported-packages/20260725-110552/loose-files/encounter_zone_manifest.json archive/physics archive/full-motion/hargold_mebble_full_motion_build_009_qa.json; do
+            if test -e "$path"; then cp -a --parents "$path" /tmp/meadow-wake-review/; fi
+          done
+          git rev-parse HEAD > /tmp/meadow-wake-review/REVIEW_COMMIT.txt
+          tar -czf /tmp/meadow-wake-review.tar.gz -C /tmp/meadow-wake-review .
+      - name: Upload review bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meadow-wake-runtime-and-references
+          path: /tmp/meadow-wake-review.tar.gz
+          retention-days: 7
+          compression-level: 0
