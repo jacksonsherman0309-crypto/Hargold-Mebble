@@ -24,10 +24,10 @@ jobs:
           node-version: '22'
       - name: Keep opening production-art integration current
         run: python tools/apply-meadow-wake-opening-art.py
-      - name: Syntax check production visual runtime
+      - name: Syntax check production terrain runtime
         run: |
-          node --check src/environment/meadow-wake-opening-production-art.js
-          node --check src/environment/meadow-wake-opening-polish.js
+          node --check src/environment/meadow-wake-terrain-cleanup.js
+          node --check src/environment/meadow-wake-terrain-finalization.js
           node --check src/environment/meadow-wake-production-gate.js
           node --check src/visual-game.js
           node --check src/character-renderer.js
@@ -44,27 +44,27 @@ jobs:
             git commit -m 'Keep opening production visual integration wired'
             git push origin HEAD:visual/meadow-wake-production-rebuild
           fi
-      - name: Install Chromium visual-review tooling
+      - name: Install Chromium terrain-review tooling
         run: |
           npm install --no-save --package-lock=false playwright@1.51.1
           npx playwright install --with-deps chromium
-      - name: Assemble and capture production visual gate
+      - name: Assemble and capture terrain visual gate
         run: |
-          rm -rf /tmp/meadow-wake-site /tmp/meadow-wake-visual
-          mkdir -p /tmp/meadow-wake-site/assets /tmp/meadow-wake-visual
+          rm -rf /tmp/meadow-wake-site /tmp/meadow-wake-terrain
+          mkdir -p /tmp/meadow-wake-site/assets /tmp/meadow-wake-terrain
           cp index.html styles.css /tmp/meadow-wake-site/
           cp -R src vendor data /tmp/meadow-wake-site/
           cp -R assets/exports assets/textures /tmp/meadow-wake-site/assets/
-          (cd /tmp/meadow-wake-site && node "$GITHUB_WORKSPACE/tools/local-preview-server.mjs") > /tmp/meadow-wake-visual/server.log 2>&1 &
+          (cd /tmp/meadow-wake-site && node "$GITHUB_WORKSPACE/tools/local-preview-server.mjs") > /tmp/meadow-wake-terrain/server.log 2>&1 &
           sleep 2
-          HM_CAPTURE_OUTPUT=/tmp/meadow-wake-visual node tools/capture-meadow-wake-layout.mjs
-      - name: Keep production visual evidence
+          HM_CAPTURE_OUTPUT=/tmp/meadow-wake-terrain node tools/capture-meadow-wake-terrain-gate.mjs
+      - name: Keep terrain visual evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: meadow-wake-production-visual-gate
+          name: meadow-wake-terrain-visual-gate
           path: |
-            /tmp/meadow-wake-visual/*.png
-            /tmp/meadow-wake-visual/browser-report.json
-            /tmp/meadow-wake-visual/server.log
+            /tmp/meadow-wake-terrain/*.png
+            /tmp/meadow-wake-terrain/terrain-browser-report.json
+            /tmp/meadow-wake-terrain/server.log
           retention-days: 7
