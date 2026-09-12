@@ -1,18 +1,13 @@
 name: Meadow Wake layout validation
-
 on:
   push:
-    branches:
-      - level-one/meadow-wake-layout-2026-09-11
+    branches: [level-one/meadow-wake-layout-2026-09-11]
   workflow_dispatch:
-
 permissions:
   contents: write
-
 concurrency:
-  group: meadow-wake-layout-${{ github.ref }}
+  group: meadow-wake-layout-v2-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -20,17 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Apply hash-checked source transfer
-        if: ${{ hashFiles('tools/meadow-wake-layout-migration.json.gz') != '' }}
+        with: {node-version: '22'}
+      - name: Apply verified shell-route transfer
+        if: ${{ hashFiles('tools/meadow-wake-shell-layout-transfer.json') != '' }}
         run: python tools/apply-meadow-wake-layout-migration.py
-      - name: Test authored layout and live gameplay
+      - name: Test authored layout and normal-input puzzle solutions
         id: layout
         run: |
           mkdir -p /tmp/meadow-wake-evidence
-          node --experimental-vm-modules --test tests/meadow-wake-layout-completion.test.mjs 2>&1 | tee /tmp/meadow-wake-evidence/layout-tests.txt
-      - name: Test movement and terrain independently of character rig status
+          node --experimental-vm-modules --test tests/meadow-wake-layout-completion.test.mjs tests/meadow-wake-shell-route-input.test.mjs 2>&1 | tee /tmp/meadow-wake-evidence/layout-tests.txt
+      - name: Test movement and terrain independently of character rigs
         id: terrain
         if: always()
         shell: bash
@@ -42,26 +36,26 @@ jobs:
             cat "/tmp/meadow-wake-evidence/$(basename "$test").log"
           done
           exit "$failed"
-      - name: Record complete-suite status including existing animation failure
+      - name: Record full suite including existing animation failure
         id: fullsuite
         if: always()
         continue-on-error: true
         run: npm test > /tmp/meadow-wake-evidence/full-suite.txt 2>&1
-      - name: Commit verified gameplay source to this isolated branch
-        if: ${{ steps.layout.outcome == 'success' && hashFiles('tools/meadow-wake-layout-migration.json.gz') != '' && github.ref == 'refs/heads/level-one/meadow-wake-layout-2026-09-11' }}
+      - name: Commit verified shell-route fixes on the isolated branch
+        if: ${{ steps.layout.outcome == 'success' && hashFiles('tools/meadow-wake-shell-layout-transfer.json') != '' && github.ref == 'refs/heads/level-one/meadow-wake-layout-2026-09-11' }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add index.html src/character-renderer.js src/content/meadow-wake-course.js src/content/meadow-wake-level-data.js src/game.js src/gameplay/levels/platform-block-runtime.js tests/level-foundation.test.mjs
-          git rm tools/meadow-wake-layout-migration.json.gz tools/apply-meadow-wake-layout-migration.py
-          git commit -m 'Implement tested Meadow Wake terrain interactions, authored mobs and route fixes'
+          git add src/game.js src/content/meadow-wake-level-data.js src/gameplay/enemies/mob-simulation.js
+          git rm tools/meadow-wake-shell-layout-transfer.json tools/apply-meadow-wake-layout-migration.py
+          git commit -m 'Make quarry Shellback a safe reusable tool on its authored staging ledge'
           git push origin HEAD:level-one/meadow-wake-layout-2026-09-11
-      - name: Install isolated browser test dependency
+      - name: Install browser test tooling
         if: always()
         run: |
           npm install --no-save --package-lock=false playwright@1.51.1
           npx playwright install --with-deps chromium
-      - name: Assemble actual deployment payload and capture its runtime
+      - name: Assemble and test the actual static-site payload
         id: browser
         if: always()
         run: |
@@ -69,9 +63,9 @@ jobs:
           cp index.html styles.css /tmp/meadow-wake-site/
           cp -R src vendor data /tmp/meadow-wake-site/
           cp -R assets/exports assets/textures /tmp/meadow-wake-site/assets/
-          node "$PWD/tools/local-preview-server.mjs" > /tmp/meadow-wake-evidence/server.txt 2>&1 &
+          (cd /tmp/meadow-wake-site && node "$GITHUB_WORKSPACE/tools/local-preview-server.mjs") > /tmp/meadow-wake-evidence/server.txt 2>&1 &
           node tools/capture-meadow-wake-layout.mjs
-      - name: Package evidence and runnable source
+      - name: Package exact tested source and evidence
         if: always()
         run: |
           git rev-parse HEAD > /tmp/meadow-wake-evidence/TESTED_COMMIT.txt

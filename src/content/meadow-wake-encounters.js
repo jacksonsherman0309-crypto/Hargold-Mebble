@@ -4,7 +4,7 @@
  */
 export const MEADOW_WAKE_MOB_PLACEMENTS = Object.freeze([
   { id: '1-1-critter-a', type: 'camp_critter', x: 28.2, patrolFrom: 27.7, patrolTo: 29.1, purpose: 'isolated first stomp after the protection block' },
-  { id: '1-1-shellback-a', type: 'shellback', x: 31.45, patrolFrom: 30.95, patrolTo: 32.55, purpose: 'retract and kick into the adjacent quarry column' },
+  { id: '1-1-shellback-a', type: 'shellback', x: 30.75, patrolFrom: 30.15, patrolTo: 31.25, supportPlatformId: 'shellback-low-ledge', purpose: 'retract and kick into the adjacent quarry column' },
   { id: '1-1-critter-b', type: 'camp_critter', x: 42.65, patrolFrom: 41.9, patrolTo: 43.2, purpose: 'grounded approach to the timber climb' },
   { id: '1-1-critter-c', type: 'camp_critter', x: 55.05, patrolFrom: 54.65, patrolTo: 56.15, purpose: 'spacing test before the bramble clue and recovery block' },
   { id: '1-1-critter-d', type: 'camp_critter', x: 75, patrolFrom: 74.2, patrolTo: 75.65, purpose: 'resume pressure only after checkpoint recovery' },
