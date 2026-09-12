@@ -282,13 +282,22 @@ function createMobFromActor(placement) {
       x: placement.position.x,
       direction: -1
     });
-    mob.y = groundHeightAt(mob.x);
+    mob.supportPlatformId = parameters.supportPlatformId ?? null;
+    mob.y = mobGroundHeightAt(mob, mob.x);
     mob.previousY = mob.y;
     mob.spawnX = placement.position.x;
     mob.patrolFrom = parameters.patrolFrom;
     mob.patrolTo = parameters.patrolTo;
     mob.activated = false;
     return mob;
+}
+
+function mobGroundHeightAt(mob, x) {
+  const support = platforms.find(platform => platform.id === mob.supportPlatformId);
+  if (support && x >= support.x - support.width / 2 && x <= support.x + support.width / 2) {
+    return support.y - support.height / 2;
+  }
+  return groundHeightAt(x);
 }
 
 function createCourseMobActivation() {
@@ -626,7 +635,7 @@ function updateCombat(input, previousPlayerFootY, dt) {
     if (!mob.activated) continue;
     const previousMobX = mob.x;
     const events = stepMob(mob, dt, {
-      groundHeightAt,
+      groundHeightAt: x => mobGroundHeightAt(mob, x),
       hasGroundAhead: x => !inPit(x),
       minimumX: mob.state === 'shell-roll' ? 0.7 : mob.patrolFrom,
       maximumX: mob.state === 'shell-roll' ? WORLD_END - 0.7 : mob.patrolTo,

@@ -39,7 +39,8 @@ function actorFromMob(mob) {
       patrolFrom: mob.patrolFrom,
       patrolTo: mob.patrolTo,
       purpose: mob.purpose,
-      placementMode: 'ground-relative'
+      supportPlatformId: mob.supportPlatformId ?? null,
+      placementMode: mob.supportPlatformId ? 'platform-relative' : 'ground-relative'
     }),
     eventChannels: Object.freeze({ input: null, output: `${mob.id}:defeated` }),
     persistentStateId: null,

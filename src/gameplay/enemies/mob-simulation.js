@@ -176,6 +176,7 @@ export function stepMob(mob, deltaSeconds, {
       }
     }
   }
+  if (mob.type === 'shellback') mob.damaging = !['shell-idle', 'shell-wake'].includes(mob.state);
   mob.y = groundHeightAt(mob.x);
   return Object.freeze(events);
 }
@@ -186,14 +187,16 @@ export function stompMob(mob, { protectedStomp = false } = {}) {
     return Object.freeze({ outcome: 'damage-player', reason: 'unsafe-spiked-stomp' });
   }
   if (mob.type === 'shellback') {
-    if (mob.state === 'shell-roll') {
+    if (['shell-roll', 'shell-idle', 'shell-wake'].includes(mob.state)) {
       mob.state = 'shell-idle';
+      mob.damaging = false;
       mob.stateSeconds = 0;
       mob.warning = false;
       return Object.freeze({ outcome: 'shell-stopped' });
     }
     if (['patrol', 'emerge'].includes(mob.state)) {
       mob.state = 'shell-idle';
+      mob.damaging = false;
       mob.stateSeconds = 0;
       return Object.freeze({ outcome: 'shell-retracted' });
     }
@@ -209,6 +212,7 @@ export function attackMob(mob, {
   if (!mob.alive) return Object.freeze({ outcome: 'ignored' });
   if (mob.type === 'shellback' && ['shell-idle', 'shell-wake'].includes(mob.state)) {
     mob.state = 'shell-roll';
+    mob.damaging = true;
     mob.stateSeconds = 0;
     mob.direction = direction < 0 ? -1 : 1;
     mob.launchGraceSeconds = 0.22;
