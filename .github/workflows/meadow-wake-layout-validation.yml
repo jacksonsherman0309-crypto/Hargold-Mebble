@@ -1,7 +1,7 @@
 name: Meadow Wake layout validation
 on:
   push:
-    branches: [main, level-one/meadow-wake-layout-2026-09-11]
+    branches: [main, level-one/meadow-wake-layout-2026-09-11, visual/meadow-wake-production-rebuild]
     paths: ['src/**', 'tests/**', 'tools/**', 'assets/**', 'index.html', 'styles.css']
   pull_request:
     paths: ['src/**', 'tests/**', 'tools/**', 'assets/**', 'index.html', 'styles.css']
