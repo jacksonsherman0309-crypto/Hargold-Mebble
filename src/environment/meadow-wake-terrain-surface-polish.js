@@ -1,10 +1,8 @@
 import * as THREE from '../../vendor/three/three.module.js';
-import {
-  MEADOW_WAKE_TERRAIN_MODULES,
-  MEADOW_WAKE_TERRAIN_POINTS
-} from '../content/meadow-wake-course.js?v=terrain-finalization-2';
+import { MEADOW_WAKE_TERRAIN_MODULES, MEADOW_WAKE_TERRAIN_POINTS } from '../content/meadow-wake-course.js?v=terrain-finalization-2';
 
 const SCALE = 70;
+const TAU = Math.PI * 2;
 
 function hash(seed) {
   const value = Math.sin(seed * 12.9898 + 51.731) * 43758.5453;
@@ -12,13 +10,10 @@ function hash(seed) {
 }
 
 function heightAt(x) {
-  for (let index = 0; index < MEADOW_WAKE_TERRAIN_POINTS.length - 1; index += 1) {
-    const [x0, y0] = MEADOW_WAKE_TERRAIN_POINTS[index];
-    const [x1, y1] = MEADOW_WAKE_TERRAIN_POINTS[index + 1];
-    if (x >= x0 && x <= x1) {
-      const ratio = (x - x0) / Math.max(0.0001, x1 - x0);
-      return THREE.MathUtils.lerp(y0, y1, ratio);
-    }
+  for (let i = 0; i < MEADOW_WAKE_TERRAIN_POINTS.length - 1; i += 1) {
+    const [x0, y0] = MEADOW_WAKE_TERRAIN_POINTS[i];
+    const [x1, y1] = MEADOW_WAKE_TERRAIN_POINTS[i + 1];
+    if (x >= x0 && x <= x1) return THREE.MathUtils.lerp(y0, y1, (x - x0) / Math.max(0.0001, x1 - x0));
   }
   return MEADOW_WAKE_TERRAIN_POINTS.at(-1)[1];
 }
@@ -26,69 +21,35 @@ function heightAt(x) {
 function cloneMaterial(source, fallback, multiplier = 1) {
   const material = source?.clone?.() ?? new THREE.MeshStandardMaterial({ color: fallback });
   if (material.color) material.color.multiplyScalar(multiplier);
-  material.roughness = Math.max(0.97, material.roughness ?? 0.97);
+  material.roughness = 1;
   material.metalness = 0;
   material.needsUpdate = true;
   return material;
 }
 
-function makeCohesiveBankFace(definition, sceneHeight) {
+function bankGeometry(definition, sceneHeight) {
   const from = definition.visualFrom ?? definition.from;
   const to = definition.visualTo ?? definition.to;
   const span = to - from;
-  const samples = Math.max(10, Math.ceil(span / 0.38));
-  const lowerProfile = definition.lowerProfile ?? [0.68, 0.76, 0.7, 0.82, 0.72, 0.66];
+  const columns = Math.max(18, Math.ceil(span / 0.24));
+  const rows = 7;
   const positions = [];
   const uvs = [];
-  const indices = [];
-
-  for (let index = 0; index <= samples; index += 1) {
-    const ratio = index / samples;
-    const x = THREE.MathUtils.lerp(from, to, ratio);
-    const topY = sceneHeight / 2 - heightAt(x) * SCALE - 2;
-    const profilePosition = ratio * (lowerProfile.length - 1);
-    const profileIndex = Math.min(lowerProfile.length - 2, Math.floor(profilePosition));
-    const profileMix = profilePosition - profileIndex;
-    const profile = THREE.MathUtils.lerp(lowerProfile[profileIndex], lowerProfile[profileIndex + 1], profileMix);
-    const broadUndulation = Math.sin(ratio * Math.PI * 2 + definition.seed * 0.17) * 18;
-    const depth = (definition.faceDepth ?? 470) * (0.78 + profile * 0.34) + broadUndulation;
-    const bottomY = topY - depth;
-    positions.push(x * SCALE, topY, 0, x * SCALE, bottomY, 0);
-    const u = ratio * Math.max(2.2, span / 1.8);
-    uvs.push(u, 1, u, 0);
-  }
-
-  for (let index = 0; index < samples; index += 1) {
-    const a = index * 2;
-    const b = a + 2;
-    indices.push(a, a + 1, b, b, a + 1, b + 1);
-  }
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-  geometry.computeBoundingSphere();
-  return geometry;
-}
-
-function makeBroadSoilMass(width, height, depth, seed) {
-  const columns = 9;
-  const rows = 5;
-  const positions = [];
   const indices = [];
   for (let row = 0; row <= rows; row += 1) {
     const v = row / rows;
     for (let column = 0; column <= columns; column += 1) {
       const u = column / columns;
-      const x = (u - 0.5) * width;
-      const y = (v - 0.5) * height;
-      const edgeFade = Math.sin(u * Math.PI) * Math.sin(v * Math.PI);
-      const broad = Math.sin(u * Math.PI * 1.35 + seed * 0.11) * 7 + Math.cos(v * Math.PI * 1.1 + seed * 0.07) * 5;
-      const small = (hash(seed + row * 31 + column * 17) - 0.5) * 8;
-      const z = depth * 0.38 + (broad + small) * edgeFade;
-      positions.push(x, y, z);
+      const x = THREE.MathUtils.lerp(from, to, u);
+      const top = sceneHeight / 2 - heightAt(x) * SCALE;
+      const depth = 455 + 45 * Math.sin(u * Math.PI + definition.seed * 0.23);
+      const edge = Math.sin(u * Math.PI);
+      const broad = Math.sin(u * TAU * 1.35 + definition.seed) * 12 * v * edge;
+      const erosion = Math.sin(v * Math.PI * 2.2 + u * 5.1 + definition.seed * 0.31) * 8 * v * edge;
+      const y = top - v * depth + broad;
+      const z = 7 + (Math.sin(u * 8.2 + v * 5.7 + definition.seed) * 8 + erosion) * edge;
+      positions.push(x * SCALE, y, z);
+      uvs.push(u * Math.max(2.5, span / 1.6), 1 - v * 2.2);
     }
   }
   for (let row = 0; row < rows; row += 1) {
@@ -102,100 +63,107 @@ function makeBroadSoilMass(width, height, depth, seed) {
   }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
-  geometry.computeBoundingSphere();
   return geometry;
 }
 
-function makeStoneLens(width, height, depth, seed) {
-  const points = [];
-  const count = 12;
-  for (let index = 0; index < count; index += 1) {
-    const angle = index / count * Math.PI * 2;
-    const radius = 0.9 + (hash(seed + index * 13) - 0.5) * 0.14;
-    points.push([
-      Math.cos(angle) * width * 0.5 * radius,
-      Math.sin(angle) * height * 0.5 * radius
-    ]);
-  }
-  const shape = new THREE.Shape();
-  shape.moveTo(points[0][0], points[0][1]);
-  for (let index = 1; index < points.length; index += 1) shape.lineTo(points[index][0], points[index][1]);
-  shape.closePath();
-  const geometry = new THREE.ExtrudeGeometry(shape, {
-    depth,
-    bevelEnabled: true,
-    bevelSegments: 4,
-    bevelSize: 3,
-    bevelThickness: 3,
-    curveSegments: 3,
-    steps: 1
-  });
-  geometry.translate(0, 0, -depth * 0.5);
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-function makeMossShelf(width, drop, seed) {
-  const columns = 12;
-  const vertices = [];
+function turfCrownGeometry(definition, sceneHeight) {
+  const from = definition.visualFrom ?? definition.from;
+  const to = definition.visualTo ?? definition.to;
+  const span = to - from;
+  const columns = Math.max(18, Math.ceil(span / 0.22));
+  const rows = 5;
+  const positions = [];
+  const uvs = [];
   const indices = [];
-  for (let index = 0; index <= columns; index += 1) {
-    const ratio = index / columns;
-    const x = THREE.MathUtils.lerp(-width / 2, width / 2, ratio);
-    const crown = Math.sin(ratio * Math.PI) * 2.2;
-    const localDrop = drop * (0.62 + hash(seed + index * 7) * 0.34);
-    const z = (hash(seed + index * 19) - 0.5) * 2;
-    vertices.push(x, crown, z, x, -localDrop, z + 1.2);
+  for (let row = 0; row <= rows; row += 1) {
+    const v = row / rows;
+    for (let column = 0; column <= columns; column += 1) {
+      const u = column / columns;
+      const x = THREE.MathUtils.lerp(from, to, u);
+      const surface = sceneHeight / 2 - heightAt(x) * SCALE;
+      const lip = 16 + 9 * Math.sin(u * 10.4 + definition.seed) + 5 * Math.sin(u * 24.7 + definition.seed * 0.6);
+      const y = surface + 5 - v * Math.max(9, lip);
+      const z = 35 + v * 20 + Math.sin(u * 13 + definition.seed) * 4;
+      positions.push(x * SCALE, y, z);
+      uvs.push(u * Math.max(3, span / 1.4), 1 - v);
+    }
   }
-  for (let index = 0; index < columns; index += 1) {
-    const a = index * 2;
-    const b = a + 2;
-    indices.push(a, a + 1, b, b, a + 1, b + 1);
+  for (let row = 0; row < rows; row += 1) {
+    for (let column = 0; column < columns; column += 1) {
+      const a = row * (columns + 1) + column;
+      const b = a + 1;
+      const c = a + columns + 1;
+      const d = c + 1;
+      indices.push(a, c, b, b, c, d);
+    }
   }
   const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
   return geometry;
 }
 
-const HIDE_EXACT = new Set([
-  'terrain-final-sculpted-bank-clod',
-  'terrain-final-eroded-horizontal-shelf',
-  'terrain-final-embedded-fractured-stone',
-  'terrain-final-natural-erosion-groove',
-  'terrain-final-irregular-living-edge',
-  'landform-supporting-boulder',
-  'root-bank-supporting-boulder',
-  'landform-exposed-root-network',
-  'instanced-embedded-rounded-fieldstone',
-  'instanced-embedded-branching-earth-root',
-  'instanced-authored-terrain-relief-stone',
-  'instanced-authored-earth-face-root',
-  'terrain-transition-root-toe',
-  'terrain-transition-boulder',
-  'fractured-readable-cliff-edge',
-  'cliff-edge-exposed-root',
-  'goal-overlook-fractured-edge',
-  'authored-clay-and-loam-strata'
-]);
+function skirtGeometry(definition, sceneHeight) {
+  const from = definition.visualFrom ?? definition.from;
+  const to = definition.visualTo ?? definition.to;
+  const span = to - from;
+  const samples = Math.max(12, Math.ceil(span / 0.32));
+  const positions = [];
+  const indices = [];
+  for (let i = 0; i <= samples; i += 1) {
+    const u = i / samples;
+    const x = THREE.MathUtils.lerp(from, to, u);
+    const top = sceneHeight / 2 - heightAt(x) * SCALE;
+    const drop = 330 + hash(definition.seed * 13 + i) * 90;
+    const wave = Math.sin(u * 9.2 + definition.seed) * 12;
+    positions.push(x * SCALE, top - 190 + wave, 20, x * SCALE, top - drop, 28);
+  }
+  for (let i = 0; i < samples; i += 1) {
+    const a = i * 2;
+    indices.push(a, a + 1, a + 2, a + 2, a + 1, a + 3);
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
+}
 
-const HIDE_GROUPS = new Set([
-  'MeadowWake_BlenderAuthoredRoomFinishKit',
-  'MeadowWake_HandcraftedLandformFeatures'
-]);
+function stoneGeometry(radius, seed) {
+  const geometry = new THREE.IcosahedronGeometry(radius, 2);
+  const p = geometry.getAttribute('position');
+  for (let i = 0; i < p.count; i += 1) {
+    const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+    const n = 0.9 + 0.12 * Math.sin(seed * 3.7 + x * 0.09 + y * 0.07 + z * 0.11);
+    p.setXYZ(i, x * n * 1.12, y * n * 0.78, z * n * 0.7);
+  }
+  p.needsUpdate = true;
+  geometry.computeVertexNormals();
+  return geometry;
+}
 
-function suppressLegacyTerrainLayers(terrainRoot) {
-  terrainRoot.traverse(object => {
-    if (HIDE_EXACT.has(object.name) || HIDE_GROUPS.has(object.name)) {
-      object.visible = false;
-      object.userData = {
-        ...object.userData,
-        terrainReplacementStatus: 'superseded-by-cohesive-terrain-finish'
-      };
-    }
+const LEGACY_TERRAIN_NAMES = new Set([
+  'modeled-verdant-vale-earth-relief', 'recessed-irregular-subsoil-mass',
+  'modeled-irregular-living-surface-transition', 'authored-clay-and-loam-strata',
+  'instanced-embedded-rounded-fieldstone', 'instanced-embedded-branching-earth-root',
+  'instanced-authored-terrain-relief-stone', 'instanced-authored-earth-face-root',
+  'terrain-final-sculpted-bank-clod', 'terrain-final-eroded-horizontal-shelf',
+  'terrain-final-embedded-fractured-stone', 'terrain-final-natural-erosion-groove',
+  'terrain-final-irregular-living-edge', 'fractured-readable-cliff-edge',
+  'cliff-edge-exposed-root', 'landform-supporting-boulder', 'root-bank-supporting-boulder',
+  'landform-exposed-root-network', 'terrain-transition-root-toe', 'terrain-transition-boulder',
+  'goal-overlook-fractured-edge'
+]);
+const LEGACY_TERRAIN_GROUPS = new Set(['MeadowWake_BlenderAuthoredRoomFinishKit', 'MeadowWake_HandcraftedLandformFeatures']);
+
+function suppressOldTerrain(root) {
+  root.traverse(object => {
+    if (LEGACY_TERRAIN_NAMES.has(object.name) || LEGACY_TERRAIN_GROUPS.has(object.name)) object.visible = false;
   });
 }
 
@@ -204,99 +172,64 @@ export function applyMeadowWakeTerrainSurfacePolish(renderer) {
   const terrainRoot = foreground?.terrainVisualRoot;
   const finalRoot = terrainRoot?.getObjectByName('MeadowWake_TerrainFinalization');
   if (!terrainRoot || !finalRoot || !Number.isFinite(renderer?.height)) return null;
-
-  suppressLegacyTerrainLayers(terrainRoot);
-
+  suppressOldTerrain(terrainRoot);
   finalRoot.getObjectByName('MeadowWake_TerrainSurfacePolish')?.removeFromParent();
+
   const root = new THREE.Group();
   root.name = 'MeadowWake_TerrainSurfacePolish';
-  root.position.z = 210;
-  root.userData = {
-    scope: 'terrain-only',
-    visualGate: 'cohesive-textured-bank-face-sparse-geology-v5',
-    legacyTerrainFinishSuppressed: true
-  };
+  root.position.z = 225;
+  root.userData = { scope: 'terrain-only', visualGate: 'hard-reference-living-landmass-v6' };
   finalRoot.add(root);
 
-  const bankMaterial = cloneMaterial(foreground.materials?.soil, 0x77533f, 0.94);
-  bankMaterial.side = THREE.DoubleSide;
-  if (bankMaterial.map) {
-    bankMaterial.map = bankMaterial.map.clone();
-    bankMaterial.map.wrapS = THREE.RepeatWrapping;
-    bankMaterial.map.wrapT = THREE.RepeatWrapping;
-    bankMaterial.map.repeat.set(1.38, 1.58);
-    bankMaterial.map.needsUpdate = true;
-  }
-  const soil = cloneMaterial(foreground.materials?.soil, 0x76533f, 0.9);
-  const deepSoil = cloneMaterial(foreground.materials?.soil, 0x513b30, 0.8);
-  const stone = cloneMaterial(foreground.materials?.stone, 0x8a857b, 0.98);
-  const moss = cloneMaterial(foreground.materials?.turf, 0x567f3c, 0.92);
-  moss.side = THREE.DoubleSide;
+  const earth = cloneMaterial(foreground.materials?.soil, 0x4f392d, 0.72);
+  const deepEarth = cloneMaterial(foreground.materials?.soil, 0x263024, 0.46);
+  const turf = cloneMaterial(foreground.materials?.turf, 0x4f7d31, 0.9);
+  const stone = cloneMaterial(foreground.materials?.stone, 0x5e5d50, 0.72);
+  const stoneLight = cloneMaterial(foreground.materials?.stone, 0x777466, 0.82);
+  for (const material of [earth, deepEarth, turf, stone, stoneLight]) material.side = THREE.DoubleSide;
+  if (earth.map) { earth.map = earth.map.clone(); earth.map.wrapS = earth.map.wrapT = THREE.RepeatWrapping; earth.map.repeat.set(1.15, 1.45); earth.map.needsUpdate = true; }
+  if (turf.map) { turf.map = turf.map.clone(); turf.map.wrapS = turf.map.wrapT = THREE.RepeatWrapping; turf.map.repeat.set(1.4, 1.1); turf.map.needsUpdate = true; }
 
   for (const definition of MEADOW_WAKE_TERRAIN_MODULES) {
     const from = definition.visualFrom ?? definition.from;
     const to = definition.visualTo ?? definition.to;
     const span = to - from;
 
-    const bank = new THREE.Mesh(makeCohesiveBankFace(definition, renderer.height), bankMaterial);
-    bank.name = 'terrain-polish-continuous-textured-bank-face';
-    bank.position.z = 0;
-    bank.receiveShadow = true;
-    bank.castShadow = false;
-    root.add(bank);
+    const bank = new THREE.Mesh(bankGeometry(definition, renderer.height), earth);
+    bank.name = 'reference-sculpted-dark-earth-body'; bank.receiveShadow = true; bank.castShadow = true; root.add(bank);
+    const crown = new THREE.Mesh(turfCrownGeometry(definition, renderer.height), turf);
+    crown.name = 'reference-deep-living-turf-crown'; crown.receiveShadow = true; crown.castShadow = true; root.add(crown);
+    const skirt = new THREE.Mesh(skirtGeometry(definition, renderer.height), deepEarth);
+    skirt.name = 'reference-shadowed-foreground-skirt'; skirt.receiveShadow = true; root.add(skirt);
 
-    const massCount = span > 5.1 ? 2 : 1;
-    for (let index = 0; index < massCount; index += 1) {
-      const ratio = (index + 0.5) / massCount;
-      const x = THREE.MathUtils.lerp(from, to, ratio);
+    const stoneCount = Math.max(2, Math.round(span * 0.38));
+    for (let i = 0; i < stoneCount; i += 1) {
+      const u = (i + 0.55) / stoneCount;
+      const x = THREE.MathUtils.lerp(from, to, u);
       const surface = renderer.height / 2 - heightAt(x) * SCALE;
-      const width = span * SCALE / massCount * 0.72;
-      const height = 190 + hash(definition.seed * 5 + index) * 80;
-      const mass = new THREE.Mesh(
-        makeBroadSoilMass(width, height, 24, definition.seed * 101 + index),
-        index % 2 ? deepSoil : soil
-      );
-      mass.name = 'terrain-polish-cohesive-earth-bank';
-      mass.position.set(x * SCALE, surface - 190 - hash(definition.seed * 17 + index) * 58, 5);
-      mass.rotation.z = (hash(definition.seed * 29 + index) - 0.5) * 0.035;
-      mass.scale.z = 0.52;
-      mass.castShadow = true;
-      mass.receiveShadow = true;
-      root.add(mass);
+      const size = 19 + hash(definition.seed * 41 + i) * 16;
+      const rock = new THREE.Mesh(stoneGeometry(size, definition.seed * 101 + i), i % 3 ? stone : stoneLight);
+      rock.name = 'reference-rounded-embedded-bank-stone';
+      rock.position.set(x * SCALE, surface - 95 - hash(definition.seed * 47 + i) * 205, 32);
+      rock.rotation.z = (hash(definition.seed * 53 + i) - 0.5) * 0.35;
+      rock.scale.set(1.2, 0.72, 0.58); rock.castShadow = true; rock.receiveShadow = true; root.add(rock);
     }
 
-    if (span >= 3.6 && hash(definition.seed * 37) > 0.68) {
-      const x = THREE.MathUtils.lerp(from, to, 0.34 + hash(definition.seed * 41) * 0.3);
+    const tuftCount = Math.max(5, Math.round(span * 1.1));
+    for (let i = 0; i < tuftCount; i += 1) {
+      const u = (i + 0.35 + hash(definition.seed * 61 + i) * 0.3) / tuftCount;
+      const x = THREE.MathUtils.lerp(from, to, Math.min(0.98, u));
       const surface = renderer.height / 2 - heightAt(x) * SCALE;
-      const lens = new THREE.Mesh(
-        makeStoneLens(68 + hash(definition.seed * 43) * 52, 28 + hash(definition.seed * 47) * 20, 10, definition.seed * 107),
-        stone
-      );
-      lens.name = 'terrain-polish-integrated-stone-lens';
-      lens.position.set(x * SCALE, surface - 170 - hash(definition.seed * 53) * 105, 11);
-      lens.rotation.z = (hash(definition.seed * 59) - 0.5) * 0.22;
-      lens.scale.z = 0.45;
-      lens.castShadow = true;
-      lens.receiveShadow = true;
-      root.add(lens);
-    }
-
-    const mossCount = Math.max(1, Math.floor(span / 3.5));
-    for (let index = 0; index < mossCount; index += 1) {
-      const x = THREE.MathUtils.lerp(from, to, (index + 0.5) / mossCount);
-      const surface = renderer.height / 2 - heightAt(x) * SCALE;
-      const shelf = new THREE.Mesh(
-        makeMossShelf(105 + hash(definition.seed * 61 + index) * 105, 13 + hash(definition.seed * 67 + index) * 17, definition.seed * 109 + index),
-        moss
-      );
-      shelf.name = 'terrain-polish-soft-moss-shelf';
-      shelf.position.set(x * SCALE, surface + 1, 12);
-      shelf.rotation.z = (hash(definition.seed * 71 + index) - 0.5) * 0.03;
-      shelf.castShadow = true;
-      shelf.receiveShadow = true;
-      root.add(shelf);
+      const blades = 4 + (i % 3);
+      for (let b = 0; b < blades; b += 1) {
+        const h = 11 + hash(definition.seed * 71 + i * 7 + b) * 16;
+        const blade = new THREE.Mesh(new THREE.ConeGeometry(1.1 + b * 0.12, h, 5), turf);
+        blade.name = 'reference-turf-crown-blade';
+        blade.position.set(x * SCALE + (b - blades / 2) * 3.4, surface + h * 0.45, 56 + b % 2 * 3);
+        blade.rotation.z = (hash(definition.seed * 79 + i * 11 + b) - 0.5) * 0.42;
+        blade.castShadow = true; root.add(blade);
+      }
     }
   }
-
   return root;
 }
