@@ -1,0 +1,50 @@
+name: Complete 84-animation reel audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/animation-catalog-reel-audit.yml'
+      - 'tools/animation-catalog-reel-audit.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  play-complete-animation-reel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: |
+          npm install --no-save --no-package-lock playwright@1.54.1
+          npx playwright install --with-deps chromium
+      - name: Start preview
+        run: |
+          nohup npm run preview > /tmp/hm-reel-preview.log 2>&1 &
+          for attempt in $(seq 1 90); do
+            curl --fail --silent http://127.0.0.1:4173/ > /dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/hm-reel-preview.log
+          exit 1
+      - name: Play every listed animation at production speed
+        run: node tools/animation-catalog-reel-audit.mjs
+      - name: Preserve runtime log
+        if: always()
+        run: |
+          mkdir -p animation-reel-audit-output/logs
+          cp /tmp/hm-reel-preview.log animation-reel-audit-output/logs/preview.log || true
+      - name: Upload complete reel and timeline
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: complete-84-animation-reel
+          path: animation-reel-audit-output
+          if-no-files-found: error
+          retention-days: 14
