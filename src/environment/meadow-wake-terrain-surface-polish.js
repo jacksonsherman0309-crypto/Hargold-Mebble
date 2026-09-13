@@ -176,8 +176,26 @@ const HIDE_EXACT = new Set([
   'terrain-transition-boulder',
   'fractured-readable-cliff-edge',
   'cliff-edge-exposed-root',
-  'goal-overlook-fractured-edge'
+  'goal-overlook-fractured-edge',
+  'authored-clay-and-loam-strata'
 ]);
+
+const HIDE_GROUPS = new Set([
+  'MeadowWake_BlenderAuthoredRoomFinishKit',
+  'MeadowWake_HandcraftedLandformFeatures'
+]);
+
+function suppressLegacyTerrainLayers(terrainRoot) {
+  terrainRoot.traverse(object => {
+    if (HIDE_EXACT.has(object.name) || HIDE_GROUPS.has(object.name)) {
+      object.visible = false;
+      object.userData = {
+        ...object.userData,
+        terrainReplacementStatus: 'superseded-by-cohesive-terrain-finish'
+      };
+    }
+  });
+}
 
 export function applyMeadowWakeTerrainSurfacePolish(renderer) {
   const foreground = renderer?.foregroundArt;
@@ -185,17 +203,16 @@ export function applyMeadowWakeTerrainSurfacePolish(renderer) {
   const finalRoot = terrainRoot?.getObjectByName('MeadowWake_TerrainFinalization');
   if (!terrainRoot || !finalRoot || !Number.isFinite(renderer?.height)) return null;
 
-  terrainRoot.traverse(object => {
-    if (HIDE_EXACT.has(object.name)) object.visible = false;
-  });
+  suppressLegacyTerrainLayers(terrainRoot);
 
   finalRoot.getObjectByName('MeadowWake_TerrainSurfacePolish')?.removeFromParent();
   const root = new THREE.Group();
   root.name = 'MeadowWake_TerrainSurfacePolish';
-  root.position.z = 148;
+  root.position.z = 210;
   root.userData = {
     scope: 'terrain-only',
-    visualGate: 'cohesive-textured-bank-face-sparse-geology-v3'
+    visualGate: 'cohesive-textured-bank-face-sparse-geology-v4',
+    legacyTerrainFinishSuppressed: true
   };
   finalRoot.add(root);
 
@@ -205,7 +222,7 @@ export function applyMeadowWakeTerrainSurfacePolish(renderer) {
     bankMaterial.map = bankMaterial.map.clone();
     bankMaterial.map.wrapS = THREE.RepeatWrapping;
     bankMaterial.map.wrapT = THREE.RepeatWrapping;
-    bankMaterial.map.repeat.set(1.55, 1.75);
+    bankMaterial.map.repeat.set(1.38, 1.58);
     bankMaterial.map.needsUpdate = true;
   }
   const soil = cloneMaterial(foreground.materials?.soil, 0x76533f, 0.9);
@@ -226,8 +243,6 @@ export function applyMeadowWakeTerrainSurfacePolish(renderer) {
     bank.castShadow = false;
     root.add(bank);
 
-    // Broad shallow masses give the face modeled depth without returning to a
-    // field of repeated rock/clod primitives.
     const massCount = span > 5.1 ? 2 : 1;
     for (let index = 0; index < massCount; index += 1) {
       const ratio = (index + 0.5) / massCount;
@@ -248,35 +263,33 @@ export function applyMeadowWakeTerrainSurfacePolish(renderer) {
       root.add(mass);
     }
 
-    // Sparse geology only: broad, nearly flush lenses rather than scattered
-    // polygon stones. Some modules intentionally have no visible rock lens.
-    if (span >= 3.6 && hash(definition.seed * 37) > 0.56) {
+    if (span >= 3.6 && hash(definition.seed * 37) > 0.68) {
       const x = THREE.MathUtils.lerp(from, to, 0.34 + hash(definition.seed * 41) * 0.3);
       const surface = renderer.height / 2 - heightAt(x) * SCALE;
       const lens = new THREE.Mesh(
-        makeStoneLens(58 + hash(definition.seed * 43) * 46, 25 + hash(definition.seed * 47) * 18, 10, definition.seed * 107),
+        makeStoneLens(68 + hash(definition.seed * 43) * 52, 28 + hash(definition.seed * 47) * 20, 10, definition.seed * 107),
         stone
       );
       lens.name = 'terrain-polish-integrated-stone-lens';
       lens.position.set(x * SCALE, surface - 170 - hash(definition.seed * 53) * 105, 11);
-      lens.rotation.z = (hash(definition.seed * 59) - 0.5) * 0.26;
-      lens.scale.z = 0.5;
+      lens.rotation.z = (hash(definition.seed * 59) - 0.5) * 0.22;
+      lens.scale.z = 0.45;
       lens.castShadow = true;
       lens.receiveShadow = true;
       root.add(lens);
     }
 
-    const mossCount = Math.max(1, Math.floor(span / 3.2));
+    const mossCount = Math.max(1, Math.floor(span / 3.5));
     for (let index = 0; index < mossCount; index += 1) {
       const x = THREE.MathUtils.lerp(from, to, (index + 0.5) / mossCount);
       const surface = renderer.height / 2 - heightAt(x) * SCALE;
       const shelf = new THREE.Mesh(
-        makeMossShelf(92 + hash(definition.seed * 61 + index) * 105, 13 + hash(definition.seed * 67 + index) * 18, definition.seed * 109 + index),
+        makeMossShelf(105 + hash(definition.seed * 61 + index) * 105, 13 + hash(definition.seed * 67 + index) * 17, definition.seed * 109 + index),
         moss
       );
       shelf.name = 'terrain-polish-soft-moss-shelf';
       shelf.position.set(x * SCALE, surface + 1, 12);
-      shelf.rotation.z = (hash(definition.seed * 71 + index) - 0.5) * 0.035;
+      shelf.rotation.z = (hash(definition.seed * 71 + index) - 0.5) * 0.03;
       shelf.castShadow = true;
       shelf.receiveShadow = true;
       root.add(shelf);
