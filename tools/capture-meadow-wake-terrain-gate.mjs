@@ -18,23 +18,26 @@ const views = [
 ];
 const report = { status: 'running', scope: 'terrain-only visual review', views: [] };
 
+const context = await browser.newContext({ viewport: { width: 1536, height: 864 }, deviceScaleFactor: 1 });
+const page = await context.newPage();
+const pageErrors = [];
+page.on('pageerror', error => pageErrors.push(error.message));
+
 try {
   for (const view of views) {
-    const context = await browser.newContext({ viewport: { width: 1536, height: 864 }, deviceScaleFactor: 1 });
-    const page = await context.newPage();
-    const errors = [];
     const failures = [];
-    page.on('pageerror', error => errors.push(error.message));
-    page.on('response', response => {
+    const responseListener = response => {
       if (response.status() >= 400 && !response.url().endsWith('/favicon.ico')) failures.push(`${response.status()} ${response.url()}`);
-    });
+    };
+    page.on('response', responseListener);
 
     await page.goto(`${base}/?artPreview=${view.x}&qaRoute=1`, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.waitForFunction(() => {
       const text = document.querySelector('#status')?.textContent ?? '';
       return text.includes('3D characters + layered Meadow Wake environment ready') || /ERROR|fallback active/.test(text);
     }, null, { timeout: 60000 });
-    await page.waitForTimeout(900);
+    await page.waitForTimeout(550);
+
     const status = await page.locator('#status').textContent();
     const ready = status?.includes('3D characters + layered Meadow Wake environment ready') ?? false;
     const canvas = page.locator('#game');
@@ -55,13 +58,14 @@ try {
       terrainMetrics: window.__HM_TERRAIN_METRICS__ ?? null,
       route: window.__HM_ROUTE_QA__ ?? null
     }));
-    report.views.push({ ...view, ready, errors, failures, ...metrics });
-    await context.close();
+    report.views.push({ ...view, ready, errors: [...pageErrors], failures, ...metrics });
+    page.off('response', responseListener);
   }
   report.status = report.views.length === views.length && report.views.every(view => view.ready && !view.errors.length && !view.failures.length)
     ? 'pass-runtime-and-terrain-captures'
     : 'fail';
 } finally {
+  await context.close();
   await browser.close();
   await writeFile(`${output}/terrain-browser-report.json`, JSON.stringify(report, null, 2));
 }
