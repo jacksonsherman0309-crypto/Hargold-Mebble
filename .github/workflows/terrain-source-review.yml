@@ -1,0 +1,23 @@
+name: Terrain source review
+on:
+  push:
+    branches: [visual/meadow-wake-production-rebuild]
+    paths: [.github/workflows/terrain-source-review.yml]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Package exact source and reference assets
+        run: |
+          git rev-parse HEAD > TERRAIN_SOURCE_COMMIT.txt
+          tar -czf /tmp/terrain-source-review.tar.gz src docs data tools tests vendor assets/references assets/textures index.html styles.css package.json AGENTS.md IMPORT_STATUS.txt TERRAIN_SOURCE_COMMIT.txt archive/physics archive/full-motion archive/imported-packages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: terrain-source-review
+          path: /tmp/terrain-source-review.tar.gz
+          retention-days: 3
+          compression-level: 0
