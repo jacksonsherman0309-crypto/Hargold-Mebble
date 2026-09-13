@@ -57,7 +57,7 @@ jobs:
           mkdir -p /tmp/meadow-wake-site/assets /tmp/meadow-wake-terrain
           cp index.html styles.css /tmp/meadow-wake-site/
           cp -R src vendor data /tmp/meadow-wake-site/
-          cp -R assets/exports assets/textures /tmp/meadow-wake-site/assets/
+          cp -R assets/exports assets/textures assets/references /tmp/meadow-wake-site/assets/
           (cd /tmp/meadow-wake-site && node "$GITHUB_WORKSPACE/tools/local-preview-server.mjs") > /tmp/meadow-wake-terrain/server.log 2>&1 &
           sleep 2
           HM_CAPTURE_OUTPUT=/tmp/meadow-wake-terrain node tools/capture-meadow-wake-terrain-gate.mjs
