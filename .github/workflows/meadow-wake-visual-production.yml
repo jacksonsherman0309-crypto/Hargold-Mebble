@@ -1,18 +1,13 @@
 name: Meadow Wake visual production gate
-
 on:
   push:
-    branches:
-      - visual/meadow-wake-production-rebuild
+    branches: [visual/meadow-wake-production-rebuild]
   workflow_dispatch:
-
 permissions:
-  contents: write
-
+  contents: read
 concurrency:
   group: meadow-wake-visual-production-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   visual-gate:
     runs-on: ubuntu-latest
@@ -20,54 +15,44 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Keep opening production-art integration current
-        run: python tools/apply-meadow-wake-opening-art.py
-      - name: Syntax check production terrain runtime
+        with: {node-version: '22'}
+      - name: Validate terrain code and renderer integration
         run: |
-          node --check src/environment/meadow-wake-terrain-cleanup.js
-          node --check src/environment/meadow-wake-terrain-finalization.js
-          node --check src/environment/meadow-wake-terrain-organic-detail.js
-          node --check src/environment/meadow-wake-terrain-cliff-pass.js
+          node --check src/environment/meadow-wake-living-terrain.js
           node --check src/environment/meadow-wake-terrain-surface-polish.js
-          node --check src/environment/meadow-wake-production-gate.js
           node --check src/visual-game.js
-          node --check src/character-renderer.js
+          npm run test:terrain
       - name: Preserve Level 1 gameplay contracts
         run: npm run test:level-one
-      - name: Commit renderer integration only when newly applied
-        run: |
-          if git diff --quiet -- src/character-renderer.js; then
-            echo 'Renderer already integrated.'
-          else
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add src/character-renderer.js
-            git commit -m 'Keep opening production visual integration wired'
-            git push origin HEAD:visual/meadow-wake-production-rebuild
-          fi
       - name: Install Chromium terrain-review tooling
         run: |
           npm install --no-save --package-lock=false playwright@1.51.1
           npx playwright install --with-deps chromium
-      - name: Assemble and capture terrain visual gate
+      - name: Assemble the exact commit and capture terrain
         run: |
-          rm -rf /tmp/meadow-wake-site /tmp/meadow-wake-terrain
           mkdir -p /tmp/meadow-wake-site/assets /tmp/meadow-wake-terrain
           cp index.html styles.css /tmp/meadow-wake-site/
           cp -R src vendor data /tmp/meadow-wake-site/
-          cp -R assets/exports assets/textures assets/references /tmp/meadow-wake-site/assets/
+          cp -R assets/exports assets/textures /tmp/meadow-wake-site/assets/
+          git rev-parse HEAD > /tmp/meadow-wake-site/BUILD_COMMIT.txt
           (cd /tmp/meadow-wake-site && node "$GITHUB_WORKSPACE/tools/local-preview-server.mjs") > /tmp/meadow-wake-terrain/server.log 2>&1 &
           sleep 2
           HM_CAPTURE_OUTPUT=/tmp/meadow-wake-terrain node tools/capture-meadow-wake-terrain-gate.mjs
+      - name: Package the tested playable build
+        run: |
+          cp tools/local-preview-server.mjs /tmp/meadow-wake-site/preview.mjs
+          tar -czf /tmp/meadow-wake-tested-playable.tar.gz -C /tmp/meadow-wake-site .
       - name: Keep terrain visual evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: meadow-wake-terrain-visual-gate
-          path: |
-            /tmp/meadow-wake-terrain/*.png
-            /tmp/meadow-wake-terrain/terrain-browser-report.json
-            /tmp/meadow-wake-terrain/server.log
+          path: /tmp/meadow-wake-terrain
           retention-days: 7
+      - name: Keep tested playable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: meadow-wake-terrain-tested-playable
+          path: /tmp/meadow-wake-tested-playable.tar.gz
+          retention-days: 7
+          compression-level: 0

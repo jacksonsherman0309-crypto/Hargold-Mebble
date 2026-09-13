@@ -1,0 +1,35 @@
+{
+  "version": "living-bank-20260913-r3",
+  "status": "BROWSER_TERRAIN_REPAIR_IMPLEMENTED_PENDING_USER_REVIEW",
+  "scope": "Terrain banks and terrain-material ledges only; no gameplay layout, hero, enemy, block, timber, rope, or scenery-prop edits.",
+  "baselineCommit": "bc0554960ea8d91185bd708d594a2cd3a4e7b589",
+  "deliveryBranch": "visual/meadow-wake-production-rebuild",
+  "mainUpdateRequiresUserApproval": true,
+  "collisionBearing": false,
+  "referenceImagesInScene": false,
+  "runtimeTextures": [
+    "meadow-soil-stone-albedo-v3.png",
+    "meadow-turf-albedo-v1.png",
+    "meadow-ruin-stone-albedo-v1.png",
+    "verdant-vale-living-surface-atlas-v1.png"
+  ],
+  "courseFileSha256": "a739688efb8effde9172f6f978fe49c6858d598125d7ea0f531bd6aca3df8a43",
+  "moduleCount": 25,
+  "roomCount": 12,
+  "terrainLedgeCount": 12,
+  "pitCount": 5,
+  "dccVisibleMasterAuthored": false,
+  "humanVisualApproval": false,
+  "targetDevicePerformanceCertified": false,
+  "verification": {
+    "terrainRegressionTests": 10,
+    "levelOneGameplayTests": 26,
+    "desktopViews": [
+      "opening",
+      "quarry",
+      "creek",
+      "finale"
+    ],
+    "desktopErrors": 0
+  }
+}
