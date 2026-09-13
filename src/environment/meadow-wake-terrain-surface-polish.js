@@ -172,6 +172,8 @@ const HIDE_EXACT = new Set([
   'landform-exposed-root-network',
   'instanced-embedded-rounded-fieldstone',
   'instanced-embedded-branching-earth-root',
+  'instanced-authored-terrain-relief-stone',
+  'instanced-authored-earth-face-root',
   'terrain-transition-root-toe',
   'terrain-transition-boulder',
   'fractured-readable-cliff-edge',
@@ -211,7 +213,7 @@ export function applyMeadowWakeTerrainSurfacePolish(renderer) {
   root.position.z = 210;
   root.userData = {
     scope: 'terrain-only',
-    visualGate: 'cohesive-textured-bank-face-sparse-geology-v4',
+    visualGate: 'cohesive-textured-bank-face-sparse-geology-v5',
     legacyTerrainFinishSuppressed: true
   };
   finalRoot.add(root);
