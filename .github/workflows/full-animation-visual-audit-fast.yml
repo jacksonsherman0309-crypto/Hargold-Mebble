@@ -1,0 +1,71 @@
+name: Fast direct-canvas animation visual audit
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-one-hero:
+    name: Audit ${{ matrix.hero }} animations
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        hero:
+          - Hargold
+          - Mebble
+
+    steps:
+      - name: Check out repository and large assets
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install audit dependencies
+        run: npm install --no-save playwright sharp
+
+      - name: Install Chromium and system dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Start live preview
+        shell: bash
+        run: |
+          npm run preview > /tmp/hargold-mebble-preview.log 2>&1 &
+          for attempt in {1..90}; do
+            if curl --fail --silent --show-error http://127.0.0.1:4173/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/hargold-mebble-preview.log
+          exit 1
+
+      - name: Play and capture every listed ${{ matrix.hero }} animation
+        env:
+          HM_AUDIT_HERO: ${{ matrix.hero }}
+        run: node tools/full-animation-visual-audit-fast.mjs
+
+      - name: Print preview diagnostics
+        if: always()
+        run: cat /tmp/hargold-mebble-preview.log || true
+
+      - name: Upload ${{ matrix.hero }} visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fast-animation-visual-audit-${{ matrix.hero }}-${{ github.sha }}
+          path: audit-output-fast/${{ matrix.hero == 'Hargold' && 'hargold' || 'mebble' }}
+          if-no-files-found: error
+          retention-days: 14
